@@ -1,9 +1,0 @@
-#spring.application.name=casp-modulith
-spring:
-  application:
-    name: casp-modulith
-  data:
-    mongodb:
-      database: caspdb
-      uri: ${mongodb.container.port}
-      uuid-representation: standard
