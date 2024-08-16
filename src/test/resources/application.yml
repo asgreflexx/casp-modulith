@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: admin
+
+casp:
+  europenet-api-endpoint: http://europetnet.ehealth.gv.at/Index.aspx
+
+eureka:
+  client:
+    enabled: false
+
+# MongoDb releases: https://www.mongodb.com/download-center/community/releases
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 6.0.11

@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: admin
+
+casp:
+  europenet-api-endpoint: http://europetnet.ehealth.gv.at/Index.aspx
