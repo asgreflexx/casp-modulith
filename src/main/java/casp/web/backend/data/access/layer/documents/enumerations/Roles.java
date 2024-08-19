@@ -1,7 +1,8 @@
-package casp.web.backend.data.access.layer.enumerations;
+package casp.web.backend.data.access.layer.documents.enumerations;
 
 public enum Roles {
-    USER, ADMIN,
+    USER,
+    ADMIN,
     TRAINER,
     SECRETARY,
     REPRESENTATIVE,

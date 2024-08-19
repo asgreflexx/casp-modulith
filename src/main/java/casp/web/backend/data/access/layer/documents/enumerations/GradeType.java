@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.enumerations;
+package casp.web.backend.data.access.layer.documents.enumerations;
 
 /**
  * This enum class describes the mail exam/grade types which are used in the ÖHU
