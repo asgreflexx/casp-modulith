@@ -1,12 +1,17 @@
-package casp.web.backend.data.access.layer.entities;
+package casp.web.backend.data.access.layer.documents.dog;
 
-import casp.web.backend.data.access.layer.enumerations.EuropeNetState;
-import casp.web.backend.data.access.layer.enumerations.Gender;
+import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
+import casp.web.backend.data.access.layer.documents.enumerations.Gender;
+import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
+import java.util.StringJoiner;
 
+@QueryEntity
 @Document
 public class Dog extends BaseEntity {
 
@@ -21,13 +26,14 @@ public class Dog extends BaseEntity {
 
     private String pedigree;
 
+    @NotNull
     private Gender gender = Gender.FEMALE;
 
     private String chipNumber;
 
     private LocalDate rabiesDate;
 
-    private Float height;
+    private float height;
 
     @NotBlank
     private String ownerName;
@@ -35,7 +41,8 @@ public class Dog extends BaseEntity {
     @NotBlank
     private String ownerAddress;
 
-    private EuropeNetState europetnetState = EuropeNetState.NOT_CHECKED;
+    @NotNull
+    private EuropeNetState europeNetState = EuropeNetState.NOT_CHECKED;
 
     public String getName() {
         return name;
@@ -101,11 +108,11 @@ public class Dog extends BaseEntity {
         this.rabiesDate = rabiesDate;
     }
 
-    public Float getHeight() {
+    public float getHeight() {
         return height;
     }
 
-    public void setHeight(Float height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
@@ -125,29 +132,46 @@ public class Dog extends BaseEntity {
         this.ownerAddress = ownerAddress;
     }
 
-    public EuropeNetState getEuropetnetState() {
-        return europetnetState;
+    public EuropeNetState getEuropeNetState() {
+        return europeNetState;
     }
 
-    public void setEuropetnetState(EuropeNetState europetnetState) {
-        this.europetnetState = europetnetState;
+    public void setEuropeNetState(EuropeNetState europeNetState) {
+        this.europeNetState = europeNetState;
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 
     @Override
     public String toString() {
-        return "Dog{" +
-                "name='" + name + '\'' +
-                ", breederName='" + breederName + '\'' +
-                ", breedName='" + breedName + '\'' +
-                ", birthDate=" + birthDate +
-                ", pedigree='" + pedigree + '\'' +
-                ", gender=" + gender +
-                ", chipNumber='" + chipNumber + '\'' +
-                ", rabiesDate=" + rabiesDate +
-                ", height=" + height +
-                ", ownerName='" + ownerName + '\'' +
-                ", ownerAddress='" + ownerAddress + '\'' +
-                ", europetnet='" + europetnetState + '\'' +
-                '}';
+        return new StringJoiner(", ", Dog.class.getSimpleName() + "[", "]")
+                .add("created=" + created)
+                .add("name='" + name + "'")
+                .add("breederName='" + breederName + "'")
+                .add("breedName='" + breedName + "'")
+                .add("birthDate=" + birthDate)
+                .add("pedigree='" + pedigree + "'")
+                .add("gender=" + gender)
+                .add("chipNumber='" + chipNumber + "'")
+                .add("rabiesDate=" + rabiesDate)
+                .add("height=" + height)
+                .add("ownerName='" + ownerName + "'")
+                .add("ownerAddress='" + ownerAddress + "'")
+                .add("europeNetState=" + europeNetState)
+                .add("id=" + id)
+                .add("version=" + version)
+                .add("createdBy='" + createdBy + "'")
+                .add("modifiedBy='" + modifiedBy + "'")
+                .add("modified=" + modified)
+                .add("entityStatus=" + entityStatus)
+                .toString();
     }
 }
