@@ -1,16 +1,24 @@
-package casp.web.backend.data.access.layer.entities;
+package casp.web.backend.data.access.layer.documents.member;
 
-import casp.web.backend.data.access.layer.enumerations.Gender;
-import casp.web.backend.data.access.layer.enumerations.Roles;
+import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.enumerations.Gender;
+import casp.web.backend.data.access.layer.documents.enumerations.Roles;
+import com.querydsl.core.annotations.QueryEntity;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 
+@QueryEntity
 @Document
 public class Member extends BaseEntity {
 
@@ -22,11 +30,11 @@ public class Member extends BaseEntity {
 
     private LocalDate birthDate;
 
-    private Gender gender = Gender.FEMALE;
+    private Gender gender;
 
     private String telephoneNumber;
 
-    @NotBlank
+    @NotNull
     @Email
     @Indexed(unique = true)
     private String email;
@@ -37,8 +45,11 @@ public class Member extends BaseEntity {
 
     private String city;
 
-    private Set<Roles> roles = new HashSet<>();
+    @NotEmpty
+    private Set<Roles> roles = new HashSet<>(List.of(Roles.USER));
 
+    @NotNull
+    @Valid
     private Set<MembershipFee> membershipFees = new HashSet<>();
 
     public String getFirstName() {
@@ -130,19 +141,36 @@ public class Member extends BaseEntity {
     }
 
     @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
     public String toString() {
-        return "Member{" +
-                "firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", birthDate=" + birthDate +
-                ", gender=" + gender +
-                ", telephoneNumber='" + telephoneNumber + '\'' +
-                ", email='" + email + '\'' +
-                ", address='" + address + '\'' +
-                ", postcode='" + postcode + '\'' +
-                ", city='" + city + '\'' +
-                ", roles=" + roles +
-                ", membershipFees=" + membershipFees +
-                '}';
+        return new StringJoiner(", ", Member.class.getSimpleName() + "[", "]")
+                .add("firstName='" + firstName + "'")
+                .add("lastName='" + lastName + "'")
+                .add("birthDate=" + birthDate)
+                .add("gender=" + gender)
+                .add("telephoneNumber='" + telephoneNumber + "'")
+                .add("email='" + email + "'")
+                .add("address='" + address + "'")
+                .add("postcode='" + postcode + "'")
+                .add("city='" + city + "'")
+                .add("roles=" + roles)
+                .add("membershipFees=" + membershipFees)
+                .add("id=" + id)
+                .add("version=" + version)
+                .add("createdBy='" + createdBy + "'")
+                .add("created=" + created)
+                .add("modifiedBy='" + modifiedBy + "'")
+                .add("modified=" + modified)
+                .add("entityStatus=" + entityStatus)
+                .toString();
     }
 }
