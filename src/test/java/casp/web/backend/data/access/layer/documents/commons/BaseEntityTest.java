@@ -3,8 +3,10 @@ package casp.web.backend.data.access.layer.documents.commons;
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.Grade;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.documents.enumerations.EventResponse;
 import casp.web.backend.data.access.layer.documents.enumerations.GradeType;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
+import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import jakarta.validation.ConstraintViolation;
@@ -78,5 +80,10 @@ public abstract class BaseEntityTest {
     protected <T extends BaseEntity> void baseAssertions(T baseEntity) {
         assertSame(EntityStatus.ACTIVE, baseEntity.getEntityStatus());
         assertNotNull(baseEntity.getId());
+    }
+
+    protected <T extends BaseParticipant> void baseParticipantAssertions(T baseParticipant) {
+        baseAssertions(baseParticipant);
+        assertSame(EventResponse.ACCEPTED, baseParticipant.getResponse());
     }
 }
