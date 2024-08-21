@@ -21,6 +21,7 @@
         <springdoc-openapi-ui.version>1.7.0</springdoc-openapi-ui.version>
         <spring-boot-admin.version>3.1.8</spring-boot-admin.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
+        <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
         <de.flapdoodle.embed.mongo.spring31x.version>4.11.0</de.flapdoodle.embed.mongo.spring31x.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
@@ -119,6 +120,11 @@
             <version>${querydsl.version}</version>
             <scope>provided</scope>
         </dependency>
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}</finalName>
@@ -149,6 +155,19 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
