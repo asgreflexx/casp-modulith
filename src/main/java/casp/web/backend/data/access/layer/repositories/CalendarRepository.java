@@ -6,7 +6,6 @@ import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -29,17 +28,4 @@ public interface CalendarRepository extends MongoRepository<Calendar, UUID>, Que
     Set<Calendar> findAllByBaseEvent(BaseEvent baseEvent);
 
     Set<Calendar> findAllByBaseEventInAndEntityStatusNotLike(Set<BaseEvent> baseEventSet, EntityStatus entityStatus);
-
-    List<Calendar> findAllByEntityStatusAndEventFromGreaterThanEqualAndEventToLessThanEqual(
-            EntityStatus entityStatus,
-            LocalDateTime eventFrom,
-            LocalDateTime eventTo
-    );
-
-    List<Calendar> findAllByEntityStatusAndEventFromGreaterThanEqualAndEventToLessThanEqualAndBaseEventIn(
-            EntityStatus entityStatus,
-            LocalDateTime eventFrom,
-            LocalDateTime eventTo,
-            Set<BaseEvent> baseEvents
-    );
 }
