@@ -61,11 +61,11 @@ public class DogHasHandler extends BaseEntity {
         this.memberId = memberId;
     }
 
-    Member getMember() {
+    public Member getMember() {
         return member;
     }
 
-    void setMember(Member member) {
+    public void setMember(Member member) {
         this.member = member;
     }
 
@@ -77,11 +77,11 @@ public class DogHasHandler extends BaseEntity {
         this.dogId = dogId;
     }
 
-    Dog getDog() {
+    public Dog getDog() {
         return dog;
     }
 
-    void setDog(Dog dog) {
+    public void setDog(Dog dog) {
         this.dog = dog;
     }
 

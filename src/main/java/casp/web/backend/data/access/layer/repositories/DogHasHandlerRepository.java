@@ -40,7 +40,7 @@ public interface DogHasHandlerRepository extends MongoRepository<DogHasHandler, 
      * @deprecated use {@link #findAllByEntityStatusAndDog(EntityStatus, Dog)} instead
      */
     @Deprecated(forRemoval = true)
-    List<DogHasHandler> findAllByEntityStatusAndDogId(EntityStatus entityStatus, UUID dogId);
+    Set<DogHasHandler> findAllByEntityStatusAndDogId(EntityStatus entityStatus, UUID dogId);
 
     Set<DogHasHandler> findAllByEntityStatusAndDog(EntityStatus entityStatus, Dog dog);
 
@@ -48,7 +48,7 @@ public interface DogHasHandlerRepository extends MongoRepository<DogHasHandler, 
      * @deprecated use {@link #findAllByEntityStatusAndMember(EntityStatus, Member)} instead
      */
     @Deprecated(forRemoval = true)
-    List<DogHasHandler> findAllByEntityStatusAndMemberId(EntityStatus entityStatus, UUID memberId);
+    Set<DogHasHandler> findAllByEntityStatusAndMemberId(EntityStatus entityStatus, UUID memberId);
 
     Set<DogHasHandler> findAllByEntityStatusAndMember(EntityStatus entityStatus, Member member);
 
@@ -62,7 +62,7 @@ public interface DogHasHandlerRepository extends MongoRepository<DogHasHandler, 
 
     Set<DogHasHandler> findAllByEntityStatus(EntityStatus entityStatus);
 
-    Set<DogHasHandler> findAllByEntityStatusAndIdIn(EntityStatus entityStatus, List<UUID> ids);
+    Set<DogHasHandler> findAllByEntityStatusAndIdIn(EntityStatus entityStatus, Set<UUID> ids);
 
     /**
      * I will search for any {@link DogHasHandler} by the memberId and dogId and not this entityStatus
@@ -76,4 +76,6 @@ public interface DogHasHandlerRepository extends MongoRepository<DogHasHandler, 
     Optional<DogHasHandler> findOneByMemberIdAndDogIdAndEntityStatusNotLike(UUID memberId, UUID dogId, EntityStatus entityStatus);
 
     Optional<DogHasHandler> findOneByMemberAndDogAndEntityStatusNotLike(Member member, Dog dog, EntityStatus entityStatus);
+
+    Optional<DogHasHandler> findDogHasHandlerByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 }

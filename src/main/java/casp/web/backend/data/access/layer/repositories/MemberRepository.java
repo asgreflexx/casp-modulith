@@ -54,4 +54,6 @@ public interface MemberRepository extends MongoRepository<Member, UUID>, Queryds
     );
 
     Set<Member> findAllByIdInAndEntityStatus(Set<UUID> membersId, EntityStatus entityStatus);
+
+    Optional<Member> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 }
