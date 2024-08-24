@@ -2,6 +2,7 @@ package casp.web.backend.business.logic.layer.dog;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -72,5 +74,10 @@ class DogServiceImpl implements DogService {
     @Override
     public Page<Dog> getDogs(final Pageable pageable) {
         return dogRepository.findAllByEntityStatus(EntityStatus.ACTIVE, pageable);
+    }
+
+    @Override
+    public Set<Dog> getDogsThatWereNotChecked() {
+        return dogRepository.findAllByChipNumberIsNotEmptyAndEuropeNetStateIsNotAndEntityStatus(EuropeNetState.NOT_CHECKED, EntityStatus.ACTIVE);
     }
 }

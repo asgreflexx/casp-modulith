@@ -3,7 +3,8 @@ spring:
     name: admin
 
 casp:
-  europenet-api-endpoint: http://europetnet.ehealth.gv.at/Index.aspx
+  europenet-api-endpoint: https://europetnet.ehealth.gv.at/Index.aspx?mn={chipNumber}
+  cron: 0 0 0 * * *
 
 eureka:
   client:

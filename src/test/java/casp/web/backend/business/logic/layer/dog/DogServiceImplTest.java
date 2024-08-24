@@ -2,6 +2,7 @@ package casp.web.backend.business.logic.layer.dog;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,6 +59,15 @@ class DogServiceImplTest {
         var dogPage = dogService.getDogs(pageable);
 
         assertThat(dogPage.stream().toList()).isEmpty();
+    }
+
+    @Test
+    void getDogsThatWereNotChecked() {
+        var dog = new Dog();
+        dog.setChipNumber("1234");
+        when(dogRepository.findAllByChipNumberIsNotEmptyAndEuropeNetStateIsNotAndEntityStatus(EuropeNetState.NOT_CHECKED, EntityStatus.ACTIVE)).thenReturn(Set.of(dog));
+
+        assertThat(dogService.getDogsThatWereNotChecked()).containsExactly(dog);
     }
 
     @Nested

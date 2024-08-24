@@ -2,6 +2,7 @@ package casp.web.backend.data.access.layer.repositories;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -32,4 +33,5 @@ public interface DogRepository extends MongoRepository<Dog, UUID>, QuerydslPredi
 
     Set<Dog> findAllByEntityStatusAndName(EntityStatus entityStatus, String name);
 
+    Set<Dog> findAllByChipNumberIsNotEmptyAndEuropeNetStateIsNotAndEntityStatus(EuropeNetState europeNetState, EntityStatus entityStatus);
 }
