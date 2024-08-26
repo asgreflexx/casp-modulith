@@ -4,3 +4,7 @@ spring:
       database: caspdb
       uri: mongodb://localhost:27017
       uuid-representation: standard
+
+eureka:
+  client:
+    enabled: false
