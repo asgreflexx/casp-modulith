@@ -26,7 +26,7 @@ public interface DogService {
     * either ownerName and name are empty or chip number is empty.
     * If chip number is empty, ownerName and name should not be empty.
     */
-    List<Dog> getDogsByOwnerNameAndDogsNameOrChipNumber(@Nullable String ownerName, @Nullable String name, @Nullable String chipNumber);
+    List<Dog> getDogsByOwnerNameAndDogsNameOrChipNumber(@Nullable String chipNumber, @Nullable String name, @Nullable String ownerName);
 
     Page<Dog> getDogs(Pageable pageable);
 

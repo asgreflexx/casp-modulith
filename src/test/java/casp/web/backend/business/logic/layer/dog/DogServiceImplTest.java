@@ -2,15 +2,11 @@ package casp.web.backend.business.logic.layer.dog;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -65,44 +61,21 @@ class DogServiceImplTest {
     void getDogsThatWereNotChecked() {
         var dog = new Dog();
         dog.setChipNumber("1234");
-        when(dogRepository.findAllByChipNumberIsNotEmptyAndEuropeNetStateIsNotAndEntityStatus(EuropeNetState.NOT_CHECKED, EntityStatus.ACTIVE)).thenReturn(Set.of(dog));
+        when(dogRepository.findAllByEuropeNetStateNotChecked()).thenReturn(Set.of(dog));
 
         assertThat(dogService.getDogsThatWereNotChecked()).containsExactly(dog);
     }
 
-    @Nested
-    class GetDogsByOwnerNameAndDogsNameOrChipNumber {
+    @Test
+    void getDogsByOwnerNameAndDogsNameOrChipNumber() {
+        var dog = new Dog();
+        var chipNumber = UUID.randomUUID().toString();
+        when(dogRepository.findAllByChipNumberOrDogNameOrOwnerName(chipNumber, null, null)).thenReturn(List.of(dog));
 
-        private Dog dog;
-
-        @BeforeEach
-        void setUp() {
-            dog = new Dog();
-        }
-
-        @Test
-        void findDogByChipNumber() {
-            var chipNumber = UUID.randomUUID().toString();
-            when(dogRepository.findDogByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
-
-            var dogs = dogService.getDogsByOwnerNameAndDogsNameOrChipNumber(null, null, chipNumber);
-
-            assertSame(dog, dogs.getFirst());
-        }
-
-        @ParameterizedTest
-        @ValueSource(strings = {""})
-        @NullSource
-        void findDogByOwnerNameAndName(String chipNumber) {
-            var ownerName = "ownerName";
-            var name = "name";
-            when(dogRepository.findAllByOwnerNameAndNameAndEntityStatusOrderByNameAscOwnerNameAsc(ownerName, name, EntityStatus.ACTIVE)).thenReturn(List.of(dog));
-
-            var dogs = dogService.getDogsByOwnerNameAndDogsNameOrChipNumber(ownerName, name, chipNumber);
-
-            assertSame(dog, dogs.getFirst());
-        }
+        assertThat(dogService.getDogsByOwnerNameAndDogsNameOrChipNumber(chipNumber, null, null))
+                .containsExactly(dog);
     }
+
 
     @Nested
     class DeleteDogById {

@@ -2,7 +2,6 @@ package casp.web.backend.business.logic.layer.dog;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -62,13 +60,8 @@ class DogServiceImpl implements DogService {
     }
 
     @Override
-    public List<Dog> getDogsByOwnerNameAndDogsNameOrChipNumber(final String ownerName, final String name, final String chipNumber) {
-        if (!ObjectUtils.isEmpty(chipNumber)) {
-            return dogRepository.findDogByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)
-                    .stream().toList();
-        } else {
-            return dogRepository.findAllByOwnerNameAndNameAndEntityStatusOrderByNameAscOwnerNameAsc(ownerName, name, EntityStatus.ACTIVE);
-        }
+    public List<Dog> getDogsByOwnerNameAndDogsNameOrChipNumber(final String chipNumber, final String name, final String ownerName) {
+        return dogRepository.findAllByChipNumberOrDogNameOrOwnerName(chipNumber, name, ownerName);
     }
 
     @Override
@@ -78,6 +71,6 @@ class DogServiceImpl implements DogService {
 
     @Override
     public Set<Dog> getDogsThatWereNotChecked() {
-        return dogRepository.findAllByChipNumberIsNotEmptyAndEuropeNetStateIsNotAndEntityStatus(EuropeNetState.NOT_CHECKED, EntityStatus.ACTIVE);
+        return dogRepository.findAllByEuropeNetStateNotChecked();
     }
 }
