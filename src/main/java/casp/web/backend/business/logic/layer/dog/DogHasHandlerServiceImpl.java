@@ -2,10 +2,8 @@ package casp.web.backend.business.logic.layer.dog;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
-import casp.web.backend.data.access.layer.documents.dog.QDogHasHandler;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.member.Member;
-import casp.web.backend.data.access.layer.documents.member.QMember;
 import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
 import casp.web.backend.data.access.layer.repositories.MemberRepository;
@@ -21,7 +19,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 /**
  * DogHasHandlerService
@@ -106,16 +103,9 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     @Transactional
     @Override
     public Set<DogHasHandler> searchDogHasHandlerByFirstNameOrLastNameOrDogName(final String name) {
-        var dogIds = dogRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name).stream().map(Dog::getId).collect(Collectors.toSet());
-
-        var qMember = QMember.member;
-        var memberQuery = qMember.entityStatus.eq(EntityStatus.ACTIVE).and(qMember.firstName.eq(name).or(qMember.lastName.eq(name)));
-        var memberIds = StreamSupport.stream(memberRepository.findAll(memberQuery).spliterator(), false).map(Member::getId).collect(Collectors.toSet());
-
-        var qDogHasHandler = QDogHasHandler.dogHasHandler;
-        var dogHasHandlerQuery = qDogHasHandler.entityStatus.eq(EntityStatus.ACTIVE).and(qDogHasHandler.dogId.in(dogIds).or(qDogHasHandler.memberId.in(memberIds)));
-
-        return StreamSupport.stream(dogHasHandlerRepository.findAll(dogHasHandlerQuery).spliterator(), false).collect(Collectors.toSet());
+        var dogHasHandlers = dogHasHandlerRepository.findAllByMemberNameOrDogName(name);
+        dogHasHandlers.forEach(this::setDogAndMemberIfTheyAreNull);
+        return dogHasHandlers;
     }
 
     @Transactional

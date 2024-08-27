@@ -7,7 +7,6 @@ import casp.web.backend.data.access.layer.documents.member.Member;
 import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
 import casp.web.backend.data.access.layer.repositories.MemberRepository;
-import com.querydsl.core.types.Predicate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,10 +23,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -138,23 +135,14 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void searchDogHasHandlerByFirstNameOrLastNameOrDogName() {
-        ArgumentCaptor<Predicate> predicateArgumentCaptor = ArgumentCaptor.forClass(Predicate.class);
         dog.setName("casp");
         member.setFirstName(dog.getName());
         member.setLastName(dog.getName());
-        when(dogRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, dog.getName())).thenReturn(Set.of(dog));
-        when(memberRepository.findAll(any(Predicate.class))).thenReturn(Set.of(member));
-        when(dogHasHandlerRepository.findAll(any(Predicate.class))).thenReturn(Set.of(dogHasHandler));
+        when(dogHasHandlerRepository.findAllByMemberNameOrDogName(dog.getName())).thenReturn(Set.of(dogHasHandler));
 
 
         assertThat(dogHasHandlerService.searchDogHasHandlerByFirstNameOrLastNameOrDogName(dog.getName()))
                 .containsExactly(dogHasHandler);
-        verify(memberRepository).findAll(predicateArgumentCaptor.capture());
-        var memberPredicate = predicateArgumentCaptor.getValue();
-        assertEquals("member.entityStatus = ACTIVE && (member.firstName = casp || member.lastName = casp)", memberPredicate.toString());
-        verify(dogHasHandlerRepository).findAll(predicateArgumentCaptor.capture());
-        var dogHasHandlerPredicate = predicateArgumentCaptor.getValue();
-        assertEquals("dogHasHandler.entityStatus = ACTIVE && (dogHasHandler.dogId = %s || dogHasHandler.memberId = %s)".formatted(dogId, memberId), dogHasHandlerPredicate.toString());
     }
 
     @Test

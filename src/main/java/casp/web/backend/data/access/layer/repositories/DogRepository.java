@@ -25,6 +25,6 @@ public interface DogRepository extends MongoRepository<Dog, UUID>, QuerydslPredi
 
     Page<Dog> findAllByEntityStatus(EntityStatus entityStatus, Pageable pageable);
 
-    Set<Dog> findAllByEntityStatusAndName(EntityStatus entityStatus, String name);
+    Set<Dog> findAllByEntityStatusAndNameIgnoreCase(EntityStatus entityStatus, String name);
 
 }

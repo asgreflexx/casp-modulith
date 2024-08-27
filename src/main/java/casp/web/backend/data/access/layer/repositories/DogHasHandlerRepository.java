@@ -18,7 +18,7 @@ import java.util.UUID;
  * @author sarah
  */
 
-public interface DogHasHandlerRepository extends MongoRepository<DogHasHandler, UUID>, QuerydslPredicateExecutor<DogHasHandler> {
+public interface DogHasHandlerRepository extends MongoRepository<DogHasHandler, UUID>, QuerydslPredicateExecutor<DogHasHandler>, DogHasHandlerCustomRepository {
 
     /**
      * @deprecated use {@link #findAllByMember(Member)} instead
