@@ -37,28 +37,30 @@ public interface DogHasHandlerRepository extends MongoRepository<DogHasHandler, 
     Set<DogHasHandler> findAllByDog(Dog dog);
 
     /**
-     * @deprecated use {@link #findAllByEntityStatusAndDog(EntityStatus, Dog)} instead
+     * @deprecated use {@link #findAllByDogAndEntityStatus(Dog, EntityStatus)} instead
      */
     @Deprecated(forRemoval = true)
-    Set<DogHasHandler> findAllByEntityStatusAndDogId(EntityStatus entityStatus, UUID dogId);
+    Set<DogHasHandler> findAllByDogIdAndEntityStatus(UUID dogId, EntityStatus entityStatus);
 
-    Set<DogHasHandler> findAllByEntityStatusAndDog(EntityStatus entityStatus, Dog dog);
+    Set<DogHasHandler> findAllByDogIdAndEntityStatusNot(UUID dogId, EntityStatus entityStatus);
+
+    Set<DogHasHandler> findAllByDogAndEntityStatus(Dog dog, EntityStatus entityStatus);
 
     /**
-     * @deprecated use {@link #findAllByEntityStatusAndMember(EntityStatus, Member)} instead
+     * @deprecated use {@link #findAllByMemberAndEntityStatus(Member, EntityStatus)} instead
      */
     @Deprecated(forRemoval = true)
-    Set<DogHasHandler> findAllByEntityStatusAndMemberId(EntityStatus entityStatus, UUID memberId);
+    Set<DogHasHandler> findAllByMemberIdAndEntityStatus(UUID memberId, EntityStatus entityStatus);
 
-    Set<DogHasHandler> findAllByEntityStatusAndMember(EntityStatus entityStatus, Member member);
+    Set<DogHasHandler> findAllByMemberIdAndEntityStatusIsNot(UUID memberId, EntityStatus entityStatus);
+
+    Set<DogHasHandler> findAllByMemberAndEntityStatus(Member member, EntityStatus entityStatus);
 
     /**
-     * @deprecated use {@link #findAllByEntityStatusAndDogInOrMemberIn(EntityStatus, Set, Set)} instead
+     * @deprecated use {@link findAllByEntityStatusAndDogInOrMemberIn(EntityStatus, Set, Set)} instead
      */
     @Deprecated(forRemoval = true)
     List<DogHasHandler> findAllByEntityStatusAndDogIdInOrMemberIdIn(EntityStatus entityStatus, List<UUID> dogIds, List<UUID> memberIds);
-
-    Set<DogHasHandler> findAllByEntityStatusAndDogInOrMemberIn(EntityStatus entityStatus, Set<Dog> dogs, Set<Member> members);
 
     Set<DogHasHandler> findAllByEntityStatus(EntityStatus entityStatus);
 

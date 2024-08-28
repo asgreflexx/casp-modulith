@@ -75,7 +75,7 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void deleteDogHasHandlerByMemberId() {
-        when(dogHasHandlerRepository.findAllByEntityStatusAndMemberId(EntityStatus.ACTIVE, memberId))
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatusIsNot(memberId, EntityStatus.DELETED))
                 .thenReturn(Set.of(dogHasHandler));
 
         dogHasHandlerService.deleteDogHasHandlerByMemberId(memberId);
@@ -85,7 +85,7 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void deleteDogHasHandlerByDogId() {
-        when(dogHasHandlerRepository.findAllByEntityStatusAndDogId(EntityStatus.ACTIVE, dogId))
+        when(dogHasHandlerRepository.findAllByDogIdAndEntityStatusNot(dogId, EntityStatus.DELETED))
                 .thenReturn(Set.of(dogHasHandler));
 
         dogHasHandlerService.deleteDogHasHandlerByDogId(dogId);
@@ -97,7 +97,7 @@ class DogHasHandlerServiceImplTest {
     void getDogsByMemberId() {
         when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
                 .thenReturn(Optional.of(member));
-        when(dogHasHandlerRepository.findAllByEntityStatusAndMemberId(EntityStatus.ACTIVE, memberId))
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
                 .thenReturn(Set.of(dogHasHandler));
         when(dogRepository.findDogByIdAndEntityStatus(dogHasHandler.getDogId(), EntityStatus.ACTIVE))
                 .thenReturn(Optional.of(dog));
@@ -107,7 +107,7 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void getMembersByDogId() {
-        when(dogHasHandlerRepository.findAllByEntityStatusAndDogId(EntityStatus.ACTIVE, dogId))
+        when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
                 .thenReturn(Set.of(dogHasHandler));
         when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
                 .thenReturn(Optional.of(dog));
@@ -119,7 +119,7 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void getHandlersByMemberId() {
-        when(dogHasHandlerRepository.findAllByEntityStatusAndMemberId(EntityStatus.ACTIVE, memberId))
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
                 .thenReturn(Set.of(dogHasHandler));
 
         assertThat(dogHasHandlerService.getHandlersByMemberId(memberId)).containsExactly(dogHasHandler);
@@ -127,7 +127,7 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void getHandlersByDogId() {
-        when(dogHasHandlerRepository.findAllByEntityStatusAndDogId(EntityStatus.ACTIVE, dogId))
+        when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
                 .thenReturn(Set.of(dogHasHandler));
 
         assertThat(dogHasHandlerService.getHandlersByDogId(dogId)).containsExactly(dogHasHandler);
@@ -161,14 +161,14 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void getDogHasHandlerIdsByMemberId() {
-        when(dogHasHandlerRepository.findAllByEntityStatusAndMemberId(EntityStatus.ACTIVE, memberId)).thenReturn(Set.of(dogHasHandler));
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Set.of(dogHasHandler));
 
         assertThat(dogHasHandlerService.getDogHasHandlerIdsByMemberId(memberId)).containsExactly(dogHasHandler.getId());
     }
 
     @Test
     void getDogHasHandlerIdsByDogId() {
-        when(dogHasHandlerRepository.findAllByEntityStatusAndDogId(EntityStatus.ACTIVE, dogId)).thenReturn(Set.of(dogHasHandler));
+        when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Set.of(dogHasHandler));
 
         assertThat(dogHasHandlerService.getDogHasHandlerIdsByDogId(dogId)).containsExactly(dogHasHandler.getId());
     }

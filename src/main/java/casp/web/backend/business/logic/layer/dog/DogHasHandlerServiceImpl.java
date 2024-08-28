@@ -65,13 +65,15 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     @Transactional
     @Override
     public void deleteDogHasHandlerByMemberId(final UUID memberId) {
-        getHandlersByMemberId(memberId).forEach(dh -> dh.setEntityStatus(EntityStatus.DELETED));
+        dogHasHandlerRepository.findAllByMemberIdAndEntityStatusIsNot(memberId, EntityStatus.DELETED)
+                .forEach(this::deleteDogHasHandler);
     }
 
     @Transactional
     @Override
     public void deleteDogHasHandlerByDogId(final UUID dogId) {
-        getHandlersByDogId(dogId).forEach(dh -> dh.setEntityStatus(EntityStatus.DELETED));
+        dogHasHandlerRepository.findAllByDogIdAndEntityStatusNot(dogId, EntityStatus.DELETED)
+                .forEach(this::deleteDogHasHandler);
     }
 
     @Transactional
@@ -92,12 +94,12 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public Set<DogHasHandler> getHandlersByMemberId(final UUID memberId) {
-        return dogHasHandlerRepository.findAllByEntityStatusAndMemberId(EntityStatus.ACTIVE, memberId);
+        return dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 
     @Override
     public Set<DogHasHandler> getHandlersByDogId(final UUID dogId) {
-        return dogHasHandlerRepository.findAllByEntityStatusAndDogId(EntityStatus.ACTIVE, dogId);
+        return dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE);
     }
 
     @Transactional
@@ -140,6 +142,11 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         return getDogHasHandlersByIds(handlerIds).stream()
                 .map(dh -> dh.getMember().getEmail())
                 .collect(Collectors.toSet());
+    }
+
+    private void deleteDogHasHandler(final DogHasHandler dh) {
+        // TODO baseParticipantService.deleteByMemberOrHandlerId(dh.id);
+        dh.setEntityStatus(EntityStatus.DELETED);
     }
 
     private DogHasHandler setDogAndMemberIfTheyAreNull(final DogHasHandler dh) {
