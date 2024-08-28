@@ -71,7 +71,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Transactional
     @Override
-    public void deleteDogHasHandlerByDogId(final UUID dogId) {
+    public void deleteDogHasHandlersByDogId(final UUID dogId) {
         dogHasHandlerRepository.findAllByDogIdAndEntityStatusNot(dogId, EntityStatus.DELETED)
                 .forEach(this::deleteDogHasHandler);
     }

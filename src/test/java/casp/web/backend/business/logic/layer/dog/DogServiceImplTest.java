@@ -96,7 +96,7 @@ class DogServiceImplTest {
             dogService.deleteDogById(id);
 
             verify(dog).setEntityStatus(EntityStatus.DELETED);
-            verify(dogHasHandlerService).deleteDogHasHandlerByDogId(id);
+            verify(dogHasHandlerService).deleteDogHasHandlersByDogId(id);
         }
 
         @Test

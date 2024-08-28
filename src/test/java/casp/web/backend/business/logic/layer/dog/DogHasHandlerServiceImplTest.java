@@ -84,11 +84,11 @@ class DogHasHandlerServiceImplTest {
     }
 
     @Test
-    void deleteDogHasHandlerByDogId() {
+    void deleteDogHasHandlersByDogId() {
         when(dogHasHandlerRepository.findAllByDogIdAndEntityStatusNot(dogId, EntityStatus.DELETED))
                 .thenReturn(Set.of(dogHasHandler));
 
-        dogHasHandlerService.deleteDogHasHandlerByDogId(dogId);
+        dogHasHandlerService.deleteDogHasHandlersByDogId(dogId);
 
         assertSame(EntityStatus.DELETED, dogHasHandler.getEntityStatus());
     }

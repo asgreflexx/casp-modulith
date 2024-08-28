@@ -49,13 +49,13 @@ class DogServiceImpl implements DogService {
         return dogRepository.save(dog);
     }
 
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteDogById(final UUID id) {
         dogRepository.findDogByIdAndEntityStatusIsNot(id, EntityStatus.DELETED)
                 .ifPresent(dog -> {
                     dog.setEntityStatus(EntityStatus.DELETED);
-                    dogHasHandlerService.deleteDogHasHandlerByDogId(id);
+                    dogHasHandlerService.deleteDogHasHandlersByDogId(id);
                 });
     }
 
