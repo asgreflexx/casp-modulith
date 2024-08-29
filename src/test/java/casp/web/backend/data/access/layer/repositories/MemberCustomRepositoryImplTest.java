@@ -14,9 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Pageable;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataMongoTest
 class MemberCustomRepositoryImplTest {
@@ -86,6 +90,20 @@ class MemberCustomRepositoryImplTest {
         @Test
         void findAllByMultipleLettersSeparatedBySpaces() {
             assertThat(memberRepository.findAllByValue("J X D", Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+        }
+    }
+
+    @Nested
+    class FindByIdAndEntityStatus {
+        @Test
+        void memberExist() {
+            assertEquals(john, memberRepository.findByIdAndEntityStatusCustom(john.getId(), EntityStatus.ACTIVE));
+        }
+
+        @Test
+        void memberNotFound() {
+            var memberId = UUID.randomUUID();
+            assertThrows(NoSuchElementException.class, () -> memberRepository.findByIdAndEntityStatusCustom(memberId, EntityStatus.DELETED));
         }
     }
 }

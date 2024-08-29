@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +36,8 @@ class MemberServiceImplTest {
 
     @Mock
     private DogHasHandlerService dogHasHandlerService;
+    @Mock
+    private CardService cardService;
 
     @InjectMocks
     private MemberServiceImpl memberService;
@@ -85,24 +86,31 @@ class MemberServiceImplTest {
         assertThat(memberService.getMembersEmailByIds(Set.of(member.getId()))).containsExactly(member.getEmail());
     }
 
-    @Nested
-    class GetMemberById {
+    @Test
+    void getMemberById() {
+        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
 
-        @Test
-        void memberExist() {
-            when(memberRepository.findByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+        assertSame(member, memberService.getMemberById(member.getId()));
+    }
 
-            assertSame(member, memberService.getMemberById(member.getId()));
-        }
+    @Test
+    void deactivateMember() {
+        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
 
-        @Test
-        void memberDoesNotExist() {
-            var memberId = UUID.randomUUID();
-            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+        assertSame(EntityStatus.INACTIVE, memberService.deactivateMember(member.getId()).getEntityStatus());
 
-            assertThrows(NoSuchElementException.class, () -> memberService.getMemberById(memberId));
-        }
+        verify(dogHasHandlerService).deactivateDogHasHandlersByMemberId(member.getId());
+        verify(cardService).deactivateCardsByMemberId(member.getId());
+    }
 
+    @Test
+    void activateMember() {
+        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.INACTIVE)).thenReturn(member);
+
+        assertSame(EntityStatus.ACTIVE, memberService.activateMember(member.getId()).getEntityStatus());
+
+        verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
+        verify(cardService).activateCardsByMemberId(member.getId());
     }
 
     @Nested
@@ -131,7 +139,7 @@ class MemberServiceImplTest {
 
             memberService.deleteMemberById(memberId);
 
-            verifyNoInteractions(dogHasHandlerService);
+            verifyNoInteractions(dogHasHandlerService, cardService);
 
         }
 
@@ -142,48 +150,9 @@ class MemberServiceImplTest {
             memberService.deleteMemberById(member.getId());
 
             verify(dogHasHandlerService).deleteDogHasHandlersByMemberId(member.getId());
+            verify(cardService).deleteCardsByMemberId(member.getId());
             verify(member).setEntityStatus(EntityStatus.DELETED);
             verify(member).setEmail("%s---%s".formatted(member.getEmail(), member.getId()));
-        }
-    }
-
-    @Nested
-    class DeactivateMember {
-        @Test
-        void memberDoesNotExist() {
-            var memberId = UUID.randomUUID();
-            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> memberService.deactivateMember(memberId));
-        }
-
-        @Test
-        void memberExist() {
-            when(memberRepository.findByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
-
-            assertSame(EntityStatus.INACTIVE, memberService.deactivateMember(member.getId()).getEntityStatus());
-
-            verify(dogHasHandlerService).deactivateDogHasHandlersByMemberId(member.getId());
-        }
-    }
-
-    @Nested
-    class ActivateMember {
-        @Test
-        void memberDoesNotExist() {
-            var memberId = UUID.randomUUID();
-            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.INACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> memberService.activateMember(memberId));
-        }
-
-        @Test
-        void memberExist() {
-            when(memberRepository.findByIdAndEntityStatus(member.getId(), EntityStatus.INACTIVE)).thenReturn(Optional.of(member));
-
-            assertSame(EntityStatus.ACTIVE, memberService.activateMember(member.getId()).getEntityStatus());
-
-            verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
         }
     }
 }

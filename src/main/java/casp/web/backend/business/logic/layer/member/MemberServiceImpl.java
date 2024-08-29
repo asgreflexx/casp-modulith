@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,11 +32,13 @@ class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final DogHasHandlerService dogHasHandlerService;
+    private final CardService cardService;
 
     @Autowired
-    MemberServiceImpl(final MemberRepository memberRepository, final DogHasHandlerService dogHasHandlerService) {
+    MemberServiceImpl(final MemberRepository memberRepository, final DogHasHandlerService dogHasHandlerService, final CardService cardService) {
         this.memberRepository = memberRepository;
         this.dogHasHandlerService = dogHasHandlerService;
+        this.cardService = cardService;
     }
 
     @Override
@@ -57,7 +58,7 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public Member getMemberById(final UUID id) {
-        return findMember(id, EntityStatus.ACTIVE);
+        return memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE);
     }
 
     @Transactional
@@ -79,7 +80,7 @@ class MemberServiceImpl implements MemberService {
     public void deleteMemberById(final UUID id) {
         memberRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED).ifPresent(member -> {
             dogHasHandlerService.deleteDogHasHandlersByMemberId(id);
-            // TODO: delete Card
+            cardService.deleteCardsByMemberId(id);
             // TODO: delete BaseEvents
             // TODO: delete BaseParticipants
             member.setEmail(EMAIL_FORMAT_IF_DELETED.formatted(member.getEmail(), id));
@@ -92,7 +93,7 @@ class MemberServiceImpl implements MemberService {
     public Member deactivateMember(final UUID id) {
         var member = getMemberById(id);
         dogHasHandlerService.deactivateDogHasHandlersByMemberId(id);
-        // TODO: deactivate Card
+        cardService.deactivateCardsByMemberId(id);
         // TODO: deactivate BaseEvents
         // TODO: deactivate BaseParticipants
         member.setEntityStatus(EntityStatus.INACTIVE);
@@ -102,9 +103,9 @@ class MemberServiceImpl implements MemberService {
     @Transactional(rollbackFor = Exception.class)
     @Override
     public Member activateMember(final UUID id) {
-        var member = findMember(id, EntityStatus.INACTIVE);
+        var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.INACTIVE);
         dogHasHandlerService.activateDogHasHandlersByMemberId(id);
-        // TODO: activate Card
+        cardService.activateCardsByMemberId(id);
         // TODO: activate BaseEvents
         // TODO: activate BaseParticipants
         member.setEntityStatus(EntityStatus.ACTIVE);
@@ -122,13 +123,5 @@ class MemberServiceImpl implements MemberService {
                 .stream()
                 .map(Member::getEmail)
                 .collect(Collectors.toSet());
-    }
-
-    private Member findMember(final UUID id, final EntityStatus entityStatus) {
-        return memberRepository.findByIdAndEntityStatus(id, entityStatus).orElseThrow(() -> {
-            var msg = "Member with id %s not found or it isn't %s.".formatted(id, entityStatus);
-            LOG.error(msg);
-            return new NoSuchElementException(msg);
-        });
     }
 }

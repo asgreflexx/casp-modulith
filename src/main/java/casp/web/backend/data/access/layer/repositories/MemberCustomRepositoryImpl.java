@@ -6,6 +6,8 @@ import casp.web.backend.data.access.layer.documents.member.QMember;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.apache.commons.lang3.ObjectUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,10 +17,15 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.UUID;
+
 
 @Component
 class MemberCustomRepositoryImpl implements MemberCustomRepository {
-    public static final QMember MEMBER = QMember.member;
+    private static final Logger LOG = LoggerFactory.getLogger(MemberCustomRepositoryImpl.class);
+    private static final QMember MEMBER = QMember.member;
     private static final OrderSpecifier<?>[] DEFAULT_ORDER = {MEMBER.lastName.asc(), MEMBER.firstName.asc()};
     private static final String SPLIT_WORDS_WITH_SPACE = " ";
     private final MongoOperations mongoOperations;
@@ -62,6 +69,18 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
         }
         return createQuery().where(expression)
                 .fetchPage(pageable);
+    }
+
+    // fetchOne can return a null
+    @SuppressWarnings("OptionalOfNullableMisuse")
+    @Override
+    public Member findByIdAndEntityStatusCustom(final UUID id, final EntityStatus entityStatus) {
+        var expression = MEMBER.entityStatus.eq(entityStatus).and(MEMBER.id.eq(id));
+        return Optional.ofNullable(createQuery().where(expression).fetchOne()).orElseThrow(() -> {
+            var msg = "Member with id %s not found or it isn't %s.".formatted(id, entityStatus);
+            LOG.error(msg);
+            return new NoSuchElementException(msg);
+        });
     }
 
     private SpringDataMongodbQuery<Member> createQuery() {
