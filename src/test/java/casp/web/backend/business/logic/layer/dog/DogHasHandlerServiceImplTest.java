@@ -74,11 +74,11 @@ class DogHasHandlerServiceImplTest {
     }
 
     @Test
-    void deleteDogHasHandlerByMemberId() {
+    void deleteDogHasHandlersByMemberId() {
         when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatusIsNot(memberId, EntityStatus.DELETED))
                 .thenReturn(Set.of(dogHasHandler));
 
-        dogHasHandlerService.deleteDogHasHandlerByMemberId(memberId);
+        dogHasHandlerService.deleteDogHasHandlersByMemberId(memberId);
 
         assertSame(EntityStatus.DELETED, dogHasHandler.getEntityStatus());
     }
@@ -180,6 +180,24 @@ class DogHasHandlerServiceImplTest {
         when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
         assertThat(dogHasHandlerService.getMembersEmailByIds(Set.of(dogHasHandler.getId()))).containsExactly(member.getEmail());
+    }
+
+    @Test
+    void deactivateDogHasHandlersByMemberId() {
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Set.of(dogHasHandler));
+
+        dogHasHandlerService.deactivateDogHasHandlersByMemberId(memberId);
+
+        assertSame(EntityStatus.INACTIVE, dogHasHandler.getEntityStatus());
+    }
+
+    @Test
+    void activateDogHasHandlersByMemberId() {
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE)).thenReturn(Set.of(dogHasHandler));
+
+        dogHasHandlerService.activateDogHasHandlersByMemberId(memberId);
+
+        assertSame(EntityStatus.ACTIVE, dogHasHandler.getEntityStatus());
     }
 
     @Nested

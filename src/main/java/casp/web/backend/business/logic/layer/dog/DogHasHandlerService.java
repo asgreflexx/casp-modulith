@@ -19,7 +19,7 @@ public interface DogHasHandlerService {
 
     DogHasHandler getDogHasHandlerById(UUID id);
 
-    void deleteDogHasHandlerByMemberId(UUID memberId);
+    void deleteDogHasHandlersByMemberId(UUID memberId);
 
     void deleteDogHasHandlersByDogId(UUID dogId);
 
@@ -42,4 +42,8 @@ public interface DogHasHandlerService {
     Set<UUID> getDogHasHandlerIdsByDogId(UUID dogId);
 
     Set<String> getMembersEmailByIds(Set<UUID> handlerIds);
+
+    void deactivateDogHasHandlersByMemberId(UUID memberId);
+
+    void activateDogHasHandlersByMemberId(UUID memberId);
 }

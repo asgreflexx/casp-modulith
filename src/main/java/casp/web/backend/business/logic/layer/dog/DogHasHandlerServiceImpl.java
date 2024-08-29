@@ -64,7 +64,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Transactional
     @Override
-    public void deleteDogHasHandlerByMemberId(final UUID memberId) {
+    public void deleteDogHasHandlersByMemberId(final UUID memberId) {
         dogHasHandlerRepository.findAllByMemberIdAndEntityStatusIsNot(memberId, EntityStatus.DELETED)
                 .forEach(this::deleteDogHasHandler);
     }
@@ -142,6 +142,22 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         return getDogHasHandlersByIds(handlerIds).stream()
                 .map(dh -> dh.getMember().getEmail())
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void deactivateDogHasHandlersByMemberId(final UUID memberId) {
+        getHandlersByMemberId(memberId).forEach(dh -> {
+            // TODO baseParticipantService.deactivateByMemberOrHandlerId(dh.id);
+            dh.setEntityStatus(EntityStatus.INACTIVE);
+        });
+    }
+
+    @Override
+    public void activateDogHasHandlersByMemberId(final UUID memberId) {
+        dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE).forEach(dh -> {
+            // TODO baseParticipantService.activateByMemberOrHandlerId(dh.id);
+            dh.setEntityStatus(EntityStatus.ACTIVE);
+        });
     }
 
     private void deleteDogHasHandler(final DogHasHandler dh) {

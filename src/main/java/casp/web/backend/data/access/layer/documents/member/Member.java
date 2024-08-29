@@ -2,7 +2,7 @@ package casp.web.backend.data.access.layer.documents.member;
 
 import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
 import casp.web.backend.data.access.layer.documents.enumerations.Gender;
-import casp.web.backend.data.access.layer.documents.enumerations.Roles;
+import casp.web.backend.data.access.layer.documents.enumerations.Role;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
@@ -46,7 +46,7 @@ public class Member extends BaseEntity {
     private String city;
 
     @NotEmpty
-    private Set<Roles> roles = new HashSet<>(List.of(Roles.USER));
+    private Set<Role> roles = new HashSet<>(List.of(Role.USER));
 
     @NotNull
     @Valid
@@ -124,11 +124,11 @@ public class Member extends BaseEntity {
         this.city = city;
     }
 
-    public Set<Roles> getRoles() {
+    public Set<Role> getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<Roles> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
