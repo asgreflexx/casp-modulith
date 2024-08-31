@@ -1,12 +1,12 @@
 package casp.web.backend.data.access.layer.documents.dog;
 
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -17,17 +17,12 @@ class DogHasHandlerTest extends BaseEntityTest {
 
     @BeforeEach
     void setUp() {
-        dogHasHandler = new DogHasHandler();
-        dogHasHandler.setDogId(UUID.randomUUID());
-        dogHasHandler.setMemberId(UUID.randomUUID());
-        dogHasHandler.setMember(createValidMember());
-        dogHasHandler.setDog(createValidDog());
-
+        dogHasHandler = TestFixture.createValidDogHasHandler();
     }
 
     @Test
     void happyPath() {
-        assertThat(getViolations(dogHasHandler)).isEmpty();
+        assertThat(TestFixture.getViolations(dogHasHandler)).isEmpty();
         baseAssertions(dogHasHandler);
         assertNotNull(dogHasHandler.getGrades());
     }
@@ -36,6 +31,6 @@ class DogHasHandlerTest extends BaseEntityTest {
     void gradeIsInvalid() {
         dogHasHandler.setGrades(Collections.singleton(new Grade()));
 
-        assertThat(getViolations(dogHasHandler)).isNotEmpty();
+        assertThat(TestFixture.getViolations(dogHasHandler)).isNotEmpty();
     }
 }

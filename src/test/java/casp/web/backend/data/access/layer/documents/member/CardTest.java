@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.documents.member;
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
 import org.junit.jupiter.api.Test;
 
@@ -13,9 +14,9 @@ class CardTest extends BaseEntityTest {
         var card = new Card();
         card.setCode("code");
         card.setMemberId(UUID.randomUUID());
-        card.setMember(createValidMember());
+        card.setMember(TestFixture.createValidMember());
 
-        assertThat(getViolations(card)).isEmpty();
+        assertThat(TestFixture.getViolations(card)).isEmpty();
         baseAssertions(card);
     }
 }

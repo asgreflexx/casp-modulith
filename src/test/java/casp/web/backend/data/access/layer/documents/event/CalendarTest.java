@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.documents.event;
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,16 +18,12 @@ class CalendarTest extends BaseEntityTest {
 
     @BeforeEach
     void setUp() {
-        calendar = new Calendar();
-        calendar.setEventFrom(LocalDateTime.now());
-        calendar.setEventTo(LocalDateTime.now().plusHours(1));
-
-        calendar.setBaseEvent(createValidEvent());
+        calendar = TestFixture.createValidCalendarEntry();
     }
 
     @Test
     void happyPath() {
-        assertThat(getViolations(calendar)).isEmpty();
+        assertThat(TestFixture.getViolations(calendar)).isEmpty();
         baseAssertions(calendar);
     }
 

@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.documents.event.participant;
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
 import org.junit.jupiter.api.Test;
 
@@ -11,10 +12,10 @@ class CoTrainerTest extends BaseEntityTest {
     @Test
     void happyPath() {
         var coTrainer = new CoTrainer();
-        coTrainer.setBaseEvent(createValidEvent());
+        coTrainer.setBaseEvent(TestFixture.createValidEvent());
         coTrainer.setMemberOrHandlerId(UUID.randomUUID());
 
-        assertThat(getViolations(coTrainer)).isEmpty();
+        assertThat(TestFixture.getViolations(coTrainer)).isEmpty();
         baseParticipantAssertions(coTrainer);
     }
 }

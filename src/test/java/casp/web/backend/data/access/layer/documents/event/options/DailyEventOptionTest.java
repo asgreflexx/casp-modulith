@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.documents.event.options;
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
 import org.junit.jupiter.api.Test;
 
@@ -17,6 +18,6 @@ class DailyEventOptionTest extends BaseEntityTest {
         dailyEventOption.setStartTime(LocalTime.MIN);
         dailyEventOption.setEndTime(LocalTime.MAX);
 
-        assertThat(getViolations(dailyEventOption)).isEmpty();
+        assertThat(TestFixture.getViolations(dailyEventOption)).isEmpty();
     }
 }

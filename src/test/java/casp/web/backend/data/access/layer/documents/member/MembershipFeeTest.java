@@ -1,6 +1,7 @@
 package casp.web.backend.data.access.layer.documents.member;
 
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,7 +24,7 @@ class MembershipFeeTest extends BaseEntityTest {
     class Valid {
         @Test
         void notPaid() {
-            assertThat(getViolations(membershipFee)).isEmpty();
+            assertThat(TestFixture.getViolations(membershipFee)).isEmpty();
         }
 
         @Test
@@ -31,7 +32,7 @@ class MembershipFeeTest extends BaseEntityTest {
             membershipFee.setPaid(true);
             membershipFee.setPaidDate(LocalDate.now());
             membershipFee.setPaidPrice(10.0);
-            assertThat(getViolations(membershipFee)).isEmpty();
+            assertThat(TestFixture.getViolations(membershipFee)).isEmpty();
         }
     }
 }
