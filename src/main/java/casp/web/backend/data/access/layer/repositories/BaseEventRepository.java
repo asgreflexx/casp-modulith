@@ -5,21 +5,17 @@ import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public interface BaseEventRepository extends MongoRepository<BaseEvent, UUID>, QuerydslPredicateExecutor<BaseEvent> {
+public interface BaseEventRepository extends MongoRepository<BaseEvent, UUID>, QuerydslPredicateExecutor<BaseEvent>, BaseEventCustomRepository {
 
-    Optional<BaseEvent> findBaseEventByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
+    Optional<BaseEvent> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 
-    Set<BaseEvent> findAllByMemberIdAndEntityStatusNotLike(UUID memberId, EntityStatus entityStatus);
+    Optional<BaseEvent> findByIdAndEntityStatusNot(UUID id, EntityStatus entityStatus);
 
-    Set<BaseEvent> findAllByEventTypeInAndEntityStatusAndMinLocalDateTimeGreaterThanEqualAndMaxLocalDateTimeLessThanEqual(
-            Set<String> eventTypes,
-            EntityStatus entityStatus,
-            LocalDateTime minLocalDateTime,
-            LocalDateTime maxLocalDateTime
-    );
+    Set<BaseEvent> findAllByMemberIdAndEntityStatusNot(UUID memberId, EntityStatus entityStatus);
+
+    Set<BaseEvent> findAllByMemberIdAndEntityStatus(UUID memberId, EntityStatus entityStatus);
 }

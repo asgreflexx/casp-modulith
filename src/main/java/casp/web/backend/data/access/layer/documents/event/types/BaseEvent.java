@@ -3,7 +3,6 @@ package casp.web.backend.data.access.layer.documents.event.types;
 
 import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
 import casp.web.backend.data.access.layer.documents.event.TypesRegex;
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.options.DailyEventOption;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOption;
 import casp.web.backend.data.access.layer.documents.member.Member;
@@ -14,12 +13,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 // cannot be abstract because of error: abstract types either need to be mapped to concrete types, have custom deserializer, or contain additional type information
@@ -123,23 +118,6 @@ public class BaseEvent extends BaseEntity {
 
     public void setEventType(String eventType) {
         this.eventType = eventType;
-    }
-
-    public void setMinAndMaxEventPeriod(List<Calendar> entries) {
-        if (!CollectionUtils.isEmpty(entries)) {
-            final Calendar min = entries
-                    .stream()
-                    .min(Comparator.comparing(Calendar::getEventFrom))
-                    .orElseThrow(NoSuchElementException::new);
-
-            final Calendar max = entries
-                    .stream()
-                    .max(Comparator.comparing(Calendar::getEventTo))
-                    .orElseThrow(NoSuchElementException::new);
-
-            minLocalDateTime = min.getEventFrom();
-            maxLocalDateTime = max.getEventTo();
-        }
     }
 
     public LocalDateTime getMinLocalDateTime() {

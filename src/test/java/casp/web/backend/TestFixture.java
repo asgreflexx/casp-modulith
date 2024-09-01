@@ -4,6 +4,7 @@ import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
+import casp.web.backend.data.access.layer.documents.event.participant.EventParticipant;
 import casp.web.backend.data.access.layer.documents.event.participant.Space;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
@@ -117,5 +118,16 @@ public final class TestFixture {
         dog.setOwnerName("John Doe");
         dog.setOwnerAddress("123 Main St");
         return dog;
+    }
+
+    public static EventParticipant createValidEventParticipant() {
+        return createValidEventParticipant(createValidEvent());
+    }
+
+    public static EventParticipant createValidEventParticipant(final Event event) {
+        var eventParticipant = new EventParticipant();
+        eventParticipant.setMemberOrHandlerId(createValidMember().getId());
+        eventParticipant.setBaseEvent(event);
+        return eventParticipant;
     }
 }
