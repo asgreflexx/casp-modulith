@@ -5,6 +5,7 @@ import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
 import casp.web.backend.data.access.layer.documents.event.participant.EventParticipant;
+import casp.web.backend.data.access.layer.documents.event.participant.ExamParticipant;
 import casp.web.backend.data.access.layer.documents.event.participant.Space;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
@@ -129,5 +130,16 @@ public final class TestFixture {
         eventParticipant.setMemberOrHandlerId(createValidMember().getId());
         eventParticipant.setBaseEvent(event);
         return eventParticipant;
+    }
+
+    public static ExamParticipant createValidExamParticipant() {
+        return createValidExamParticipant(createValidExam());
+    }
+
+    public static ExamParticipant createValidExamParticipant(final Exam exam) {
+        var examParticipant = new ExamParticipant();
+        examParticipant.setMemberOrHandlerId(createValidDogHasHandler().getId());
+        examParticipant.setBaseEvent(exam);
+        return examParticipant;
     }
 }
