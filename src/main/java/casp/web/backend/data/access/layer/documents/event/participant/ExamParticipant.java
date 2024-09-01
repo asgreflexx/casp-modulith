@@ -22,7 +22,7 @@ public class ExamParticipant extends BaseParticipant {
                 .add("participantType='" + participantType + "'")
                 .add("memberOrHandlerId=" + memberOrHandlerId)
                 .add("response=" + response)
-                .add("baseEvent=" + baseEvent)
+                .add("baseEventId=" + baseEventId)
                 .add("id=" + id)
                 .add("version=" + version)
                 .add("createdBy='" + createdBy + "'")

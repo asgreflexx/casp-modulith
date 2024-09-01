@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.documents.event;
+package casp.web.backend.data.access.layer.documents.event.calendar;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

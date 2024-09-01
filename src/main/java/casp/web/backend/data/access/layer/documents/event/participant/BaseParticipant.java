@@ -33,10 +33,15 @@ public class BaseParticipant extends BaseEntity {
     @NotNull
     protected EventResponse response = EventResponse.ACCEPTED;
 
-    @NotNull
+    /**
+     * @deprecated use {@link #baseEventId} instead
+     */
+    @Deprecated
     @Valid
     @DBRef
     protected BaseEvent baseEvent;
+
+    protected UUID baseEventId;
 
     protected BaseParticipant(String participantType) {
         this.participantType = participantType;

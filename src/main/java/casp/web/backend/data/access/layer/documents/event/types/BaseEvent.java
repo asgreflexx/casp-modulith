@@ -2,8 +2,8 @@ package casp.web.backend.data.access.layer.documents.event.types;
 
 
 import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
-import casp.web.backend.data.access.layer.documents.event.Calendar;
 import casp.web.backend.data.access.layer.documents.event.TypesRegex;
+import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.options.DailyEventOption;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOption;
 import casp.web.backend.data.access.layer.documents.member.Member;

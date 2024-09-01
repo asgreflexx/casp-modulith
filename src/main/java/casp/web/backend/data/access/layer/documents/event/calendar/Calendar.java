@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.documents.event;
+package casp.web.backend.data.access.layer.documents.event.calendar;
 
 import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.util.StringJoiner;
+import java.util.UUID;
 
 @QueryEntity
 @Document
@@ -24,10 +25,15 @@ public class Calendar extends BaseEntity implements Comparable<Calendar> {
 
     private String location;
 
-    @NotNull
+    /**
+     * @deprecated use {@link #baseEventId} instead
+     */
+    @Deprecated
     @Valid
     @DBRef
     private BaseEvent baseEvent;
+
+    private UUID baseEventId;
 
     public Calendar() {
     }
@@ -91,13 +97,21 @@ public class Calendar extends BaseEntity implements Comparable<Calendar> {
         return super.hashCode();
     }
 
+    public UUID getBaseEventId() {
+        return baseEventId;
+    }
+
+    public void setBaseEventId(final UUID baseEventId) {
+        this.baseEventId = baseEventId;
+    }
+
     @Override
     public String toString() {
         return new StringJoiner(", ", Calendar.class.getSimpleName() + "[", "]")
                 .add("eventFrom=" + eventFrom)
                 .add("eventTo=" + eventTo)
                 .add("location='" + location + "'")
-                .add("baseEvent=" + baseEvent)
+                .add("baseEventId=" + baseEventId)
                 .add("id=" + id)
                 .add("version=" + version)
                 .add("createdBy='" + createdBy + "'")

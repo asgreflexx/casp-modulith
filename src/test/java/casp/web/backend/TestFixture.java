@@ -2,7 +2,7 @@ package casp.web.backend;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
-import casp.web.backend.data.access.layer.documents.event.Calendar;
+import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
 import casp.web.backend.data.access.layer.documents.event.participant.Space;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;

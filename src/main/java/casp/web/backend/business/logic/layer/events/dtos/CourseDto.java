@@ -1,6 +1,6 @@
 package casp.web.backend.business.logic.layer.events.dtos;
 
-import casp.web.backend.data.access.layer.documents.event.Calendar;
+import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.participant.CoTrainer;
 import casp.web.backend.data.access.layer.documents.event.participant.Space;
 import casp.web.backend.data.access.layer.documents.event.types.Course;

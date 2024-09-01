@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.documents.event;
+package casp.web.backend.data.access.layer.documents.event.calendar;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
