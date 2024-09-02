@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CourseTest extends BaseEntityTest {
     @Test
     void happyPath() {
-        var course = TestFixture.ceateValidCourse();
+        var course = TestFixture.createValidCourse();
 
         assertThat(TestFixture.getViolations(course)).isEmpty();
         baseAssertions(course);

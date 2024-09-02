@@ -4,6 +4,7 @@ import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
+import casp.web.backend.data.access.layer.documents.event.participant.CoTrainer;
 import casp.web.backend.data.access.layer.documents.event.participant.EventParticipant;
 import casp.web.backend.data.access.layer.documents.event.participant.ExamParticipant;
 import casp.web.backend.data.access.layer.documents.event.participant.Space;
@@ -21,7 +22,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
-import java.util.UUID;
 
 public final class TestFixture {
     private static final Validator VALIDATOR;
@@ -86,7 +86,7 @@ public final class TestFixture {
         return exam;
     }
 
-    public static Course ceateValidCourse() {
+    public static Course createValidCourse() {
         var member = createValidMember();
         var course = new Course();
         course.setName("Course Name");
@@ -96,9 +96,13 @@ public final class TestFixture {
     }
 
     public static Space createValidSpace() {
+        return createValidSpace(createValidCourse());
+    }
+
+    public static Space createValidSpace(final Course course) {
         var space = new Space();
-        space.setMemberOrHandlerId(UUID.randomUUID());
-        space.setBaseEvent(createValidEvent());
+        space.setMemberOrHandlerId(createValidDogHasHandler().getId());
+        space.setBaseEvent(course);
         return space;
     }
 
@@ -141,5 +145,16 @@ public final class TestFixture {
         examParticipant.setMemberOrHandlerId(createValidDogHasHandler().getId());
         examParticipant.setBaseEvent(exam);
         return examParticipant;
+    }
+
+    public static CoTrainer createValidCoTrainer() {
+        return createValidCoTrainer(createValidCourse());
+    }
+
+    public static CoTrainer createValidCoTrainer(final Course course) {
+        var coTrainer = new CoTrainer();
+        coTrainer.setBaseEvent(course);
+        coTrainer.setMemberOrHandlerId(createValidMember().getId());
+        return coTrainer;
     }
 }

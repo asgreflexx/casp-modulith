@@ -16,18 +16,18 @@ import java.util.Set;
 public class CourseDto extends Course implements BaseEventDto<Space> {
     @Valid
     @NotNull
-    private Set<CoTrainer> trainers = new HashSet<>();
+    private Set<CoTrainer> coTrainers = new HashSet<>();
 
     private List<Calendar> calendarEntries = new ArrayList<>();
 
     private Set<Space> participants = new HashSet<>();
 
-    public Set<CoTrainer> getTrainers() {
-        return trainers;
+    public Set<CoTrainer> getCoTrainers() {
+        return coTrainers;
     }
 
-    public void setTrainers(Set<CoTrainer> trainers) {
-        this.trainers = trainers;
+    public void setCoTrainers(Set<CoTrainer> coTrainers) {
+        this.coTrainers = coTrainers;
     }
 
     @Override

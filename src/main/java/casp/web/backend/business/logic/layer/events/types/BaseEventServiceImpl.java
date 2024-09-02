@@ -19,6 +19,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.UUID;
@@ -47,47 +48,52 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         this.mapper = mapper;
     }
 
-    private static void deleteBaseEvent(final BaseEvent baseEvent) {
+    protected static void deleteBaseEvent(final BaseEvent baseEvent) {
         // TODO delete  calendar entries (event);
         // TODO delete participants (event);
         baseEvent.setEntityStatus(EntityStatus.DELETED);
     }
 
+    protected static void deactivateBaseEvent(final BaseEvent baseEvent) {
+        // TODO deactivate  calendar entries (event);
+        // TODO deactivate participants (event);
+        baseEvent.setEntityStatus(EntityStatus.INACTIVE);
+    }
+
+    protected static void activateBaseEvent(final BaseEvent baseEvent) {
+        // TODO activate  calendar entries (event);
+        // TODO activate participants (event);
+        baseEvent.setEntityStatus(EntityStatus.ACTIVE);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventById(final UUID id) {
-        eventRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED).ifPresent(BaseEventServiceImpl::deleteBaseEvent);
+        findBaseEventNotDeleted(id).ifPresent(BaseEventServiceImpl::deleteBaseEvent);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventsByMemberId(final UUID memberId) {
-        eventRepository.findAllByMemberIdAndEntityStatusNot(memberId, EntityStatus.DELETED).forEach(BaseEventServiceImpl::deleteBaseEvent);
+        findAllByMemberIdAndNotDeleted(memberId).forEach(BaseEventServiceImpl::deleteBaseEvent);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deactivateBaseEventsByMemberId(final UUID memberId) {
-        eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE).forEach(baseEvent -> {
-            // TODO deactivate  calendar entries (event);
-            // TODO deactivate participants (event);
-            baseEvent.setEntityStatus(EntityStatus.INACTIVE);
-        });
+        findAllByMemberIdAndIsActive(memberId).forEach(BaseEventServiceImpl::deactivateBaseEvent);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void activateBaseEventsByMemberId(final UUID memberId) {
-        eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE).forEach(baseEvent -> {
-            // TODO activate  calendar entries (event);
-            // TODO activate participants (event);
-            baseEvent.setEntityStatus(EntityStatus.ACTIVE);
-        });
+        findAllByMemberIdAndIsInactive(memberId).forEach(BaseEventServiceImpl::activateBaseEvent);
 
     }
 
     // It cast to the correct type
     @SuppressWarnings("unchecked")
+    @Transactional(readOnly = true)
     @Override
     public D getBaseEventDtoById(final UUID id) {
         var event = (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
@@ -129,6 +135,22 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         calendar.setEventTo(eventFrom.plusHours(DEFAULT_EVENT_LENGTH));
         event.getCalendarEntries().add(calendar);
         return event;
+    }
+
+    protected Optional<BaseEvent> findBaseEventNotDeleted(final UUID id) {
+        return eventRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED);
+    }
+
+    protected Set<BaseEvent> findAllByMemberIdAndNotDeleted(final UUID memberId) {
+        return eventRepository.findAllByMemberIdAndEntityStatusNot(memberId, EntityStatus.DELETED);
+    }
+
+    protected Set<BaseEvent> findAllByMemberIdAndIsActive(final UUID memberId) {
+        return eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
+    }
+
+    protected Set<BaseEvent> findAllByMemberIdAndIsInactive(final UUID memberId) {
+        return eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE);
     }
 
     private E saveEvent(final E event, final Set<P> participants, final List<Calendar> calendarEntries) {

@@ -17,7 +17,7 @@ class CourseDtoTest {
 
     @BeforeEach
     void setUp() {
-        var course = TestFixture.ceateValidCourse();
+        var course = TestFixture.createValidCourse();
         courseDto = new CourseMapperImpl().documentToDto(course);
         courseDto.setCalendarEntries(List.of(TestFixture.createValidCalendarEntry(course)));
     }
@@ -46,7 +46,7 @@ class CourseDtoTest {
 
     @Test
     void trainersIsNull() {
-        courseDto.setTrainers(null);
+        courseDto.setCoTrainers(null);
 
         assertThat(TestFixture.getViolations(courseDto)).hasSize(1);
     }
