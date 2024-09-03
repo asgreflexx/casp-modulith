@@ -104,7 +104,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
                 });
         var dto = mapper.documentToDto(event);
         dto.setParticipants(participantService.getParticipantsByEvent(event));
-        dto.setCalendarEntries(calendarService.getCalendarEntriesByEvent(event));
+        dto.setCalendarEntries(calendarService.getCalendarEntriesByBaseEvent(event));
         return dto;
     }
 
@@ -154,11 +154,11 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     }
 
     private E saveEvent(final E event, final Set<P> participants, final List<Calendar> calendarEntries) {
-        this.calendarEntries = calendarService.replaceCalendarEntriesFromEvent(event, calendarEntries);
+        this.calendarEntries = calendarService.replaceCalendarEntriesFromEvent(event, calendarEntries.getFirst());
         this.participants = participantService.saveParticipants(participants);
 
-        event.setMinLocalDateTime(calendarEntries.getFirst().getEventFrom());
-        event.setMaxLocalDateTime(calendarEntries.getLast().getEventTo());
+        event.setMinLocalDateTime(this.calendarEntries.getFirst().getEventFrom());
+        event.setMaxLocalDateTime(this.calendarEntries.getLast().getEventTo());
         event.setParticipantsSize(this.participants.size());
         return eventRepository.save(event);
     }

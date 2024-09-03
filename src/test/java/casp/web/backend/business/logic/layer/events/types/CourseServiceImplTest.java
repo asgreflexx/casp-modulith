@@ -74,7 +74,7 @@ class CourseServiceImplTest {
         courseDto.setCalendarEntries(calendarEntries);
         courseDto.setParticipants(participants);
         courseDto.setCoTrainers(coTrainers);
-        when(calendarService.replaceCalendarEntriesFromEvent(course, calendarEntries)).thenReturn(calendarEntries);
+        when(calendarService.replaceCalendarEntriesFromEvent(course, calendarEntries.getFirst())).thenReturn(calendarEntries);
         when(participantService.saveParticipants(courseDto.getParticipants())).thenReturn(courseDto.getParticipants());
         when(coTrainerService.saveParticipants(courseDto.getCoTrainers())).thenReturn(courseDto.getCoTrainers());
         when(eventRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
@@ -158,7 +158,7 @@ class CourseServiceImplTest {
         @Test
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-            when(calendarService.getCalendarEntriesByEvent(course)).thenReturn(calendarEntries);
+            when(calendarService.getCalendarEntriesByBaseEvent(course)).thenReturn(calendarEntries);
             when(participantService.getParticipantsByEvent(course)).thenReturn(participants);
             when(coTrainerService.getParticipantsByEvent(course)).thenReturn(coTrainers);
 

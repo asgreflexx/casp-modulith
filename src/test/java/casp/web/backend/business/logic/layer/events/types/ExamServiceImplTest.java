@@ -67,7 +67,7 @@ class ExamServiceImplTest {
         var eventDto = examMapper.documentToDto(exam);
         eventDto.setCalendarEntries(calendarEntries);
         eventDto.setParticipants(participants);
-        when(calendarService.replaceCalendarEntriesFromEvent(exam, calendarEntries)).thenReturn(calendarEntries);
+        when(calendarService.replaceCalendarEntriesFromEvent(exam, calendarEntries.getFirst())).thenReturn(calendarEntries);
         when(participantService.saveParticipants(eventDto.getParticipants())).thenReturn(eventDto.getParticipants());
         when(eventRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -148,7 +148,7 @@ class ExamServiceImplTest {
         @Test
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(exam));
-            when(calendarService.getCalendarEntriesByEvent(exam)).thenReturn(calendarEntries);
+            when(calendarService.getCalendarEntriesByBaseEvent(exam)).thenReturn(calendarEntries);
             when(participantService.getParticipantsByEvent(exam)).thenReturn(participants);
 
             var examDto = examService.getBaseEventDtoById(exam.getId());
