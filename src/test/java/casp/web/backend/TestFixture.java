@@ -60,7 +60,7 @@ public final class TestFixture {
         var member = new Member();
         member.setFirstName("John");
         member.setLastName("Doe");
-        member.setEmail("john.doe@example.com");
+        member.setEmail("%s@example.com".formatted(member.getId()));
         return member;
     }
 
@@ -69,6 +69,8 @@ public final class TestFixture {
         calendar.setEventFrom(LocalDateTime.now());
         calendar.setEventTo(LocalDateTime.now().plusHours(1));
         calendar.setBaseEvent(baseEvent);
+        baseEvent.setMinLocalDateTime(calendar.getEventFrom());
+        baseEvent.setMaxLocalDateTime(calendar.getEventTo());
         return calendar;
     }
 
