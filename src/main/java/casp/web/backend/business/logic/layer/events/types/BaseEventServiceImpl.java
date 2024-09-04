@@ -15,19 +15,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TimeZone;
 import java.util.UUID;
 
 abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<E, P, D> {
     protected static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
     private static final int DEFAULT_EVENT_LENGTH = 1;
-    private static final ZoneId ZONE_ID = TimeZone.getDefault().toZoneId();
     protected final CalendarService calendarService;
     protected final BaseParticipantService<P, E> participantService;
     protected final BaseEventRepository eventRepository;
@@ -129,7 +127,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     }
 
     protected D createNewEventWithOneCalendarEntry(final D event) {
-        var eventFrom = ZonedDateTime.now(ZONE_ID).toLocalDateTime().withNano(0);
+        var eventFrom = LocalDateTime.now(ZoneId.systemDefault());
         var calendar = new Calendar();
         calendar.setEventFrom(eventFrom);
         calendar.setEventTo(eventFrom.plusHours(DEFAULT_EVENT_LENGTH));

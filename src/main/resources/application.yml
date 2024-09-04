@@ -1,6 +1,8 @@
 spring:
   application:
     name: admin
+  jackson:
+    time-zone: UTC
 
 casp:
   europenet-api-endpoint: https://europetnet.ehealth.gv.at/Index.aspx?mn={chipNumber}
