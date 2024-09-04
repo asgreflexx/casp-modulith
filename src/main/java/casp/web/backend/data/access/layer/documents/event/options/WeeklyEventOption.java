@@ -4,21 +4,22 @@ package casp.web.backend.data.access.layer.documents.event.options;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringJoiner;
-import java.util.TreeSet;
 
 public class WeeklyEventOption extends BaseEventOption {
 
     @Valid
     @NotEmpty
-    private Set<WeeklyEventOptionRecurrence> occurrences = new TreeSet<>();
+    private List<WeeklyEventOptionRecurrence> occurrences = new ArrayList<>();
 
-    public Set<WeeklyEventOptionRecurrence> getOccurrences() {
+    public List<WeeklyEventOptionRecurrence> getOccurrences() {
+        occurrences.sort(WeeklyEventOptionRecurrence::compareTo);
         return occurrences;
     }
 
-    public void setOccurrences(Set<WeeklyEventOptionRecurrence> occurrences) {
+    public void setOccurrences(List<WeeklyEventOptionRecurrence> occurrences) {
         this.occurrences = occurrences;
     }
 

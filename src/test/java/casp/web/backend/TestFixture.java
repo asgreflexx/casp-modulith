@@ -3,6 +3,8 @@ package casp.web.backend;
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
+import casp.web.backend.data.access.layer.documents.event.options.DailyEventOption;
+import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOption;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
 import casp.web.backend.data.access.layer.documents.event.participant.CoTrainer;
 import casp.web.backend.data.access.layer.documents.event.participant.EventParticipant;
@@ -19,8 +21,10 @@ import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
 import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Set;
 
 public final class TestFixture {
@@ -158,5 +162,22 @@ public final class TestFixture {
         coTrainer.setBaseEvent(course);
         coTrainer.setMemberOrHandlerId(createValidMember().getId());
         return coTrainer;
+    }
+
+    public static DailyEventOption createValidDailyEventOption() {
+        var dailyEventOption = new DailyEventOption();
+        dailyEventOption.setStartRecurrence(LocalDate.MIN);
+        dailyEventOption.setEndRecurrence(LocalDate.MAX);
+        dailyEventOption.setStartTime(LocalTime.MIN);
+        dailyEventOption.setEndTime(LocalTime.MAX);
+        return dailyEventOption;
+    }
+
+    public static WeeklyEventOption createValidWeeklyEventOption() {
+        var weeklyEventOption = new WeeklyEventOption();
+        weeklyEventOption.setStartRecurrence(LocalDate.MIN);
+        weeklyEventOption.setEndRecurrence(LocalDate.MAX);
+        weeklyEventOption.setOccurrences(List.of(createValidWeeklyEventOptionRecurrence()));
+        return weeklyEventOption;
     }
 }
