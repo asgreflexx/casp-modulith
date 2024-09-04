@@ -22,6 +22,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -29,6 +32,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -91,14 +95,15 @@ class ExamServiceImplTest {
 
     @Test
     void createNewBaseEventWithOneCalendarEntry() {
+        var expectedFrom = LocalDateTime.now(ZoneId.systemDefault());
+        var expectedTo = expectedFrom.plusHours(1);
         var examDto = examService.createNewBaseEventWithOneCalendarEntry();
 
         assertThat(examDto.getCalendarEntries())
                 .singleElement()
                 .satisfies(calendar -> {
-                    // It is hard to compare the LocalDateTime objects directly, because of the time zone.
-                    assertThat(calendar.getEventFrom()).isNotNull();
-                    assertThat(calendar.getEventTo()).isNotNull();
+                    assertThat(calendar.getEventFrom()).isCloseTo(expectedFrom, within(3, ChronoUnit.SECONDS));
+                    assertThat(calendar.getEventTo()).isCloseTo(expectedTo, within(3, ChronoUnit.SECONDS));
                 });
     }
 
