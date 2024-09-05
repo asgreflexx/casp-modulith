@@ -22,7 +22,7 @@ public class CoTrainer extends BaseParticipant {
                 .add("participantType='" + participantType + "'")
                 .add("memberOrHandlerId=" + memberOrHandlerId)
                 .add("response=" + response)
-                .add("baseEventId=" + baseEventId)
+                .add("baseEvent=" + baseEvent)
                 .add("id=" + id)
                 .add("version=" + version)
                 .add("createdBy='" + createdBy + "'")
