@@ -72,7 +72,7 @@ class ExamServiceImplTest {
         eventDto.setCalendarEntries(calendarEntries);
         eventDto.setParticipants(participants);
         when(calendarService.replaceCalendarEntriesFromEvent(exam, calendarEntries.getFirst())).thenReturn(calendarEntries);
-        when(participantService.saveParticipants(eventDto.getParticipants())).thenReturn(eventDto.getParticipants());
+        when(participantService.saveParticipants(eventDto.getParticipants(), exam)).thenReturn(eventDto.getParticipants());
         when(eventRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         var actualExam = examService.saveBaseEventDto(eventDto);
@@ -154,7 +154,7 @@ class ExamServiceImplTest {
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(exam));
             when(calendarService.getCalendarEntriesByBaseEvent(exam)).thenReturn(calendarEntries);
-            when(participantService.getParticipantsByEvent(exam)).thenReturn(participants);
+            when(participantService.getParticipantsByBaseEventId(exam.getId())).thenReturn(participants);
 
             var examDto = examService.getBaseEventDtoById(exam.getId());
 

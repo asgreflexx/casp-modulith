@@ -38,7 +38,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     @Override
     public CourseDto saveBaseEventDto(final CourseDto actualBaseEventDto) {
         var courseDto = super.saveBaseEventDto(actualBaseEventDto);
-        courseDto.setCoTrainers(coTrainerService.saveParticipants(actualBaseEventDto.getCoTrainers()));
+        courseDto.setCoTrainers(coTrainerService.saveParticipants(actualBaseEventDto.getCoTrainers(), baseEvent));
         return courseDto;
     }
 
@@ -46,7 +46,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     @Override
     public CourseDto getBaseEventDtoById(final UUID id) {
         var courseDto = super.getBaseEventDtoById(id);
-        courseDto.setCoTrainers(coTrainerService.getParticipantsByEvent(mapper.dtoToDocument(courseDto)));
+        courseDto.setCoTrainers(coTrainerService.getParticipantsByBaseEventId(baseEvent.getId()));
         return courseDto;
     }
 

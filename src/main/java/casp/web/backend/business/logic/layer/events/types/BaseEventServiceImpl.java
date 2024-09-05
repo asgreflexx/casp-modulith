@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.UUID;
 
 abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<E, P, D> {
-    protected static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
+    private static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
     private static final int DEFAULT_EVENT_LENGTH = 1;
     protected final CalendarService calendarService;
     protected final BaseParticipantService<P, E> participantService;
@@ -33,6 +33,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     protected final BaseEventMapper<E, D> mapper;
     protected Set<P> participants;
     protected List<Calendar> calendarEntries;
+    protected E baseEvent;
 
     protected BaseEventServiceImpl(final CalendarService calendarService,
                                    final BaseParticipantService<P, E> participantService,
@@ -94,15 +95,15 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     @Transactional(readOnly = true)
     @Override
     public D getBaseEventDtoById(final UUID id) {
-        var event = (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+        baseEvent = (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> {
                     var msg = "This %s[%s] doesn't exist or it isn't active".formatted(eventType, id);
                     LOG.error(msg);
                     return new NoSuchElementException(msg);
                 });
-        var dto = mapper.documentToDto(event);
-        dto.setParticipants(participantService.getParticipantsByEvent(event));
-        dto.setCalendarEntries(calendarService.getCalendarEntriesByBaseEvent(event));
+        var dto = mapper.documentToDto(baseEvent);
+        dto.setParticipants(participantService.getParticipantsByBaseEventId(baseEvent.getId()));
+        dto.setCalendarEntries(calendarService.getCalendarEntriesByBaseEvent(baseEvent));
         return dto;
     }
 
@@ -116,23 +117,23 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     @Transactional
     @Override
     public D saveBaseEventDto(final D actualBaseEventDto) {
-        E event = mapper.dtoToDocument(actualBaseEventDto);
-        event = saveEvent(event, actualBaseEventDto.getParticipants(), actualBaseEventDto.getCalendarEntries());
+        baseEvent = mapper.dtoToDocument(actualBaseEventDto);
+        saveEvent(baseEvent, actualBaseEventDto.getParticipants(), actualBaseEventDto.getCalendarEntries());
 
-        var newBaseEvent = mapper.documentToDto(event);
+        var newBaseEvent = mapper.documentToDto(baseEvent);
         newBaseEvent.setParticipants(participants);
         newBaseEvent.setCalendarEntries(calendarEntries);
 
         return newBaseEvent;
     }
 
-    protected D createNewEventWithOneCalendarEntry(final D event) {
+    protected D createNewEventWithOneCalendarEntry(final D baseEventDto) {
         var eventFrom = LocalDateTime.now(ZoneId.systemDefault());
         var calendar = new Calendar();
         calendar.setEventFrom(eventFrom);
         calendar.setEventTo(eventFrom.plusHours(DEFAULT_EVENT_LENGTH));
-        event.getCalendarEntries().add(calendar);
-        return event;
+        baseEventDto.getCalendarEntries().add(calendar);
+        return baseEventDto;
     }
 
     protected Optional<BaseEvent> findBaseEventNotDeleted(final UUID id) {
@@ -151,13 +152,13 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         return eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE);
     }
 
-    private E saveEvent(final E event, final Set<P> participants, final List<Calendar> calendarEntries) {
-        this.calendarEntries = calendarService.replaceCalendarEntriesFromEvent(event, calendarEntries.getFirst());
-        this.participants = participantService.saveParticipants(participants);
+    private void saveEvent(final E baseEventParam, final Set<P> participants, final List<Calendar> calendarEntries) {
+        this.calendarEntries = calendarService.replaceCalendarEntriesFromEvent(baseEventParam, calendarEntries.getFirst());
+        this.participants = participantService.saveParticipants(participants, baseEventParam);
 
-        event.setMinLocalDateTime(this.calendarEntries.getFirst().getEventFrom());
-        event.setMaxLocalDateTime(this.calendarEntries.getLast().getEventTo());
-        event.setParticipantsSize(this.participants.size());
-        return eventRepository.save(event);
+        baseEventParam.setMinLocalDateTime(this.calendarEntries.getFirst().getEventFrom());
+        baseEventParam.setMaxLocalDateTime(this.calendarEntries.getLast().getEventTo());
+        baseEventParam.setParticipantsSize(this.participants.size());
+        baseEvent = eventRepository.save(baseEventParam);
     }
 }
