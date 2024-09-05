@@ -88,7 +88,7 @@ public class Space extends BaseParticipant implements Payment {
                 .add("participantType='" + participantType + "'")
                 .add("memberOrHandlerId=" + memberOrHandlerId)
                 .add("response=" + response)
-                .add("baseEventId=" + baseEventId)
+                .add("baseEvent=" + baseEvent)
                 .add("id=" + id)
                 .add("version=" + version)
                 .add("createdBy='" + createdBy + "'")
