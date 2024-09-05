@@ -71,7 +71,7 @@ class EventServiceImplTest {
         eventDto.setCalendarEntries(calendarEntries);
         eventDto.setParticipants(participants);
         when(calendarService.replaceCalendarEntriesFromEvent(event, calendarEntries.getFirst())).thenReturn(calendarEntries);
-        when(participantService.saveParticipants(eventDto.getParticipants())).thenReturn(eventDto.getParticipants());
+        when(participantService.saveParticipants(eventDto.getParticipants(), event)).thenReturn(eventDto.getParticipants());
         when(eventRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         var actualEvent = eventService.saveBaseEventDto(eventDto);
@@ -153,7 +153,7 @@ class EventServiceImplTest {
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
             when(calendarService.getCalendarEntriesByBaseEvent(event)).thenReturn(calendarEntries);
-            when(participantService.getParticipantsByEvent(event)).thenReturn(participants);
+            when(participantService.getParticipantsByBaseEventId(event.getId())).thenReturn(participants);
 
             var eventDto = eventService.getBaseEventDtoById(event.getId());
 
