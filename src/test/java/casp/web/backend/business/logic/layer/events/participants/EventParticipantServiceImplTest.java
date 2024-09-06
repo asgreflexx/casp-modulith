@@ -34,10 +34,12 @@ class EventParticipantServiceImplTest {
     private Event event;
     private Set<EventParticipant> expectedParticipants;
     private Set<BaseParticipant> baseParticipants;
+    private String participantType;
 
     @BeforeEach
     void setUp() {
         participant = spy(TestFixture.createValidEventParticipant());
+        participantType = participant.getParticipantType();
         event = (Event) participant.getBaseEvent();
         expectedParticipants = Set.of(participant);
         baseParticipants = expectedParticipants.stream()
@@ -92,7 +94,7 @@ class EventParticipantServiceImplTest {
 
     @Test
     void deactivateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE, participantType)).thenReturn(baseParticipants);
 
         eventParticipantService.deactivateParticipantsByMemberOrHandlerId(participant.getMemberOrHandlerId());
 
@@ -101,7 +103,7 @@ class EventParticipantServiceImplTest {
 
     @Test
     void activateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.INACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.INACTIVE, participantType)).thenReturn(baseParticipants);
 
         eventParticipantService.activateParticipantsByMemberOrHandlerId(participant.getMemberOrHandlerId());
 
@@ -110,7 +112,7 @@ class EventParticipantServiceImplTest {
 
     @Test
     void deleteParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(participant.getMemberOrHandlerId(), EntityStatus.DELETED)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(participant.getMemberOrHandlerId(), EntityStatus.DELETED, participantType)).thenReturn(baseParticipants);
 
         eventParticipantService.deleteParticipantsByMemberOrHandlerId(participant.getMemberOrHandlerId());
 
