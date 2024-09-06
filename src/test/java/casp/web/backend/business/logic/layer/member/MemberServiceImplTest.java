@@ -1,6 +1,8 @@
 package casp.web.backend.business.logic.layer.member;
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
+import casp.web.backend.business.logic.layer.events.participants.BaseParticipantObserver;
+import casp.web.backend.business.logic.layer.events.types.BaseEventObserver;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
 import casp.web.backend.data.access.layer.documents.member.Member;
@@ -38,6 +40,10 @@ class MemberServiceImplTest {
     private DogHasHandlerService dogHasHandlerService;
     @Mock
     private CardService cardService;
+    @Mock
+    private BaseParticipantObserver baseParticipantObserver;
+    @Mock
+    private BaseEventObserver baseEventObserver;
 
     @InjectMocks
     private MemberServiceImpl memberService;
@@ -101,6 +107,8 @@ class MemberServiceImplTest {
 
         verify(dogHasHandlerService).deactivateDogHasHandlersByMemberId(member.getId());
         verify(cardService).deactivateCardsByMemberId(member.getId());
+        verify(baseParticipantObserver).deactivateParticipantsByMemberOrHandlerId(member.getId());
+        verify(baseEventObserver).deactivateBaseEventsByMemberId(member.getId());
     }
 
     @Test
@@ -111,6 +119,8 @@ class MemberServiceImplTest {
 
         verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
         verify(cardService).activateCardsByMemberId(member.getId());
+        verify(baseParticipantObserver).activateParticipantsByMemberOrHandlerId(member.getId());
+        verify(baseEventObserver).activateBaseEventsByMemberId(member.getId());
     }
 
     @Nested
@@ -139,7 +149,7 @@ class MemberServiceImplTest {
 
             memberService.deleteMemberById(memberId);
 
-            verifyNoInteractions(dogHasHandlerService, cardService);
+            verifyNoInteractions(dogHasHandlerService, cardService, baseParticipantObserver, baseEventObserver);
 
         }
 
@@ -151,6 +161,8 @@ class MemberServiceImplTest {
 
             verify(dogHasHandlerService).deleteDogHasHandlersByMemberId(member.getId());
             verify(cardService).deleteCardsByMemberId(member.getId());
+            verify(baseParticipantObserver).deleteParticipantsByMemberOrHandlerId(member.getId());
+            verify(baseEventObserver).deleteBaseEventsByMemberId(member.getId());
             verify(member).setEntityStatus(EntityStatus.DELETED);
             verify(member).setEmail("%s---%s".formatted(member.getEmail(), member.getId()));
         }

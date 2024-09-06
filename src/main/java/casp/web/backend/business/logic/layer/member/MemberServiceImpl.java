@@ -2,6 +2,8 @@ package casp.web.backend.business.logic.layer.member;
 
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
+import casp.web.backend.business.logic.layer.events.participants.BaseParticipantObserver;
+import casp.web.backend.business.logic.layer.events.types.BaseEventObserver;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
 import casp.web.backend.data.access.layer.documents.member.Member;
@@ -33,12 +35,20 @@ class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final DogHasHandlerService dogHasHandlerService;
     private final CardService cardService;
+    private final BaseParticipantObserver baseParticipantObserver;
+    private final BaseEventObserver baseEventObserver;
 
     @Autowired
-    MemberServiceImpl(final MemberRepository memberRepository, final DogHasHandlerService dogHasHandlerService, final CardService cardService) {
+    MemberServiceImpl(final MemberRepository memberRepository,
+                      final DogHasHandlerService dogHasHandlerService,
+                      final CardService cardService,
+                      final BaseParticipantObserver baseParticipantObserver,
+                      final BaseEventObserver baseEventObserver) {
         this.memberRepository = memberRepository;
         this.dogHasHandlerService = dogHasHandlerService;
         this.cardService = cardService;
+        this.baseParticipantObserver = baseParticipantObserver;
+        this.baseEventObserver = baseEventObserver;
     }
 
     @Override
@@ -81,8 +91,8 @@ class MemberServiceImpl implements MemberService {
         memberRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED).ifPresent(member -> {
             dogHasHandlerService.deleteDogHasHandlersByMemberId(id);
             cardService.deleteCardsByMemberId(id);
-            // TODO: delete BaseEvents
-            // TODO: delete BaseParticipants
+            baseParticipantObserver.deleteParticipantsByMemberOrHandlerId(id);
+            baseEventObserver.deleteBaseEventsByMemberId(id);
             member.setEmail(EMAIL_FORMAT_IF_DELETED.formatted(member.getEmail(), id));
             member.setEntityStatus(EntityStatus.DELETED);
         });
@@ -94,8 +104,8 @@ class MemberServiceImpl implements MemberService {
         var member = getMemberById(id);
         dogHasHandlerService.deactivateDogHasHandlersByMemberId(id);
         cardService.deactivateCardsByMemberId(id);
-        // TODO: deactivate BaseEvents
-        // TODO: deactivate BaseParticipants
+        baseParticipantObserver.deactivateParticipantsByMemberOrHandlerId(id);
+        baseEventObserver.deactivateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.INACTIVE);
         return member;
     }
@@ -106,8 +116,8 @@ class MemberServiceImpl implements MemberService {
         var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.INACTIVE);
         dogHasHandlerService.activateDogHasHandlersByMemberId(id);
         cardService.activateCardsByMemberId(id);
-        // TODO: activate BaseEvents
-        // TODO: activate BaseParticipants
+        baseParticipantObserver.activateParticipantsByMemberOrHandlerId(id);
+        baseEventObserver.activateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.ACTIVE);
         return member;
     }
