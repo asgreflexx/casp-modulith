@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -90,6 +91,8 @@ class ExamServiceImplTest {
 
         examService.deleteBaseEventById(exam.getId());
 
+        verify(participantService).deleteParticipantsByBaseEventId(exam.getId());
+        verify(calendarService).deleteCalendarEntriesByBaseEventId(exam.getId());
         assertSame(EntityStatus.DELETED, exam.getEntityStatus());
     }
 
@@ -125,6 +128,8 @@ class ExamServiceImplTest {
 
         examService.deleteBaseEventsByMemberId(memberId);
 
+        verify(participantService).deleteParticipantsByBaseEventId(exam.getId());
+        verify(calendarService).deleteCalendarEntriesByBaseEventId(exam.getId());
         assertSame(EntityStatus.DELETED, exam.getEntityStatus());
     }
 
@@ -135,6 +140,8 @@ class ExamServiceImplTest {
 
         examService.deactivateBaseEventsByMemberId(memberId);
 
+        verify(participantService).deactivateParticipantsByBaseEventId(exam.getId());
+        verify(calendarService).deactivateCalendarEntriesByBaseEventId(exam.getId());
         assertSame(EntityStatus.INACTIVE, exam.getEntityStatus());
     }
 
@@ -145,6 +152,8 @@ class ExamServiceImplTest {
 
         examService.activateBaseEventsByMemberId(memberId);
 
+        verify(participantService).activateParticipantsByBaseEventId(exam.getId());
+        verify(calendarService).activateCalendarEntriesByBaseEventId(exam.getId());
         assertSame(EntityStatus.ACTIVE, exam.getEntityStatus());
     }
 

@@ -29,8 +29,8 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
         this.coTrainerService = coTrainerService;
     }
 
-    private static void deleteCourse(final BaseEvent course) {
-        // TODO delete cotrainers (event);
+    private void deleteCourse(final BaseEvent course) {
+        coTrainerService.deleteParticipantsByBaseEventId(course.getId());
         deleteBaseEvent(course);
     }
 
@@ -53,20 +53,20 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventById(final UUID id) {
-        findBaseEventNotDeleted(id).ifPresent(CourseServiceImpl::deleteCourse);
+        findBaseEventNotDeleted(id).ifPresent(this::deleteCourse);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventsByMemberId(final UUID memberId) {
-        findAllByMemberIdAndNotDeleted(memberId).forEach(CourseServiceImpl::deleteCourse);
+        findAllByMemberIdAndNotDeleted(memberId).forEach(this::deleteCourse);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deactivateBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndIsActive(memberId).forEach(course -> {
-            // TODO deactivate coTrainers
+            coTrainerService.deactivateParticipantsByBaseEventId(course.getId());
             deactivateBaseEvent(course);
         });
     }
@@ -75,7 +75,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     @Override
     public void activateBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndIsInactive(memberId).forEach(course -> {
-            // TODO activate coTrainers
+            coTrainerService.activateParticipantsByBaseEventId(course.getId());
             activateBaseEvent(course);
         });
     }

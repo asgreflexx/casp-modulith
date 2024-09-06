@@ -47,46 +47,46 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         this.mapper = mapper;
     }
 
-    protected static void deleteBaseEvent(final BaseEvent baseEvent) {
-        // TODO delete  calendar entries (event);
-        // TODO delete participants (event);
+    protected void deleteBaseEvent(final BaseEvent baseEvent) {
+        participantService.deleteParticipantsByBaseEventId(baseEvent.getId());
+        calendarService.deleteCalendarEntriesByBaseEventId(baseEvent.getId());
         baseEvent.setEntityStatus(EntityStatus.DELETED);
     }
 
-    protected static void deactivateBaseEvent(final BaseEvent baseEvent) {
-        // TODO deactivate  calendar entries (event);
-        // TODO deactivate participants (event);
+    protected void deactivateBaseEvent(final BaseEvent baseEvent) {
+        participantService.deactivateParticipantsByBaseEventId(baseEvent.getId());
+        calendarService.deactivateCalendarEntriesByBaseEventId(baseEvent.getId());
         baseEvent.setEntityStatus(EntityStatus.INACTIVE);
     }
 
-    protected static void activateBaseEvent(final BaseEvent baseEvent) {
-        // TODO activate  calendar entries (event);
-        // TODO activate participants (event);
+    protected void activateBaseEvent(final BaseEvent baseEvent) {
+        participantService.activateParticipantsByBaseEventId(baseEvent.getId());
+        calendarService.activateCalendarEntriesByBaseEventId(baseEvent.getId());
         baseEvent.setEntityStatus(EntityStatus.ACTIVE);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventById(final UUID id) {
-        findBaseEventNotDeleted(id).ifPresent(BaseEventServiceImpl::deleteBaseEvent);
+        findBaseEventNotDeleted(id).ifPresent(this::deleteBaseEvent);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventsByMemberId(final UUID memberId) {
-        findAllByMemberIdAndNotDeleted(memberId).forEach(BaseEventServiceImpl::deleteBaseEvent);
+        findAllByMemberIdAndNotDeleted(memberId).forEach(this::deleteBaseEvent);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void deactivateBaseEventsByMemberId(final UUID memberId) {
-        findAllByMemberIdAndIsActive(memberId).forEach(BaseEventServiceImpl::deactivateBaseEvent);
+        findAllByMemberIdAndIsActive(memberId).forEach(this::deactivateBaseEvent);
     }
 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void activateBaseEventsByMemberId(final UUID memberId) {
-        findAllByMemberIdAndIsInactive(memberId).forEach(BaseEventServiceImpl::activateBaseEvent);
+        findAllByMemberIdAndIsInactive(memberId).forEach(this::activateBaseEvent);
 
     }
 
