@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -100,6 +101,9 @@ class CourseServiceImplTest {
 
         courseService.deleteBaseEventById(course.getId());
 
+        verify(participantService).deleteParticipantsByBaseEventId(course.getId());
+        verify(calendarService).deleteCalendarEntriesByBaseEventId(course.getId());
+        verify(coTrainerService).deleteParticipantsByBaseEventId(course.getId());
         assertSame(EntityStatus.DELETED, course.getEntityStatus());
     }
 
@@ -135,6 +139,9 @@ class CourseServiceImplTest {
 
         courseService.deleteBaseEventsByMemberId(memberId);
 
+        verify(participantService).deleteParticipantsByBaseEventId(course.getId());
+        verify(calendarService).deleteCalendarEntriesByBaseEventId(course.getId());
+        verify(coTrainerService).deleteParticipantsByBaseEventId(course.getId());
         assertSame(EntityStatus.DELETED, course.getEntityStatus());
     }
 
@@ -145,6 +152,9 @@ class CourseServiceImplTest {
 
         courseService.deactivateBaseEventsByMemberId(memberId);
 
+        verify(participantService).deactivateParticipantsByBaseEventId(course.getId());
+        verify(calendarService).deactivateCalendarEntriesByBaseEventId(course.getId());
+        verify(coTrainerService).deactivateParticipantsByBaseEventId(course.getId());
         assertSame(EntityStatus.INACTIVE, course.getEntityStatus());
     }
 
@@ -155,6 +165,9 @@ class CourseServiceImplTest {
 
         courseService.activateBaseEventsByMemberId(memberId);
 
+        verify(participantService).activateParticipantsByBaseEventId(course.getId());
+        verify(calendarService).activateCalendarEntriesByBaseEventId(course.getId());
+        verify(coTrainerService).activateParticipantsByBaseEventId(course.getId());
         assertSame(EntityStatus.ACTIVE, course.getEntityStatus());
     }
 
