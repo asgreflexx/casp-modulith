@@ -12,9 +12,11 @@ import java.util.UUID;
 
 abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends BaseEvent> implements BaseParticipantService<P, E> {
     protected final BaseParticipantRepository baseParticipantRepository;
+    protected final String participantType;
 
-    BaseParticipantServiceImpl(final BaseParticipantRepository baseParticipantRepository) {
+    BaseParticipantServiceImpl(final BaseParticipantRepository baseParticipantRepository, final String participantType) {
         this.baseParticipantRepository = baseParticipantRepository;
+        this.participantType = participantType;
     }
 
     @Transactional
@@ -56,21 +58,21 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
     @Transactional
     @Override
     public void deleteParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
-        baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(memberOrHandlerId, EntityStatus.DELETED)
+        baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(memberOrHandlerId, EntityStatus.DELETED, participantType)
                 .forEach(participant -> participant.setEntityStatus(EntityStatus.DELETED));
     }
 
     @Transactional
     @Override
     public void deactivateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
-        baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.ACTIVE)
+        baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.ACTIVE, participantType)
                 .forEach(participant -> participant.setEntityStatus(EntityStatus.INACTIVE));
     }
 
     @Transactional
     @Override
     public void activateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
-        baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.INACTIVE)
+        baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.INACTIVE, participantType)
                 .forEach(participant -> participant.setEntityStatus(EntityStatus.ACTIVE));
     }
 }

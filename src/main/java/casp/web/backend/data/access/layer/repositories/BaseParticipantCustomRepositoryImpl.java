@@ -25,24 +25,26 @@ class BaseParticipantCustomRepositoryImpl implements BaseParticipantCustomReposi
 
 
     @Override
-    public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdIn(final Set<UUID> memberOrHandlersId, final P newInstanceOfBaseParticipant) {
+    public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdIn(final Set<UUID> memberOrHandlersId, final String participantType) {
         var expression = BASE_PARTICIPANT.entityStatus.eq(EntityStatus.ACTIVE)
                 .and(BASE_PARTICIPANT.memberOrHandlerId.in(memberOrHandlersId))
-                .and(BASE_PARTICIPANT.participantType.eq(newInstanceOfBaseParticipant.getParticipantType()));
+                .and(BASE_PARTICIPANT.participantType.eq(participantType));
         return runQueryAndMapBaseParticipants(expression);
     }
 
     @Override
-    public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdAndEntityStatus(final UUID memberOrHandlerId, final EntityStatus entityStatus) {
+    public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdAndEntityStatus(final UUID memberOrHandlerId, final EntityStatus entityStatus, final String participantType) {
         var expression = BASE_PARTICIPANT.memberOrHandlerId.eq(memberOrHandlerId)
-                .and(BASE_PARTICIPANT.entityStatus.eq(entityStatus));
+                .and(BASE_PARTICIPANT.entityStatus.eq(entityStatus))
+                .and(BASE_PARTICIPANT.participantType.eq(participantType));
         return runQueryAndMapBaseParticipants(expression);
     }
 
     @Override
-    public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdAndEntityStatusNot(final UUID memberOrHandlerId, final EntityStatus entityStatus) {
+    public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdAndEntityStatusNot(final UUID memberOrHandlerId, final EntityStatus entityStatus, final String participantType) {
         var expression = BASE_PARTICIPANT.memberOrHandlerId.eq(memberOrHandlerId)
-                .and(BASE_PARTICIPANT.entityStatus.ne(entityStatus));
+                .and(BASE_PARTICIPANT.entityStatus.ne(entityStatus))
+                .and(BASE_PARTICIPANT.participantType.eq(participantType));
         return runQueryAndMapBaseParticipants(expression);
     }
 

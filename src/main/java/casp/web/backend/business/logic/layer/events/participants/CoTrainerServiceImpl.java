@@ -12,6 +12,6 @@ class CoTrainerServiceImpl extends BaseParticipantServiceImpl<CoTrainer, Course>
 
     @Autowired
     CoTrainerServiceImpl(final BaseParticipantRepository baseParticipantRepository) {
-        super(baseParticipantRepository);
+        super(baseParticipantRepository, CoTrainer.PARTICIPANT_TYPE);
     }
 }

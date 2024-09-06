@@ -29,13 +29,12 @@ class BaseParticipantCustomRepositoryImplTest {
 
     @Test
     void findAllByMemberOrHandlerIdAndEntityStatus() {
-        assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE))
-                .containsExactly(space);
+        assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE, space.getParticipantType())).containsExactly(space);
     }
 
     @Test
     void findAllByMemberOrHandlerIdAndEntityStatusNot() {
-        assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(space.getMemberOrHandlerId(), EntityStatus.INACTIVE))
+        assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(space.getMemberOrHandlerId(), EntityStatus.INACTIVE, space.getParticipantType()))
                 .containsExactly(space);
     }
 
@@ -43,12 +42,12 @@ class BaseParticipantCustomRepositoryImplTest {
     class FindAllByMemberOrHandlerIdIn {
         @Test
         void participantWasFound() {
-            assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), new Space())).containsExactly(space);
+            assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), space.getParticipantType())).containsExactly(space);
         }
 
         @Test
         void participantNotFound() {
-            assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), new EventParticipant())).isEmpty();
+            assertThat(baseParticipantRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), EventParticipant.PARTICIPANT_TYPE)).isEmpty();
         }
     }
 }

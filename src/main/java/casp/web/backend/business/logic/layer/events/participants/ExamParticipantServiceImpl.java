@@ -11,6 +11,6 @@ class ExamParticipantServiceImpl extends BaseParticipantServiceImpl<ExamParticip
 
     @Autowired
     ExamParticipantServiceImpl(final BaseParticipantRepository baseParticipantRepository) {
-        super(baseParticipantRepository);
+        super(baseParticipantRepository, ExamParticipant.PARTICIPANT_TYPE);
     }
 }

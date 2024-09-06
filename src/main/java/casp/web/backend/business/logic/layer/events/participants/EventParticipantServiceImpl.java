@@ -12,6 +12,6 @@ class EventParticipantServiceImpl extends BaseParticipantServiceImpl<EventPartic
 
     @Autowired
     EventParticipantServiceImpl(final BaseParticipantRepository baseParticipantRepository) {
-        super(baseParticipantRepository);
+        super(baseParticipantRepository, EventParticipant.PARTICIPANT_TYPE);
     }
 }

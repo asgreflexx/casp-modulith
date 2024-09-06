@@ -15,7 +15,7 @@ class SpaceServiceImpl extends BaseParticipantServiceImpl<Space, Course> impleme
 
     @Autowired
     SpaceServiceImpl(final BaseParticipantRepository baseParticipantRepository) {
-        super(baseParticipantRepository);
+        super(baseParticipantRepository, Space.PARTICIPANT_TYPE);
     }
 
     @Override
@@ -25,6 +25,6 @@ class SpaceServiceImpl extends BaseParticipantServiceImpl<Space, Course> impleme
 
     @Override
     public Set<Space> getSpacesByDogHasHandlersId(final Set<UUID> dogHasHandlersId) {
-        return baseParticipantRepository.findAllByMemberOrHandlerIdIn(dogHasHandlersId, new Space());
+        return baseParticipantRepository.findAllByMemberOrHandlerIdIn(dogHasHandlersId, participantType);
     }
 }

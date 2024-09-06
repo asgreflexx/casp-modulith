@@ -33,10 +33,12 @@ class CoTrainerServiceImplTest {
     private Course course;
     private Set<CoTrainer> expectedCoTrainers;
     private Set<BaseParticipant> baseParticipants;
+    private String participantType;
 
     @BeforeEach
     void setUp() {
         coTrainer = spy(TestFixture.createValidCoTrainer());
+        participantType = coTrainer.getParticipantType();
         course = (Course) coTrainer.getBaseEvent();
         expectedCoTrainers = Set.of(coTrainer);
         baseParticipants = expectedCoTrainers.stream()
@@ -91,7 +93,7 @@ class CoTrainerServiceImplTest {
 
     @Test
     void deactivateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.ACTIVE, participantType)).thenReturn(baseParticipants);
 
         coTrainerService.deactivateParticipantsByMemberOrHandlerId(coTrainer.getMemberOrHandlerId());
 
@@ -100,7 +102,7 @@ class CoTrainerServiceImplTest {
 
     @Test
     void activateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.INACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.INACTIVE, participantType)).thenReturn(baseParticipants);
 
         coTrainerService.activateParticipantsByMemberOrHandlerId(coTrainer.getMemberOrHandlerId());
 
@@ -109,7 +111,7 @@ class CoTrainerServiceImplTest {
 
     @Test
     void deleteParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(coTrainer.getMemberOrHandlerId(), EntityStatus.DELETED)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(coTrainer.getMemberOrHandlerId(), EntityStatus.DELETED, participantType)).thenReturn(baseParticipants);
 
         coTrainerService.deleteParticipantsByMemberOrHandlerId(coTrainer.getMemberOrHandlerId());
 

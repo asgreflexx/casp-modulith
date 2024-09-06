@@ -18,8 +18,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -35,10 +33,12 @@ class SpaceServiceImplTest {
     private Course course;
     private Set<Space> expectedSpaces;
     private Set<BaseParticipant> baseParticipants;
+    private String participantType;
 
     @BeforeEach
     void setUp() {
         space = spy(TestFixture.createValidSpace());
+        participantType = space.getParticipantType();
         course = (Course) space.getBaseEvent();
         expectedSpaces = Set.of(space);
         baseParticipants = expectedSpaces.stream()
@@ -100,14 +100,14 @@ class SpaceServiceImplTest {
 
     @Test
     void getSpacesByDogHasHandlersId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdIn(eq(Set.of(space.getMemberOrHandlerId())), any(Space.class))).thenReturn(expectedSpaces);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), participantType)).thenReturn(baseParticipants);
 
         assertThat(spaceService.getSpacesByDogHasHandlersId(Set.of(space.getMemberOrHandlerId()))).containsAll(expectedSpaces);
     }
 
     @Test
     void deactivateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE, participantType)).thenReturn(baseParticipants);
 
         spaceService.deactivateParticipantsByMemberOrHandlerId(space.getMemberOrHandlerId());
 
@@ -116,7 +116,7 @@ class SpaceServiceImplTest {
 
     @Test
     void activateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.INACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.INACTIVE, participantType)).thenReturn(baseParticipants);
 
         spaceService.activateParticipantsByMemberOrHandlerId(space.getMemberOrHandlerId());
 
@@ -125,7 +125,7 @@ class SpaceServiceImplTest {
 
     @Test
     void deleteParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(space.getMemberOrHandlerId(), EntityStatus.DELETED)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(space.getMemberOrHandlerId(), EntityStatus.DELETED, participantType)).thenReturn(baseParticipants);
 
         spaceService.deleteParticipantsByMemberOrHandlerId(space.getMemberOrHandlerId());
 
