@@ -121,7 +121,7 @@ class ExamServiceImplTest {
     @Test
     void deleteBaseEventsByMemberId() {
         UUID memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatusNot(memberId, EntityStatus.DELETED)).thenReturn(Set.of(exam));
+        when(eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, exam.getEventType())).thenReturn(Set.of(exam));
 
         examService.deleteBaseEventsByMemberId(memberId);
 
@@ -131,7 +131,7 @@ class ExamServiceImplTest {
     @Test
     void deactivateBaseEventsByMemberId() {
         UUID memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Set.of(exam));
+        when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, exam.getEventType())).thenReturn(Set.of(exam));
 
         examService.deactivateBaseEventsByMemberId(memberId);
 
@@ -141,7 +141,7 @@ class ExamServiceImplTest {
     @Test
     void activateBaseEventsByMemberId() {
         UUID memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE)).thenReturn(Set.of(exam));
+        when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, exam.getEventType())).thenReturn(Set.of(exam));
 
         examService.activateBaseEventsByMemberId(memberId);
 

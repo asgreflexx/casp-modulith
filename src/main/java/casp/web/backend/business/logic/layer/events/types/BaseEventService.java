@@ -15,15 +15,15 @@ public interface BaseEventService<E extends BaseEvent, P extends BaseParticipant
 
     void deleteBaseEventById(UUID id);
 
-    void deleteBaseEventsByMemberId(UUID memberId);
-
-    void deactivateBaseEventsByMemberId(UUID memberId);
-
-    void activateBaseEventsByMemberId(UUID memberId);
-
     D getBaseEventDtoById(UUID id);
 
     D createNewBaseEventWithOneCalendarEntry();
 
     Page<E> getBaseEventsAsPage(int year, Pageable pageable);
+
+    void deleteBaseEventsByMemberId(UUID memberId);
+
+    void deactivateBaseEventsByMemberId(UUID memberId);
+
+    void activateBaseEventsByMemberId(UUID memberId);
 }

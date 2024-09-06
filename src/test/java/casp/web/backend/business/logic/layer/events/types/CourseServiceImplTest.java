@@ -131,7 +131,7 @@ class CourseServiceImplTest {
     @Test
     void deleteBaseEventsByMemberId() {
         UUID memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatusNot(memberId, EntityStatus.DELETED)).thenReturn(Set.of(course));
+        when(eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, course.getEventType())).thenReturn(Set.of(course));
 
         courseService.deleteBaseEventsByMemberId(memberId);
 
@@ -141,7 +141,7 @@ class CourseServiceImplTest {
     @Test
     void deactivateBaseEventsByMemberId() {
         UUID memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Set.of(course));
+        when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, course.getEventType())).thenReturn(Set.of(course));
 
         courseService.deactivateBaseEventsByMemberId(memberId);
 
@@ -151,7 +151,7 @@ class CourseServiceImplTest {
     @Test
     void activateBaseEventsByMemberId() {
         UUID memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE)).thenReturn(Set.of(course));
+        when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, course.getEventType())).thenReturn(Set.of(course));
 
         courseService.activateBaseEventsByMemberId(memberId);
 

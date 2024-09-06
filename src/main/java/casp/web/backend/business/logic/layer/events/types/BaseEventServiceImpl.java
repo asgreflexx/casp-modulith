@@ -141,15 +141,15 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     }
 
     protected Set<BaseEvent> findAllByMemberIdAndNotDeleted(final UUID memberId) {
-        return eventRepository.findAllByMemberIdAndEntityStatusNot(memberId, EntityStatus.DELETED);
+        return eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, eventType);
     }
 
     protected Set<BaseEvent> findAllByMemberIdAndIsActive(final UUID memberId) {
-        return eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
+        return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, eventType);
     }
 
     protected Set<BaseEvent> findAllByMemberIdAndIsInactive(final UUID memberId) {
-        return eventRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE);
+        return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, eventType);
     }
 
     private void saveEvent(final E baseEventParam, final Set<P> participants, final List<Calendar> calendarEntries) {
