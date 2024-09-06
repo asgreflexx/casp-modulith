@@ -1,5 +1,6 @@
 package casp.web.backend.business.logic.layer.dog;
 
+import casp.web.backend.business.logic.layer.events.participants.BaseParticipantObserver;
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
@@ -38,6 +39,8 @@ class DogHasHandlerServiceImplTest {
     private MemberRepository memberRepository;
     @Mock
     private MongoTransactionManager mongoTransactionManager;
+    @Mock
+    private BaseParticipantObserver baseParticipantObserver;
 
     @InjectMocks
     private DogHasHandlerServiceImpl dogHasHandlerService;
@@ -80,6 +83,7 @@ class DogHasHandlerServiceImplTest {
 
         dogHasHandlerService.deleteDogHasHandlersByMemberId(memberId);
 
+        verify(baseParticipantObserver).deleteParticipantsByMemberOrHandlerId(dogHasHandler.getId());
         assertSame(EntityStatus.DELETED, dogHasHandler.getEntityStatus());
     }
 
@@ -90,6 +94,7 @@ class DogHasHandlerServiceImplTest {
 
         dogHasHandlerService.deleteDogHasHandlersByDogId(dogId);
 
+        verify(baseParticipantObserver).deleteParticipantsByMemberOrHandlerId(dogHasHandler.getId());
         assertSame(EntityStatus.DELETED, dogHasHandler.getEntityStatus());
     }
 
@@ -188,6 +193,7 @@ class DogHasHandlerServiceImplTest {
 
         dogHasHandlerService.deactivateDogHasHandlersByMemberId(memberId);
 
+        verify(baseParticipantObserver).deactivateParticipantsByMemberOrHandlerId(dogHasHandler.getId());
         assertSame(EntityStatus.INACTIVE, dogHasHandler.getEntityStatus());
     }
 
@@ -197,6 +203,7 @@ class DogHasHandlerServiceImplTest {
 
         dogHasHandlerService.activateDogHasHandlersByMemberId(memberId);
 
+        verify(baseParticipantObserver).activateParticipantsByMemberOrHandlerId(dogHasHandler.getId());
         assertSame(EntityStatus.ACTIVE, dogHasHandler.getEntityStatus());
     }
 

@@ -1,5 +1,6 @@
 package casp.web.backend.business.logic.layer.dog;
 
+import casp.web.backend.business.logic.layer.events.participants.BaseParticipantObserver;
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
@@ -34,16 +35,19 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     private final MemberRepository memberRepository;
     private final DogRepository dogRepository;
     private final TransactionTemplate transactionTemplate;
+    private final BaseParticipantObserver baseParticipantObserver;
 
     @Autowired
     DogHasHandlerServiceImpl(final DogHasHandlerRepository dogHasHandlerRepository,
                              final MemberRepository memberRepository,
                              final DogRepository dogRepository,
-                             final MongoTransactionManager mongoTransactionManager) {
+                             final MongoTransactionManager mongoTransactionManager,
+                             final BaseParticipantObserver baseParticipantObserver) {
         this.dogHasHandlerRepository = dogHasHandlerRepository;
         this.memberRepository = memberRepository;
         this.dogRepository = dogRepository;
         this.transactionTemplate = new TransactionTemplate(mongoTransactionManager);
+        this.baseParticipantObserver = baseParticipantObserver;
     }
 
     @Transactional
@@ -147,7 +151,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     @Override
     public void deactivateDogHasHandlersByMemberId(final UUID memberId) {
         getHandlersByMemberId(memberId).forEach(dh -> {
-            // TODO baseParticipantService.deactivateByMemberOrHandlerId(dh.id);
+            baseParticipantObserver.deactivateParticipantsByMemberOrHandlerId(dh.getId());
             dh.setEntityStatus(EntityStatus.INACTIVE);
         });
     }
@@ -155,13 +159,13 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     @Override
     public void activateDogHasHandlersByMemberId(final UUID memberId) {
         dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE).forEach(dh -> {
-            // TODO baseParticipantService.activateByMemberOrHandlerId(dh.id);
+            baseParticipantObserver.activateParticipantsByMemberOrHandlerId(dh.getId());
             dh.setEntityStatus(EntityStatus.ACTIVE);
         });
     }
 
     private void deleteDogHasHandler(final DogHasHandler dh) {
-        // TODO baseParticipantService.deleteByMemberOrHandlerId(dh.id);
+        baseParticipantObserver.deleteParticipantsByMemberOrHandlerId(dh.getId());
         dh.setEntityStatus(EntityStatus.DELETED);
     }
 
