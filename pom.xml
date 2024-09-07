@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>casp-web-backend</groupId>
-    <artifactId>admin</artifactId>
+    <artifactId>adminV2</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>Admin</name>
+    <name>AdminV2</name>
     <description>This Administration solution</description>
     <properties>
         <java.version>21</java.version>
