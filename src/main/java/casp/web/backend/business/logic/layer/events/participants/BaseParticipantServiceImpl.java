@@ -34,47 +34,44 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
         return (Set<P>) baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(baseEventId, EntityStatus.ACTIVE);
     }
 
-    @Transactional
     @Override
     public void deleteParticipantsByBaseEventId(final UUID baseEventId) {
         baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNot(baseEventId, EntityStatus.DELETED)
-                .forEach(participant -> participant.setEntityStatus(EntityStatus.DELETED));
+                .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.DELETED));
     }
 
-    @Transactional
     @Override
     public void deactivateParticipantsByBaseEventId(final UUID baseEventId) {
         getParticipantsByBaseEventId(baseEventId)
-                .forEach(participant -> participant.setEntityStatus(EntityStatus.INACTIVE));
+                .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.INACTIVE));
     }
 
-    @Transactional
     @Override
     public void activateParticipantsByBaseEventId(final UUID baseEventId) {
         baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(baseEventId, EntityStatus.INACTIVE)
-                .forEach(participant -> participant.setEntityStatus(EntityStatus.ACTIVE));
+                .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.ACTIVE));
     }
 
     @Override
     public void deleteParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(memberOrHandlerId, EntityStatus.DELETED, participantType)
-                .forEach(participant -> {
-                    participant.setEntityStatus(EntityStatus.DELETED);
-                    baseParticipantRepository.save(participant);
-                });
+                .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.DELETED));
     }
 
-    @Transactional
     @Override
     public void deactivateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.ACTIVE, participantType)
-                .forEach(participant -> participant.setEntityStatus(EntityStatus.INACTIVE));
+                .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.INACTIVE));
     }
 
-    @Transactional
     @Override
     public void activateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.INACTIVE, participantType)
-                .forEach(participant -> participant.setEntityStatus(EntityStatus.ACTIVE));
+                .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.ACTIVE));
+    }
+
+    private void saveItWithNewStatus(final BaseParticipant participant, final EntityStatus entityStatus) {
+        participant.setEntityStatus(entityStatus);
+        baseParticipantRepository.save(participant);
     }
 }

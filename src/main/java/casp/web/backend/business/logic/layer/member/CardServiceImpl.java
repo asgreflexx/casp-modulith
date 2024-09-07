@@ -64,24 +64,27 @@ class CardServiceImpl implements CardService {
         });
     }
 
-    @Transactional
     @Override
     public void deleteCardsByMemberId(final UUID memberId) {
         cardRepository.findAllByMemberIdAndEntityStatusNot(memberId, EntityStatus.DELETED)
-                .forEach(card -> card.setEntityStatus(EntityStatus.DELETED));
+                .forEach(card -> saveItWithStatus(card, EntityStatus.DELETED));
     }
 
-    @Transactional
     @Override
     public void deactivateCardsByMemberId(final UUID memberId) {
         cardRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE)
-                .forEach(card -> card.setEntityStatus(EntityStatus.INACTIVE));
+                .forEach(card -> saveItWithStatus(card, EntityStatus.INACTIVE));
     }
 
     @Override
     public void activateCardsByMemberId(final UUID memberId) {
         cardRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE)
-                .forEach(card -> card.setEntityStatus(EntityStatus.ACTIVE));
+                .forEach(card -> saveItWithStatus(card, EntityStatus.ACTIVE));
+    }
+
+    private void saveItWithStatus(final Card card, final EntityStatus deleted) {
+        card.setEntityStatus(deleted);
+        cardRepository.save(card);
     }
 
     private Member getMember(final UUID memberId) {

@@ -2,7 +2,6 @@ package casp.web.backend.business.logic.layer.events.participants;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -28,13 +27,11 @@ class BaseParticipantObserverImpl implements BaseParticipantObserver {
         observers.forEach(observer -> observer.deleteParticipantsByMemberOrHandlerId(memberOrHandlerId));
     }
 
-    @Transactional
     @Override
     public void deactivateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         observers.forEach(observer -> observer.deactivateParticipantsByMemberOrHandlerId(memberOrHandlerId));
     }
 
-    @Transactional
     @Override
     public void activateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         observers.forEach(observer -> observer.activateParticipantsByMemberOrHandlerId(memberOrHandlerId));

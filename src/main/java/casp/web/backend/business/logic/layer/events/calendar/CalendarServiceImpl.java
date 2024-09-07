@@ -64,24 +64,26 @@ class CalendarServiceImpl implements CalendarService {
                 .ifPresent(calendarEntry -> calendarEntry.setEntityStatus(EntityStatus.DELETED));
     }
 
-    @Transactional
     @Override
     public void deleteCalendarEntriesByBaseEventId(final UUID baseEventId) {
         calendarRepository.findAllByBaseEventIdAndEntityStatusNot(baseEventId, EntityStatus.DELETED)
-                .forEach(calendarEntry -> calendarEntry.setEntityStatus(EntityStatus.DELETED));
+                .forEach(calendarEntry -> saveItWithStatus(calendarEntry, EntityStatus.DELETED));
     }
 
-    @Transactional
     @Override
     public void deactivateCalendarEntriesByBaseEventId(final UUID baseEventId) {
         calendarRepository.findAllByBaseEventIdAndEntityStatus(baseEventId, EntityStatus.ACTIVE)
-                .forEach(calendarEntry -> calendarEntry.setEntityStatus(EntityStatus.INACTIVE));
+                .forEach(calendarEntry -> saveItWithStatus(calendarEntry, EntityStatus.INACTIVE));
     }
 
-    @Transactional
     @Override
     public void activateCalendarEntriesByBaseEventId(final UUID baseEventId) {
         calendarRepository.findAllByBaseEventIdAndEntityStatus(baseEventId, EntityStatus.INACTIVE)
-                .forEach(calendarEntry -> calendarEntry.setEntityStatus(EntityStatus.ACTIVE));
+                .forEach(calendarEntry -> saveItWithStatus(calendarEntry, EntityStatus.ACTIVE));
+    }
+
+    private void saveItWithStatus(final Calendar calendarEntry, final EntityStatus deleted) {
+        calendarEntry.setEntityStatus(deleted);
+        calendarRepository.save(calendarEntry);
     }
 }

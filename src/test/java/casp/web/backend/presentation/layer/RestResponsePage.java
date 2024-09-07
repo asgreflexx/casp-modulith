@@ -1,4 +1,4 @@
-package casp.web.backend.presentation.layer.dog;
+package casp.web.backend.presentation.layer;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,7 +8,7 @@ import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
-class RestResponsePage<T> extends PageImpl<T> {
+public class RestResponsePage<T> extends PageImpl<T> {
     @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
     public RestResponsePage(@JsonProperty("content") List<T> content,
                             @JsonProperty("number") int number,

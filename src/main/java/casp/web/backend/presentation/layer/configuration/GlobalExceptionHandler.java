@@ -34,6 +34,7 @@ class GlobalExceptionHandler {
             MissingServletRequestParameterException.class,
             ConstraintViolationException.class,
             IllegalArgumentException.class,
+            IllegalStateException.class,
             MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class,
             NoSuchElementException.class,

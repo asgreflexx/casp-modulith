@@ -14,6 +14,7 @@ import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.documents.event.types.Exam;
+import casp.web.backend.data.access.layer.documents.member.Card;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
@@ -61,9 +62,13 @@ public final class TestFixture {
     }
 
     public static Member createValidMember() {
+        return createValidMember("John", "Doe");
+    }
+
+    public static Member createValidMember(final String firstName, final String lastName) {
         var member = new Member();
-        member.setFirstName("John");
-        member.setLastName("Doe");
+        member.setFirstName(firstName);
+        member.setLastName(lastName);
         member.setEmail("%s@example.com".formatted(member.getId()));
         return member;
     }
@@ -179,5 +184,18 @@ public final class TestFixture {
         weeklyEventOption.setEndRecurrence(LocalDate.MAX);
         weeklyEventOption.setOccurrences(List.of(createValidWeeklyEventOptionRecurrence()));
         return weeklyEventOption;
+    }
+
+    public static Card createValidCard() {
+        var member = createValidMember();
+        return createValidCard(member);
+    }
+
+    public static Card createValidCard(final Member member) {
+        var card = new Card();
+        card.setCode("code");
+        card.setMemberId(member.getId());
+        card.setMember(member);
+        return card;
     }
 }
