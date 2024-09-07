@@ -73,7 +73,6 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
                 .forEach(this::deleteDogHasHandler);
     }
 
-    @Transactional
     @Override
     public void deleteDogHasHandlersByDogId(final UUID dogId) {
         dogHasHandlerRepository.findAllByDogIdAndEntityStatusNot(dogId, EntityStatus.DELETED)
@@ -167,6 +166,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     private void deleteDogHasHandler(final DogHasHandler dh) {
         baseParticipantObserver.deleteParticipantsByMemberOrHandlerId(dh.getId());
         dh.setEntityStatus(EntityStatus.DELETED);
+        dogHasHandlerRepository.save(dh);
     }
 
     private DogHasHandler setDogAndMemberIfTheyAreNull(final DogHasHandler dh) {

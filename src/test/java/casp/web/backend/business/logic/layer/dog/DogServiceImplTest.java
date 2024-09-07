@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,7 +90,7 @@ class DogServiceImplTest {
 
         @Test
         void dogWasFound() {
-            when(dogRepository.findDogByIdAndEntityStatusIsNot(id, EntityStatus.DELETED)).thenReturn(Optional.of(dog));
+            when(dogRepository.findDogByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
 
             dogService.deleteDogById(id);
 
@@ -101,11 +100,9 @@ class DogServiceImplTest {
 
         @Test
         void dogWasNotFound() {
-            when(dogRepository.findDogByIdAndEntityStatusIsNot(id, EntityStatus.DELETED)).thenReturn(Optional.empty());
+            when(dogRepository.findDogByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            dogService.deleteDogById(id);
-
-            verifyNoInteractions(dogHasHandlerService, dog);
+            assertThrows(NoSuchElementException.class, () -> dogService.deleteDogById(id));
         }
     }
 

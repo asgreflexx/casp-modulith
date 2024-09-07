@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -30,7 +29,7 @@ class DogServiceImpl implements DogService {
     private final DogHasHandlerService dogHasHandlerService;
 
     @Autowired
-    DogServiceImpl(DogRepository dogRepository, DogHasHandlerService dogHasHandlerService) {
+    DogServiceImpl(final DogRepository dogRepository, final DogHasHandlerService dogHasHandlerService) {
         this.dogRepository = dogRepository;
         this.dogHasHandlerService = dogHasHandlerService;
     }
@@ -49,14 +48,12 @@ class DogServiceImpl implements DogService {
         return dogRepository.save(dog);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteDogById(final UUID id) {
-        dogRepository.findDogByIdAndEntityStatusIsNot(id, EntityStatus.DELETED)
-                .ifPresent(dog -> {
-                    dog.setEntityStatus(EntityStatus.DELETED);
-                    dogHasHandlerService.deleteDogHasHandlersByDogId(id);
-                });
+        var dog = getDogById(id);
+        dogHasHandlerService.deleteDogHasHandlersByDogId(id);
+        dog.setEntityStatus(EntityStatus.DELETED);
+        dogRepository.save(dog);
     }
 
     @Override
