@@ -23,7 +23,6 @@ class BaseParticipantObserverImpl implements BaseParticipantObserver {
         observers.add(spaceService);
     }
 
-    @Transactional
     @Override
     public void deleteParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         observers.forEach(observer -> observer.deleteParticipantsByMemberOrHandlerId(memberOrHandlerId));

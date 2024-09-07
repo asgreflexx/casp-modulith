@@ -3,6 +3,11 @@ spring:
     name: admin
   jackson:
     time-zone: UTC
+  data:
+    mongodb:
+      database: test
+      uri: mongodb://localhost
+      uuid-representation: standard
 
 casp:
   europenet-api-endpoint: https://europetnet.ehealth.gv.at/Index.aspx?mn={chipNumber}

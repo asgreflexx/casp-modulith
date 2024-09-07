@@ -55,11 +55,13 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
                 .forEach(participant -> participant.setEntityStatus(EntityStatus.ACTIVE));
     }
 
-    @Transactional
     @Override
     public void deleteParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(memberOrHandlerId, EntityStatus.DELETED, participantType)
-                .forEach(participant -> participant.setEntityStatus(EntityStatus.DELETED));
+                .forEach(participant -> {
+                    participant.setEntityStatus(EntityStatus.DELETED);
+                    baseParticipantRepository.save(participant);
+                });
     }
 
     @Transactional
