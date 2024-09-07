@@ -2,7 +2,6 @@ package casp.web.backend.business.logic.layer.events.types;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -19,19 +18,16 @@ class BaseEventObserverImpl implements BaseEventObserver {
         observers.add(examService);
     }
 
-    @Transactional
     @Override
     public void deleteBaseEventsByMemberId(final UUID memberId) {
         observers.forEach(observer -> observer.deleteBaseEventsByMemberId(memberId));
     }
 
-    @Transactional
     @Override
     public void deactivateBaseEventsByMemberId(final UUID memberId) {
         observers.forEach(observer -> observer.deactivateBaseEventsByMemberId(memberId));
     }
 
-    @Transactional
     @Override
     public void activateBaseEventsByMemberId(final UUID memberId) {
         observers.forEach(observer -> observer.activateBaseEventsByMemberId(memberId));

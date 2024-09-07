@@ -56,13 +56,11 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
         findBaseEventNotDeleted(id).ifPresent(this::deleteCourse);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndNotDeleted(memberId).forEach(this::deleteCourse);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deactivateBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndIsActive(memberId).forEach(course -> {
@@ -71,7 +69,6 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
         });
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void activateBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndIsInactive(memberId).forEach(course -> {

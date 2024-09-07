@@ -51,18 +51,21 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         participantService.deleteParticipantsByBaseEventId(baseEvent.getId());
         calendarService.deleteCalendarEntriesByBaseEventId(baseEvent.getId());
         baseEvent.setEntityStatus(EntityStatus.DELETED);
+        eventRepository.save(baseEvent);
     }
 
     protected void deactivateBaseEvent(final BaseEvent baseEvent) {
         participantService.deactivateParticipantsByBaseEventId(baseEvent.getId());
         calendarService.deactivateCalendarEntriesByBaseEventId(baseEvent.getId());
         baseEvent.setEntityStatus(EntityStatus.INACTIVE);
+        eventRepository.save(baseEvent);
     }
 
     protected void activateBaseEvent(final BaseEvent baseEvent) {
         participantService.activateParticipantsByBaseEventId(baseEvent.getId());
         calendarService.activateCalendarEntriesByBaseEventId(baseEvent.getId());
         baseEvent.setEntityStatus(EntityStatus.ACTIVE);
+        eventRepository.save(baseEvent);
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -71,19 +74,16 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         findBaseEventNotDeleted(id).ifPresent(this::deleteBaseEvent);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndNotDeleted(memberId).forEach(this::deleteBaseEvent);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deactivateBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndIsActive(memberId).forEach(this::deactivateBaseEvent);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void activateBaseEventsByMemberId(final UUID memberId) {
         findAllByMemberIdAndIsInactive(memberId).forEach(this::activateBaseEvent);

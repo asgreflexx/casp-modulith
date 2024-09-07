@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -71,7 +70,6 @@ class MemberServiceImpl implements MemberService {
         return memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE);
     }
 
-    @Transactional
     @Override
     public Member saveMember(final Member member) {
         memberRepository.findMemberByEmail(member.getEmail())
@@ -85,20 +83,18 @@ class MemberServiceImpl implements MemberService {
         return memberRepository.save(member);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteMemberById(final UUID id) {
-        memberRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED).ifPresent(member -> {
-            dogHasHandlerService.deleteDogHasHandlersByMemberId(id);
-            cardService.deleteCardsByMemberId(id);
-            baseParticipantObserver.deleteParticipantsByMemberOrHandlerId(id);
-            baseEventObserver.deleteBaseEventsByMemberId(id);
-            member.setEmail(EMAIL_FORMAT_IF_DELETED.formatted(member.getEmail(), id));
-            member.setEntityStatus(EntityStatus.DELETED);
-        });
+        var member = getMemberById(id);
+        dogHasHandlerService.deleteDogHasHandlersByMemberId(id);
+        cardService.deleteCardsByMemberId(id);
+        baseParticipantObserver.deleteParticipantsByMemberOrHandlerId(id);
+        baseEventObserver.deleteBaseEventsByMemberId(id);
+        member.setEmail(EMAIL_FORMAT_IF_DELETED.formatted(member.getEmail(), id));
+        member.setEntityStatus(EntityStatus.DELETED);
+        memberRepository.save(member);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public Member deactivateMember(final UUID id) {
         var member = getMemberById(id);
@@ -107,10 +103,9 @@ class MemberServiceImpl implements MemberService {
         baseParticipantObserver.deactivateParticipantsByMemberOrHandlerId(id);
         baseEventObserver.deactivateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.INACTIVE);
-        return member;
+        return memberRepository.save(member);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public Member activateMember(final UUID id) {
         var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.INACTIVE);
@@ -119,7 +114,7 @@ class MemberServiceImpl implements MemberService {
         baseParticipantObserver.activateParticipantsByMemberOrHandlerId(id);
         baseEventObserver.activateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.ACTIVE);
-        return member;
+        return memberRepository.save(member);
     }
 
     @Override

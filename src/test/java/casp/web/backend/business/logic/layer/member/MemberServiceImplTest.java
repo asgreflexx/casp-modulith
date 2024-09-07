@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -102,6 +103,7 @@ class MemberServiceImplTest {
     @Test
     void deactivateMember() {
         when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
+        when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
 
         assertSame(EntityStatus.INACTIVE, memberService.deactivateMember(member.getId()).getEntityStatus());
 
@@ -114,6 +116,7 @@ class MemberServiceImplTest {
     @Test
     void activateMember() {
         when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.INACTIVE)).thenReturn(member);
+        when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
 
         assertSame(EntityStatus.ACTIVE, memberService.activateMember(member.getId()).getEntityStatus());
 
@@ -145,9 +148,9 @@ class MemberServiceImplTest {
         @Test
         void memberDoesNotExist() {
             var memberId = UUID.randomUUID();
-            when(memberRepository.findByIdAndEntityStatusNot(memberId, EntityStatus.DELETED)).thenReturn(Optional.empty());
+            when(memberRepository.findByIdAndEntityStatusCustom(memberId, EntityStatus.ACTIVE)).thenThrow(new NoSuchElementException());
 
-            memberService.deleteMemberById(memberId);
+            assertThrows(NoSuchElementException.class, () -> memberService.deleteMemberById(memberId));
 
             verifyNoInteractions(dogHasHandlerService, cardService, baseParticipantObserver, baseEventObserver);
 
@@ -155,7 +158,7 @@ class MemberServiceImplTest {
 
         @Test
         void memberExist() {
-            when(memberRepository.findByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
+            when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
 
             memberService.deleteMemberById(member.getId());
 

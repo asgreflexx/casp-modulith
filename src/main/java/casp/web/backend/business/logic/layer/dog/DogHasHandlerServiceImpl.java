@@ -66,7 +66,6 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         });
     }
 
-    @Transactional
     @Override
     public void deleteDogHasHandlersByMemberId(final UUID memberId) {
         dogHasHandlerRepository.findAllByMemberIdAndEntityStatusIsNot(memberId, EntityStatus.DELETED)
@@ -151,7 +150,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     public void deactivateDogHasHandlersByMemberId(final UUID memberId) {
         getHandlersByMemberId(memberId).forEach(dh -> {
             baseParticipantObserver.deactivateParticipantsByMemberOrHandlerId(dh.getId());
-            dh.setEntityStatus(EntityStatus.INACTIVE);
+            saveItWithNewStatus(dh, EntityStatus.INACTIVE);
         });
     }
 
@@ -159,14 +158,18 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     public void activateDogHasHandlersByMemberId(final UUID memberId) {
         dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE).forEach(dh -> {
             baseParticipantObserver.activateParticipantsByMemberOrHandlerId(dh.getId());
-            dh.setEntityStatus(EntityStatus.ACTIVE);
+            saveItWithNewStatus(dh, EntityStatus.ACTIVE);
         });
+    }
+
+    private void saveItWithNewStatus(final DogHasHandler dh, final EntityStatus entityStatus) {
+        dh.setEntityStatus(entityStatus);
+        dogHasHandlerRepository.save(dh);
     }
 
     private void deleteDogHasHandler(final DogHasHandler dh) {
         baseParticipantObserver.deleteParticipantsByMemberOrHandlerId(dh.getId());
-        dh.setEntityStatus(EntityStatus.DELETED);
-        dogHasHandlerRepository.save(dh);
+        saveItWithNewStatus(dh, EntityStatus.DELETED);
     }
 
     private DogHasHandler setDogAndMemberIfTheyAreNull(final DogHasHandler dh) {
