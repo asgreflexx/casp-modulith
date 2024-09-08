@@ -1,4 +1,4 @@
-package casp.web.backend.presentation.layer.dog;
+package casp.web.backend.presentation.layer.dtos.dog;
 
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 

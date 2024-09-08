@@ -1,6 +1,7 @@
 package casp.web.backend.presentation.layer.dog;
 
 import casp.web.backend.business.logic.layer.dog.DogService;
+import casp.web.backend.presentation.layer.dtos.dog.DogDto;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,11 +21,12 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.dog.DogMapper.DOG_MAPPER;
+
 @RestController
 @RequestMapping("/dog")
 @Validated
 class DogRestController {
-    private static final DogMapper DOG_MAPPER = new DogMapperImpl();
 
     private final DogService dogService;
 
