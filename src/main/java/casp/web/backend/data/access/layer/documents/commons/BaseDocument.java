@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-public abstract class BaseEntity {
+public abstract class BaseDocument {
     @Id
     protected UUID id = UUID.randomUUID();
 
@@ -95,7 +95,7 @@ public abstract class BaseEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        BaseEntity that = (BaseEntity) o;
+        BaseDocument that = (BaseDocument) o;
         return Objects.equals(id, that.id);
     }
 

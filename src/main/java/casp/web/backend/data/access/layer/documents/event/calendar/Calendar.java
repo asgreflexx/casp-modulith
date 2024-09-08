@@ -1,6 +1,6 @@
 package casp.web.backend.data.access.layer.documents.event.calendar;
 
-import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocument;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
@@ -14,7 +14,7 @@ import java.util.StringJoiner;
 @QueryEntity
 @Document
 @CalendarFromToConstraint
-public class Calendar extends BaseEntity implements Comparable<Calendar> {
+public class Calendar extends BaseDocument implements Comparable<Calendar> {
 
     @NotNull
     private LocalDateTime eventFrom;

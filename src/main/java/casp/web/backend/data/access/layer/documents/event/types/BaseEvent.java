@@ -1,7 +1,7 @@
 package casp.web.backend.data.access.layer.documents.event.types;
 
 
-import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocument;
 import casp.web.backend.data.access.layer.documents.event.TypesRegex;
 import casp.web.backend.data.access.layer.documents.event.options.DailyEventOption;
 import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOption;
@@ -21,7 +21,7 @@ import java.util.UUID;
 @BaseEventOptionConstraint
 @QueryEntity
 @Document(BaseEvent.COLLECTION)
-public class BaseEvent extends BaseEntity {
+public class BaseEvent extends BaseDocument {
     public static final String COLLECTION = "BASE_EVENT";
 
     @NotNull

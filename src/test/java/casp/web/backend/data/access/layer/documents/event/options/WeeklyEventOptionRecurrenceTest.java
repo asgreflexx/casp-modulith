@@ -1,7 +1,7 @@
 package casp.web.backend.data.access.layer.documents.event.options;
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocumentTest;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
@@ -12,7 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class WeeklyEventOptionRecurrenceTest extends BaseEntityTest {
+class WeeklyEventOptionRecurrenceTest extends BaseDocumentTest {
     @Test
     void happyPath() {
         var weeklyEventOptionRecurrence = TestFixture.createValidWeeklyEventOptionRecurrence();

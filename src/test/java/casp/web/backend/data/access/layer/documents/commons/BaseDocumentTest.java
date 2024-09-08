@@ -7,9 +7,9 @@ import casp.web.backend.data.access.layer.documents.event.participant.BasePartic
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
-public abstract class BaseEntityTest {
+public abstract class BaseDocumentTest {
 
-    protected <T extends BaseEntity> void baseAssertions(T baseEntity) {
+    protected <T extends BaseDocument> void baseAssertions(T baseEntity) {
         assertSame(EntityStatus.ACTIVE, baseEntity.getEntityStatus());
         assertNotNull(baseEntity.getId());
     }

@@ -16,6 +16,7 @@ import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.documents.event.types.Exam;
 import casp.web.backend.data.access.layer.documents.member.Card;
 import casp.web.backend.data.access.layer.documents.member.Member;
+import casp.web.backend.data.access.layer.documents.member.MembershipFee;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -197,5 +198,13 @@ public final class TestFixture {
         card.setMemberId(member.getId());
         card.setMember(member);
         return card;
+    }
+
+    public static MembershipFee createValidMembershipFee() {
+        var membershipFee = new MembershipFee();
+        membershipFee.setPaid(true);
+        membershipFee.setPaidDate(LocalDate.now());
+        membershipFee.setPaidPrice(10.0);
+        return membershipFee;
     }
 }

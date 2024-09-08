@@ -1,7 +1,7 @@
 package casp.web.backend.data.access.layer.documents.event.participant;
 
 
-import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocument;
 import casp.web.backend.data.access.layer.documents.enumerations.EventResponse;
 import casp.web.backend.data.access.layer.documents.event.TypesRegex;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
@@ -19,7 +19,7 @@ import java.util.UUID;
  */
 @QueryEntity
 @Document(BaseParticipant.COLLECTION)
-public class BaseParticipant extends BaseEntity {
+public class BaseParticipant extends BaseDocument {
     public static final String COLLECTION = "BASE_PARTICIPANT";
 
     @NotNull
