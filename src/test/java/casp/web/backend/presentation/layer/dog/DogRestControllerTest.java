@@ -7,6 +7,7 @@ import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
+import casp.web.backend.presentation.layer.dtos.dog.DogDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.dog.DogMapper.DOG_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -32,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 class DogRestControllerTest {
-    private static final DogMapper DOG_MAPPER = new DogMapperImpl();
     private static final String DOG_URL_PREFIX = "/dog";
 
     @Autowired

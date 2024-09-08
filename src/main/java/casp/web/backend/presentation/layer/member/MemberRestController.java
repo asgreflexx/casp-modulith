@@ -3,6 +3,7 @@ package casp.web.backend.presentation.layer.member;
 import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
+import casp.web.backend.presentation.layer.dtos.member.MemberDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import org.springdoc.core.annotations.ParameterObject;
@@ -23,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 
 @RestController
 @RequestMapping("/member")
