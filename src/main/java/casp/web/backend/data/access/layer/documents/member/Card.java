@@ -1,6 +1,6 @@
 package casp.web.backend.data.access.layer.documents.member;
 
-import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocument;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @QueryEntity
 @Document
-public class Card extends BaseEntity {
+public class Card extends BaseDocument {
 
     @NotBlank
     private String code;

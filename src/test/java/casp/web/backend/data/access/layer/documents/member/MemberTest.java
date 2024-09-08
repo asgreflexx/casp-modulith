@@ -1,7 +1,7 @@
 package casp.web.backend.data.access.layer.documents.member;
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocumentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +9,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MemberTest extends BaseEntityTest {
+class MemberTest extends BaseDocumentTest {
 
     private Member member;
 

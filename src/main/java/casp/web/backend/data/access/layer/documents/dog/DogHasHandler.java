@@ -1,6 +1,6 @@
 package casp.web.backend.data.access.layer.documents.dog;
 
-import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocument;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @QueryEntity
 @Document
-public class DogHasHandler extends BaseEntity {
+public class DogHasHandler extends BaseDocument {
 
     /**
      * @deprecated Use {@link #member} instead.

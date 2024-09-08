@@ -1,6 +1,6 @@
 package casp.web.backend.data.access.layer.documents.dog;
 
-import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocument;
 import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
 import casp.web.backend.data.access.layer.documents.enumerations.Gender;
 import com.querydsl.core.annotations.QueryEntity;
@@ -13,7 +13,7 @@ import java.util.StringJoiner;
 
 @QueryEntity
 @Document
-public class Dog extends BaseEntity {
+public class Dog extends BaseDocument {
 
     @NotBlank
     private String name;

@@ -1,12 +1,12 @@
 package casp.web.backend.data.access.layer.documents.member;
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocumentTest;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CardTest extends BaseEntityTest {
+class CardTest extends BaseDocumentTest {
     @Test
     void happyPath() {
         var card = TestFixture.createValidCard();

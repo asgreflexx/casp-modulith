@@ -2,36 +2,24 @@ package casp.web.backend.data.access.layer.documents.member;
 
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
-import org.junit.jupiter.api.BeforeEach;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocumentTest;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MembershipFeeTest extends BaseEntityTest {
-
-    private MembershipFee membershipFee;
-
-    @BeforeEach
-    void setUp() {
-        membershipFee = new MembershipFee();
-    }
-
+class MembershipFeeTest extends BaseDocumentTest {
     @Nested
-    class Valid {
+    class Validate {
         @Test
         void notPaid() {
+            var membershipFee = new MembershipFee();
             assertThat(TestFixture.getViolations(membershipFee)).isEmpty();
         }
 
         @Test
         void paid() {
-            membershipFee.setPaid(true);
-            membershipFee.setPaidDate(LocalDate.now());
-            membershipFee.setPaidPrice(10.0);
+            var membershipFee = TestFixture.createValidMembershipFee();
             assertThat(TestFixture.getViolations(membershipFee)).isEmpty();
         }
     }

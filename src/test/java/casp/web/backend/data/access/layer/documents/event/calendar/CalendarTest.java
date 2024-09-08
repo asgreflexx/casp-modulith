@@ -1,7 +1,7 @@
 package casp.web.backend.data.access.layer.documents.event.calendar;
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.commons.BaseEntityTest;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocumentTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class CalendarTest extends BaseEntityTest {
+class CalendarTest extends BaseDocumentTest {
 
     private Calendar calendar;
 

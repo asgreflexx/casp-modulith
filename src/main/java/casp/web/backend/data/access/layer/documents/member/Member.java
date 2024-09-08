@@ -1,6 +1,6 @@
 package casp.web.backend.data.access.layer.documents.member;
 
-import casp.web.backend.data.access.layer.documents.commons.BaseEntity;
+import casp.web.backend.data.access.layer.documents.commons.BaseDocument;
 import casp.web.backend.data.access.layer.documents.enumerations.Gender;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
 import com.querydsl.core.annotations.QueryEntity;
@@ -20,7 +20,7 @@ import java.util.StringJoiner;
 
 @QueryEntity
 @Document
-public class Member extends BaseEntity {
+public class Member extends BaseDocument {
 
     @NotBlank
     private String firstName;
