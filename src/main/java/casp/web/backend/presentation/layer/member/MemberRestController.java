@@ -1,5 +1,6 @@
 package casp.web.backend.presentation.layer.member;
 
+import casp.web.backend.business.logic.layer.member.CardService;
 import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.member.CardMapper.CARD_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 
 @RestController
@@ -33,10 +35,12 @@ import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBE
 class MemberRestController {
 
     private final MemberService memberService;
+    private final CardService cardService;
 
     @Autowired
-    MemberRestController(final MemberService memberService) {
+    MemberRestController(final MemberService memberService, final CardService cardService) {
         this.memberService = memberService;
+        this.cardService = cardService;
     }
 
     @GetMapping()
@@ -48,7 +52,10 @@ class MemberRestController {
 
     @GetMapping("/{id}")
     ResponseEntity<MemberDto> getMemberById(final @PathVariable UUID id) {
-        return ResponseEntity.ok(MEMBER_MAPPER.toDto(memberService.getMemberById(id)));
+        var memberDto = MEMBER_MAPPER.toDto(memberService.getMemberById(id));
+        var cardDtoSet = CARD_MAPPER.toDtoSet(cardService.getCardsByMemberId(id));
+        memberDto.setCardDtoSet(cardDtoSet);
+        return ResponseEntity.ok(memberDto);
     }
 
     @GetMapping("/search-members-by-firstname-and-lastname")
@@ -61,7 +68,8 @@ class MemberRestController {
     @PostMapping()
     ResponseEntity<MemberDto> saveMember(final @RequestBody @Valid MemberDto memberDto) {
         var member = MEMBER_MAPPER.toDocument(memberDto);
-        return ResponseEntity.ok(MEMBER_MAPPER.toDto(memberService.saveMember(member)));
+        memberService.saveMember(member);
+        return getMemberById(member.getId());
     }
 
     @DeleteMapping("/{id}")
@@ -76,7 +84,8 @@ class MemberRestController {
 
     @PostMapping("/{id}/activate")
     ResponseEntity<MemberDto> activateMember(final @PathVariable UUID id) {
-        return ResponseEntity.ok(MEMBER_MAPPER.toDto(memberService.activateMember(id)));
+        memberService.activateMember(id);
+        return getMemberById(id);
     }
 
     @GetMapping("/search-members-by-name")

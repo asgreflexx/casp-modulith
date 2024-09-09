@@ -116,10 +116,11 @@ class MemberServiceImplTest {
     @Test
     void activateMember() {
         when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.INACTIVE)).thenReturn(member);
-        when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
 
-        assertSame(EntityStatus.ACTIVE, memberService.activateMember(member.getId()).getEntityStatus());
+        memberService.activateMember(member.getId());
 
+        verify(member).setEntityStatus(EntityStatus.ACTIVE);
+        verify(memberRepository).save(member);
         verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
         verify(cardService).activateCardsByMemberId(member.getId());
         verify(baseParticipantObserver).activateParticipantsByMemberOrHandlerId(member.getId());
@@ -130,9 +131,9 @@ class MemberServiceImplTest {
     class SaveMember {
         @Test
         void emailDoesNotExists() {
-            when(memberRepository.save(member)).thenReturn(member);
+            memberService.saveMember(member);
 
-            assertSame(member, memberService.saveMember(member));
+            verify(memberRepository).save(member);
         }
 
         @Test

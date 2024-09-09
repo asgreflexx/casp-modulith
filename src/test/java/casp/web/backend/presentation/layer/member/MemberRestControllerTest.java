@@ -3,6 +3,7 @@ package casp.web.backend.presentation.layer.member;
 import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
+import casp.web.backend.data.access.layer.documents.member.Card;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
@@ -29,6 +30,8 @@ import java.util.UUID;
 
 import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -58,6 +61,7 @@ class MemberRestControllerTest {
     private MemberDto john;
     private MemberDto zephyr;
     private Member inactive;
+    private Card card;
 
     @BeforeEach
     void setUp() {
@@ -67,27 +71,28 @@ class MemberRestControllerTest {
         dogHasHandlerRepository.deleteAll();
         memberRepository.deleteAll();
 
-        john = MEMBER_MAPPER.toDto(memberRepository.save(TestFixture.createValidMember()));
+        var johnDocument = memberRepository.save(TestFixture.createValidMember());
+        john = MEMBER_MAPPER.toDto(johnDocument);
         zephyr = MEMBER_MAPPER.toDto(memberRepository.save(TestFixture.createValidMember("Zephyr", "Starling")));
         inactive = TestFixture.createValidMember("INACTIVE", "INACTIVE");
         inactive.setEntityStatus(EntityStatus.INACTIVE);
         memberRepository.save(inactive);
 
         var hasHandler = TestFixture.createValidDogHasHandler();
-        hasHandler.setMember(john);
-        hasHandler.setMemberId(john.getId());
+        hasHandler.setMember(johnDocument);
+        hasHandler.setMemberId(johnDocument.getId());
         dogHasHandlerRepository.save(hasHandler);
         var eventParticipant = TestFixture.createValidEventParticipant();
-        eventParticipant.setMemberOrHandlerId(john.getId());
+        eventParticipant.setMemberOrHandlerId(johnDocument.getId());
         var event = eventParticipant.getBaseEvent();
-        event.setMember(john);
-        event.setMemberId(john.getId());
+        event.setMember(johnDocument);
+        event.setMemberId(johnDocument.getId());
         var coTrainer = TestFixture.createValidCoTrainer();
-        coTrainer.setMemberOrHandlerId(john.getId());
+        coTrainer.setMemberOrHandlerId(johnDocument.getId());
         var course = coTrainer.getBaseEvent();
-        course.setMember(john);
-        course.setMemberId(john.getId());
-        var card = TestFixture.createValidCard(john);
+        course.setMember(johnDocument);
+        course.setMemberId(johnDocument.getId());
+        card = TestFixture.createValidCard(johnDocument);
         cardRepository.save(card);
         baseEventRepository.saveAll(Set.of(event, course));
         baseParticipantRepository.saveAll(Set.of(eventParticipant, coTrainer));
@@ -173,7 +178,11 @@ class MemberRestControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            assertThat(MvcMapper.toObject(mvcResult, MemberDto.class)).satisfies(m -> assertSame(EntityStatus.ACTIVE, m.getEntityStatus()));
+            assertThat(MvcMapper.toObject(mvcResult, MemberDto.class)).satisfies(dto -> {
+                assertSame(EntityStatus.ACTIVE, dto.getEntityStatus());
+                assertEquals(john, dto);
+                assertCardDtoSet(dto);
+            });
             assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.ACTIVE, dh.getEntityStatus()));
             assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.ACTIVE, p.getEntityStatus()));
             assertThat(cardRepository.findAll()).allSatisfy(c -> assertSame(EntityStatus.ACTIVE, c.getEntityStatus()));
@@ -198,7 +207,10 @@ class MemberRestControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            assertThat(MvcMapper.toObject(mvcResult, MemberDto.class)).satisfies(m -> assertSame(EntityStatus.INACTIVE, m.getEntityStatus()));
+            assertThat(MvcMapper.toObject(mvcResult, MemberDto.class)).satisfies(dto -> {
+                assertSame(EntityStatus.INACTIVE, dto.getEntityStatus());
+                assertThat(dto.getCardDtoSet()).isEmpty();
+            });
             assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.INACTIVE, dh.getEntityStatus()));
             assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.INACTIVE, p.getEntityStatus()));
             assertThat(cardRepository.findAll()).allSatisfy(c -> assertSame(EntityStatus.INACTIVE, c.getEntityStatus()));
@@ -245,8 +257,12 @@ class MemberRestControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            assertThat(MvcMapper.toObject(mvcResult, MemberDto.class).getEntityStatus())
-                    .isEqualTo(EntityStatus.ACTIVE);
+            assertThat(MvcMapper.toObject(mvcResult, MemberDto.class)).satisfies(dto -> {
+                assertSame(EntityStatus.ACTIVE, dto.getEntityStatus());
+                assertEquals(john, dto);
+                assertCardDtoSet(dto);
+            });
+
         }
 
         @Test
@@ -283,7 +299,9 @@ class MemberRestControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            assertThat(MvcMapper.toObject(mvcResult, MemberDto.class)).isEqualTo(john);
+            var memberDto = MvcMapper.toObject(mvcResult, MemberDto.class);
+            assertThat(memberDto).isEqualTo(john);
+            assertCardDtoSet(memberDto);
         }
 
         @Test
@@ -291,5 +309,15 @@ class MemberRestControllerTest {
             getMemberById(inactive.getId())
                     .andExpect(status().isBadRequest());
         }
+    }
+
+    private void assertCardDtoSet(final MemberDto memberDto) {
+        assertThat(memberDto.getCardDtoSet())
+                .singleElement()
+                .satisfies(cardDto -> {
+                    assertEquals(card.getId(), cardDto.getId());
+                    assertNull(cardDto.getMemberId());
+                    assertNull(cardDto.getMember());
+                });
     }
 }
