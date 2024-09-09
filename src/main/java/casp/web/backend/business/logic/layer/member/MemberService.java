@@ -22,13 +22,13 @@ public interface MemberService {
 
     Member getMemberById(UUID id);
 
-    Member saveMember(Member member);
+    void saveMember(Member member);
 
     void deleteMemberById(UUID id);
 
     Member deactivateMember(UUID id);
 
-    Member activateMember(UUID id);
+    void activateMember(UUID id);
 
     Page<Member> getMembersByName(@Nullable String name, final Pageable pageable);
 

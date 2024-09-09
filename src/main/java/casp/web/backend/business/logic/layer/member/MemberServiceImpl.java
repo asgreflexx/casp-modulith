@@ -71,7 +71,7 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member saveMember(final Member member) {
+    public void saveMember(final Member member) {
         memberRepository.findMemberByEmail(member.getEmail())
                 .ifPresent(m -> {
                     if (!member.equals(m)) {
@@ -80,7 +80,7 @@ class MemberServiceImpl implements MemberService {
                         throw new IllegalStateException(msg);
                     }
                 });
-        return memberRepository.save(member);
+        memberRepository.save(member);
     }
 
     @Override
@@ -107,14 +107,14 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Member activateMember(final UUID id) {
+    public void activateMember(final UUID id) {
         var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.INACTIVE);
         dogHasHandlerService.activateDogHasHandlersByMemberId(id);
         cardService.activateCardsByMemberId(id);
         baseParticipantObserver.activateParticipantsByMemberOrHandlerId(id);
         baseEventObserver.activateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.ACTIVE);
-        return memberRepository.save(member);
+        memberRepository.save(member);
     }
 
     @Override
