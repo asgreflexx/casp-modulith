@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.NoSuchElementException;
@@ -50,7 +49,6 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         this.baseParticipantObserver = baseParticipantObserver;
     }
 
-    @Transactional
     @Override
     public DogHasHandler saveDogHasHandler(final DogHasHandler dogHasHandler) {
         setDogAndMember(dogHasHandler);
@@ -78,41 +76,37 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
                 .forEach(this::deleteDogHasHandler);
     }
 
-    @Transactional
     @Override
     public Set<Dog> getDogsByMemberId(final UUID memberId) {
-        return getHandlersByMemberId(memberId).stream()
+        return getDogHasHandlersByMemberId(memberId).stream()
                 .map(dh -> setDogAndMemberIfTheyAreNull(dh).getDog())
                 .collect(Collectors.toSet());
     }
 
-    @Transactional
     @Override
     public Set<Member> getMembersByDogId(final UUID dogId) {
-        return getHandlersByDogId(dogId).stream()
+        return getDogHasHandlersByDogId(dogId).stream()
                 .map(dh -> setDogAndMemberIfTheyAreNull(dh).getMember())
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public Set<DogHasHandler> getHandlersByMemberId(final UUID memberId) {
+    public Set<DogHasHandler> getDogHasHandlersByMemberId(final UUID memberId) {
         return dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 
     @Override
-    public Set<DogHasHandler> getHandlersByDogId(final UUID dogId) {
+    public Set<DogHasHandler> getDogHasHandlersByDogId(final UUID dogId) {
         return dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE);
     }
 
-    @Transactional
     @Override
-    public Set<DogHasHandler> searchDogHasHandlerByFirstNameOrLastNameOrDogName(final String name) {
+    public Set<DogHasHandler> searchByName(final String name) {
         var dogHasHandlers = dogHasHandlerRepository.findAllByMemberNameOrDogName(name);
         dogHasHandlers.forEach(this::setDogAndMemberIfTheyAreNull);
         return dogHasHandlers;
     }
 
-    @Transactional
     @Override
     public Set<DogHasHandler> getAllDogHasHandler() {
         Set<DogHasHandler> dogHasHandlers = dogHasHandlerRepository.findAllByEntityStatus(EntityStatus.ACTIVE);
@@ -130,15 +124,14 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public Set<UUID> getDogHasHandlerIdsByMemberId(final UUID memberId) {
-        return getHandlersByMemberId(memberId).stream().map(DogHasHandler::getId).collect(Collectors.toSet());
+        return getDogHasHandlersByMemberId(memberId).stream().map(DogHasHandler::getId).collect(Collectors.toSet());
     }
 
     @Override
     public Set<UUID> getDogHasHandlerIdsByDogId(final UUID dogId) {
-        return getHandlersByDogId(dogId).stream().map(DogHasHandler::getId).collect(Collectors.toSet());
+        return getDogHasHandlersByDogId(dogId).stream().map(DogHasHandler::getId).collect(Collectors.toSet());
     }
 
-    @Transactional
     @Override
     public Set<String> getMembersEmailByIds(final Set<UUID> handlerIds) {
         return getDogHasHandlersByIds(handlerIds).stream()
@@ -148,7 +141,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public void deactivateDogHasHandlersByMemberId(final UUID memberId) {
-        getHandlersByMemberId(memberId).forEach(dh -> {
+        getDogHasHandlersByMemberId(memberId).forEach(dh -> {
             baseParticipantObserver.deactivateParticipantsByMemberOrHandlerId(dh.getId());
             saveItWithNewStatus(dh, EntityStatus.INACTIVE);
         });

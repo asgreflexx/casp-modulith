@@ -123,30 +123,30 @@ class DogHasHandlerServiceImplTest {
     }
 
     @Test
-    void getHandlersByMemberId() {
+    void getDogHasHandlersByMemberId() {
         when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
                 .thenReturn(Set.of(dogHasHandler));
 
-        assertThat(dogHasHandlerService.getHandlersByMemberId(memberId)).containsExactly(dogHasHandler);
+        assertThat(dogHasHandlerService.getDogHasHandlersByMemberId(memberId)).containsExactly(dogHasHandler);
     }
 
     @Test
-    void getHandlersByDogId() {
+    void getDogHasHandlersByDogId() {
         when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
                 .thenReturn(Set.of(dogHasHandler));
 
-        assertThat(dogHasHandlerService.getHandlersByDogId(dogId)).containsExactly(dogHasHandler);
+        assertThat(dogHasHandlerService.getDogHasHandlersByDogId(dogId)).containsExactly(dogHasHandler);
     }
 
     @Test
-    void searchDogHasHandlerByFirstNameOrLastNameOrDogName() {
+    void searchByName() {
         dog.setName("casp");
         member.setFirstName(dog.getName());
         member.setLastName(dog.getName());
         when(dogHasHandlerRepository.findAllByMemberNameOrDogName(dog.getName())).thenReturn(Set.of(dogHasHandler));
 
 
-        assertThat(dogHasHandlerService.searchDogHasHandlerByFirstNameOrLastNameOrDogName(dog.getName()))
+        assertThat(dogHasHandlerService.searchByName(dog.getName()))
                 .containsExactly(dogHasHandler);
     }
 

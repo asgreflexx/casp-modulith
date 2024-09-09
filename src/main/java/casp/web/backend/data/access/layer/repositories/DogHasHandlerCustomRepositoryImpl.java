@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
@@ -31,13 +30,12 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
         this.mongoOperations = mongoOperations;
     }
 
-    // Query DBRef with Spring Data MongoDB using QueryDSL -> It's not supported.
-    // https://stackoverflow.com/a/44316748/1066054
-    @Transactional(readOnly = true)
     @Override
     public Set<DogHasHandler> findAllByMemberNameOrDogName(final String name) {
         var expression = DOG_HAS_HANDLER.entityStatus.eq(EntityStatus.ACTIVE);
         if (StringUtils.hasText(name)) {
+            // The use of "Join"s in MongoDb. Query DBRef with Spring Data MongoDB using QueryDSL -> It's not supported.
+            // https://stackoverflow.com/a/44316748/1066054
             var dogsId = getDogsId(name);
             var membersId = getMembersId(name);
             expression = expression.and(DOG_HAS_HANDLER.dogId.in(dogsId).or(DOG_HAS_HANDLER.memberId.in(membersId)));

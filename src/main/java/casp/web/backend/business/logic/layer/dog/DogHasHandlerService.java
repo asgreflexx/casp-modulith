@@ -3,6 +3,7 @@ package casp.web.backend.business.logic.layer.dog;
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.member.Member;
+import jakarta.annotation.Nullable;
 
 import java.util.Set;
 import java.util.UUID;
@@ -27,11 +28,11 @@ public interface DogHasHandlerService {
 
     Set<Member> getMembersByDogId(UUID dogId);
 
-    Set<DogHasHandler> getHandlersByMemberId(UUID memberId);
+    Set<DogHasHandler> getDogHasHandlersByMemberId(UUID memberId);
 
-    Set<DogHasHandler> getHandlersByDogId(UUID dogId);
+    Set<DogHasHandler> getDogHasHandlersByDogId(UUID dogId);
 
-    Set<DogHasHandler> searchDogHasHandlerByFirstNameOrLastNameOrDogName(String name);
+    Set<DogHasHandler> searchByName(@Nullable String name);
 
     Set<DogHasHandler> getAllDogHasHandler();
 
