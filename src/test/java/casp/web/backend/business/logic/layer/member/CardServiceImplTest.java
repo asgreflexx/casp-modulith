@@ -56,7 +56,6 @@ class CardServiceImplTest {
 
     @Test
     void getCardsByMemberId() {
-        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
         when(cardRepository.findAllByMemberIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Set.of(card));
 
         assertThat(cardService.getCardsByMemberId(member.getId())).containsExactly(card);
