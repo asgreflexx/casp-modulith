@@ -3,14 +3,12 @@ package casp.web.backend.business.logic.layer.member;
 
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.member.Card;
-import casp.web.backend.data.access.layer.documents.member.Member;
 import casp.web.backend.data.access.layer.repositories.CardRepository;
 import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -34,25 +32,22 @@ class CardServiceImpl implements CardService {
         this.memberRepository = memberRepository;
     }
 
-    @Transactional
     @Override
     public Card saveCard(final Card card) {
-        card.setMember(getMember(card.getMemberId()));
+        var member = memberRepository.findByIdAndEntityStatusCustom(card.getMemberId(), EntityStatus.ACTIVE);
+        card.setMember(member);
         return cardRepository.save(card);
     }
 
-    @Transactional(readOnly = true)
     @Override
     public Set<Card> getCardsByMemberId(final UUID memberId) {
-        var member = getMember(memberId);
-        return cardRepository.findAllByMemberIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE);
+        return cardRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 
-    @Transactional
     @Override
     public void deleteCardById(final UUID id) {
         cardRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED)
-                .ifPresent(card -> card.setEntityStatus(EntityStatus.DELETED));
+                .ifPresent(card -> saveItWithStatus(card, EntityStatus.DELETED));
     }
 
     @Override
@@ -85,9 +80,5 @@ class CardServiceImpl implements CardService {
     private void saveItWithStatus(final Card card, final EntityStatus deleted) {
         card.setEntityStatus(deleted);
         cardRepository.save(card);
-    }
-
-    private Member getMember(final UUID memberId) {
-        return memberRepository.findByIdAndEntityStatusCustom(memberId, EntityStatus.ACTIVE);
     }
 }
