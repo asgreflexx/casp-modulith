@@ -19,7 +19,7 @@ public interface DogService {
 
     Dog getDogById(UUID id);
 
-    Dog saveDog(Dog dog);
+    void saveDog(Dog dog);
 
     void deleteDogById(UUID id);
     /**

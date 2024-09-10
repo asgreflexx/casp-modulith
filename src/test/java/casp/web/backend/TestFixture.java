@@ -121,6 +121,10 @@ public final class TestFixture {
     public static DogHasHandler createValidDogHasHandler() {
         var member = createValidMember();
         var dog = createValidDog();
+        return createValidDogHasHandler(dog, member);
+    }
+
+    public static DogHasHandler createValidDogHasHandler(final Dog dog, final Member member) {
         var dogHasHandler = new DogHasHandler();
         dogHasHandler.setDogId(dog.getId());
         dogHasHandler.setDog(dog);

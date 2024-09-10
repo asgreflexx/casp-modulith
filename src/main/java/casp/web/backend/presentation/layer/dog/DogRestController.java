@@ -1,5 +1,6 @@
 package casp.web.backend.presentation.layer.dog;
 
+import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.dog.DogService;
 import casp.web.backend.presentation.layer.dtos.dog.DogDto;
 import jakarta.validation.Valid;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.dog.DogMapper.DOG_MAPPER;
 
 @RestController
@@ -29,15 +31,20 @@ import static casp.web.backend.presentation.layer.dtos.dog.DogMapper.DOG_MAPPER;
 class DogRestController {
 
     private final DogService dogService;
+    private final DogHasHandlerService dogHasHandlerService;
 
     @Autowired
-    DogRestController(final DogService dogService) {
+    DogRestController(final DogService dogService, final DogHasHandlerService dogHasHandlerService) {
         this.dogService = dogService;
+        this.dogHasHandlerService = dogHasHandlerService;
     }
 
     @GetMapping("/{id}")
     ResponseEntity<DogDto> getDogById(final @PathVariable UUID id) {
-        return ResponseEntity.ok(DOG_MAPPER.toDto(dogService.getDogById(id)));
+        var dogDto = DOG_MAPPER.toDto(dogService.getDogById(id));
+        var dogHasHandlerSet = dogHasHandlerService.getDogHasHandlersByDogId(id);
+        dogDto.setDogHasHandlerSet(DOG_HAS_HANDLER_MAPPER.toDtoSet(dogHasHandlerSet));
+        return ResponseEntity.ok(dogDto);
     }
 
     @GetMapping("/by-chip-number-or-dog-name-or-owner-name")
@@ -56,13 +63,13 @@ class DogRestController {
     }
 
     @PostMapping()
-    ResponseEntity<DogDto> postData(final @RequestBody @Valid DogDto dogDto) {
-        var saveDog = dogService.saveDog(DOG_MAPPER.toDocument(dogDto));
-        return ResponseEntity.ok(DOG_MAPPER.toDto(saveDog));
+    ResponseEntity<DogDto> saveDog(final @RequestBody @Valid DogDto dogDto) {
+        dogService.saveDog(DOG_MAPPER.toDocument(dogDto));
+        return getDogById(dogDto.getId());
     }
 
     @DeleteMapping("/{id}")
-    void deleteDataById(final @PathVariable UUID id) {
+    void deleteDogById(final @PathVariable UUID id) {
         dogService.deleteDogById(id);
     }
 }

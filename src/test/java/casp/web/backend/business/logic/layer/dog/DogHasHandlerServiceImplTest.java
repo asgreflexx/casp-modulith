@@ -1,5 +1,6 @@
 package casp.web.backend.business.logic.layer.dog;
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.events.participants.BaseParticipantObserver;
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
@@ -16,7 +17,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.mongodb.MongoTransactionManager;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -38,8 +38,6 @@ class DogHasHandlerServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
     @Mock
-    private MongoTransactionManager mongoTransactionManager;
-    @Mock
     private BaseParticipantObserver baseParticipantObserver;
 
     @InjectMocks
@@ -53,27 +51,11 @@ class DogHasHandlerServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        dog = new Dog();
+        dogHasHandler = TestFixture.createValidDogHasHandler();
+        dog = dogHasHandler.getDog();
         dogId = dog.getId();
-        member = new Member();
+        member = dogHasHandler.getMember();
         memberId = member.getId();
-        dogHasHandler = new DogHasHandler();
-        dogHasHandler.setDogId(dogId);
-        dogHasHandler.setMemberId(memberId);
-    }
-
-    @Test
-    void saveDogHasHandler() {
-        when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
-        when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
-
-        dogHasHandlerService.saveDogHasHandler(dogHasHandler);
-
-        var captor = ArgumentCaptor.forClass(DogHasHandler.class);
-        verify(dogHasHandlerRepository).save(captor.capture());
-        var actualDogHasHandler = captor.getValue();
-        assertSame(member, actualDogHasHandler.getMember());
-        assertSame(dog, actualDogHasHandler.getDog());
     }
 
     @Test
@@ -96,58 +78,6 @@ class DogHasHandlerServiceImplTest {
 
         verify(baseParticipantObserver).deleteParticipantsByMemberOrHandlerId(dogHasHandler.getId());
         assertSame(EntityStatus.DELETED, dogHasHandler.getEntityStatus());
-    }
-
-    @Test
-    void getDogsByMemberId() {
-        when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
-                .thenReturn(Optional.of(member));
-        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
-                .thenReturn(Set.of(dogHasHandler));
-        when(dogRepository.findDogByIdAndEntityStatus(dogHasHandler.getDogId(), EntityStatus.ACTIVE))
-                .thenReturn(Optional.of(dog));
-
-        assertThat(dogHasHandlerService.getDogsByMemberId(memberId)).containsExactly(dog);
-    }
-
-    @Test
-    void getMembersByDogId() {
-        when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
-                .thenReturn(Set.of(dogHasHandler));
-        when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
-                .thenReturn(Optional.of(dog));
-        when(memberRepository.findByIdAndEntityStatus(dogHasHandler.getMemberId(), EntityStatus.ACTIVE))
-                .thenReturn(Optional.of(member));
-
-        assertThat(dogHasHandlerService.getMembersByDogId(dogId)).containsExactly(member);
-    }
-
-    @Test
-    void getDogHasHandlersByMemberId() {
-        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
-                .thenReturn(Set.of(dogHasHandler));
-
-        assertThat(dogHasHandlerService.getDogHasHandlersByMemberId(memberId)).containsExactly(dogHasHandler);
-    }
-
-    @Test
-    void getDogHasHandlersByDogId() {
-        when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
-                .thenReturn(Set.of(dogHasHandler));
-
-        assertThat(dogHasHandlerService.getDogHasHandlersByDogId(dogId)).containsExactly(dogHasHandler);
-    }
-
-    @Test
-    void searchByName() {
-        dog.setName("casp");
-        member.setFirstName(dog.getName());
-        member.setLastName(dog.getName());
-        when(dogHasHandlerRepository.findAllByMemberNameOrDogName(dog.getName())).thenReturn(Set.of(dogHasHandler));
-
-
-        assertThat(dogHasHandlerService.searchByName(dog.getName()))
-                .containsExactly(dogHasHandler);
     }
 
     @Test
@@ -180,9 +110,7 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void getMembersEmailByIds() {
-        member.setEmail("XXXXXXXXXXXXX");
         when(dogHasHandlerRepository.findAllByEntityStatusAndIdIn(EntityStatus.ACTIVE, Set.of(dogHasHandler.getId()))).thenReturn(Set.of(dogHasHandler));
-        when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
         assertThat(dogHasHandlerService.getMembersEmailByIds(Set.of(dogHasHandler.getId()))).containsExactly(member.getEmail());
     }
@@ -208,6 +136,168 @@ class DogHasHandlerServiceImplTest {
     }
 
     @Nested
+    class GetDogHasHandlersByMemberId {
+        @BeforeEach
+        void setUp() {
+            when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
+                    .thenReturn(Set.of(dogHasHandler));
+        }
+
+        @Test
+        void dogIsEmpty() {
+            dogHasHandler.setDog(null);
+            when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+
+            assertThat(dogHasHandlerService.getDogHasHandlersByMemberId(memberId))
+                    .singleElement()
+                    .satisfies(dh -> {
+                        assertSame(member, dh.getMember());
+                        assertSame(dog, dh.getDog());
+                    });
+        }
+
+        @Test
+        void memberIsEmpty() {
+            dogHasHandler.setMember(null);
+            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            assertThat(dogHasHandlerService.getDogHasHandlersByMemberId(memberId))
+                    .singleElement()
+                    .satisfies(dh -> {
+                        assertSame(member, dh.getMember());
+                        assertSame(dog, dh.getDog());
+                    });
+        }
+    }
+
+    @Nested
+    class GetDogHasHandlersByDogId {
+        @BeforeEach
+        void setUp() {
+            when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
+                    .thenReturn(Set.of(dogHasHandler));
+        }
+
+        @Test
+        void dogIsEmpty() {
+            dogHasHandler.setDog(null);
+            when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+
+            assertThat(dogHasHandlerService.getDogHasHandlersByDogId(dogId))
+                    .singleElement()
+                    .satisfies(dh -> {
+                        assertSame(member, dh.getMember());
+                        assertSame(dog, dh.getDog());
+                    });
+        }
+
+        @Test
+        void memberIsEmpty() {
+            dogHasHandler.setMember(null);
+            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            assertThat(dogHasHandlerService.getDogHasHandlersByDogId(dogId))
+                    .singleElement()
+                    .satisfies(dh -> {
+                        assertSame(member, dh.getMember());
+                        assertSame(dog, dh.getDog());
+                    });
+        }
+    }
+
+    @Nested
+    class SearchByName {
+        @BeforeEach
+        void setUp() {
+            when(dogHasHandlerRepository.findAllByMemberNameOrDogName(dog.getName())).thenReturn(Set.of(dogHasHandler));
+        }
+
+        @Test
+        void dogIsEmpty() {
+            dogHasHandler.setDog(null);
+            when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+
+            assertThat(dogHasHandlerService.searchByName(dog.getName()))
+                    .singleElement()
+                    .satisfies(dh -> {
+                        assertSame(member, dh.getMember());
+                        assertSame(dog, dh.getDog());
+                    });
+        }
+
+        @Test
+        void memberIsEmpty() {
+            dogHasHandler.setMember(null);
+            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            assertThat(dogHasHandlerService.searchByName(dog.getName()))
+                    .singleElement()
+                    .satisfies(dh -> {
+                        assertSame(member, dh.getMember());
+                        assertSame(dog, dh.getDog());
+                    });
+        }
+    }
+
+    @Nested
+    class SaveDogHasHandler {
+        @Test
+        void dogIsEmpty() {
+            dogHasHandler.setDog(null);
+            when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+
+            dogHasHandlerService.saveDogHasHandler(dogHasHandler);
+
+            var captor = ArgumentCaptor.forClass(DogHasHandler.class);
+            verify(dogHasHandlerRepository).save(captor.capture());
+            var actualDogHasHandler = captor.getValue();
+            assertSame(member, actualDogHasHandler.getMember());
+            assertSame(dog, actualDogHasHandler.getDog());
+
+        }
+
+        @Test
+        void memberIsEmpty() {
+            dogHasHandler.setMember(null);
+            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            dogHasHandlerService.saveDogHasHandler(dogHasHandler);
+
+            var captor = ArgumentCaptor.forClass(DogHasHandler.class);
+            verify(dogHasHandlerRepository).save(captor.capture());
+            var actualDogHasHandler = captor.getValue();
+            assertSame(member, actualDogHasHandler.getMember());
+            assertSame(dog, actualDogHasHandler.getDog());
+        }
+    }
+
+    @Nested
+    class GetDogsByMemberId {
+        @Test
+        void dogIsEmpty() {
+            dogHasHandler.setDog(null);
+            when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+            when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE))
+                    .thenReturn(Set.of(dogHasHandler));
+
+            assertThat(dogHasHandlerService.getDogsByMemberId(memberId)).containsExactly(dog);
+        }
+    }
+
+    @Nested
+    class GetMembersByDogId {
+        @Test
+        void memberIsEmpty() {
+            dogHasHandler.setMember(null);
+            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+            when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE))
+                    .thenReturn(Set.of(dogHasHandler));
+
+            assertThat(dogHasHandlerService.getMembersByDogId(dogId)).containsExactly(member);
+        }
+    }
+
+    @Nested
     class GetDogHasHandlerById {
         @Test
         void handlerExist() {
@@ -222,6 +312,30 @@ class DogHasHandlerServiceImplTest {
             when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> dogHasHandlerService.getDogHasHandlerById(dogHasHandlerId));
+        }
+
+        @Test
+        void dogIsEmpty() {
+            dogHasHandler.setDog(null);
+            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(dogHasHandler.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+
+            var actualDogHasHandler = dogHasHandlerService.getDogHasHandlerById(dogHasHandler.getId());
+
+            assertSame(member, actualDogHasHandler.getMember());
+            assertSame(dog, actualDogHasHandler.getDog());
+        }
+
+        @Test
+        void memberIsEmpty() {
+            dogHasHandler.setMember(null);
+            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(dogHasHandler.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            var actualDogHasHandler = dogHasHandlerService.getDogHasHandlerById(dogHasHandler.getId());
+
+            assertSame(member, actualDogHasHandler.getMember());
+            assertSame(dog, actualDogHasHandler.getDog());
         }
     }
 }
