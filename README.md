@@ -6,3 +6,4 @@
   * This example is interesting:
     `transactionTemplate.executeWithoutResult(ignore -> dogHasHandlers.forEach(this::setDogAndMemberIfTheyAreNull));`
     * See `casp.web.backend.business.logic.layer.dog.DogHasHandlerServiceImpl.getDogHasHandlersByIds`
+    * See how to configure a TransactionTemplate on commit: `#1 Remove unneeded MongoClient`
