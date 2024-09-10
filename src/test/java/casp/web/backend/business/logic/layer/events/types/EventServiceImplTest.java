@@ -4,8 +4,6 @@ import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.events.participants.EventParticipantService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participant.EventParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
@@ -20,22 +18,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static casp.web.backend.presentation.layer.dtos.events.EventMapper.EVENT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -53,34 +44,17 @@ class EventServiceImplTest {
     private EventServiceImpl eventService;
 
     private Event event;
-    private Calendar calendarEntry;
-    private List<Calendar> calendarEntries;
-    private Set<EventParticipant> participants;
 
     @BeforeEach
     void setUp() {
         event = TestFixture.createValidEvent();
-        calendarEntry = TestFixture.createValidCalendarEntry(event);
-        calendarEntries = List.of(calendarEntry);
-        participants = Set.of(TestFixture.createValidEventParticipant(event));
     }
 
     @Test
-    void saveBaseEventDto() {
-        var eventDto = EVENT_MAPPER.toDto(event);
-        eventDto.setCalendarEntries(calendarEntries);
-        eventDto.setParticipants(participants);
-        when(calendarService.replaceCalendarEntriesFromEvent(event, calendarEntries.getFirst())).thenReturn(calendarEntries);
-        when(participantService.saveParticipants(eventDto.getParticipants(), event)).thenReturn(eventDto.getParticipants());
-        when(eventRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    void saveBaseEvent() {
+        when(eventRepository.save(event)).thenAnswer(invocation -> invocation.getArgument(0));
 
-        var actualEvent = eventService.saveBaseEventDto(eventDto);
-
-        assertSame(calendarEntry.getEventTo(), actualEvent.getMaxLocalDateTime());
-        assertSame(calendarEntry.getEventFrom(), actualEvent.getMinLocalDateTime());
-        assertEquals(calendarEntries, actualEvent.getCalendarEntries());
-        assertEquals(participants.size(), actualEvent.getParticipantsSize());
-        assertEquals(participants, actualEvent.getParticipants());
+        assertSame(event, eventService.saveBaseEvent(event));
     }
 
     @Test
@@ -92,20 +66,6 @@ class EventServiceImplTest {
         verify(participantService).deleteParticipantsByBaseEventId(event.getId());
         verify(calendarService).deleteCalendarEntriesByBaseEventId(event.getId());
         assertSame(EntityStatus.DELETED, event.getEntityStatus());
-    }
-
-    @Test
-    void createNewBaseEventWithOneCalendarEntry() {
-        var expectedFrom = LocalDateTime.now(ZoneId.systemDefault());
-        var expectedTo = expectedFrom.plusHours(1);
-        var eventDto = eventService.createNewBaseEventWithOneCalendarEntry();
-
-        assertThat(eventDto.getCalendarEntries())
-                .singleElement()
-                .satisfies(calendar -> {
-                    assertThat(calendar.getEventFrom()).isCloseTo(expectedFrom, within(3, ChronoUnit.SECONDS));
-                    assertThat(calendar.getEventTo()).isCloseTo(expectedTo, within(3, ChronoUnit.SECONDS));
-                });
     }
 
     @Test
@@ -121,7 +81,7 @@ class EventServiceImplTest {
 
     @Test
     void deleteBaseEventsByMemberId() {
-        UUID memberId = UUID.randomUUID();
+        var memberId = UUID.randomUUID();
         when(eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, event.getEventType())).thenReturn(Set.of(event));
 
         eventService.deleteBaseEventsByMemberId(memberId);
@@ -133,7 +93,7 @@ class EventServiceImplTest {
 
     @Test
     void deactivateBaseEventsByMemberId() {
-        UUID memberId = UUID.randomUUID();
+        var memberId = UUID.randomUUID();
         when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, event.getEventType())).thenReturn(Set.of(event));
 
         eventService.deactivateBaseEventsByMemberId(memberId);
@@ -145,7 +105,7 @@ class EventServiceImplTest {
 
     @Test
     void activateBaseEventsByMemberId() {
-        UUID memberId = UUID.randomUUID();
+        var memberId = UUID.randomUUID();
         when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, event.getEventType())).thenReturn(Set.of(event));
 
         eventService.activateBaseEventsByMemberId(memberId);
@@ -156,17 +116,12 @@ class EventServiceImplTest {
     }
 
     @Nested
-    class GetBaseEventDtoById {
+    class GetBaseEventById {
         @Test
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
-            when(calendarService.getCalendarEntriesByBaseEvent(event)).thenReturn(calendarEntries);
-            when(participantService.getParticipantsByBaseEventId(event.getId())).thenReturn(participants);
 
-            var eventDto = eventService.getBaseEventDtoById(event.getId());
-
-            assertEquals(calendarEntries, eventDto.getCalendarEntries());
-            assertSame(participants, eventDto.getParticipants());
+            assertSame(event, eventService.getBaseEventById(event.getId()));
         }
 
         @Test
@@ -174,7 +129,7 @@ class EventServiceImplTest {
             var id = UUID.randomUUID();
             when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> eventService.getBaseEventDtoById(id));
+            assertThrows(NoSuchElementException.class, () -> eventService.getBaseEventById(id));
         }
     }
 }

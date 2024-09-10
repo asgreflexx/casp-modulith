@@ -6,9 +6,6 @@ import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.events.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.events.participants.SpaceService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participant.CoTrainer;
-import casp.web.backend.data.access.layer.documents.event.participant.Space;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
@@ -23,22 +20,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static casp.web.backend.presentation.layer.dtos.events.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.within;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -58,40 +48,17 @@ class CourseServiceImplTest {
     private CourseServiceImpl courseService;
 
     private Course course;
-    private Calendar calendarEntry;
-    private List<Calendar> calendarEntries;
-    private Set<Space> participants;
-    private Set<CoTrainer> coTrainers;
 
     @BeforeEach
     void setUp() {
         course = TestFixture.createValidCourse();
-        calendarEntry = TestFixture.createValidCalendarEntry(course);
-        calendarEntries = List.of(calendarEntry);
-        participants = Set.of(TestFixture.createValidSpace(course));
-        coTrainers = Set.of(TestFixture.createValidCoTrainer(course));
     }
 
     @Test
-    void saveBaseEventDto() {
-        var courseDto = COURSE_MAPPER.toDto(course);
-        courseDto.setCalendarEntries(calendarEntries);
-        courseDto.setParticipants(participants);
-        courseDto.setCoTrainers(coTrainers);
-        when(calendarService.replaceCalendarEntriesFromEvent(course, calendarEntries.getFirst())).thenReturn(calendarEntries);
-        when(participantService.saveParticipants(courseDto.getParticipants(), course)).thenReturn(courseDto.getParticipants());
-        when(coTrainerService.saveParticipants(courseDto.getCoTrainers(), course)).thenReturn(courseDto.getCoTrainers());
-        when(eventRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+    void saveBaseEvent() {
+        when(eventRepository.save(course)).thenAnswer(invocation -> invocation.getArgument(0));
 
-        var actualCourse = courseService.saveBaseEventDto(courseDto);
-
-        assertSame(calendarEntry.getEventTo(), actualCourse.getMaxLocalDateTime());
-        assertSame(calendarEntry.getEventFrom(), actualCourse.getMinLocalDateTime());
-        assertEquals(calendarEntries, actualCourse.getCalendarEntries());
-        assertEquals(participants.size(), actualCourse.getParticipantsSize());
-        assertEquals(participants, actualCourse.getParticipants());
-        assertEquals(coTrainers, actualCourse.getCoTrainers());
-        assertEquals(coTrainers.size(), actualCourse.getCoTrainers().size());
+        assertSame(course, courseService.saveBaseEvent(course));
     }
 
     @Test
@@ -107,20 +74,6 @@ class CourseServiceImplTest {
     }
 
     @Test
-    void createNewBaseEventWithOneCalendarEntry() {
-        var expectedFrom = LocalDateTime.now(ZoneId.systemDefault());
-        var expectedTo = expectedFrom.plusHours(1);
-        var courseDto = courseService.createNewBaseEventWithOneCalendarEntry();
-
-        assertThat(courseDto.getCalendarEntries())
-                .singleElement()
-                .satisfies(calendar -> {
-                    assertThat(calendar.getEventFrom()).isCloseTo(expectedFrom, within(3, ChronoUnit.SECONDS));
-                    assertThat(calendar.getEventTo()).isCloseTo(expectedTo, within(3, ChronoUnit.SECONDS));
-                });
-    }
-
-    @Test
     void getBaseEventsAsPage() {
         var page = new PageImpl<BaseEvent>(List.of(course));
         var year = LocalDate.now().getYear();
@@ -133,7 +86,7 @@ class CourseServiceImplTest {
 
     @Test
     void deleteBaseEventsByMemberId() {
-        UUID memberId = UUID.randomUUID();
+        var memberId = UUID.randomUUID();
         when(eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, course.getEventType())).thenReturn(Set.of(course));
 
         courseService.deleteBaseEventsByMemberId(memberId);
@@ -146,7 +99,7 @@ class CourseServiceImplTest {
 
     @Test
     void deactivateBaseEventsByMemberId() {
-        UUID memberId = UUID.randomUUID();
+        var memberId = UUID.randomUUID();
         when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, course.getEventType())).thenReturn(Set.of(course));
 
         courseService.deactivateBaseEventsByMemberId(memberId);
@@ -159,7 +112,7 @@ class CourseServiceImplTest {
 
     @Test
     void activateBaseEventsByMemberId() {
-        UUID memberId = UUID.randomUUID();
+        var memberId = UUID.randomUUID();
         when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, course.getEventType())).thenReturn(Set.of(course));
 
         courseService.activateBaseEventsByMemberId(memberId);
@@ -171,18 +124,12 @@ class CourseServiceImplTest {
     }
 
     @Nested
-    class GetBaseEventDtoById {
+    class GetBaseEventById {
         @Test
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-            when(calendarService.getCalendarEntriesByBaseEvent(course)).thenReturn(calendarEntries);
-            when(participantService.getParticipantsByBaseEventId(course.getId())).thenReturn(participants);
-            when(coTrainerService.getParticipantsByBaseEventId(course.getId())).thenReturn(coTrainers);
 
-            var examDto = courseService.getBaseEventDtoById(course.getId());
-
-            assertEquals(calendarEntries, examDto.getCalendarEntries());
-            assertSame(participants, examDto.getParticipants());
+            assertSame(course, courseService.getBaseEventById(course.getId()));
         }
 
         @Test
@@ -190,7 +137,7 @@ class CourseServiceImplTest {
             var id = UUID.randomUUID();
             when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> courseService.getBaseEventDtoById(id));
+            assertThrows(NoSuchElementException.class, () -> courseService.getBaseEventById(id));
         }
     }
 }

@@ -1,23 +1,19 @@
 package casp.web.backend.business.logic.layer.events.types;
 
 
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
-import casp.web.backend.presentation.layer.dtos.events.BaseEventDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
 
-public interface BaseEventService<E extends BaseEvent, P extends BaseParticipant, D extends BaseEventDto<P>> {
+public interface BaseEventService<E extends BaseEvent> {
 
-    D saveBaseEventDto(D actualBaseEventDto);
+    E saveBaseEvent(E actualBaseEventDto);
 
     void deleteBaseEventById(UUID id);
 
-    D getBaseEventDtoById(UUID id);
-
-    D createNewBaseEventWithOneCalendarEntry();
+    E getBaseEventById(UUID id);
 
     Page<E> getBaseEventsAsPage(int year, Pageable pageable);
 
