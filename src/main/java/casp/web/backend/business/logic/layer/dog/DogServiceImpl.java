@@ -44,8 +44,8 @@ class DogServiceImpl implements DogService {
     }
 
     @Override
-    public Dog saveDog(final Dog dog) {
-        return dogRepository.save(dog);
+    public void saveDog(final Dog dog) {
+        dogRepository.save(dog);
     }
 
     @Override

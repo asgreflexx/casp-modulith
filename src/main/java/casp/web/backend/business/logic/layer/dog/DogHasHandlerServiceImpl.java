@@ -11,9 +11,7 @@ import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.MongoTransactionManager;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -33,19 +31,16 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     private final DogHasHandlerRepository dogHasHandlerRepository;
     private final MemberRepository memberRepository;
     private final DogRepository dogRepository;
-    private final TransactionTemplate transactionTemplate;
     private final BaseParticipantObserver baseParticipantObserver;
 
     @Autowired
     DogHasHandlerServiceImpl(final DogHasHandlerRepository dogHasHandlerRepository,
                              final MemberRepository memberRepository,
                              final DogRepository dogRepository,
-                             final MongoTransactionManager mongoTransactionManager,
                              final BaseParticipantObserver baseParticipantObserver) {
         this.dogHasHandlerRepository = dogHasHandlerRepository;
         this.memberRepository = memberRepository;
         this.dogRepository = dogRepository;
-        this.transactionTemplate = new TransactionTemplate(mongoTransactionManager);
         this.baseParticipantObserver = baseParticipantObserver;
     }
 
@@ -57,11 +52,12 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public DogHasHandler getDogHasHandlerById(final UUID id) {
-        return dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
+        var dogHasHandler = dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "DogHasHandler with id %s not found or it isn't active".formatted(id);
             LOG.error(msg);
             return new NoSuchElementException(msg);
         });
+        return setDogAndMember(dogHasHandler);
     }
 
     @Override
@@ -79,47 +75,40 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     @Override
     public Set<Dog> getDogsByMemberId(final UUID memberId) {
         return getDogHasHandlersByMemberId(memberId).stream()
-                .map(dh -> setDogAndMemberIfTheyAreNull(dh).getDog())
+                .map(dh -> setDogAndMember(dh).getDog())
                 .collect(Collectors.toSet());
     }
 
     @Override
     public Set<Member> getMembersByDogId(final UUID dogId) {
         return getDogHasHandlersByDogId(dogId).stream()
-                .map(dh -> setDogAndMemberIfTheyAreNull(dh).getMember())
+                .map(dh -> setDogAndMember(dh).getMember())
                 .collect(Collectors.toSet());
     }
 
     @Override
     public Set<DogHasHandler> getDogHasHandlersByMemberId(final UUID memberId) {
-        return dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
+        return setMissingMembersAndDogs(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE));
     }
 
     @Override
     public Set<DogHasHandler> getDogHasHandlersByDogId(final UUID dogId) {
-        return dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE);
+        return setMissingMembersAndDogs(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE));
     }
 
     @Override
     public Set<DogHasHandler> searchByName(final String name) {
-        var dogHasHandlers = dogHasHandlerRepository.findAllByMemberNameOrDogName(name);
-        dogHasHandlers.forEach(this::setDogAndMemberIfTheyAreNull);
-        return dogHasHandlers;
+        return setMissingMembersAndDogs(dogHasHandlerRepository.findAllByMemberNameOrDogName(name));
     }
 
     @Override
     public Set<DogHasHandler> getAllDogHasHandler() {
-        Set<DogHasHandler> dogHasHandlers = dogHasHandlerRepository.findAllByEntityStatus(EntityStatus.ACTIVE);
-        dogHasHandlers.forEach(this::setDogAndMemberIfTheyAreNull);
-        return dogHasHandlers;
+        return dogHasHandlerRepository.findAllByEntityStatus(EntityStatus.ACTIVE);
     }
 
     @Override
     public Set<DogHasHandler> getDogHasHandlersByIds(final Set<UUID> handlerIds) {
-        Set<DogHasHandler> dogHasHandlers = dogHasHandlerRepository.findAllByEntityStatusAndIdIn(EntityStatus.ACTIVE, handlerIds);
-        transactionTemplate.executeWithoutResult(ignore -> dogHasHandlers.forEach(this::setDogAndMemberIfTheyAreNull));
-        return dogHasHandlers;
-
+        return dogHasHandlerRepository.findAllByEntityStatusAndIdIn(EntityStatus.ACTIVE, handlerIds);
     }
 
     @Override
@@ -155,6 +144,11 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         });
     }
 
+    private Set<DogHasHandler> setMissingMembersAndDogs(final Set<DogHasHandler> dogHasHandlers) {
+        dogHasHandlers.forEach(this::setDogAndMember);
+        return dogHasHandlers;
+    }
+
     private void saveItWithNewStatus(final DogHasHandler dh, final EntityStatus entityStatus) {
         dh.setEntityStatus(entityStatus);
         dogHasHandlerRepository.save(dh);
@@ -165,15 +159,13 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         saveItWithNewStatus(dh, EntityStatus.DELETED);
     }
 
-    private DogHasHandler setDogAndMemberIfTheyAreNull(final DogHasHandler dh) {
-        if (null == dh.getDog() || null == dh.getMember()) {
-            setDogAndMember(dh);
+    private DogHasHandler setDogAndMember(final DogHasHandler dogHasHandler) {
+        if (null == dogHasHandler.getMember()) {
+            memberRepository.findByIdAndEntityStatus(dogHasHandler.getMemberId(), EntityStatus.ACTIVE).ifPresent(dogHasHandler::setMember);
         }
-        return dh;
-    }
-
-    private void setDogAndMember(final DogHasHandler dogHasHandler) {
-        memberRepository.findByIdAndEntityStatus(dogHasHandler.getMemberId(), EntityStatus.ACTIVE).ifPresent(dogHasHandler::setMember);
-        dogRepository.findDogByIdAndEntityStatus(dogHasHandler.getDogId(), EntityStatus.ACTIVE).ifPresent(dogHasHandler::setDog);
+        if (null == dogHasHandler.getDog()) {
+            dogRepository.findDogByIdAndEntityStatus(dogHasHandler.getDogId(), EntityStatus.ACTIVE).ifPresent(dogHasHandler::setDog);
+        }
+        return dogHasHandler;
     }
 }

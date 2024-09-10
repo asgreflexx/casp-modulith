@@ -5,9 +5,11 @@ import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.repositories.DogRepository;
+import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import casp.web.backend.presentation.layer.dtos.dog.DogDto;
+import casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -23,8 +25,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.dog.DogMapper.DOG_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -44,6 +49,8 @@ class DogRestControllerTest {
     private DogHasHandlerRepository dogHasHandlerRepository;
     @Autowired
     private BaseParticipantRepository baseParticipantRepository;
+    @Autowired
+    private MemberRepository memberRepository;
 
     private DogDto charlie;
     private DogDto bonsai;
@@ -54,6 +61,7 @@ class DogRestControllerTest {
         baseParticipantRepository.deleteAll();
         dogHasHandlerRepository.deleteAll();
         dogRepository.deleteAll();
+        memberRepository.deleteAll();
 
         charlie = createDog("Charlie", EntityStatus.ACTIVE);
         bonsai = createDog("Bonsai", EntityStatus.ACTIVE);
@@ -80,7 +88,25 @@ class DogRestControllerTest {
         dog.setEntityStatus(entityStatus);
         dog.setName(name);
         dog.setChipNumber(UUID.randomUUID().toString());
-        return DOG_MAPPER.toDto(dogRepository.save(dog));
+
+        var member = TestFixture.createValidMember();
+        member.setEntityStatus(entityStatus);
+        memberRepository.save(member);
+
+        var dogHasHandler = TestFixture.createValidDogHasHandler(dog, member);
+        dogHasHandler.setEntityStatus(entityStatus);
+        dogHasHandlerRepository.save(dogHasHandler);
+        var space = TestFixture.createValidSpace();
+        space.setMemberOrHandlerId(dogHasHandler.getId());
+        space.setEntityStatus(entityStatus);
+        var examParticipant = TestFixture.createValidExamParticipant();
+        examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
+        examParticipant.setEntityStatus(entityStatus);
+        baseParticipantRepository.saveAll(Set.of(examParticipant, space));
+
+        var dto = DOG_MAPPER.toDto(dogRepository.save(dog));
+        dto.setDogHasHandlerSet(Set.of(DOG_HAS_HANDLER_MAPPER.toDto(dogHasHandler)));
+        return dto;
     }
 
     private ResultActions getDogById(final UUID dogId) throws Exception {
@@ -88,25 +114,25 @@ class DogRestControllerTest {
     }
 
     @Nested
-    class DeleteDataById {
+    class DeleteDogById {
         @Test
         void cascadeDelete() throws Exception {
-            var dogHasHandler = TestFixture.createValidDogHasHandler();
-            dogHasHandler.setDog(charlie);
-            dogHasHandler.setDogId(charlie.getId());
-            dogHasHandlerRepository.save(dogHasHandler);
-            var space = TestFixture.createValidSpace();
-            space.setMemberOrHandlerId(dogHasHandler.getId());
-            var examParticipant = TestFixture.createValidExamParticipant();
-            examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
-            baseParticipantRepository.saveAll(Set.of(examParticipant, space));
-
+            var dogHasHandlerId = getDogHasHandler().getId();
             deleteDog(charlie.getId())
                     .andExpect(status().isOk());
 
             getDogById(charlie.getId()).andExpect(status().isBadRequest());
-            assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.DELETED, dh.getEntityStatus()));
-            assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.DELETED, p.getEntityStatus()));
+
+            var dogHasHandlerList = dogHasHandlerRepository.findAll()
+                    .stream()
+                    .filter(dh -> charlie.getId().equals(dh.getDogId()))
+                    .toList();
+            var baseParticipantList = baseParticipantRepository.findAll()
+                    .stream()
+                    .filter(p -> dogHasHandlerId.equals(p.getMemberOrHandlerId()))
+                    .toList();
+            assertThat(dogHasHandlerList).isNotEmpty().allSatisfy(dh -> assertSame(EntityStatus.DELETED, dh.getEntityStatus()));
+            assertThat(baseParticipantList).isNotEmpty().allSatisfy(p -> assertSame(EntityStatus.DELETED, p.getEntityStatus()));
         }
 
         @Test
@@ -121,11 +147,10 @@ class DogRestControllerTest {
     }
 
     @Nested
-    class PostData {
+    class SaveDog {
         @Test
         void dogIsAlwaysAsActiveSaved() throws Exception {
             charlie.setEntityStatus(EntityStatus.DELETED);
-
             performPost(charlie)
                     .andExpect(status().isOk());
 
@@ -133,7 +158,10 @@ class DogRestControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
             assertThat(MvcMapper.toObject(mvcResult, DogDto.class))
-                    .satisfies(dogDto -> assertSame(EntityStatus.ACTIVE, dogDto.getEntityStatus()));
+                    .satisfies(dogDto -> {
+                        assertSame(EntityStatus.ACTIVE, dogDto.getEntityStatus());
+                        assertDogHasHandler(dogDto);
+                    });
         }
 
         @Test
@@ -150,6 +178,22 @@ class DogRestControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON));
         }
+    }
+
+    private void assertDogHasHandler(final DogDto actual) {
+        assertThat(actual.getDogHasHandlerSet())
+                .singleElement()
+                .satisfies(dh -> {
+                    assertEquals(getDogHasHandler().getId(), dh.getId());
+                    assertEquals(getDogHasHandler().getMemberId(), dh.getMemberId());
+                    assertEquals(getDogHasHandler().getMember().getId(), dh.getMember().getId());
+                    assertNull(dh.getDogId());
+                    assertNull(dh.getDog());
+                });
+    }
+
+    private DogHasHandlerDto getDogHasHandler() {
+        return charlie.getDogHasHandlerSet().stream().findAny().orElseThrow();
     }
 
     @Nested
@@ -219,7 +263,9 @@ class DogRestControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            assertThat(MvcMapper.toObject(mvcResult, DogDto.class)).isEqualTo(charlie);
+            var dogDto = MvcMapper.toObject(mvcResult, DogDto.class);
+            assertThat(dogDto).isEqualTo(charlie);
+            assertDogHasHandler(dogDto);
         }
 
         @Test
