@@ -3,7 +3,6 @@ package casp.web.backend.business.logic.layer.events.types;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
-import casp.web.backend.business.logic.layer.events.mappers.ExamMapperImpl;
 import casp.web.backend.business.logic.layer.events.participants.ExamParticipantService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
@@ -31,6 +30,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.events.ExamMapper.EXAM_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -68,8 +68,7 @@ class ExamServiceImplTest {
 
     @Test
     void saveBaseEventDto() {
-        var examMapper = new ExamMapperImpl();
-        var eventDto = examMapper.documentToDto(exam);
+        var eventDto = EXAM_MAPPER.toDto(exam);
         eventDto.setCalendarEntries(calendarEntries);
         eventDto.setParticipants(participants);
         when(calendarService.replaceCalendarEntriesFromEvent(exam, calendarEntries.getFirst())).thenReturn(calendarEntries);

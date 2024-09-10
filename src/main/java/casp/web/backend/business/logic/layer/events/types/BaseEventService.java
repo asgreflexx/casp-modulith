@@ -1,9 +1,9 @@
 package casp.web.backend.business.logic.layer.events.types;
 
 
-import casp.web.backend.business.logic.layer.events.dtos.BaseEventDto;
 import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
+import casp.web.backend.presentation.layer.dtos.events.BaseEventDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,14 +1,15 @@
-package casp.web.backend.business.logic.layer.events.dtos;
+package casp.web.backend.presentation.layer.dtos;
 
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.business.logic.layer.events.mappers.CourseMapperImpl;
+import casp.web.backend.presentation.layer.dtos.events.CourseDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Set;
 
+import static casp.web.backend.presentation.layer.dtos.events.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class CourseDtoTest {
@@ -18,7 +19,7 @@ class CourseDtoTest {
     @BeforeEach
     void setUp() {
         var course = TestFixture.createValidCourse();
-        courseDto = new CourseMapperImpl().documentToDto(course);
+        courseDto = COURSE_MAPPER.toDto(course);
         courseDto.setCalendarEntries(List.of(TestFixture.createValidCalendarEntry(course)));
     }
 

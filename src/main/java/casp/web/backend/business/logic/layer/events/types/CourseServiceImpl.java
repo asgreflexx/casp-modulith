@@ -1,19 +1,20 @@
 package casp.web.backend.business.logic.layer.events.types;
 
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
-import casp.web.backend.business.logic.layer.events.dtos.CourseDto;
-import casp.web.backend.business.logic.layer.events.mappers.CourseMapperImpl;
 import casp.web.backend.business.logic.layer.events.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.events.participants.SpaceService;
 import casp.web.backend.data.access.layer.documents.event.participant.Space;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
+import casp.web.backend.presentation.layer.dtos.events.CourseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
+
+import static casp.web.backend.presentation.layer.dtos.events.CourseMapper.COURSE_MAPPER;
 
 @Service
 class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> implements CourseService {
@@ -25,7 +26,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
                              final SpaceService participantService,
                              final BaseEventRepository eventRepository,
                              final CoTrainerService coTrainerService) {
-        super(calendarService, participantService, eventRepository, Course.EVENT_TYPE, new CourseMapperImpl());
+        super(calendarService, participantService, eventRepository, Course.EVENT_TYPE, COURSE_MAPPER);
         this.coTrainerService = coTrainerService;
     }
 

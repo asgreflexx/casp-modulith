@@ -5,7 +5,7 @@ import casp.web.backend.presentation.layer.dtos.BaseMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface MemberMapper extends BaseMapper<Member, MemberDto> {
     MemberMapper MEMBER_MAPPER = Mappers.getMapper(MemberMapper.class);
 }
