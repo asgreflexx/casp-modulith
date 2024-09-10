@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Service
 class BaseEventObserverImpl implements BaseEventObserver {
-    private final Set<BaseEventService<?, ?, ?>> observers = new HashSet<>();
+    private final Set<BaseEventService<?>> observers = new HashSet<>();
 
     @Autowired
     BaseEventObserverImpl(final CourseService courseService, final EventService eventService, final ExamService examService) {

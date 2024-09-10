@@ -3,48 +3,32 @@ package casp.web.backend.business.logic.layer.events.types;
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.events.participants.BaseParticipantService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
-import casp.web.backend.presentation.layer.dtos.BaseMapper;
-import casp.web.backend.presentation.layer.dtos.events.BaseEventDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<E, P, D> {
+abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipant> implements BaseEventService<E> {
     private static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
-    private static final int DEFAULT_EVENT_LENGTH = 1;
     protected final CalendarService calendarService;
     protected final BaseParticipantService<P, E> participantService;
     protected final BaseEventRepository eventRepository;
     protected final String eventType;
-    protected final BaseMapper<E, D> mapper;
-    protected Set<P> participants;
-    protected List<Calendar> calendarEntries;
-    protected E baseEvent;
 
-    protected BaseEventServiceImpl(final CalendarService calendarService,
-                                   final BaseParticipantService<P, E> participantService,
-                                   final BaseEventRepository eventRepository,
-                                   final String eventType,
-                                   final BaseMapper<E, D> mapper) {
+    protected BaseEventServiceImpl(final CalendarService calendarService, final BaseParticipantService<P, E> participantService, final BaseEventRepository eventRepository, final String eventType) {
         this.calendarService = calendarService;
         this.participantService = participantService;
         this.eventRepository = eventRepository;
         this.eventType = eventType;
-        this.mapper = mapper;
     }
 
     protected void deleteBaseEvent(final BaseEvent baseEvent) {
@@ -94,17 +78,12 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     @Override
-    public D getBaseEventDtoById(final UUID id) {
-        baseEvent = (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
-                .orElseThrow(() -> {
-                    var msg = "This %s[%s] doesn't exist or it isn't active".formatted(eventType, id);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
-        var dto = mapper.toDto(baseEvent);
-        dto.setParticipants(participantService.getParticipantsByBaseEventId(baseEvent.getId()));
-        dto.setCalendarEntries(calendarService.getCalendarEntriesByBaseEvent(baseEvent));
-        return dto;
+    public E getBaseEventById(final UUID id) {
+        return (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
+            var msg = "This %s[%s] doesn't exist or it isn't active".formatted(eventType, id);
+            LOG.error(msg);
+            return new NoSuchElementException(msg);
+        });
     }
 
     // It cast to the correct type
@@ -114,26 +93,9 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         return (Page<E>) eventRepository.findAllByYearAndEventType(year, eventType, pageable);
     }
 
-    @Transactional
     @Override
-    public D saveBaseEventDto(final D actualBaseEventDto) {
-        baseEvent = mapper.toDocument(actualBaseEventDto);
-        saveEvent(baseEvent, actualBaseEventDto.getParticipants(), actualBaseEventDto.getCalendarEntries());
-
-        var newBaseEvent = mapper.toDto(baseEvent);
-        newBaseEvent.setParticipants(participants);
-        newBaseEvent.setCalendarEntries(calendarEntries);
-
-        return newBaseEvent;
-    }
-
-    protected D createNewEventWithOneCalendarEntry(final D baseEventDto) {
-        var eventFrom = LocalDateTime.now(ZoneId.systemDefault());
-        var calendar = new Calendar();
-        calendar.setEventFrom(eventFrom);
-        calendar.setEventTo(eventFrom.plusHours(DEFAULT_EVENT_LENGTH));
-        baseEventDto.getCalendarEntries().add(calendar);
-        return baseEventDto;
+    public E saveBaseEvent(final E actualBaseEvent) {
+        return eventRepository.save(actualBaseEvent);
     }
 
     protected Optional<BaseEvent> findBaseEventNotDeleted(final UUID id) {
@@ -152,13 +114,4 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
         return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, eventType);
     }
 
-    private void saveEvent(final E baseEventParam, final Set<P> participants, final List<Calendar> calendarEntries) {
-        this.calendarEntries = calendarService.replaceCalendarEntriesFromEvent(baseEventParam, calendarEntries.getFirst());
-        this.participants = participantService.saveParticipants(participants, baseEventParam);
-
-        baseEventParam.setMinLocalDateTime(this.calendarEntries.getFirst().getEventFrom());
-        baseEventParam.setMaxLocalDateTime(this.calendarEntries.getLast().getEventTo());
-        baseEventParam.setParticipantsSize(this.participants.size());
-        baseEvent = eventRepository.save(baseEventParam);
-    }
 }
