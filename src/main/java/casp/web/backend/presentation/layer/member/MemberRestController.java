@@ -1,5 +1,6 @@
 package casp.web.backend.presentation.layer.member;
 
+import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.member.CardService;
 import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.member.CardMapper.CARD_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 
@@ -36,11 +38,15 @@ class MemberRestController {
 
     private final MemberService memberService;
     private final CardService cardService;
+    private final DogHasHandlerService dogHasHandlerService;
 
     @Autowired
-    MemberRestController(final MemberService memberService, final CardService cardService) {
+    MemberRestController(final MemberService memberService,
+                         final CardService cardService,
+                         final DogHasHandlerService dogHasHandlerService) {
         this.memberService = memberService;
         this.cardService = cardService;
+        this.dogHasHandlerService = dogHasHandlerService;
     }
 
     @GetMapping()
@@ -54,7 +60,9 @@ class MemberRestController {
     ResponseEntity<MemberDto> getMemberById(final @PathVariable UUID id) {
         var memberDto = MEMBER_MAPPER.toDto(memberService.getMemberById(id));
         var cardDtoSet = CARD_MAPPER.toDtoSet(cardService.getCardsByMemberId(id));
+        var dogHasHandlerDtoSet = DOG_HAS_HANDLER_MAPPER.toDtoSet(dogHasHandlerService.getDogHasHandlersByMemberId(id));
         memberDto.setCardDtoSet(cardDtoSet);
+        memberDto.setDogHasHandlerDtoSet(dogHasHandlerDtoSet);
         return ResponseEntity.ok(memberDto);
     }
 
