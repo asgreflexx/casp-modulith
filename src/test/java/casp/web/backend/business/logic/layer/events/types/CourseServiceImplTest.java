@@ -3,7 +3,6 @@ package casp.web.backend.business.logic.layer.events.types;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
-import casp.web.backend.business.logic.layer.events.mappers.CourseMapperImpl;
 import casp.web.backend.business.logic.layer.events.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.events.participants.SpaceService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
@@ -33,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.events.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -74,8 +74,7 @@ class CourseServiceImplTest {
 
     @Test
     void saveBaseEventDto() {
-        var courseMapper = new CourseMapperImpl();
-        var courseDto = courseMapper.documentToDto(course);
+        var courseDto = COURSE_MAPPER.toDto(course);
         courseDto.setCalendarEntries(calendarEntries);
         courseDto.setParticipants(participants);
         courseDto.setCoTrainers(coTrainers);

@@ -1,4 +1,4 @@
-package casp.web.backend.business.logic.layer.events.dtos;
+package casp.web.backend.presentation.layer.dtos.events.types;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;

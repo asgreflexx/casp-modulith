@@ -1,14 +1,14 @@
 package casp.web.backend.business.logic.layer.events.types;
 
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
-import casp.web.backend.business.logic.layer.events.dtos.BaseEventDto;
-import casp.web.backend.business.logic.layer.events.mappers.BaseEventMapper;
 import casp.web.backend.business.logic.layer.events.participants.BaseParticipantService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
+import casp.web.backend.presentation.layer.dtos.BaseMapper;
+import casp.web.backend.presentation.layer.dtos.events.BaseEventDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -30,7 +30,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     protected final BaseParticipantService<P, E> participantService;
     protected final BaseEventRepository eventRepository;
     protected final String eventType;
-    protected final BaseEventMapper<E, D> mapper;
+    protected final BaseMapper<E, D> mapper;
     protected Set<P> participants;
     protected List<Calendar> calendarEntries;
     protected E baseEvent;
@@ -39,7 +39,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
                                    final BaseParticipantService<P, E> participantService,
                                    final BaseEventRepository eventRepository,
                                    final String eventType,
-                                   final BaseEventMapper<E, D> mapper) {
+                                   final BaseMapper<E, D> mapper) {
         this.calendarService = calendarService;
         this.participantService = participantService;
         this.eventRepository = eventRepository;
@@ -101,7 +101,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
                     LOG.error(msg);
                     return new NoSuchElementException(msg);
                 });
-        var dto = mapper.documentToDto(baseEvent);
+        var dto = mapper.toDto(baseEvent);
         dto.setParticipants(participantService.getParticipantsByBaseEventId(baseEvent.getId()));
         dto.setCalendarEntries(calendarService.getCalendarEntriesByBaseEvent(baseEvent));
         return dto;
@@ -117,10 +117,10 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, D extends BaseEventDto<
     @Transactional
     @Override
     public D saveBaseEventDto(final D actualBaseEventDto) {
-        baseEvent = mapper.dtoToDocument(actualBaseEventDto);
+        baseEvent = mapper.toDocument(actualBaseEventDto);
         saveEvent(baseEvent, actualBaseEventDto.getParticipants(), actualBaseEventDto.getCalendarEntries());
 
-        var newBaseEvent = mapper.documentToDto(baseEvent);
+        var newBaseEvent = mapper.toDto(baseEvent);
         newBaseEvent.setParticipants(participants);
         newBaseEvent.setCalendarEntries(calendarEntries);
 

@@ -2,7 +2,6 @@ package casp.web.backend.business.logic.layer.events.types;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
-import casp.web.backend.business.logic.layer.events.mappers.EventMapperImpl;
 import casp.web.backend.business.logic.layer.events.participants.EventParticipantService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
@@ -30,6 +29,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.events.EventMapper.EVENT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -67,8 +67,7 @@ class EventServiceImplTest {
 
     @Test
     void saveBaseEventDto() {
-        var eventMapper = new EventMapperImpl();
-        var eventDto = eventMapper.documentToDto(event);
+        var eventDto = EVENT_MAPPER.toDto(event);
         eventDto.setCalendarEntries(calendarEntries);
         eventDto.setParticipants(participants);
         when(calendarService.replaceCalendarEntriesFromEvent(event, calendarEntries.getFirst())).thenReturn(calendarEntries);
