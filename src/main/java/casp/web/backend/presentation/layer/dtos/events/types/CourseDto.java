@@ -1,8 +1,8 @@
 package casp.web.backend.presentation.layer.dtos.events.types;
 
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participant.CoTrainer;
-import casp.web.backend.data.access.layer.documents.event.participant.Space;
+import casp.web.backend.data.access.layer.documents.event.participants.CoTrainer;
+import casp.web.backend.data.access.layer.documents.event.participants.Space;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;

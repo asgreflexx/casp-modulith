@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.documents.event.participant;
+package casp.web.backend.data.access.layer.documents.event.participants;
 
 import casp.web.backend.data.access.layer.documents.commons.Payment;
 import casp.web.backend.data.access.layer.documents.commons.PaymentConstraint;

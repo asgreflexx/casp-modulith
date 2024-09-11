@@ -1,8 +1,8 @@
 package casp.web.backend.data.access.layer.custom.repositories;
 
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
-import casp.web.backend.data.access.layer.documents.event.participant.QBaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.QBaseParticipant;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;

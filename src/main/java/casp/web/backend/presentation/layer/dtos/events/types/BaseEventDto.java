@@ -2,7 +2,7 @@ package casp.web.backend.presentation.layer.dtos.events.types;
 
 
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

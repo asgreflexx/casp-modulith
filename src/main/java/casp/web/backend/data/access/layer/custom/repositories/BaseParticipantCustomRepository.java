@@ -1,7 +1,7 @@
 package casp.web.backend.data.access.layer.custom.repositories;
 
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 
 import java.util.Set;
 import java.util.UUID;

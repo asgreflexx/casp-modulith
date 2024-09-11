@@ -3,7 +3,7 @@ package casp.web.backend.business.logic.layer.events.types;
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.events.participants.BaseParticipantService;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
 import org.slf4j.Logger;

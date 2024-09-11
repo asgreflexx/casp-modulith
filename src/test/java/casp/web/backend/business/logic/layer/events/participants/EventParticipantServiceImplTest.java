@@ -2,8 +2,8 @@ package casp.web.backend.business.logic.layer.events.participants;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
-import casp.web.backend.data.access.layer.documents.event.participant.EventParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.EventParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
 import org.junit.jupiter.api.BeforeEach;

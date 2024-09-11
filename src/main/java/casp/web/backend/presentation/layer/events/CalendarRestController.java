@@ -8,7 +8,7 @@ import casp.web.backend.business.logic.layer.events.participants.SpaceService;
 import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.data.access.layer.documents.event.TypesRegex;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.documents.event.types.Event;

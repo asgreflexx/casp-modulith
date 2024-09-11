@@ -1,7 +1,7 @@
 package casp.web.backend.business.logic.layer.events.participants;
 
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
 import org.springframework.transaction.annotation.Transactional;

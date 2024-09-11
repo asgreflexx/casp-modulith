@@ -3,7 +3,7 @@ package casp.web.backend.business.logic.layer.events.types;
 import casp.web.backend.business.logic.layer.events.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.events.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.events.participants.SpaceService;
-import casp.web.backend.data.access.layer.documents.event.participant.Space;
+import casp.web.backend.data.access.layer.documents.event.participants.Space;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;

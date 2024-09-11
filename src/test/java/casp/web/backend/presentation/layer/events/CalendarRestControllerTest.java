@@ -2,11 +2,11 @@ package casp.web.backend.presentation.layer.events;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participant.BaseParticipant;
-import casp.web.backend.data.access.layer.documents.event.participant.CoTrainer;
-import casp.web.backend.data.access.layer.documents.event.participant.EventParticipant;
-import casp.web.backend.data.access.layer.documents.event.participant.ExamParticipant;
-import casp.web.backend.data.access.layer.documents.event.participant.Space;
+import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.CoTrainer;
+import casp.web.backend.data.access.layer.documents.event.participants.EventParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.ExamParticipant;
+import casp.web.backend.data.access.layer.documents.event.participants.Space;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.documents.event.types.Exam;

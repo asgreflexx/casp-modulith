@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.documents.event.participant;
+package casp.web.backend.data.access.layer.documents.event.participants;
 
 import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.annotation.TypeAlias;
@@ -8,17 +8,17 @@ import java.util.StringJoiner;
 
 @QueryEntity
 @Document(BaseParticipant.COLLECTION)
-@TypeAlias(EventParticipant.PARTICIPANT_TYPE)
-public class EventParticipant extends BaseParticipant {
-    public static final String PARTICIPANT_TYPE = "EVENT_PARTICIPANT";
+@TypeAlias(CoTrainer.PARTICIPANT_TYPE)
+public class CoTrainer extends BaseParticipant {
+    public static final String PARTICIPANT_TYPE = "CO_TRAINER";
 
-    public EventParticipant() {
+    public CoTrainer() {
         super(PARTICIPANT_TYPE);
     }
 
     @Override
     public String toString() {
-        return new StringJoiner(", ", EventParticipant.class.getSimpleName() + "[", "]")
+        return new StringJoiner(", ", CoTrainer.class.getSimpleName() + "[", "]")
                 .add("participantType='" + participantType + "'")
                 .add("memberOrHandlerId=" + memberOrHandlerId)
                 .add("response=" + response)

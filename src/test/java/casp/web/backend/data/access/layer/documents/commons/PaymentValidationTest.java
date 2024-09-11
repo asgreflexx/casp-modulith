@@ -1,6 +1,6 @@
 package casp.web.backend.data.access.layer.documents.commons;
 
-import casp.web.backend.data.access.layer.documents.event.participant.Space;
+import casp.web.backend.data.access.layer.documents.event.participants.Space;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
