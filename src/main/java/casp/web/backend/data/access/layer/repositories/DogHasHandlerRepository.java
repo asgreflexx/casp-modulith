@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.repositories;
 
+import casp.web.backend.data.access.layer.custom.repositories.DogHasHandlerCustomRepository;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;

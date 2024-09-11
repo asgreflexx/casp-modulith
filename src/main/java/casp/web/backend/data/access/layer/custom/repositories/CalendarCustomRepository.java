@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.repositories;
+package casp.web.backend.data.access.layer.custom.repositories;
 
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import jakarta.annotation.Nullable;

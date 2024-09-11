@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.repositories;
 
+import casp.web.backend.data.access.layer.custom.repositories.MemberCustomRepository;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import org.springframework.data.domain.Page;
