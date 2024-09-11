@@ -1,6 +1,6 @@
 package casp.web.backend.business.logic.layer.dog;
 
-import casp.web.backend.business.logic.layer.events.participants.BaseParticipantObserver;
+import casp.web.backend.business.logic.layer.event.participants.BaseParticipantObserver;
 import casp.web.backend.data.access.layer.documents.dog.Dog;
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
