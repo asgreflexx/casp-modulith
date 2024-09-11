@@ -6,7 +6,9 @@ import casp.web.backend.data.access.layer.documents.event.participants.BaseParti
 import casp.web.backend.data.access.layer.documents.event.participants.ExamParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.Exam;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
+import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,10 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +30,8 @@ import static org.mockito.Mockito.when;
 class ExamParticipantServiceImplTest {
     @Mock
     private BaseParticipantRepository baseParticipantRepository;
+    @Mock
+    private DogHasHandlerRepository dogHasHandlerRepository;
 
     @InjectMocks
     private ExamParticipantServiceImpl examParticipantService;
@@ -116,5 +122,34 @@ class ExamParticipantServiceImplTest {
         examParticipantService.deleteParticipantsByMemberOrHandlerId(participant.getMemberOrHandlerId());
 
         verify(participant).setEntityStatus(EntityStatus.DELETED);
+    }
+
+    @Nested
+    class GetActiveExamParticipantsIfDogHasHandlersAreActive {
+        @BeforeEach
+        void setUp() {
+            when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(exam.getId(), EntityStatus.ACTIVE, participantType)).thenReturn(baseParticipants);
+        }
+
+        @Test
+        void spaceIsActive() {
+            var dogHasHandler = TestFixture.createValidDogHasHandler();
+            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+
+            assertThat(examParticipantService.getActiveExamParticipantsIfDogHasHandlersAreActive(exam.getId()))
+                    .singleElement()
+                    .satisfies(pd -> {
+                        assertEquals(participant.getId(), pd.participant().getId());
+                        assertEquals(dogHasHandler.getId(), pd.dogHasHandler().getId());
+                    });
+        }
+
+        @Test
+        void spaceIsInActive() {
+            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThat(examParticipantService.getActiveExamParticipantsIfDogHasHandlersAreActive(exam.getId()))
+                    .isEmpty();
+        }
     }
 }

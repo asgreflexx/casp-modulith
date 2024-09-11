@@ -6,7 +6,9 @@ import casp.web.backend.data.access.layer.documents.event.participants.BaseParti
 import casp.web.backend.data.access.layer.documents.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
+import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,10 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -26,6 +30,8 @@ import static org.mockito.Mockito.when;
 class CoTrainerServiceImplTest {
     @Mock
     private BaseParticipantRepository baseParticipantRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private CoTrainerServiceImpl coTrainerService;
@@ -116,5 +122,34 @@ class CoTrainerServiceImplTest {
         coTrainerService.deleteParticipantsByMemberOrHandlerId(coTrainer.getMemberOrHandlerId());
 
         verify(coTrainer).setEntityStatus(EntityStatus.DELETED);
+    }
+
+    @Nested
+    class GetActiveCoTrainersAndDeleteTheOthers {
+        @BeforeEach
+        void setUp() {
+            when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, CoTrainer.PARTICIPANT_TYPE)).thenReturn(Set.of(coTrainer));
+        }
+
+        @Test
+        void coTrainerIsActive() {
+            var member = TestFixture.createValidMember();
+            when(memberRepository.findByIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            assertThat(coTrainerService.getActiveCoTrainersIfMembersAreActive(course.getId()))
+                    .singleElement()
+                    .satisfies(pm -> {
+                        assertEquals(coTrainer.getId(), pm.participant().getId());
+                        assertEquals(member.getId(), pm.member().getId());
+                    });
+        }
+
+        @Test
+        void coTrainerIsInactiveActive() {
+            when(memberRepository.findByIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThat(coTrainerService.getActiveCoTrainersIfMembersAreActive(course.getId()))
+                    .isEmpty();
+        }
     }
 }

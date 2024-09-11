@@ -6,7 +6,9 @@ import casp.web.backend.data.access.layer.documents.event.participants.BaseParti
 import casp.web.backend.data.access.layer.documents.event.participants.EventParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
+import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -14,10 +16,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,6 +31,8 @@ import static org.mockito.Mockito.when;
 class EventParticipantServiceImplTest {
     @Mock
     private BaseParticipantRepository baseParticipantRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private EventParticipantServiceImpl eventParticipantService;
@@ -117,5 +123,34 @@ class EventParticipantServiceImplTest {
         eventParticipantService.deleteParticipantsByMemberOrHandlerId(participant.getMemberOrHandlerId());
 
         verify(participant).setEntityStatus(EntityStatus.DELETED);
+    }
+
+    @Nested
+    class GetActiveEventParticipantsIfMembersAreActive {
+        @BeforeEach
+        void setUp() {
+            when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(event.getId(), EntityStatus.ACTIVE, EventParticipant.PARTICIPANT_TYPE)).thenReturn(Set.of(participant));
+        }
+
+        @Test
+        void coTrainerIsActive() {
+            var member = TestFixture.createValidMember();
+            when(memberRepository.findByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            assertThat(eventParticipantService.getActiveEventParticipantsIfMembersAreActive(event.getId()))
+                    .singleElement()
+                    .satisfies(pm -> {
+                        assertEquals(participant.getId(), pm.participant().getId());
+                        assertEquals(member.getId(), pm.member().getId());
+                    });
+        }
+
+        @Test
+        void coTrainerIsInactiveActive() {
+            when(memberRepository.findByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThat(eventParticipantService.getActiveEventParticipantsIfMembersAreActive(event.getId()))
+                    .isEmpty();
+        }
     }
 }
