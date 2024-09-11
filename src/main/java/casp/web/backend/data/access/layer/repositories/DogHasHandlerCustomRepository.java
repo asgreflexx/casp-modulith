@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.custom.repositories;
+package casp.web.backend.data.access.layer.repositories;
 
 import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import jakarta.annotation.Nullable;

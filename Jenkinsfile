@@ -24,7 +24,7 @@ pipeline {
                     sh 'mvn -B clean verify'
                 }
                 jacoco  changeBuildStatus: true,
-                        exclusionPattern: '**/data/access/layer/documents/**/*.class, **/*Test*.class, **/*AdminApplication.class, **/data/access/layer/repositories/*.class, **/presentation/layer/configuration/*.class, **/presentation/layer/dtos/**/*.class',
+                        exclusionPattern: '**/data/access/layer/documents/**/*.class, **/*Test*.class, **/*AdminApplication.class, **/presentation/layer/configuration/*.class, **/presentation/layer/dtos/**/*.class',
                         maximumBranchCoverage: '80',
                         maximumClassCoverage: '80',
                         maximumComplexityCoverage: '80',

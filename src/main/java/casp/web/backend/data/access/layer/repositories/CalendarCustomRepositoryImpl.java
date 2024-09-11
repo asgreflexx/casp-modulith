@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.custom.repositories;
+package casp.web.backend.data.access.layer.repositories;
 
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
