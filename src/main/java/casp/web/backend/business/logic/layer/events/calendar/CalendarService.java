@@ -13,7 +13,7 @@ public interface CalendarService {
 
     Calendar getCalendarEntryById(UUID id);
 
-    List<Calendar> getCalendarEntriesByPeriodAndEventTypes(LocalDate eventFrom, LocalDate eventTo, @NotNull Set<String> eventTypes);
+    List<Calendar> getCalendarEntriesByPeriodAndEventTypes(LocalDate calendarEntriesFrom, LocalDate calendarEntriesTo, @NotNull Set<String> eventTypes);
 
     List<Calendar> replaceCalendarEntriesFromEvent(BaseEvent baseEvent, Calendar calendarEntry);
 

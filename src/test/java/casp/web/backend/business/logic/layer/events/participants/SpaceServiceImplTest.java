@@ -59,14 +59,14 @@ class SpaceServiceImplTest {
 
     @Test
     void getParticipantsByBaseEvent() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         assertThat(spaceService.getParticipantsByBaseEventId(course.getId())).containsAll(expectedSpaces);
     }
 
     @Test
     void deactivateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         spaceService.deactivateParticipantsByBaseEventId(course.getId());
 
@@ -75,7 +75,7 @@ class SpaceServiceImplTest {
 
     @Test
     void activateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.INACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.INACTIVE, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         spaceService.activateParticipantsByBaseEventId(course.getId());
 
@@ -84,7 +84,7 @@ class SpaceServiceImplTest {
 
     @Test
     void deleteParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNot(course.getId(), EntityStatus.DELETED)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNotAndParticipantType(course.getId(), EntityStatus.DELETED, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         spaceService.deleteParticipantsByBaseEventId(course.getId());
 

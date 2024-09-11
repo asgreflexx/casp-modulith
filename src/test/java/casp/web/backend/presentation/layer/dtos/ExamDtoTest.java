@@ -2,13 +2,13 @@ package casp.web.backend.presentation.layer.dtos;
 
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.presentation.layer.dtos.events.ExamDto;
+import casp.web.backend.presentation.layer.dtos.events.types.ExamDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static casp.web.backend.presentation.layer.dtos.events.ExamMapper.EXAM_MAPPER;
+import static casp.web.backend.presentation.layer.dtos.events.types.ExamMapper.EXAM_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 
 

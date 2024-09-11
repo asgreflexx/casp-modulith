@@ -37,8 +37,8 @@ class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public List<Calendar> getCalendarEntriesByPeriodAndEventTypes(final LocalDate eventFrom, final LocalDate eventTo, final Set<String> eventTypes) {
-        return calendarRepository.findAllBetweenEventFromAndEventToAndEventTypes(eventFrom, eventTo, eventTypes);
+    public List<Calendar> getCalendarEntriesByPeriodAndEventTypes(final LocalDate calendarEntriesFrom, final LocalDate calendarEntriesTo, final Set<String> eventTypes) {
+        return calendarRepository.findAllBetweenEventFromAndEventToAndEventTypes(calendarEntriesFrom, calendarEntriesTo, eventTypes);
     }
 
     @Override

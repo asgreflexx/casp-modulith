@@ -60,14 +60,14 @@ class EventParticipantServiceImplTest {
 
     @Test
     void getParticipantsByBaseEvent() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(event.getId(), EntityStatus.ACTIVE, EventParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         assertThat(eventParticipantService.getParticipantsByBaseEventId(event.getId())).containsAll(expectedParticipants);
     }
 
     @Test
     void deactivateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(event.getId(), EntityStatus.ACTIVE, EventParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         eventParticipantService.deactivateParticipantsByBaseEventId(event.getId());
 
@@ -76,7 +76,7 @@ class EventParticipantServiceImplTest {
 
     @Test
     void activateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(event.getId(), EntityStatus.INACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(event.getId(), EntityStatus.INACTIVE, EventParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         eventParticipantService.activateParticipantsByBaseEventId(event.getId());
 
@@ -85,7 +85,7 @@ class EventParticipantServiceImplTest {
 
     @Test
     void deleteParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNot(event.getId(), EntityStatus.DELETED)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNotAndParticipantType(event.getId(), EntityStatus.DELETED, EventParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         eventParticipantService.deleteParticipantsByBaseEventId(event.getId());
 
