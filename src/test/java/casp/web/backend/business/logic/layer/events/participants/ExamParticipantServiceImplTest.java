@@ -59,14 +59,14 @@ class ExamParticipantServiceImplTest {
 
     @Test
     void getParticipantsByBaseEvent() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(exam.getId(), EntityStatus.ACTIVE, ExamParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         assertThat(examParticipantService.getParticipantsByBaseEventId(exam.getId())).containsAll(expectedParticipants);
     }
 
     @Test
     void deactivateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(exam.getId(), EntityStatus.ACTIVE, ExamParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         examParticipantService.deactivateParticipantsByBaseEventId(exam.getId());
 
@@ -75,7 +75,7 @@ class ExamParticipantServiceImplTest {
 
     @Test
     void activateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(exam.getId(), EntityStatus.INACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(exam.getId(), EntityStatus.INACTIVE, ExamParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         examParticipantService.activateParticipantsByBaseEventId(exam.getId());
 
@@ -84,7 +84,7 @@ class ExamParticipantServiceImplTest {
 
     @Test
     void deleteParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNot(exam.getId(), EntityStatus.DELETED)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNotAndParticipantType(exam.getId(), EntityStatus.DELETED, ExamParticipant.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         examParticipantService.deleteParticipantsByBaseEventId(exam.getId());
 

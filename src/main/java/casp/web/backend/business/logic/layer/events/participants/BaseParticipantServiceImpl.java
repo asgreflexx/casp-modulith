@@ -31,12 +31,12 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
     @SuppressWarnings("unchecked")
     @Override
     public Set<P> getParticipantsByBaseEventId(final UUID baseEventId) {
-        return (Set<P>) baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(baseEventId, EntityStatus.ACTIVE);
+        return (Set<P>) baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(baseEventId, EntityStatus.ACTIVE, participantType);
     }
 
     @Override
     public void deleteParticipantsByBaseEventId(final UUID baseEventId) {
-        baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNot(baseEventId, EntityStatus.DELETED)
+        baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNotAndParticipantType(baseEventId, EntityStatus.DELETED, participantType)
                 .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.DELETED));
     }
 
@@ -48,7 +48,7 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
 
     @Override
     public void activateParticipantsByBaseEventId(final UUID baseEventId) {
-        baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(baseEventId, EntityStatus.INACTIVE)
+        baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(baseEventId, EntityStatus.INACTIVE, participantType)
                 .forEach(participant -> saveItWithNewStatus(participant, EntityStatus.ACTIVE));
     }
 

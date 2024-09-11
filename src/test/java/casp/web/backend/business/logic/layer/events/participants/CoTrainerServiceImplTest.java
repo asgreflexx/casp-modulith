@@ -59,14 +59,14 @@ class CoTrainerServiceImplTest {
 
     @Test
     void getParticipantsByBaseEvent() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, CoTrainer.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         assertThat(coTrainerService.getParticipantsByBaseEventId(course.getId())).containsAll(expectedCoTrainers);
     }
 
     @Test
     void deactivateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, CoTrainer.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         coTrainerService.deactivateParticipantsByBaseEventId(course.getId());
 
@@ -75,7 +75,7 @@ class CoTrainerServiceImplTest {
 
     @Test
     void activateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.INACTIVE)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.INACTIVE, CoTrainer.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         coTrainerService.activateParticipantsByBaseEventId(course.getId());
 
@@ -84,7 +84,7 @@ class CoTrainerServiceImplTest {
 
     @Test
     void deleteParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNot(course.getId(), EntityStatus.DELETED)).thenReturn(baseParticipants);
+        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNotAndParticipantType(course.getId(), EntityStatus.DELETED, CoTrainer.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
 
         coTrainerService.deleteParticipantsByBaseEventId(course.getId());
 
