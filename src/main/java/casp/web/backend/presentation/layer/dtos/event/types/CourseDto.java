@@ -1,9 +1,9 @@
 package casp.web.backend.presentation.layer.dtos.event.types;
 
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participants.CoTrainer;
-import casp.web.backend.data.access.layer.documents.event.participants.Space;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
+import casp.web.backend.presentation.layer.dtos.event.participants.CoTrainerDto;
+import casp.web.backend.presentation.layer.dtos.event.participants.SpaceDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
@@ -13,20 +13,20 @@ import java.util.List;
 import java.util.Set;
 
 @CourseDtoSpaceConstraint
-public class CourseDto extends Course implements BaseEventDto<Space> {
+public class CourseDto extends Course implements BaseEventDto<SpaceDto> {
     @Valid
     @NotNull
-    private Set<CoTrainer> coTrainers = new HashSet<>();
+    private Set<CoTrainerDto> coTrainers = new HashSet<>();
 
     private List<Calendar> calendarEntries = new ArrayList<>();
 
-    private Set<Space> participants = new HashSet<>();
+    private Set<SpaceDto> participants = new HashSet<>();
 
-    public Set<CoTrainer> getCoTrainers() {
+    public Set<CoTrainerDto> getCoTrainers() {
         return coTrainers;
     }
 
-    public void setCoTrainers(Set<CoTrainer> coTrainers) {
+    public void setCoTrainers(Set<CoTrainerDto> coTrainers) {
         this.coTrainers = coTrainers;
     }
 
@@ -41,22 +41,12 @@ public class CourseDto extends Course implements BaseEventDto<Space> {
     }
 
     @Override
-    public Set<Space> getParticipants() {
+    public Set<SpaceDto> getParticipants() {
         return participants;
     }
 
     @Override
-    public void setParticipants(Set<Space> participants) {
+    public void setParticipants(Set<SpaceDto> participants) {
         this.participants = participants;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

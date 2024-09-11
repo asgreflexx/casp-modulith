@@ -1,5 +1,6 @@
 package casp.web.backend.presentation.layer.event;
 
+import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.event.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.event.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.event.participants.EventParticipantService;
@@ -8,7 +9,6 @@ import casp.web.backend.business.logic.layer.event.participants.SpaceService;
 import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.data.access.layer.documents.event.TypesRegex;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.event.types.Course;
 import casp.web.backend.data.access.layer.documents.event.types.Event;
@@ -32,9 +32,15 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
+import static casp.web.backend.presentation.layer.dtos.event.participants.CoTrainerMapper.CO_TRAINER_MAPPER;
+import static casp.web.backend.presentation.layer.dtos.event.participants.EventParticipantMapper.EVENT_PARTICIPANT_MAPPER;
+import static casp.web.backend.presentation.layer.dtos.event.participants.ExamParticipantMapper.EXAM_PARTICIPANT_MAPPER;
+import static casp.web.backend.presentation.layer.dtos.event.participants.SpaceMapper.SPACE_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.COURSE_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.EventMapper.EVENT_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.ExamMapper.EXAM_MAPPER;
+import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 
 @RestController
 @RequestMapping("/calendar")
@@ -47,6 +53,7 @@ class CalendarRestController {
     private final ExamParticipantService examParticipantService;
     private final SpaceService spaceService;
     private final MemberService memberService;
+    private final DogHasHandlerService dogHasHandlerService;
 
     @Autowired
     CalendarRestController(final CalendarService calendarService,
@@ -54,18 +61,15 @@ class CalendarRestController {
                            final EventParticipantService eventParticipantService,
                            final ExamParticipantService examParticipantService,
                            final SpaceService spaceService,
-                           final MemberService memberService) {
+                           final MemberService memberService,
+                           final DogHasHandlerService dogHasHandlerService) {
         this.calendarService = calendarService;
         this.coTrainerService = coTrainerService;
         this.eventParticipantService = eventParticipantService;
         this.examParticipantService = examParticipantService;
         this.spaceService = spaceService;
         this.memberService = memberService;
-    }
-
-    private static <P extends BaseParticipant> Set<P> removeBaseEventFromParticipants(final Set<P> participants) {
-        participants.forEach(p -> p.setBaseEvent(null));
-        return participants;
+        this.dogHasHandlerService = dogHasHandlerService;
     }
 
     @GetMapping()
@@ -79,7 +83,7 @@ class CalendarRestController {
     }
 
     @GetMapping("/{id}")
-    <P extends BaseParticipant> BaseEventDto<P> getCalendarEntry(final @PathVariable UUID id) {
+    <P> BaseEventDto<P> getCalendarEntry(final @PathVariable UUID id) {
         var calendarEntry = calendarService.getCalendarEntryById(id);
         var baseEvent = calendarEntry.getBaseEvent();
         setMemberIfMissing(baseEvent);
@@ -101,24 +105,64 @@ class CalendarRestController {
 
     private CourseDto mapToCourseDto(final BaseEvent baseEvent) {
         var courseDto = COURSE_MAPPER.toDto((Course) baseEvent);
-        var participants = spaceService.getParticipantsByBaseEventId(baseEvent.getId());
-        courseDto.setParticipants(removeBaseEventFromParticipants(participants));
-        var coTrainers = coTrainerService.getParticipantsByBaseEventId(baseEvent.getId());
-        courseDto.setCoTrainers(removeBaseEventFromParticipants(coTrainers));
+        setSpaces(courseDto);
+        setCoTrainers(courseDto);
         return courseDto;
+    }
+
+    private void setCoTrainers(final CourseDto courseDto) {
+        var coTrainers = coTrainerService.getParticipantsByBaseEventId(courseDto.getId());
+        var coTrainerDtoSet = CO_TRAINER_MAPPER.toDtoSet(coTrainers);
+        coTrainerDtoSet.forEach(c -> {
+            var member = memberService.getMemberById(c.getMemberOrHandlerId());
+            c.setMember(MEMBER_MAPPER.toDto(member));
+            c.setBaseEvent(null);
+        });
+        courseDto.setCoTrainers(coTrainerDtoSet);
+    }
+
+    private void setSpaces(final CourseDto courseDto) {
+        var participants = spaceService.getParticipantsByBaseEventId(courseDto.getId());
+        var spaceDtoSet = SPACE_MAPPER.toDtoSet(participants);
+        spaceDtoSet.forEach(s -> {
+            var dogHasHandler = dogHasHandlerService.getDogHasHandlerById(s.getMemberOrHandlerId());
+            s.setDogHasHandler(DOG_HAS_HANDLER_MAPPER.toDto(dogHasHandler));
+            s.setBaseEvent(null);
+        });
+        courseDto.setParticipants(spaceDtoSet);
     }
 
     private EventDto mapToEventDto(final BaseEvent baseEvent) {
         var eventDto = EVENT_MAPPER.toDto((Event) baseEvent);
-        var participants = eventParticipantService.getParticipantsByBaseEventId(baseEvent.getId());
-        eventDto.setParticipants(removeBaseEventFromParticipants(participants));
+        setEventParticipants(eventDto);
         return eventDto;
+    }
+
+    private void setEventParticipants(final EventDto eventDto) {
+        var participants = eventParticipantService.getParticipantsByBaseEventId(eventDto.getId());
+        var eventParticipantDtoSet = EVENT_PARTICIPANT_MAPPER.toDtoSet(participants);
+        eventParticipantDtoSet.forEach(e -> {
+            var member = memberService.getMemberById(e.getMemberOrHandlerId());
+            e.setMember(MEMBER_MAPPER.toDto(member));
+            e.setBaseEvent(null);
+        });
+        eventDto.setParticipants(eventParticipantDtoSet);
     }
 
     private ExamDto mapToExamDto(final BaseEvent baseEvent) {
         var examDto = EXAM_MAPPER.toDto((Exam) baseEvent);
-        var participants = examParticipantService.getParticipantsByBaseEventId(baseEvent.getId());
-        examDto.setParticipants(removeBaseEventFromParticipants(participants));
+        setExamParticipants(examDto);
         return examDto;
+    }
+
+    private void setExamParticipants(final ExamDto examDto) {
+        var participants = examParticipantService.getParticipantsByBaseEventId(examDto.getId());
+        var examParticipantDtoSet = EXAM_PARTICIPANT_MAPPER.toDtoSet(participants);
+        examParticipantDtoSet.forEach(e -> {
+            var dogHasHandler = dogHasHandlerService.getDogHasHandlerById(e.getMemberOrHandlerId());
+            e.setDogHasHandler(DOG_HAS_HANDLER_MAPPER.toDto(dogHasHandler));
+            e.setBaseEvent(null);
+        });
+        examDto.setParticipants(examParticipantDtoSet);
     }
 }

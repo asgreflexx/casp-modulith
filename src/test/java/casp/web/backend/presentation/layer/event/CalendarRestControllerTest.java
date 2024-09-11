@@ -1,6 +1,7 @@
 package casp.web.backend.presentation.layer.event;
 
 import casp.web.backend.TestFixture;
+import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.documents.event.participants.CoTrainer;
@@ -14,6 +15,7 @@ import casp.web.backend.data.access.layer.documents.member.Member;
 import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
 import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.repositories.CalendarRepository;
+import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
@@ -57,6 +59,8 @@ class CalendarRestControllerTest {
     private CalendarRepository calendarRepository;
     @Autowired
     private MemberRepository memberRepository;
+    @Autowired
+    private DogHasHandlerRepository dogHasHandlerRepository;
 
     private List<Calendar> calendarList;
     private CoTrainer coTrainer;
@@ -64,6 +68,7 @@ class CalendarRestControllerTest {
     private EventParticipant eventParticipant;
     private ExamParticipant examParticipant;
     private Member member;
+    private DogHasHandler dogHasHandler;
 
     @BeforeEach
     void setUp() {
@@ -71,18 +76,27 @@ class CalendarRestControllerTest {
         calendarRepository.deleteAll();
         baseParticipantRepository.deleteAll();
         baseEventRepository.deleteAll();
+        dogHasHandlerRepository.deleteAll();
         memberRepository.deleteAll();
 
         member = TestFixture.createValidMember();
         member = memberRepository.save(member);
+        dogHasHandler = TestFixture.createValidDogHasHandler();
+        dogHasHandler.setMember(member);
+        dogHasHandler.setMemberId(member.getId());
+        dogHasHandler = dogHasHandlerRepository.save(dogHasHandler);
         coTrainer = TestFixture.createValidCoTrainer();
+        coTrainer.setMemberOrHandlerId(member.getId());
         var course = (Course) coTrainer.getBaseEvent();
         course.setMemberId(member.getId());
         space = TestFixture.createValidSpace(course);
+        space.setMemberOrHandlerId(dogHasHandler.getId());
         eventParticipant = TestFixture.createValidEventParticipant();
+        eventParticipant.setMemberOrHandlerId(member.getId());
         var event = (Event) eventParticipant.getBaseEvent();
         event.setMemberId(member.getId());
         examParticipant = TestFixture.createValidExamParticipant();
+        examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
         var exam = (Exam) examParticipant.getBaseEvent();
         exam.setMemberId(member.getId());
         exam.setMember(member);
@@ -127,8 +141,14 @@ class CalendarRestControllerTest {
 
             assertEquals(member.getId(), courseDto.getMember().getId());
             assertThat(courseDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
-            assertThat(courseDto.getParticipants()).singleElement().satisfies(p -> assertParticipant(space, p));
-            assertThat(courseDto.getCoTrainers()).singleElement().satisfies(p -> assertParticipant(coTrainer, p));
+            assertThat(courseDto.getParticipants()).singleElement().satisfies(p -> {
+                assertParticipant(space, p);
+                assertEquals(dogHasHandler.getId(), p.getDogHasHandler().getId());
+            });
+            assertThat(courseDto.getCoTrainers()).singleElement().satisfies(p -> {
+                assertParticipant(coTrainer, p);
+                assertEquals(member.getId(), p.getMember().getId());
+            });
         }
 
         @Test
@@ -139,7 +159,10 @@ class CalendarRestControllerTest {
 
             assertEquals(member.getId(), eventDto.getMember().getId());
             assertThat(eventDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
-            assertThat(eventDto.getParticipants()).singleElement().satisfies(p -> assertParticipant(eventParticipant, p));
+            assertThat(eventDto.getParticipants()).singleElement().satisfies(p -> {
+                assertParticipant(eventParticipant, p);
+                assertEquals(member.getId(), p.getMember().getId());
+            });
         }
 
         @Test
@@ -150,7 +173,10 @@ class CalendarRestControllerTest {
 
             assertEquals(member.getId(), examDto.getMember().getId());
             assertThat(examDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
-            assertThat(examDto.getParticipants()).singleElement().satisfies(p -> assertParticipant(examParticipant, p));
+            assertThat(examDto.getParticipants()).singleElement().satisfies(p -> {
+                assertParticipant(examParticipant, p);
+                assertEquals(dogHasHandler.getId(), p.getDogHasHandler().getId());
+            });
         }
 
         private void setCalendarEntryId(final String eventType) {

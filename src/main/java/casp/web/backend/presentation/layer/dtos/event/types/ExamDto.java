@@ -1,18 +1,18 @@
 package casp.web.backend.presentation.layer.dtos.event.types;
 
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participants.ExamParticipant;
 import casp.web.backend.data.access.layer.documents.event.types.Exam;
+import casp.web.backend.presentation.layer.dtos.event.participants.ExamParticipantDto;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class ExamDto extends Exam implements BaseEventDto<ExamParticipant> {
+public class ExamDto extends Exam implements BaseEventDto<ExamParticipantDto> {
     private List<Calendar> calendarEntries = new ArrayList<>();
 
-    private Set<ExamParticipant> participants = new HashSet<>();
+    private Set<ExamParticipantDto> participants = new HashSet<>();
 
     @Override
     public List<Calendar> getCalendarEntries() {
@@ -25,22 +25,12 @@ public class ExamDto extends Exam implements BaseEventDto<ExamParticipant> {
     }
 
     @Override
-    public Set<ExamParticipant> getParticipants() {
+    public Set<ExamParticipantDto> getParticipants() {
         return participants;
     }
 
     @Override
-    public void setParticipants(Set<ExamParticipant> participants) {
+    public void setParticipants(Set<ExamParticipantDto> participants) {
         this.participants = participants;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

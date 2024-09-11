@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Set;
 
+import static casp.web.backend.presentation.layer.dtos.event.participants.SpaceMapper.SPACE_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,7 +41,7 @@ class CourseDtoTest {
         courseDto.setSpaceLimit(1);
         var john = TestFixture.createValidSpace();
         var maria = TestFixture.createValidSpace();
-        courseDto.setParticipants(Set.of(john, maria));
+        courseDto.setParticipants(SPACE_MAPPER.toDtoSet(Set.of(john, maria)));
 
         assertThat(TestFixture.getViolations(courseDto)).hasSize(1);
     }

@@ -2,7 +2,6 @@ package casp.web.backend.presentation.layer.dtos.event.types;
 
 
 import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -10,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Set;
 
-public interface BaseEventDto<P extends BaseParticipant> {
+public interface BaseEventDto<P> {
     @NotEmpty
     @Valid
     List<Calendar> getCalendarEntries();
