@@ -3,6 +3,7 @@ package casp.web.backend.business.logic.layer.member;
 
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
+import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
@@ -33,4 +34,6 @@ public interface MemberService {
     Page<Member> getMembersByName(@Nullable String name, final Pageable pageable);
 
     Set<String> getMembersEmailByIds(Set<UUID> membersId);
+
+    void setActiveMemberToBaseEvent(BaseEvent baseEvent);
 }

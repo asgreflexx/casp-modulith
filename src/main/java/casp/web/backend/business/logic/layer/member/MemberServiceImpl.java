@@ -6,6 +6,7 @@ import casp.web.backend.business.logic.layer.event.participants.BaseParticipantO
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
+import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import org.slf4j.Logger;
@@ -128,5 +129,14 @@ class MemberServiceImpl implements MemberService {
                 .stream()
                 .map(Member::getEmail)
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void setActiveMemberToBaseEvent(final BaseEvent baseEvent) {
+        if (baseEvent.getMember() == null) {
+            memberRepository.findByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
+                    .ifPresentOrElse(baseEvent::setMember,
+                            () -> LOG.warn("No active member found with id: {}", baseEvent.getMemberId()));
+        }
     }
 }

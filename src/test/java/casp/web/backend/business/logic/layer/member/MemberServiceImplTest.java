@@ -1,10 +1,12 @@
 package casp.web.backend.business.logic.layer.member;
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.event.participants.BaseParticipantObserver;
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
 import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.documents.enumerations.Role;
+import casp.web.backend.data.access.layer.documents.event.types.Event;
 import casp.web.backend.data.access.layer.documents.member.Member;
 import casp.web.backend.data.access.layer.repositories.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,6 +27,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.spy;
@@ -125,6 +129,48 @@ class MemberServiceImplTest {
         verify(cardService).activateCardsByMemberId(member.getId());
         verify(baseParticipantObserver).activateParticipantsByMemberOrHandlerId(member.getId());
         verify(baseEventObserver).activateBaseEventsByMemberId(member.getId());
+    }
+
+    @Nested
+    class SetActiveMemberToBaseEvent {
+
+        private Event event;
+
+        @BeforeEach
+        void setUp() {
+            event = spy(TestFixture.createValidEvent());
+        }
+
+        @Test
+        void memberIsActive() {
+            event.setMember(null);
+            event.setMemberId(member.getId());
+            when(memberRepository.findByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            memberService.setActiveMemberToBaseEvent(event);
+
+            assertSame(member, event.getMember());
+
+        }
+
+        @Test
+        void memberIsInactive() {
+            event.setMember(null);
+            when(memberRepository.findByIdAndEntityStatus(event.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            memberService.setActiveMemberToBaseEvent(event);
+
+            assertNull(event.getMember());
+        }
+
+        @Test
+        void noNeedToSetMember() {
+            memberService.setActiveMemberToBaseEvent(event);
+
+            verifyNoInteractions(memberRepository);
+
+            assertNotNull(event.getMember());
+        }
     }
 
     @Nested
