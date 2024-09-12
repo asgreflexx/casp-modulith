@@ -24,7 +24,7 @@ pipeline {
                     sh 'mvn -B clean verify'
                 }
                 jacoco  changeBuildStatus: true,
-                        exclusionPattern: '**/data/access/layer/documents/**/*.class, **/*Test*.class, **/*AdminApplication.class, **/presentation/layer/configuration/*.class, **/presentation/layer/dtos/**/*.class',
+                        exclusionPattern: createExclusionPattern(),
                         maximumBranchCoverage: '80',
                         maximumClassCoverage: '80',
                         maximumComplexityCoverage: '80',
@@ -44,4 +44,20 @@ pipeline {
             junit testResults: '**/target/surefire-reports/TEST-*.xml', skipPublishingChecks: true
         }
     }
+}
+
+def createExclusionPattern() {
+    def pom = readMavenPom file: 'pom.xml'
+
+    def exclusions = []
+    def plugin = pom.getBuild().getPlugins().find { p -> 'jacoco-maven-plugin' == p.getArtifactId() }
+    if (plugin) {
+        def lines = plugin.getConfiguration().toString().split('\n')
+        lines.each{ line ->
+            if (line.contains('<exclude>')) {
+                exclusions.add(line.replace('<exclude>', '').replace('</exclude>', '').replace(' ', ''))
+            }
+        }
+    }
+    return exclusions.join(', ')
 }
