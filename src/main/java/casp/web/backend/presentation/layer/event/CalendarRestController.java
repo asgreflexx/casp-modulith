@@ -56,7 +56,9 @@ class CalendarRestController {
                                                    LocalDate calendarEntriesTo,
                                                    final @RequestParam(required = false)
                                                    Set<@Pattern(regexp = TypesRegex.BASE_EVENT_TYPES_REGEX) String> eventTypes) {
-        return calendarService.getCalendarEntriesByPeriodAndEventTypes(calendarEntriesFrom, calendarEntriesTo, eventTypes);
+        var calendarEntryList = calendarService.getCalendarEntriesByPeriodAndEventTypes(calendarEntriesFrom, calendarEntriesTo, eventTypes);
+        calendarEntryList.forEach(ce -> memberService.setActiveMemberToBaseEvent(ce.getBaseEvent()));
+        return calendarEntryList;
     }
 
     @GetMapping("/{id}")

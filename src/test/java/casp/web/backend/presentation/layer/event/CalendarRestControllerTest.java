@@ -99,7 +99,6 @@ class CalendarRestControllerTest {
         examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
         var exam = (Exam) examParticipant.getBaseEvent();
         exam.setMemberId(member.getId());
-        exam.setMember(member);
 
         baseParticipantRepository.saveAll(Set.of(coTrainer, space, eventParticipant, examParticipant));
         var baseEvents = List.of(course, event, exam);
@@ -125,7 +124,10 @@ class CalendarRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertThat(MvcMapper.toObject(mvcResult, typeReference)).containsExactlyElementsOf(calendarList);
+        assertThat(MvcMapper.toObject(mvcResult, typeReference)).zipSatisfy(calendarList, (Calendar actual, Calendar expected) -> {
+            assertEquals(expected.getId(), actual.getId());
+            assertEquals(member.getId(), actual.getBaseEvent().getMember().getId());
+        });
     }
 
     @Nested
