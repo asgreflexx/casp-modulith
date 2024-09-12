@@ -65,7 +65,7 @@ class CardRestControllerTest {
     @Test
     void deleteCardById() throws Exception {
         mockMvc.perform(delete(CARD_URL_PREFIX + "/{id}", card.getId()))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         getCardById(card.getId()).andExpect(status().isBadRequest());
     }

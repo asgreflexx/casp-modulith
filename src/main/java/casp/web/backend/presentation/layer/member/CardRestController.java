@@ -37,7 +37,7 @@ class CardRestController {
         this.cardService = cardService;
     }
 
-    @PostMapping()
+    @PostMapping
     ResponseEntity<CardDto> saveCard(final @RequestBody @Valid CardDto cardDto) {
         var card = cardService.saveCard(CARD_MAPPER.toDocument(cardDto));
         return ResponseEntity.ok(CARD_MAPPER.toDto(card));
@@ -50,8 +50,9 @@ class CardRestController {
     }
 
     @DeleteMapping("/{id}")
-    void deleteCardById(final @PathVariable UUID id) {
+    ResponseEntity<Void> deleteCardById(final @PathVariable UUID id) {
         cardService.deleteCardById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}")
