@@ -119,7 +119,7 @@ class DogRestControllerTest {
         void cascadeDelete() throws Exception {
             var dogHasHandlerId = getDogHasHandler().getId();
             deleteDog(charlie.getId())
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             getDogById(charlie.getId()).andExpect(status().isBadRequest());
 

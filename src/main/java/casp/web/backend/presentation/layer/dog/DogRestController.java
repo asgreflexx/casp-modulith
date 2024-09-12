@@ -56,20 +56,21 @@ class DogRestController {
         return ResponseEntity.ok(DOG_MAPPER.toDtoList(dogList));
     }
 
-    @GetMapping()
+    @GetMapping
     ResponseEntity<Page<DogDto>> getDogs(final @ParameterObject Pageable pageable) {
         var dogPage = dogService.getDogs(pageable);
         return ResponseEntity.ok(DOG_MAPPER.toDtoPage(dogPage));
     }
 
-    @PostMapping()
+    @PostMapping
     ResponseEntity<DogDto> saveDog(final @RequestBody @Valid DogDto dogDto) {
         dogService.saveDog(DOG_MAPPER.toDocument(dogDto));
         return getDogById(dogDto.getId());
     }
 
     @DeleteMapping("/{id}")
-    void deleteDogById(final @PathVariable UUID id) {
+    ResponseEntity<Void> deleteDogById(final @PathVariable UUID id) {
         dogService.deleteDogById(id);
+        return ResponseEntity.noContent().build();
     }
 }
