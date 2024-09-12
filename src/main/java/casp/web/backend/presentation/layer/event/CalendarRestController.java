@@ -13,6 +13,7 @@ import casp.web.backend.presentation.layer.event.facades.ExamFacade;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,20 +50,20 @@ class CalendarRestController {
         this.examFacade = examFacade;
     }
 
-    @GetMapping()
-    List<Calendar> getEntriesByPeriodAndEventTypes(final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    @GetMapping
+    ResponseEntity<List<Calendar>> getEntriesByPeriodAndEventTypes(final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                    LocalDate calendarEntriesFrom,
-                                                   final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                                   final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
                                                    LocalDate calendarEntriesTo,
-                                                   final @RequestParam(required = false)
+                                                                   final @RequestParam(required = false)
                                                    Set<@Pattern(regexp = TypesRegex.BASE_EVENT_TYPES_REGEX) String> eventTypes) {
         var calendarEntryList = calendarService.getCalendarEntriesByPeriodAndEventTypes(calendarEntriesFrom, calendarEntriesTo, eventTypes);
         calendarEntryList.forEach(ce -> memberService.setActiveMemberToBaseEvent(ce.getBaseEvent()));
-        return calendarEntryList;
+        return ResponseEntity.ok(calendarEntryList);
     }
 
     @GetMapping("/{id}")
-    <P> BaseEventDto<P> getCalendarEntry(final @PathVariable UUID id) {
+    <P> ResponseEntity<BaseEventDto<P>> getCalendarEntry(final @PathVariable UUID id) {
         var calendarEntry = calendarService.getCalendarEntryById(id);
         var baseEvent = calendarEntry.getBaseEvent();
         memberService.setActiveMemberToBaseEvent(baseEvent);
@@ -73,6 +74,6 @@ class CalendarRestController {
         };
         calendarEntry.setBaseEvent(null);
         baseEventDto.setCalendarEntries(List.of(calendarEntry));
-        return (BaseEventDto<P>) baseEventDto;
+        return ResponseEntity.ok((BaseEventDto<P>) baseEventDto);
     }
 }
