@@ -173,6 +173,34 @@
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco-maven-plugin.version}</version>
+                <configuration>
+                    <excludes>
+                        <exclude>**/*Test*.class</exclude>
+                        <exclude>**/AdminApplication.class</exclude>
+                        <exclude>**/presentation/layer/configuration/*.class</exclude>
+                        <exclude>**/presentation/layer/dtos/**/*.class</exclude>
+                        <exclude>**/data/access/layer/commons/*.class</exclude>
+                        <exclude>**/data/access/layer/enumerations/*.class</exclude>
+                        <exclude>**/data/access/layer/dog/*Dog.class</exclude>
+                        <exclude>**/data/access/layer/dog/*DogHasHandler.class</exclude>
+                        <exclude>**/data/access/layer/dog/*Grade.class</exclude>
+                        <exclude>**/data/access/layer/event/calendar/*Calendar.class</exclude>
+                        <exclude>**/data/access/layer/event/options/*.class</exclude>
+                        <exclude>**/data/access/layer/event/participants/*BaseParticipant.class</exclude>
+                        <exclude>**/data/access/layer/event/participants/*CoTrainer.class</exclude>
+                        <exclude>**/data/access/layer/event/participants/*EventParticipant.class</exclude>
+                        <exclude>**/data/access/layer/event/participants/*ExamParticipant.class</exclude>
+                        <exclude>**/data/access/layer/event/participants/*Space.class</exclude>
+                        <exclude>**/data/access/layer/event/types/*BaseEvent.class</exclude>
+                        <exclude>**/data/access/layer/event/types/*Course.class</exclude>
+                        <exclude>**/data/access/layer/event/types/*Event.class</exclude>
+                        <exclude>**/data/access/layer/event/types/*Exam.class</exclude>
+                        <exclude>**/data/access/layer/event/TypesRegex.class</exclude>
+                        <exclude>**/data/access/layer/member/*Card.class</exclude>
+                        <exclude>**/data/access/layer/member/*Member.class</exclude>
+                        <exclude>**/data/access/layer/member/*MembershipFee.class</exclude>
+                    </excludes>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
