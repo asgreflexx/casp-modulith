@@ -123,7 +123,8 @@ class DogHasHandlerRestControllerTest {
 
     @Test
     void deleteDogHasHandlersByDogId() throws Exception {
-        mockMvc.perform(delete(DOG_HAS_HANDLER_URL_PREFIX + "/by-dog-id/{dogId}", dog.getId()));
+        mockMvc.perform(delete(DOG_HAS_HANDLER_URL_PREFIX + "/by-dog-id/{dogId}", dog.getId()))
+                .andExpect(status().isNoContent());
 
         assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.DELETED, dh.getEntityStatus()));
         assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.DELETED, p.getEntityStatus()));
@@ -131,7 +132,8 @@ class DogHasHandlerRestControllerTest {
 
     @Test
     void deleteDogHasHandlersByMemberId() throws Exception {
-        mockMvc.perform(delete(DOG_HAS_HANDLER_URL_PREFIX + "/by-member-id/{memberId}", member.getId()));
+        mockMvc.perform(delete(DOG_HAS_HANDLER_URL_PREFIX + "/by-member-id/{memberId}", member.getId()))
+                .andExpect(status().isNoContent());
 
         assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.DELETED, dh.getEntityStatus()));
         assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.DELETED, p.getEntityStatus()));
