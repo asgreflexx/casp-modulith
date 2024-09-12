@@ -257,7 +257,7 @@ class MemberRestControllerTest {
         @Test
         void cascadeDelete() throws Exception {
             deleteMember(john.getId())
-                    .andExpect(status().isOk());
+                    .andExpect(status().isNoContent());
 
             getMemberById(john.getId()).andExpect(status().isBadRequest());
             assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.DELETED, dh.getEntityStatus()));

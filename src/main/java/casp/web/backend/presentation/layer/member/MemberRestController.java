@@ -49,7 +49,7 @@ class MemberRestController {
         this.dogHasHandlerService = dogHasHandlerService;
     }
 
-    @GetMapping()
+    @GetMapping
     ResponseEntity<Page<MemberDto>> getMembers(final @RequestParam EntityStatus entityStatus,
                                                final @ParameterObject Pageable pageable) {
         var memberPage = memberService.getMembersByEntityStatus(entityStatus, pageable);
@@ -73,7 +73,7 @@ class MemberRestController {
         return ResponseEntity.ok(MEMBER_MAPPER.toDtoList(members));
     }
 
-    @PostMapping()
+    @PostMapping
     ResponseEntity<MemberDto> saveMember(final @RequestBody @Valid MemberDto memberDto) {
         var member = MEMBER_MAPPER.toDocument(memberDto);
         memberService.saveMember(member);
@@ -81,8 +81,9 @@ class MemberRestController {
     }
 
     @DeleteMapping("/{id}")
-    void deleteMember(final @PathVariable UUID id) {
+    ResponseEntity<Void> deleteMember(final @PathVariable UUID id) {
         memberService.deleteMemberById(id);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{id}/deactivate")
