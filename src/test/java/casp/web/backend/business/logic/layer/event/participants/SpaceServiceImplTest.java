@@ -1,12 +1,12 @@
 package casp.web.backend.business.logic.layer.event.participants;
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.participants.BaseParticipant;
-import casp.web.backend.data.access.layer.documents.event.participants.Space;
-import casp.web.backend.data.access.layer.documents.event.types.Course;
-import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
-import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
+import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
+import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
+import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.data.access.layer.event.types.Course;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

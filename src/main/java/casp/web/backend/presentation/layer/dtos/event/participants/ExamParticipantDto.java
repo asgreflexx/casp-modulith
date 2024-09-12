@@ -1,6 +1,6 @@
 package casp.web.backend.presentation.layer.dtos.event.participants;
 
-import casp.web.backend.data.access.layer.documents.event.participants.ExamParticipant;
+import casp.web.backend.data.access.layer.event.participants.ExamParticipant;
 import casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerDto;
 
 public class ExamParticipantDto extends ExamParticipant {

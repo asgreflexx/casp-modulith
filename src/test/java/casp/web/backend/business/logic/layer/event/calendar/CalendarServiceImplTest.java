@@ -1,9 +1,9 @@
 package casp.web.backend.business.logic.layer.event.calendar;
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.repositories.CalendarRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.event.calendar.Calendar;
+import casp.web.backend.data.access.layer.event.calendar.CalendarRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

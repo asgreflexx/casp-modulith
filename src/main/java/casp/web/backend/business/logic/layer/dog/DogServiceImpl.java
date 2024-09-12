@@ -1,8 +1,8 @@
 package casp.web.backend.business.logic.layer.dog;
 
-import casp.web.backend.data.access.layer.documents.dog.Dog;
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.repositories.DogRepository;
+import casp.web.backend.data.access.layer.dog.Dog;
+import casp.web.backend.data.access.layer.dog.DogRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

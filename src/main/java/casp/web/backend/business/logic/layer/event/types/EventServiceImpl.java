@@ -2,9 +2,9 @@ package casp.web.backend.business.logic.layer.event.types;
 
 import casp.web.backend.business.logic.layer.event.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.event.participants.EventParticipantService;
-import casp.web.backend.data.access.layer.documents.event.participants.EventParticipant;
-import casp.web.backend.data.access.layer.documents.event.types.Event;
-import casp.web.backend.data.access.layer.repositories.BaseEventRepository;
+import casp.web.backend.data.access.layer.event.participants.EventParticipant;
+import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
+import casp.web.backend.data.access.layer.event.types.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

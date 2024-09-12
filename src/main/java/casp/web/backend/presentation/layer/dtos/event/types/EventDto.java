@@ -1,7 +1,7 @@
 package casp.web.backend.presentation.layer.dtos.event.types;
 
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.types.Event;
+import casp.web.backend.data.access.layer.event.calendar.Calendar;
+import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.presentation.layer.dtos.event.participants.EventParticipantDto;
 
 import java.util.ArrayList;

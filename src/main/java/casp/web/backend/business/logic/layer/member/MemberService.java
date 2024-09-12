@@ -1,10 +1,10 @@
 package casp.web.backend.business.logic.layer.member;
 
 
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.enumerations.Role;
-import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
-import casp.web.backend.data.access.layer.documents.member.Member;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.enumerations.Role;
+import casp.web.backend.data.access.layer.event.types.BaseEvent;
+import casp.web.backend.data.access.layer.member.Member;
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

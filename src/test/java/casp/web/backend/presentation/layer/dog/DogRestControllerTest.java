@@ -1,11 +1,11 @@
 package casp.web.backend.presentation.layer.dog;
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
-import casp.web.backend.data.access.layer.repositories.DogHasHandlerRepository;
-import casp.web.backend.data.access.layer.repositories.DogRepository;
-import casp.web.backend.data.access.layer.repositories.MemberRepository;
+import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
+import casp.web.backend.data.access.layer.dog.DogRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import casp.web.backend.presentation.layer.dtos.dog.DogDto;

@@ -1,10 +1,10 @@
 package casp.web.backend.business.logic.layer.event.participants;
 
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.participants.CoTrainer;
-import casp.web.backend.data.access.layer.documents.event.types.Course;
-import casp.web.backend.data.access.layer.repositories.BaseParticipantRepository;
-import casp.web.backend.data.access.layer.repositories.MemberRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
+import casp.web.backend.data.access.layer.event.participants.CoTrainer;
+import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

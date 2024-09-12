@@ -1,8 +1,8 @@
 package casp.web.backend.business.logic.layer.dog;
 
-import casp.web.backend.data.access.layer.documents.dog.Dog;
-import casp.web.backend.data.access.layer.documents.dog.DogHasHandler;
-import casp.web.backend.data.access.layer.documents.member.Member;
+import casp.web.backend.data.access.layer.dog.Dog;
+import casp.web.backend.data.access.layer.dog.DogHasHandler;
+import casp.web.backend.data.access.layer.member.Member;
 import jakarta.annotation.Nullable;
 
 import java.util.Set;

@@ -1,8 +1,8 @@
 package casp.web.backend.business.logic.layer.event.options;
 
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
-import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
+import casp.web.backend.data.access.layer.event.calendar.Calendar;
+import casp.web.backend.data.access.layer.event.options.WeeklyEventOptionRecurrence;
+import casp.web.backend.data.access.layer.event.types.BaseEvent;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;

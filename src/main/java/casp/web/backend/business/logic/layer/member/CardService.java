@@ -1,7 +1,7 @@
 package casp.web.backend.business.logic.layer.member;
 
 
-import casp.web.backend.data.access.layer.documents.member.Card;
+import casp.web.backend.data.access.layer.member.Card;
 
 import java.util.Set;
 import java.util.UUID;

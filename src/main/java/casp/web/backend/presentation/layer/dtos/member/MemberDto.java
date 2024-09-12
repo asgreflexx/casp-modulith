@@ -1,6 +1,6 @@
 package casp.web.backend.presentation.layer.dtos.member;
 
-import casp.web.backend.data.access.layer.documents.member.Member;
+import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerDto;
 
 import java.util.HashSet;

@@ -1,10 +1,10 @@
 package casp.web.backend.business.logic.layer.member;
 
 
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.member.Card;
-import casp.web.backend.data.access.layer.repositories.CardRepository;
-import casp.web.backend.data.access.layer.repositories.MemberRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.member.Card;
+import casp.web.backend.data.access.layer.member.CardRepository;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

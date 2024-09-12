@@ -2,9 +2,9 @@ package casp.web.backend.business.logic.layer.event.options;
 
 
 import casp.web.backend.TestFixture;
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.options.WeeklyEventOptionRecurrence;
-import casp.web.backend.data.access.layer.documents.event.types.Event;
+import casp.web.backend.data.access.layer.event.calendar.Calendar;
+import casp.web.backend.data.access.layer.event.options.WeeklyEventOptionRecurrence;
+import casp.web.backend.data.access.layer.event.types.Event;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,9 @@
 package casp.web.backend.presentation.layer.event.facades;
 
 import casp.web.backend.business.logic.layer.event.participants.EventParticipantService;
-import casp.web.backend.data.access.layer.documents.event.participants.EventParticipant;
-import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
-import casp.web.backend.data.access.layer.documents.event.types.Event;
+import casp.web.backend.data.access.layer.event.participants.EventParticipant;
+import casp.web.backend.data.access.layer.event.types.BaseEvent;
+import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.presentation.layer.dtos.event.types.EventDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

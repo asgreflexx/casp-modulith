@@ -2,10 +2,10 @@ package casp.web.backend.presentation.layer.event.facades;
 
 import casp.web.backend.business.logic.layer.event.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.event.participants.SpaceService;
-import casp.web.backend.data.access.layer.documents.event.participants.CoTrainer;
-import casp.web.backend.data.access.layer.documents.event.participants.Space;
-import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
-import casp.web.backend.data.access.layer.documents.event.types.Course;
+import casp.web.backend.data.access.layer.event.participants.CoTrainer;
+import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.data.access.layer.event.types.BaseEvent;
+import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

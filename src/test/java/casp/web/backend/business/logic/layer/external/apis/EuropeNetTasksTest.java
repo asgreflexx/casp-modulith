@@ -2,8 +2,8 @@ package casp.web.backend.business.logic.layer.external.apis;
 
 
 import casp.web.backend.business.logic.layer.dog.DogService;
-import casp.web.backend.data.access.layer.documents.dog.Dog;
-import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
+import casp.web.backend.data.access.layer.dog.Dog;
+import casp.web.backend.data.access.layer.enumerations.EuropeNetState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

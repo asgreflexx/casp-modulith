@@ -1,7 +1,7 @@
 package casp.web.backend.business.logic.layer.event.calendar;
 
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
+import casp.web.backend.data.access.layer.event.calendar.Calendar;
+import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;

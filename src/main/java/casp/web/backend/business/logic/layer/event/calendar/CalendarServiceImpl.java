@@ -1,10 +1,10 @@
 package casp.web.backend.business.logic.layer.event.calendar;
 
 import casp.web.backend.business.logic.layer.event.options.EventOptionServiceUtility;
-import casp.web.backend.data.access.layer.documents.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.documents.event.calendar.Calendar;
-import casp.web.backend.data.access.layer.documents.event.types.BaseEvent;
-import casp.web.backend.data.access.layer.repositories.CalendarRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
+import casp.web.backend.data.access.layer.event.calendar.Calendar;
+import casp.web.backend.data.access.layer.event.calendar.CalendarRepository;
+import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

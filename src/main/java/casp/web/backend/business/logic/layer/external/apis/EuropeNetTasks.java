@@ -1,7 +1,7 @@
 package casp.web.backend.business.logic.layer.external.apis;
 
 import casp.web.backend.business.logic.layer.dog.DogService;
-import casp.web.backend.data.access.layer.documents.enumerations.EuropeNetState;
+import casp.web.backend.data.access.layer.enumerations.EuropeNetState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
