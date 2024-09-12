@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -124,7 +125,9 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     @Override
     public Set<String> getMembersEmailByIds(final Set<UUID> handlerIds) {
         return getDogHasHandlersByIds(handlerIds).stream()
-                .map(dh -> dh.getMember().getEmail())
+                .flatMap(dh -> Optional.ofNullable(setDogAndMember(dh).getMember())
+                        .map(Member::getEmail)
+                        .stream())
                 .collect(Collectors.toSet());
     }
 
