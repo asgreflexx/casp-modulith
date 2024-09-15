@@ -11,17 +11,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,17 +53,6 @@ class EventParticipantServiceImplTest {
         baseParticipants = expectedParticipants.stream()
                 .map(BaseParticipant.class::cast)
                 .collect(Collectors.toSet());
-    }
-
-    @Test
-    void saveParticipants() {
-        participant.setBaseEvent(null);
-        var newParticipants = Set.of(participant);
-        when(baseParticipantRepository.saveAll(expectedParticipants)).thenAnswer(invocation -> new ArrayList<>(expectedParticipants));
-
-        assertThat(eventParticipantService.saveParticipants(newParticipants, event)).containsAll(expectedParticipants);
-        verify(baseParticipantRepository).deleteAllByBaseEventId(event.getId());
-        verify(participant).setBaseEvent(event);
     }
 
     @Test
@@ -123,6 +114,44 @@ class EventParticipantServiceImplTest {
         eventParticipantService.deleteParticipantsByMemberOrHandlerId(participant.getMemberOrHandlerId());
 
         verify(participant).setEntityStatus(EntityStatus.DELETED);
+    }
+
+    @Nested
+    class ReplaceParticipants {
+        @Captor
+        private ArgumentCaptor<Set<EventParticipant>> captor;
+        private Set<EventParticipant> participants;
+
+        @BeforeEach
+        void setUp() {
+            var participant2 = TestFixture.createValidEventParticipant();
+            participant.setBaseEvent(null);
+            participant2.setBaseEvent(null);
+            participants = Set.of(participant, participant2);
+            event.setParticipantsSize(0);
+        }
+
+        @Test
+        void deleteParticipants() {
+            eventParticipantService.replaceParticipants(event, participants);
+
+            verify(baseParticipantRepository).deleteAllByBaseEventId(event.getId());
+        }
+
+        @Test
+        void setBaseEventToAllParticipantsAndSaveThem() {
+            eventParticipantService.replaceParticipants(event, participants);
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(event, actual.getBaseEvent()));
+        }
+
+        @Test
+        void setParticipantsSize() {
+            eventParticipantService.replaceParticipants(event, participants);
+
+            assertEquals(2, event.getParticipantsSize());
+        }
     }
 
     @Nested

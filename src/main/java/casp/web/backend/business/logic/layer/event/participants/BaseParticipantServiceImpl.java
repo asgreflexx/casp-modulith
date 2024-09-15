@@ -6,7 +6,6 @@ import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepo
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,10 +20,11 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
 
     @Transactional
     @Override
-    public Set<P> saveParticipants(final Set<P> participants, final E baseEvent) {
+    public void replaceParticipants(final E baseEvent, final Set<P> participants) {
         baseParticipantRepository.deleteAllByBaseEventId(baseEvent.getId());
         participants.forEach(participant -> participant.setBaseEvent(baseEvent));
-        return new HashSet<>(baseParticipantRepository.saveAll(participants));
+        baseParticipantRepository.saveAll(participants);
+        baseEvent.setParticipantsSize(participants.size());
     }
 
     // The casting is correct

@@ -9,9 +9,9 @@ import java.util.UUID;
 
 public interface BaseParticipantService<P extends BaseParticipant, E extends BaseEvent> {
 
-    Set<P> saveParticipants(Set<P> participants, E baseEvent);
+    void replaceParticipants(E baseEvent, Set<P> participants);
 
-    Set<P> getParticipantsByBaseEventId(final UUID baseEventId);
+    Set<P> getParticipantsByBaseEventId(UUID baseEventId);
 
     void deleteParticipantsByBaseEventId(UUID baseEventId);
 

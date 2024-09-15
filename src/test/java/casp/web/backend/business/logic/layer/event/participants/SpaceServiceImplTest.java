@@ -11,17 +11,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,17 +52,6 @@ class SpaceServiceImplTest {
         baseParticipants = expectedSpaces.stream()
                 .map(BaseParticipant.class::cast)
                 .collect(Collectors.toSet());
-    }
-
-    @Test
-    void saveParticipants() {
-        space.setBaseEvent(null);
-        var newParticipants = Set.of(space);
-        when(baseParticipantRepository.saveAll(expectedSpaces)).thenAnswer(invocation -> new ArrayList<>(expectedSpaces));
-
-        assertThat(spaceService.saveParticipants(newParticipants, course)).containsAll(expectedSpaces);
-        verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
-        verify(space).setBaseEvent(course);
     }
 
     @Test
@@ -136,6 +127,44 @@ class SpaceServiceImplTest {
         spaceService.deleteParticipantsByMemberOrHandlerId(space.getMemberOrHandlerId());
 
         verify(space).setEntityStatus(EntityStatus.DELETED);
+    }
+
+    @Nested
+    class ReplaceParticipants {
+        @Captor
+        private ArgumentCaptor<Set<Space>> captor;
+        private Set<Space> spaces;
+
+        @BeforeEach
+        void setUp() {
+            var space2 = TestFixture.createValidSpace();
+            space.setBaseEvent(null);
+            space2.setBaseEvent(null);
+            spaces = Set.of(space, space2);
+            course.setParticipantsSize(0);
+        }
+
+        @Test
+        void deleteParticipants() {
+            spaceService.replaceParticipants(course, spaces);
+
+            verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
+        }
+
+        @Test
+        void setBaseEventToAllParticipantsAndSaveThem() {
+            spaceService.replaceParticipants(course, spaces);
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(course, actual.getBaseEvent()));
+        }
+
+        @Test
+        void setParticipantsSize() {
+            spaceService.replaceParticipants(course, spaces);
+
+            assertEquals(2, course.getParticipantsSize());
+        }
     }
 
     @Nested

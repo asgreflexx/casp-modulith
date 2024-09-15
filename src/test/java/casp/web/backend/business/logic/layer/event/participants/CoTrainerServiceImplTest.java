@@ -11,17 +11,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -50,17 +52,6 @@ class CoTrainerServiceImplTest {
         baseParticipants = expectedCoTrainers.stream()
                 .map(BaseParticipant.class::cast)
                 .collect(Collectors.toSet());
-    }
-
-    @Test
-    void saveParticipants() {
-        coTrainer.setBaseEvent(null);
-        var newParticipants = Set.of(coTrainer);
-        when(baseParticipantRepository.saveAll(expectedCoTrainers)).thenAnswer(invocation -> new ArrayList<>(expectedCoTrainers));
-
-        assertThat(coTrainerService.saveParticipants(newParticipants, course)).containsAll(expectedCoTrainers);
-        verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
-        verify(coTrainer).setBaseEvent(course);
     }
 
     @Test
@@ -122,6 +113,44 @@ class CoTrainerServiceImplTest {
         coTrainerService.deleteParticipantsByMemberOrHandlerId(coTrainer.getMemberOrHandlerId());
 
         verify(coTrainer).setEntityStatus(EntityStatus.DELETED);
+    }
+
+    @Nested
+    class ReplaceParticipants {
+        @Captor
+        private ArgumentCaptor<Set<CoTrainer>> captor;
+        private Set<CoTrainer> coTrainers;
+
+        @BeforeEach
+        void setUp() {
+            var coTrainer2 = TestFixture.createValidCoTrainer();
+            coTrainer.setBaseEvent(null);
+            coTrainer2.setBaseEvent(null);
+            coTrainers = Set.of(coTrainer, coTrainer2);
+            course.setParticipantsSize(0);
+        }
+
+        @Test
+        void deleteParticipants() {
+            coTrainerService.replaceParticipants(course, coTrainers);
+
+            verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
+        }
+
+        @Test
+        void setBaseEventToAllParticipantsAndSaveThem() {
+            coTrainerService.replaceParticipants(course, coTrainers);
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(course, actual.getBaseEvent()));
+        }
+
+        @Test
+        void setParticipantsSize() {
+            coTrainerService.replaceParticipants(course, coTrainers);
+
+            assertEquals(2, course.getParticipantsSize());
+        }
     }
 
     @Nested
