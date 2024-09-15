@@ -79,8 +79,6 @@ public final class TestFixture {
         calendar.setEventFrom(LocalDateTime.now());
         calendar.setEventTo(LocalDateTime.now().plusHours(1));
         calendar.setBaseEvent(baseEvent);
-        baseEvent.setMinLocalDateTime(calendar.getEventFrom());
-        baseEvent.setMaxLocalDateTime(calendar.getEventTo());
         return calendar;
     }
 

@@ -15,7 +15,7 @@ public interface CalendarService {
 
     List<Calendar> getCalendarEntriesByPeriodAndEventTypes(LocalDate calendarEntriesFrom, LocalDate calendarEntriesTo, @NotNull Set<String> eventTypes);
 
-    List<Calendar> replaceCalendarEntriesFromEvent(BaseEvent baseEvent, Calendar calendarEntry);
+    void replaceCalendarEntries(BaseEvent baseEvent, List<Calendar> calendarEntries);
 
     List<Calendar> getCalendarEntriesByBaseEvent(BaseEvent baseEvent);
 

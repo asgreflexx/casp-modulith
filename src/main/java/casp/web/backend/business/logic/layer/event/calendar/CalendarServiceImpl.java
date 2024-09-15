@@ -42,9 +42,14 @@ class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public List<Calendar> replaceCalendarEntriesFromEvent(final BaseEvent baseEvent, final Calendar calendarEntry) {
+    public void replaceCalendarEntries(final BaseEvent baseEvent, final List<Calendar> calendarEntries) {
         calendarRepository.deleteAllByBaseEventId(baseEvent.getId());
-        return EventOptionServiceUtility.createCalendarEntries(baseEvent, calendarEntry);
+
+        var newCalendarEntries = EventOptionServiceUtility.createCalendarEntries(baseEvent, calendarEntries.getFirst());
+        baseEvent.setMinLocalDateTime(newCalendarEntries.getFirst().getEventFrom());
+        baseEvent.setMaxLocalDateTime(newCalendarEntries.getLast().getEventTo());
+
+        calendarRepository.saveAll(newCalendarEntries);
     }
 
     @Override
