@@ -22,7 +22,7 @@ import java.util.UUID;
 @QueryEntity
 @Document(BaseEvent.COLLECTION)
 public class BaseEvent extends BaseDocument {
-    public static final String COLLECTION = "BASE_EVENT";
+    static final String COLLECTION = "BASE_EVENT";
 
     @NotNull
     @Pattern(regexp = TypesRegex.BASE_EVENT_TYPES_REGEX)
