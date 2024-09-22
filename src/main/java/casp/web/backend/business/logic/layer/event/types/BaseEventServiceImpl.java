@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -52,7 +51,6 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
         eventRepository.save(baseEvent);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventById(final UUID id) {
         findBaseEventNotDeleted(id).ifPresent(this::deleteBaseEvent);
@@ -76,7 +74,6 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
 
     // It cast to the correct type
     @SuppressWarnings("unchecked")
-    @Transactional(readOnly = true)
     @Override
     public E getBaseEventById(final UUID id) {
         return (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
