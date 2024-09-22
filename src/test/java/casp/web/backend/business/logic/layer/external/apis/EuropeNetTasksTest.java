@@ -106,5 +106,16 @@ class EuropeNetTasksTest {
 
             verify(dog).setEuropeNetState(EuropeNetState.NOT_CHECKED);
         }
+
+        @Test
+        void newStateWasSaved() {
+            when(responseEntity.getStatusCode()).thenReturn(HttpStatus.OK);
+            when(responseEntity.getBody()).thenReturn(DOG_IS_REGISTERED);
+            when(restTemplate.getForEntity(EURO_PET_NET_API, String.class, URI_VARIABLES)).thenReturn(responseEntity);
+
+            europeNetTasks.scheduleChipNumbersCheckTask();
+
+            verify(dogService).saveDog(dog);
+        }
     }
 }

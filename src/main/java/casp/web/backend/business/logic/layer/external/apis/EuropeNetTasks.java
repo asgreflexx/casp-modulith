@@ -10,7 +10,6 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -39,11 +38,13 @@ class EuropeNetTasks {
         return EuropeNetState.NOT_CHECKED;
     }
 
-    @Transactional
     @Scheduled(cron = "${casp.cron}")
-    public void scheduleChipNumbersCheckTask() {
+    void scheduleChipNumbersCheckTask() {
         LOG.info("Start chip number check task");
-        dogService.getDogsThatWereNotChecked().forEach(dog -> dog.setEuropeNetState(callChipNumberCheckApi(dog.getChipNumber())));
+        dogService.getDogsThatWereNotChecked().forEach(dog -> {
+            dog.setEuropeNetState(callChipNumberCheckApi(dog.getChipNumber()));
+            dogService.saveDog(dog);
+        });
         LOG.info("Chip number check task has ended");
     }
 
