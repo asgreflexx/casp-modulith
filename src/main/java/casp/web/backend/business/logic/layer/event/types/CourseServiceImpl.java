@@ -9,7 +9,6 @@ import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
 import casp.web.backend.data.access.layer.event.types.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -32,7 +31,6 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, Space> implements C
         deleteBaseEvent(course);
     }
 
-    @Transactional(rollbackFor = Exception.class)
     @Override
     public void deleteBaseEventById(final UUID id) {
         findBaseEventNotDeleted(id).ifPresent(this::deleteCourse);
