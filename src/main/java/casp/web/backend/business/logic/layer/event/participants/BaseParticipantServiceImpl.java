@@ -4,7 +4,6 @@ import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 import java.util.UUID;
@@ -18,7 +17,6 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
         this.participantType = participantType;
     }
 
-    @Transactional
     @Override
     public void replaceParticipants(final E baseEvent, final Set<P> participants) {
         baseParticipantRepository.deleteAllByBaseEventId(baseEvent.getId());
