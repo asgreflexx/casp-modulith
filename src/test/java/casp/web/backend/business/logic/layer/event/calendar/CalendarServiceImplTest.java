@@ -123,6 +123,7 @@ class CalendarServiceImplTest {
         calendarService.deleteCalendarEntryById(calendarEntry.getId());
 
         assertSame(EntityStatus.DELETED, calendarEntry.getEntityStatus());
+        verify(calendarRepository).save(calendarEntry);
     }
 
     @Test

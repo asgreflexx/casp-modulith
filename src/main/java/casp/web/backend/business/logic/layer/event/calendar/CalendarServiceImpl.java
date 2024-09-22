@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -62,11 +61,10 @@ class CalendarServiceImpl implements CalendarService {
         return calendarRepository.save(calendarEntry);
     }
 
-    @Transactional
     @Override
     public void deleteCalendarEntryById(final UUID id) {
         calendarRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED)
-                .ifPresent(calendarEntry -> calendarEntry.setEntityStatus(EntityStatus.DELETED));
+                .ifPresent(calendarEntry -> saveItWithStatus(calendarEntry, EntityStatus.DELETED));
     }
 
     @Override
