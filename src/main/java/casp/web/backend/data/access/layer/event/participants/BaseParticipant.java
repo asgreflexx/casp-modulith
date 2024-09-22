@@ -20,7 +20,7 @@ import java.util.UUID;
 @QueryEntity
 @Document(BaseParticipant.COLLECTION)
 public class BaseParticipant extends BaseDocument {
-    public static final String COLLECTION = "BASE_PARTICIPANT";
+    static final String COLLECTION = "BASE_PARTICIPANT";
 
     @NotNull
     @Pattern(regexp = TypesRegex.BASE_PARTICIPANT_TYPES_REGEX)
