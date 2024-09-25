@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Set;
 
+import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.SpaceMapper.SPACE_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,7 +22,7 @@ class CourseDtoTest {
     void setUp() {
         var course = TestFixture.createValidCourse();
         courseDto = COURSE_MAPPER.toDto(course);
-        courseDto.setCalendarEntries(List.of(TestFixture.createValidCalendarEntry(course)));
+        courseDto.setCalendarEntries(CALENDAR_MAPPER.toDtoList(List.of(TestFixture.createValidCalendarEntry(course))));
     }
 
     @Test

@@ -80,7 +80,7 @@ class CalendarRestController {
             default -> examFacade.mapBaseEventToDto(baseEvent);
         };
         calendarEntry.setBaseEvent(null);
-        baseEventDto.setCalendarEntries(List.of(calendarEntry));
+        baseEventDto.setCalendarEntries(CALENDAR_MAPPER.toDtoList(List.of(calendarEntry)));
         return ResponseEntity.ok((BaseEventDto<P>) baseEventDto);
     }
 }

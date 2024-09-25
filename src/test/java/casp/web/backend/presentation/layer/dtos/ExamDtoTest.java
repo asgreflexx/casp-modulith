@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
+import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.ExamMapper.EXAM_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,7 +21,7 @@ class ExamDtoTest {
     void setUp() {
         var exam = TestFixture.createValidExam();
         examDto = EXAM_MAPPER.toDto(exam);
-        examDto.setCalendarEntries(List.of(TestFixture.createValidCalendarEntry(exam)));
+        examDto.setCalendarEntries(CALENDAR_MAPPER.toDtoList(List.of(TestFixture.createValidCalendarEntry(exam))));
     }
 
     @Test

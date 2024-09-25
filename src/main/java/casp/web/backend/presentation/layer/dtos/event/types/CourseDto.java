@@ -1,7 +1,7 @@
 package casp.web.backend.presentation.layer.dtos.event.types;
 
-import casp.web.backend.data.access.layer.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.presentation.layer.dtos.event.calendar.CalendarDto;
 import casp.web.backend.presentation.layer.dtos.event.participants.CoTrainerDto;
 import casp.web.backend.presentation.layer.dtos.event.participants.SpaceDto;
 import jakarta.validation.Valid;
@@ -18,7 +18,7 @@ public class CourseDto extends Course implements BaseEventDto<SpaceDto> {
     @NotNull
     private Set<CoTrainerDto> coTrainers = new HashSet<>();
 
-    private List<Calendar> calendarEntries = new ArrayList<>();
+    private List<CalendarDto> calendarEntries = new ArrayList<>();
 
     private Set<SpaceDto> participants = new HashSet<>();
 
@@ -31,12 +31,12 @@ public class CourseDto extends Course implements BaseEventDto<SpaceDto> {
     }
 
     @Override
-    public List<Calendar> getCalendarEntries() {
+    public List<CalendarDto> getCalendarEntries() {
         return calendarEntries;
     }
 
     @Override
-    public void setCalendarEntries(List<Calendar> calendarEntries) {
+    public void setCalendarEntries(List<CalendarDto> calendarEntries) {
         this.calendarEntries = calendarEntries;
     }
 

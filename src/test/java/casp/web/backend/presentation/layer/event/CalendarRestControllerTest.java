@@ -198,7 +198,7 @@ class CalendarRestControllerTest {
             return MvcMapper.toObject(mvcResult, clazz);
         }
 
-        private void assertCalendarEntry(final Calendar ce) {
+        private void assertCalendarEntry(final CalendarDto ce) {
             assertEquals(calendarEntryId, ce.getId());
             assertNull(ce.getBaseEvent());
         }
