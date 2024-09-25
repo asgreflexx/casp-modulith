@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Pattern;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
@@ -74,12 +75,19 @@ public class BaseParticipant extends BaseDocument {
     }
 
     @Override
-    public boolean equals(final Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    public String toString() {
+        return new StringJoiner(", ", "[", "]")
+                .add("participantType='" + participantType + "'")
+                .add("memberOrHandlerId=" + memberOrHandlerId)
+                .add("response=" + response)
+                .add("baseEvent=" + baseEvent)
+                .add("id=" + id)
+                .add("version=" + version)
+                .add("createdBy='" + createdBy + "'")
+                .add("created=" + created)
+                .add("modifiedBy='" + modifiedBy + "'")
+                .add("modified=" + modified)
+                .add("entityStatus=" + entityStatus)
+                .toString();
     }
 }

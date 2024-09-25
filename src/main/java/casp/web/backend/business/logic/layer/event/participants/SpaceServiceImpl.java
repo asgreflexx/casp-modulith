@@ -34,11 +34,14 @@ class SpaceServiceImpl extends BaseParticipantServiceImpl<Space, Course> impleme
     }
 
     @Override
-    public Set<ParticipantDogHasHandler> getActiveSpacesIfDogHasHandlersAreActive(final UUID baseEventId) {
+    public Set<Space> getActiveParticipantsIfMembersOrDogHasHandlerAreActive(final UUID baseEventId) {
         return getParticipantsByBaseEventId(baseEventId)
                 .stream()
                 .flatMap(s -> dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(s.getMemberOrHandlerId(), EntityStatus.ACTIVE)
-                        .map(dh -> new ParticipantDogHasHandler(s, dh))
+                        .map(dh -> {
+                            s.setDogHasHandler(dh);
+                            return s;
+                        })
                         .stream())
                 .collect(Collectors.toSet());
     }

@@ -24,11 +24,14 @@ class EventParticipantServiceImpl extends BaseParticipantServiceImpl<EventPartic
     }
 
     @Override
-    public Set<ParticipantMember> getActiveEventParticipantsIfMembersAreActive(final UUID baseEventId) {
+    public Set<EventParticipant> getActiveParticipantsIfMembersOrDogHasHandlerAreActive(final UUID baseEventId) {
         return getParticipantsByBaseEventId(baseEventId)
                 .stream()
                 .flatMap(p -> memberRepository.findByIdAndEntityStatus(p.getMemberOrHandlerId(), EntityStatus.ACTIVE)
-                        .map(m -> new ParticipantMember(p, m))
+                        .map(m -> {
+                            p.setMember(m);
+                            return p;
+                        })
                         .stream())
                 .collect(Collectors.toSet());
     }

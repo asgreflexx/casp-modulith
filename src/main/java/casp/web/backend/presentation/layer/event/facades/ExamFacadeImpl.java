@@ -31,14 +31,9 @@ class ExamFacadeImpl implements ExamFacade {
     }
 
     private void setExamParticipants(final ExamDto examDto) {
-        var examParticipantDtoSet = examParticipantService.getActiveExamParticipantsIfDogHasHandlersAreActive(examDto.getId())
+        var examParticipantDtoSet = examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(examDto.getId())
                 .stream()
-                .map(pd -> {
-                    var examParticipantDto = EXAM_PARTICIPANT_MAPPER.toDto((ExamParticipant) pd.participant());
-                    examParticipantDto.setDogHasHandler(DOG_HAS_HANDLER_MAPPER.toDto(pd.dogHasHandler()));
-                    examParticipantDto.setBaseEvent(null);
-                    return examParticipantDto;
-                })
+                .map(EXAM_PARTICIPANT_MAPPER::toDto)
                 .collect(Collectors.toSet());
 
         examDto.setParticipants(examParticipantDtoSet);

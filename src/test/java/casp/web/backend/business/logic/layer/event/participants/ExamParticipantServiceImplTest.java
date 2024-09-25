@@ -165,19 +165,16 @@ class ExamParticipantServiceImplTest {
             var dogHasHandler = TestFixture.createValidDogHasHandler();
             when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
 
-            assertThat(examParticipantService.getActiveExamParticipantsIfDogHasHandlersAreActive(exam.getId()))
+            assertThat(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId()))
                     .singleElement()
-                    .satisfies(pd -> {
-                        assertEquals(participant.getId(), pd.participant().getId());
-                        assertEquals(dogHasHandler.getId(), pd.dogHasHandler().getId());
-                    });
+                    .satisfies(pd -> assertEquals(dogHasHandler.getId(), pd.getDogHasHandler().getId()));
         }
 
         @Test
         void spaceIsInActive() {
             when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThat(examParticipantService.getActiveExamParticipantsIfDogHasHandlersAreActive(exam.getId()))
+            assertThat(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId()))
                     .isEmpty();
         }
     }

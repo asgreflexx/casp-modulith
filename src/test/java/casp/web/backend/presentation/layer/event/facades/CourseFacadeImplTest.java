@@ -2,8 +2,6 @@ package casp.web.backend.presentation.layer.event.facades;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.participants.CoTrainerService;
-import casp.web.backend.business.logic.layer.event.participants.ParticipantDogHasHandler;
-import casp.web.backend.business.logic.layer.event.participants.ParticipantMember;
 import casp.web.backend.business.logic.layer.event.participants.SpaceService;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -38,7 +36,8 @@ class CourseFacadeImplTest {
             var course = coTrainer.getBaseEvent();
             var member = course.getMember();
             coTrainer.setMemberOrHandlerId(member.getId());
-            when(coTrainerService.getActiveCoTrainersIfMembersAreActive(course.getId())).thenReturn(Set.of(new ParticipantMember(coTrainer, member)));
+            coTrainer.setMember(member);
+            when(coTrainerService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId())).thenReturn(Set.of(coTrainer));
 
             var courseDto = courseFacade.mapBaseEventToDto(course);
 
@@ -47,7 +46,6 @@ class CourseFacadeImplTest {
                     .satisfies(actual -> {
                         assertEquals(coTrainer.getId(), actual.getId());
                         assertEquals(coTrainer.getMemberOrHandlerId(), actual.getMember().getId());
-                        assertNull(actual.getBaseEvent());
                     });
         }
 
@@ -57,7 +55,8 @@ class CourseFacadeImplTest {
             var space = TestFixture.createValidSpace();
             space.setMemberOrHandlerId(dogHasHandler.getId());
             var course = space.getBaseEvent();
-            when(spaceService.getActiveSpacesIfDogHasHandlersAreActive(course.getId())).thenReturn(Set.of(new ParticipantDogHasHandler(space, dogHasHandler)));
+            space.setDogHasHandler(dogHasHandler);
+            when(spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId())).thenReturn(Set.of(space));
 
             var courseDto = courseFacade.mapBaseEventToDto(course);
 
@@ -66,7 +65,6 @@ class CourseFacadeImplTest {
                     .satisfies(actual -> {
                         assertEquals(space.getId(), actual.getId());
                         assertEquals(space.getMemberOrHandlerId(), actual.getDogHasHandler().getId());
-                        assertNull(actual.getBaseEvent());
                     });
         }
     }

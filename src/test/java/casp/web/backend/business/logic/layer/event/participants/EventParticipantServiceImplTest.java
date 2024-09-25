@@ -166,19 +166,16 @@ class EventParticipantServiceImplTest {
             var member = TestFixture.createValidMember();
             when(memberRepository.findByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
-            assertThat(eventParticipantService.getActiveEventParticipantsIfMembersAreActive(event.getId()))
+            assertThat(eventParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(event.getId()))
                     .singleElement()
-                    .satisfies(pm -> {
-                        assertEquals(participant.getId(), pm.participant().getId());
-                        assertEquals(member.getId(), pm.member().getId());
-                    });
+                    .satisfies(pm -> assertEquals(member.getId(), pm.getMember().getId()));
         }
 
         @Test
         void coTrainerIsInactiveActive() {
             when(memberRepository.findByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThat(eventParticipantService.getActiveEventParticipantsIfMembersAreActive(event.getId()))
+            assertThat(eventParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(event.getId()))
                     .isEmpty();
         }
     }

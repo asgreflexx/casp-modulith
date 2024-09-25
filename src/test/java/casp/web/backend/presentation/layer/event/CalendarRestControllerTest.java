@@ -5,7 +5,6 @@ import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.event.calendar.CalendarRepository;
-import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.EventParticipant;
@@ -145,11 +144,11 @@ class CalendarRestControllerTest {
             assertEquals(member.getId(), courseDto.getMember().getId());
             assertThat(courseDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
             assertThat(courseDto.getParticipants()).singleElement().satisfies(p -> {
-                assertParticipant(space, p);
+                assertEquals(space.getId(), p.getId());
                 assertEquals(dogHasHandler.getId(), p.getDogHasHandler().getId());
             });
             assertThat(courseDto.getCoTrainers()).singleElement().satisfies(p -> {
-                assertParticipant(coTrainer, p);
+                assertEquals(coTrainer.getId(), p.getId());
                 assertEquals(member.getId(), p.getMember().getId());
             });
         }
@@ -163,7 +162,7 @@ class CalendarRestControllerTest {
             assertEquals(member.getId(), eventDto.getMember().getId());
             assertThat(eventDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
             assertThat(eventDto.getParticipants()).singleElement().satisfies(p -> {
-                assertParticipant(eventParticipant, p);
+                assertEquals(eventParticipant.getId(), p.getId());
                 assertEquals(member.getId(), p.getMember().getId());
             });
         }
@@ -177,7 +176,7 @@ class CalendarRestControllerTest {
             assertEquals(member.getId(), examDto.getMember().getId());
             assertThat(examDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
             assertThat(examDto.getParticipants()).singleElement().satisfies(p -> {
-                assertParticipant(examParticipant, p);
+                assertEquals(examParticipant.getId(), p.getId());
                 assertEquals(dogHasHandler.getId(), p.getDogHasHandler().getId());
             });
         }
@@ -201,11 +200,6 @@ class CalendarRestControllerTest {
         private void assertCalendarEntry(final CalendarDto ce) {
             assertEquals(calendarEntryId, ce.getId());
             assertNull(ce.getBaseEvent());
-        }
-
-        private void assertParticipant(final BaseParticipant expected, final BaseParticipant actual) {
-            assertEquals(expected.getId(), actual.getId());
-            assertNull(actual.getBaseEvent());
         }
     }
 }

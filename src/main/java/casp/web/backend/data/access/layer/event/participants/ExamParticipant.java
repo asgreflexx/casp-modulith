@@ -1,10 +1,11 @@
 package casp.web.backend.data.access.layer.event.participants;
 
+import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import com.querydsl.core.annotations.QueryEntity;
+import jakarta.validation.Valid;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.util.StringJoiner;
 
 @QueryEntity
 @Document(BaseParticipant.COLLECTION)
@@ -12,24 +13,19 @@ import java.util.StringJoiner;
 public class ExamParticipant extends BaseParticipant {
     public static final String PARTICIPANT_TYPE = "EXAM_PARTICIPANT";
 
+    @Valid
+    @DBRef
+    private DogHasHandler dogHasHandler;
+
     public ExamParticipant() {
         super(PARTICIPANT_TYPE);
     }
 
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", ExamParticipant.class.getSimpleName() + "[", "]")
-                .add("participantType='" + participantType + "'")
-                .add("memberOrHandlerId=" + memberOrHandlerId)
-                .add("response=" + response)
-                .add("baseEvent=" + baseEvent)
-                .add("id=" + id)
-                .add("version=" + version)
-                .add("createdBy='" + createdBy + "'")
-                .add("created=" + created)
-                .add("modifiedBy='" + modifiedBy + "'")
-                .add("modified=" + modified)
-                .add("entityStatus=" + entityStatus)
-                .toString();
+    public DogHasHandler getDogHasHandler() {
+        return dogHasHandler;
+    }
+
+    public void setDogHasHandler(final DogHasHandler dogHasHandler) {
+        this.dogHasHandler = dogHasHandler;
     }
 }

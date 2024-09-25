@@ -1,16 +1,20 @@
 package casp.web.backend.presentation.layer.dtos.event.participants;
 
 import casp.web.backend.data.access.layer.event.participants.EventParticipant;
-import casp.web.backend.presentation.layer.dtos.member.MemberDto;
+import casp.web.backend.presentation.layer.dtos.member.SimpleMemberDto;
 
-public class EventParticipantDto extends EventParticipant {
-    private MemberDto member;
+public class EventParticipantDto extends BaseParticipantDto {
+    private SimpleMemberDto member;
 
-    public MemberDto getMember() {
+    public EventParticipantDto() {
+        super(EventParticipant.PARTICIPANT_TYPE);
+    }
+
+    public SimpleMemberDto getMember() {
         return member;
     }
 
-    public void setMember(final MemberDto member) {
+    public void setMember(final SimpleMemberDto member) {
         this.member = member;
     }
 }

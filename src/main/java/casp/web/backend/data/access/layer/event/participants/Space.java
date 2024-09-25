@@ -2,10 +2,13 @@ package casp.web.backend.data.access.layer.event.participants;
 
 import casp.web.backend.data.access.layer.commons.Payment;
 import casp.web.backend.data.access.layer.commons.PaymentConstraint;
+import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import com.querydsl.core.annotations.QueryEntity;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
@@ -27,6 +30,10 @@ public class Space extends BaseParticipant implements Payment {
     private boolean isPaid;
 
     private LocalDate paidDate;
+
+    @Valid
+    @DBRef
+    private DogHasHandler dogHasHandler;
 
     public Space() {
         super(PARTICIPANT_TYPE);
@@ -68,14 +75,12 @@ public class Space extends BaseParticipant implements Payment {
         this.paidDate = paidDate;
     }
 
-    @Override
-    public boolean equals(final Object o) {
-        return super.equals(o);
+    public DogHasHandler getDogHasHandler() {
+        return dogHasHandler;
     }
 
-    @Override
-    public int hashCode() {
-        return super.hashCode();
+    public void setDogHasHandler(final DogHasHandler dogHasHandler) {
+        this.dogHasHandler = dogHasHandler;
     }
 
     @Override

@@ -2,7 +2,6 @@ package casp.web.backend.presentation.layer.event.facades;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.participants.EventParticipantService;
-import casp.web.backend.business.logic.layer.event.participants.ParticipantMember;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -13,7 +12,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 
@@ -31,8 +29,9 @@ class EventFacadeImplTest {
         var event = eventParticipant.getBaseEvent();
         var member = event.getMember();
         eventParticipant.setMemberOrHandlerId(member.getId());
+        eventParticipant.setMember(member);
 
-        when(eventService.getActiveEventParticipantsIfMembersAreActive(event.getId())).thenReturn(Set.of(new ParticipantMember(eventParticipant, member)));
+        when(eventService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(event.getId())).thenReturn(Set.of(eventParticipant));
 
         var eventDto = eventFacade.mapBaseEventToDto(event);
 
@@ -41,7 +40,6 @@ class EventFacadeImplTest {
                 .satisfies(actual -> {
                     assertEquals(eventParticipant.getId(), actual.getId());
                     assertEquals(eventParticipant.getMemberOrHandlerId(), actual.getMember().getId());
-                    assertNull(actual.getBaseEvent());
                 });
     }
 }

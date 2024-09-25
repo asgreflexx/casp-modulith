@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 @Service
 class CoTrainerServiceImpl extends BaseParticipantServiceImpl<CoTrainer, Course> implements CoTrainerService {
     private final MemberRepository memberRepository;
+
     @Autowired
     CoTrainerServiceImpl(final BaseParticipantRepository baseParticipantRepository, final MemberRepository memberRepository) {
         super(baseParticipantRepository, CoTrainer.PARTICIPANT_TYPE);
@@ -23,11 +24,14 @@ class CoTrainerServiceImpl extends BaseParticipantServiceImpl<CoTrainer, Course>
     }
 
     @Override
-    public Set<ParticipantMember> getActiveCoTrainersIfMembersAreActive(final UUID baseEventId) {
+    public Set<CoTrainer> getActiveParticipantsIfMembersOrDogHasHandlerAreActive(final UUID baseEventId) {
         return getParticipantsByBaseEventId(baseEventId)
                 .stream()
                 .flatMap(ct -> memberRepository.findByIdAndEntityStatus(ct.getMemberOrHandlerId(), EntityStatus.ACTIVE)
-                        .map(m -> new ParticipantMember(ct, m))
+                        .map(m -> {
+                            ct.setMember(m);
+                            return ct;
+                        })
                         .stream())
                 .collect(Collectors.toSet());
     }

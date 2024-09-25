@@ -38,27 +38,18 @@ class CourseFacadeImpl implements CourseFacade {
     }
 
     private void setCoTrainers(final CourseDto courseDto) {
-        var coTrainerDtoSet = coTrainerService.getActiveCoTrainersIfMembersAreActive(courseDto.getId())
+        var coTrainerDtoSet = coTrainerService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(courseDto.getId())
                 .stream()
-                .map(pm -> {
-                    var coTrainerDto = CO_TRAINER_MAPPER.toDto((CoTrainer) pm.participant());
-                    coTrainerDto.setMember(MEMBER_MAPPER.toDto(pm.member()));
-                    coTrainerDto.setBaseEvent(null);
-                    return coTrainerDto;
-                }).collect(Collectors.toSet());
+                .map(CO_TRAINER_MAPPER::toDto)
+                .collect(Collectors.toSet());
 
         courseDto.setCoTrainers(coTrainerDtoSet);
     }
 
     private void setSpaces(final CourseDto courseDto) {
-        var spaceDtoSet = spaceService.getActiveSpacesIfDogHasHandlersAreActive(courseDto.getId())
+        var spaceDtoSet = spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(courseDto.getId())
                 .stream()
-                .map(pd -> {
-                    var spaceDto = SPACE_MAPPER.toDto((Space) pd.participant());
-                    spaceDto.setDogHasHandler(DOG_HAS_HANDLER_MAPPER.toDto(pd.dogHasHandler()));
-                    spaceDto.setBaseEvent(null);
-                    return spaceDto;
-                })
+                .map(SPACE_MAPPER::toDto)
                 .collect(Collectors.toSet());
         courseDto.setParticipants(spaceDtoSet);
     }

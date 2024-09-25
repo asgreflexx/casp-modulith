@@ -24,4 +24,6 @@ public interface BaseParticipantService<P extends BaseParticipant, E extends Bas
     void deactivateParticipantsByMemberOrHandlerId(UUID memberOrHandlerId);
 
     void activateParticipantsByMemberOrHandlerId(UUID memberOrHandlerId);
+
+    Set<P> getActiveParticipantsIfMembersOrDogHasHandlerAreActive(UUID baseEventId);
 }

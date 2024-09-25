@@ -23,11 +23,14 @@ class ExamParticipantServiceImpl extends BaseParticipantServiceImpl<ExamParticip
     }
 
     @Override
-    public Set<ParticipantDogHasHandler> getActiveExamParticipantsIfDogHasHandlersAreActive(final UUID baseEventId) {
+    public Set<ExamParticipant> getActiveParticipantsIfMembersOrDogHasHandlerAreActive(final UUID baseEventId) {
         return getParticipantsByBaseEventId(baseEventId)
                 .stream()
                 .flatMap(s -> dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(s.getMemberOrHandlerId(), EntityStatus.ACTIVE)
-                        .map(dh -> new ParticipantDogHasHandler(s, dh))
+                        .map(dh -> {
+                            s.setDogHasHandler(dh);
+                            return s;
+                        })
                         .stream())
                 .collect(Collectors.toSet());
     }
