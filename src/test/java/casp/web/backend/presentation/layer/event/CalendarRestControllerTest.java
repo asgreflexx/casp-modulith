@@ -18,6 +18,7 @@ import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
+import casp.web.backend.presentation.layer.dtos.event.calendar.CalendarDto;
 import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
 import casp.web.backend.presentation.layer.dtos.event.types.EventDto;
 import casp.web.backend.presentation.layer.dtos.event.types.ExamDto;
@@ -114,7 +115,7 @@ class CalendarRestControllerTest {
 
     @Test
     void getEntriesByPeriodAndEventTypes() throws Exception {
-        TypeReference<List<Calendar>> typeReference = new TypeReference<>() {
+        TypeReference<List<CalendarDto>> typeReference = new TypeReference<>() {
         };
         var eventFrom = LocalDate.now().minusDays(1);
         var eventTo = LocalDate.now().plusWeeks(1);
@@ -124,7 +125,7 @@ class CalendarRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertThat(MvcMapper.toObject(mvcResult, typeReference)).zipSatisfy(calendarList, (Calendar actual, Calendar expected) -> {
+        assertThat(MvcMapper.toObject(mvcResult, typeReference)).zipSatisfy(calendarList, (CalendarDto actual, Calendar expected) -> {
             assertEquals(expected.getId(), actual.getId());
             assertEquals(member.getId(), actual.getBaseEvent().getMember().getId());
         });

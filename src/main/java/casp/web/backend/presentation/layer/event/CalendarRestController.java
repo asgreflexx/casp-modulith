@@ -3,9 +3,9 @@ package casp.web.backend.presentation.layer.event;
 import casp.web.backend.business.logic.layer.event.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.data.access.layer.event.TypesRegex;
-import casp.web.backend.data.access.layer.event.calendar.Calendar;
 import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.data.access.layer.event.types.Event;
+import casp.web.backend.presentation.layer.dtos.event.calendar.CalendarDto;
 import casp.web.backend.presentation.layer.dtos.event.types.BaseEventDto;
 import casp.web.backend.presentation.layer.event.facades.CourseFacade;
 import casp.web.backend.presentation.layer.event.facades.EventFacade;
@@ -25,6 +25,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 
 @RestController
 @RequestMapping("/calendar")
@@ -51,14 +53,19 @@ class CalendarRestController {
     }
 
     @GetMapping
-    ResponseEntity<List<Calendar>> getEntriesByPeriodAndEventTypes(final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                   LocalDate calendarEntriesFrom,
-                                                                   final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
-                                                   LocalDate calendarEntriesTo,
-                                                                   final @RequestParam(required = false)
-                                                   Set<@Pattern(regexp = TypesRegex.BASE_EVENT_TYPES_REGEX) String> eventTypes) {
-        var calendarEntryList = calendarService.getCalendarEntriesByPeriodAndEventTypes(calendarEntriesFrom, calendarEntriesTo, eventTypes);
-        calendarEntryList.forEach(ce -> memberService.setActiveMemberToBaseEvent(ce.getBaseEvent()));
+    ResponseEntity<List<CalendarDto>> getEntriesByPeriodAndEventTypes(final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                                      LocalDate calendarEntriesFrom,
+                                                                      final @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+                                                                      LocalDate calendarEntriesTo,
+                                                                      final @RequestParam(required = false)
+                                                                      Set<@Pattern(regexp = TypesRegex.BASE_EVENT_TYPES_REGEX) String> eventTypes) {
+        var calendarEntryList = calendarService.getCalendarEntriesByPeriodAndEventTypes(calendarEntriesFrom, calendarEntriesTo, eventTypes)
+                .stream()
+                .map(ce -> {
+                    memberService.setActiveMemberToBaseEvent(ce.getBaseEvent());
+                    return CALENDAR_MAPPER.toDto(ce);
+                })
+                .toList();
         return ResponseEntity.ok(calendarEntryList);
     }
 

@@ -15,6 +15,7 @@ public class CalendarDto implements Comparable<CalendarDto> {
     @NotNull
     private LocalDateTime eventTo;
     private String location;
+    private CalendarBaseEventDto baseEvent;
 
     public UUID getId() {
         return id;
@@ -46,6 +47,14 @@ public class CalendarDto implements Comparable<CalendarDto> {
 
     public void setLocation(final String location) {
         this.location = location;
+    }
+
+    public CalendarBaseEventDto getBaseEvent() {
+        return baseEvent;
+    }
+
+    public void setBaseEvent(final CalendarBaseEventDto baseEvent) {
+        this.baseEvent = baseEvent;
     }
 
     @Override
