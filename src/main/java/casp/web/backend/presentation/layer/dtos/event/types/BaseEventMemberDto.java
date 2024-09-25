@@ -1,8 +1,8 @@
-package casp.web.backend.presentation.layer.dtos.event.calendar;
+package casp.web.backend.presentation.layer.dtos.event.types;
 
 import java.util.UUID;
 
-public class CalendarMemberDto {
+public class BaseEventMemberDto {
     private UUID id;
     private String firstName;
     private String lastName;

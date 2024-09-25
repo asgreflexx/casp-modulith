@@ -1,5 +1,7 @@
 package casp.web.backend.presentation.layer.dtos.event.calendar;
 
+import casp.web.backend.presentation.layer.dtos.event.types.BaseEventMemberDto;
+
 import java.util.UUID;
 
 public class CalendarBaseEventDto {
@@ -7,7 +9,7 @@ public class CalendarBaseEventDto {
     private String eventType;
     private String name;
     private String description;
-    private CalendarMemberDto member;
+    private BaseEventMemberDto member;
 
     public UUID getId() {
         return id;
@@ -41,11 +43,11 @@ public class CalendarBaseEventDto {
         this.description = description;
     }
 
-    public CalendarMemberDto getMember() {
+    public BaseEventMemberDto getMember() {
         return member;
     }
 
-    public void setMember(final CalendarMemberDto member) {
+    public void setMember(final BaseEventMemberDto member) {
         this.member = member;
     }
 }

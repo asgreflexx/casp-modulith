@@ -1,26 +1,27 @@
 package casp.web.backend.presentation.layer.dtos.event.types;
 
 import casp.web.backend.data.access.layer.event.types.Course;
-import casp.web.backend.presentation.layer.dtos.event.calendar.CalendarDto;
 import casp.web.backend.presentation.layer.dtos.event.participants.CoTrainerDto;
 import casp.web.backend.presentation.layer.dtos.event.participants.SpaceDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @CourseDtoSpaceConstraint
-public class CourseDto extends Course implements BaseEventDto<SpaceDto> {
+public class CourseDto extends BaseEventDto<SpaceDto> {
     @Valid
     @NotNull
     private Set<CoTrainerDto> coTrainers = new HashSet<>();
 
-    private List<CalendarDto> calendarEntries = new ArrayList<>();
+    @PositiveOrZero
+    private int spaceLimit;
 
-    private Set<SpaceDto> participants = new HashSet<>();
+    public CourseDto() {
+        super(Course.EVENT_TYPE);
+    }
 
     public Set<CoTrainerDto> getCoTrainers() {
         return coTrainers;
@@ -30,23 +31,11 @@ public class CourseDto extends Course implements BaseEventDto<SpaceDto> {
         this.coTrainers = coTrainers;
     }
 
-    @Override
-    public List<CalendarDto> getCalendarEntries() {
-        return calendarEntries;
+    public int getSpaceLimit() {
+        return spaceLimit;
     }
 
-    @Override
-    public void setCalendarEntries(List<CalendarDto> calendarEntries) {
-        this.calendarEntries = calendarEntries;
-    }
-
-    @Override
-    public Set<SpaceDto> getParticipants() {
-        return participants;
-    }
-
-    @Override
-    public void setParticipants(Set<SpaceDto> participants) {
-        this.participants = participants;
+    public void setSpaceLimit(final int spaceLimit) {
+        this.spaceLimit = spaceLimit;
     }
 }
