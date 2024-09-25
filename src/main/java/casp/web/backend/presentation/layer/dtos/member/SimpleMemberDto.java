@@ -1,8 +1,8 @@
-package casp.web.backend.presentation.layer.dtos.event.types;
+package casp.web.backend.presentation.layer.dtos.member;
 
 import java.util.UUID;
 
-public class BaseEventMemberDto {
+public class SimpleMemberDto {
     private UUID id;
     private String firstName;
     private String lastName;

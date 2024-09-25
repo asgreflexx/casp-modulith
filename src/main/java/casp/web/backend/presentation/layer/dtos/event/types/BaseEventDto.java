@@ -5,6 +5,7 @@ import casp.web.backend.data.access.layer.event.TypesRegex;
 import casp.web.backend.data.access.layer.event.options.DailyEventOption;
 import casp.web.backend.data.access.layer.event.options.WeeklyEventOption;
 import casp.web.backend.presentation.layer.dtos.event.calendar.CalendarDto;
+import casp.web.backend.presentation.layer.dtos.member.SimpleMemberDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -27,7 +28,7 @@ public abstract class BaseEventDto<P> {
     protected String eventType;
     protected String name;
     protected String description;
-    protected BaseEventMemberDto member;
+    protected SimpleMemberDto member;
     @Valid
     protected DailyEventOption dailyOption;
     @Valid
@@ -98,11 +99,11 @@ public abstract class BaseEventDto<P> {
         this.description = description;
     }
 
-    public BaseEventMemberDto getMember() {
+    public SimpleMemberDto getMember() {
         return member;
     }
 
-    public void setMember(final BaseEventMemberDto member) {
+    public void setMember(final SimpleMemberDto member) {
         this.member = member;
     }
 

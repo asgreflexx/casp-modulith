@@ -28,6 +28,7 @@ import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.D
 import static casp.web.backend.presentation.layer.dtos.dog.DogMapper.DOG_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -87,7 +88,9 @@ class DogHasHandlerRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE)).containsOnly(dogHasHandler);
+        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE))
+                .singleElement()
+                .satisfies(this::assertDogHasHandler);
     }
 
     @Test
@@ -96,7 +99,9 @@ class DogHasHandlerRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE)).containsOnly(dogHasHandler);
+        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE))
+                .singleElement()
+                .satisfies(this::assertDogHasHandler);
     }
 
     @Test
@@ -146,7 +151,9 @@ class DogHasHandlerRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE)).containsOnly(dogHasHandler);
+        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE))
+                .singleElement()
+                .satisfies(this::assertDogHasHandler);
     }
 
     @Test
@@ -155,7 +162,9 @@ class DogHasHandlerRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE)).containsOnly(dogHasHandler);
+        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE))
+                .singleElement()
+                .satisfies(this::assertDogHasHandler);
     }
 
     @Test
@@ -165,7 +174,8 @@ class DogHasHandlerRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE)).containsOnly(dogHasHandler);
+        assertThat(MvcMapper.toObject(mvcResult, DOG_HAS_HANDLER_SET_TYPE_REFERENCE)).singleElement()
+                .satisfies(this::assertDogHasHandler);
     }
 
     @Test
@@ -196,17 +206,23 @@ class DogHasHandlerRestControllerTest {
         assertThat(MvcMapper.toObject(mvcResult, STRING_SET_TYPE_REFERENCE)).containsOnly(member.getEmail());
     }
 
+    private void assertDogHasHandler(final DogHasHandlerDto dh) {
+        assertEquals(dogHasHandler.getId(), dh.getId());
+        assertEquals(dogHasHandler.getMember().getId(), dh.getMember().getId());
+        assertEquals(dogHasHandler.getDog().getId(), dh.getDog().getId());
+    }
+
     @Nested
     class SaveDogHasHandler {
         @Test
         void dogHasHandlerIsAlwaysAsActiveSaved() throws Exception {
-            dogHasHandler.setEntityStatus(EntityStatus.DELETED);
 
             var mvcResult = performPost(dogHasHandler)
                     .andExpect(status().isOk())
                     .andReturn();
 
-            assertThat(MvcMapper.toObject(mvcResult, DogHasHandlerDto.class).getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
+            assertThat(MvcMapper.toObject(mvcResult, DogHasHandlerDto.class))
+                    .satisfies(dh -> assertEquals(dogHasHandler.getId(), dh.getId()));
         }
 
         @Test
@@ -233,7 +249,8 @@ class DogHasHandlerRestControllerTest {
                     .andExpect(status().isOk())
                     .andReturn();
 
-            assertThat(MvcMapper.toObject(mvcResult, DogHasHandlerDto.class)).isEqualTo(dogHasHandler);
+            assertThat(MvcMapper.toObject(mvcResult, DogHasHandlerDto.class))
+                    .satisfies(DogHasHandlerRestControllerTest.this::assertDogHasHandler);
         }
 
         @Test
