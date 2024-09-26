@@ -2,6 +2,7 @@ package casp.web.backend.presentation.layer.event.facades;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.participants.ExamParticipantService;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,22 +23,47 @@ class ExamFacadeImplTest {
     @InjectMocks
     private ExamFacadeImpl examFacade;
 
-    @Test
-    void mapBaseEventToDto() {
-        var dogHasHandler = TestFixture.createDogHasHandler();
-        var examParticipant = TestFixture.createExamParticipant();
-        examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
-        examParticipant.setDogHasHandler(dogHasHandler);
-        var exam = examParticipant.getBaseEvent();
-        when(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId())).thenReturn(Set.of(examParticipant));
+    @Nested
+    class MapDocumentToDto {
+        @Test
+        void mapParticipant() {
+            var dogHasHandler = TestFixture.createDogHasHandler();
+            var examParticipant = TestFixture.createExamParticipant();
+            examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
+            examParticipant.setDogHasHandler(dogHasHandler);
+            var exam = examParticipant.getBaseEvent();
+            when(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId())).thenReturn(Set.of(examParticipant));
 
-        var courseDto = examFacade.mapBaseEventToDto(exam);
+            var courseDto = examFacade.mapBaseEventToDto(exam);
 
-        assertThat(courseDto.getParticipants())
-                .singleElement()
-                .satisfies(actual -> {
-                    assertEquals(examParticipant.getId(), actual.getId());
-                    assertEquals(examParticipant.getMemberOrHandlerId(), actual.getDogHasHandler().getId());
-                });
+            assertThat(courseDto.getParticipants())
+                    .singleElement()
+                    .satisfies(actual -> {
+                        assertEquals(examParticipant.getId(), actual.getId());
+                        assertEquals(examParticipant.getMemberOrHandlerId(), actual.getDogHasHandler().getId());
+                    });
+        }
+
+        @Test
+        void mapDailyEventOption() {
+            var dailyEventOption = TestFixture.createDailyEventOption();
+            var exam = TestFixture.createExam();
+            exam.setDailyOption(dailyEventOption);
+
+            var examDto = examFacade.mapBaseEventToDto(exam);
+
+            assertEquals(dailyEventOption.getOptionType(), examDto.getOption().getOptionType());
+        }
+
+        @Test
+        void mapWeeklyEventOption() {
+            var weeklyEventOption = TestFixture.createWeeklyEventOption();
+            var exam = TestFixture.createExam();
+            exam.setWeeklyOption(weeklyEventOption);
+
+            var examDto = examFacade.mapBaseEventToDto(exam);
+
+            assertEquals(weeklyEventOption.getOptionType(), examDto.getOption().getOptionType());
+        }
     }
 }

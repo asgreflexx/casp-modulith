@@ -28,7 +28,7 @@ class CourseFacadeImplTest {
     private CourseFacadeImpl courseFacade;
 
     @Nested
-    class MapBaseEventToDto {
+    class MapDocumentToDto {
         @Test
         void mapCoTrainer() {
             var coTrainer = TestFixture.createCoTrainer();
@@ -65,6 +65,28 @@ class CourseFacadeImplTest {
                         assertEquals(space.getId(), actual.getId());
                         assertEquals(space.getMemberOrHandlerId(), actual.getDogHasHandler().getId());
                     });
+        }
+
+        @Test
+        void mapDailyEventOption() {
+            var dailyEventOption = TestFixture.createDailyEventOption();
+            var course = TestFixture.createCourse();
+            course.setDailyOption(dailyEventOption);
+
+            var courseDto = courseFacade.mapBaseEventToDto(course);
+
+            assertEquals(dailyEventOption.getOptionType(), courseDto.getOption().getOptionType());
+        }
+
+        @Test
+        void mapWeeklyEventOption() {
+            var weeklyEventOption = TestFixture.createWeeklyEventOption();
+            var course = TestFixture.createCourse();
+            course.setWeeklyOption(weeklyEventOption);
+
+            var courseDto = courseFacade.mapBaseEventToDto(course);
+
+            assertEquals(weeklyEventOption.getOptionType(), courseDto.getOption().getOptionType());
         }
     }
 }

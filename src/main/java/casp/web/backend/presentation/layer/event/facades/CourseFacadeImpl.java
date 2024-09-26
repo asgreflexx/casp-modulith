@@ -2,8 +2,6 @@ package casp.web.backend.presentation.layer.event.facades;
 
 import casp.web.backend.business.logic.layer.event.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.event.participants.SpaceService;
-import casp.web.backend.data.access.layer.event.participants.CoTrainer;
-import casp.web.backend.data.access.layer.event.participants.Space;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
@@ -12,11 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
-import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.CoTrainerMapper.CO_TRAINER_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.SpaceMapper.SPACE_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.COURSE_MAPPER;
-import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 
 @Service
 class CourseFacadeImpl implements CourseFacade {
@@ -42,7 +38,6 @@ class CourseFacadeImpl implements CourseFacade {
                 .stream()
                 .map(CO_TRAINER_MAPPER::toDto)
                 .collect(Collectors.toSet());
-
         courseDto.setCoTrainers(coTrainerDtoSet);
     }
 
