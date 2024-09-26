@@ -143,11 +143,11 @@ class CalendarRestControllerTest {
 
             assertEquals(member.getId(), courseDto.getMember().getId());
             assertThat(courseDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
-            assertThat(courseDto.getParticipants()).singleElement().satisfies(p -> {
+            assertThat(courseDto.getParticipantsToRead()).singleElement().satisfies(p -> {
                 assertEquals(space.getId(), p.getId());
                 assertEquals(dogHasHandler.getId(), p.getDogHasHandler().getId());
             });
-            assertThat(courseDto.getCoTrainers()).singleElement().satisfies(p -> {
+            assertThat(courseDto.getCoTrainersToRead()).singleElement().satisfies(p -> {
                 assertEquals(coTrainer.getId(), p.getId());
                 assertEquals(member.getId(), p.getMember().getId());
             });
@@ -161,7 +161,7 @@ class CalendarRestControllerTest {
 
             assertEquals(member.getId(), eventDto.getMember().getId());
             assertThat(eventDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
-            assertThat(eventDto.getParticipants()).singleElement().satisfies(p -> {
+            assertThat(eventDto.getParticipantsToRead()).singleElement().satisfies(p -> {
                 assertEquals(eventParticipant.getId(), p.getId());
                 assertEquals(member.getId(), p.getMember().getId());
             });
@@ -175,7 +175,7 @@ class CalendarRestControllerTest {
 
             assertEquals(member.getId(), examDto.getMember().getId());
             assertThat(examDto.getCalendarEntries()).singleElement().satisfies(this::assertCalendarEntry);
-            assertThat(examDto.getParticipants()).singleElement().satisfies(p -> {
+            assertThat(examDto.getParticipantsToRead()).singleElement().satisfies(p -> {
                 assertEquals(examParticipant.getId(), p.getId());
                 assertEquals(dogHasHandler.getId(), p.getDogHasHandler().getId());
             });

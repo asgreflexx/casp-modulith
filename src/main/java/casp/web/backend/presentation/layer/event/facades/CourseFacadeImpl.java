@@ -47,7 +47,7 @@ class CourseFacadeImpl implements CourseFacade {
                 .stream()
                 .map(CO_TRAINER_MAPPER::toDto)
                 .collect(Collectors.toSet());
-        courseDto.setCoTrainers(coTrainerDtoSet);
+        courseDto.setCoTrainersToRead(coTrainerDtoSet);
     }
 
     private void setSpaces(final CourseDto courseDto) {
@@ -55,6 +55,6 @@ class CourseFacadeImpl implements CourseFacade {
                 .stream()
                 .map(SPACE_MAPPER::toDto)
                 .collect(Collectors.toSet());
-        courseDto.setParticipants(spaceDtoSet);
+        courseDto.setParticipantsToRead(spaceDtoSet);
     }
 }

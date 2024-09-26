@@ -43,6 +43,6 @@ class ExamFacadeImpl implements ExamFacade {
                 .map(EXAM_PARTICIPANT_MAPPER::toDto)
                 .collect(Collectors.toSet());
 
-        examDto.setParticipants(examParticipantDtoSet);
+        examDto.setParticipantsToRead(examParticipantDtoSet);
     }
 }

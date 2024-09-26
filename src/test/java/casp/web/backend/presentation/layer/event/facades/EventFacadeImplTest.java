@@ -39,7 +39,7 @@ class EventFacadeImplTest {
 
             var eventDto = eventFacade.mapDocumentToDto(event);
 
-            assertThat(eventDto.getParticipants())
+            assertThat(eventDto.getParticipantsToRead())
                     .singleElement()
                     .satisfies(actual -> {
                         assertEquals(eventParticipant.getId(), actual.getId());

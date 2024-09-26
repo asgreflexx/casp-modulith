@@ -41,7 +41,7 @@ class CourseFacadeImplTest {
 
             var courseDto = courseFacade.mapDocumentToDto(course);
 
-            assertThat(courseDto.getCoTrainers())
+            assertThat(courseDto.getCoTrainersToRead())
                     .singleElement()
                     .satisfies(actual -> {
                         assertEquals(coTrainer.getId(), actual.getId());
@@ -60,7 +60,7 @@ class CourseFacadeImplTest {
 
             var courseDto = courseFacade.mapDocumentToDto(course);
 
-            assertThat(courseDto.getParticipants())
+            assertThat(courseDto.getParticipantsToRead())
                     .singleElement()
                     .satisfies(actual -> {
                         assertEquals(space.getId(), actual.getId());

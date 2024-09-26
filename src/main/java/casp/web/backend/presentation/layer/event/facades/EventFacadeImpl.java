@@ -43,6 +43,6 @@ class EventFacadeImpl implements EventFacade {
                 .map(EVENT_PARTICIPANT_MAPPER::toDto)
                 .collect(Collectors.toSet());
 
-        eventDto.setParticipants(coTrainerDtoSet);
+        eventDto.setParticipantsToRead(coTrainerDtoSet);
     }
 }

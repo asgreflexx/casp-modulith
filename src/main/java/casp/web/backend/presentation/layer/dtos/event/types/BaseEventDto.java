@@ -34,8 +34,7 @@ public abstract class BaseEventDto<P> {
     @Valid
     protected List<CalendarDto> calendarEntries = new ArrayList<>();
     @Valid
-    @NotNull
-    protected Set<P> participants = new HashSet<>();
+    protected Set<P> participantsToRead = new HashSet<>();
 
     BaseEventDto(final String eventType) {
         this.eventType = eventType;
@@ -121,11 +120,11 @@ public abstract class BaseEventDto<P> {
         this.calendarEntries = calendarEntries;
     }
 
-    public Set<P> getParticipants() {
-        return participants;
+    public Set<P> getParticipantsToRead() {
+        return participantsToRead;
     }
 
-    public void setParticipants(final Set<P> participants) {
-        this.participants = participants;
+    public void setParticipantsToRead(final Set<P> participantsToRead) {
+        this.participantsToRead = participantsToRead;
     }
 }

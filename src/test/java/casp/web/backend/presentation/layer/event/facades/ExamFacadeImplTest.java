@@ -37,7 +37,7 @@ class ExamFacadeImplTest {
 
             var courseDto = examFacade.mapDocumentToDto(exam);
 
-            assertThat(courseDto.getParticipants())
+            assertThat(courseDto.getParticipantsToRead())
                     .singleElement()
                     .satisfies(actual -> {
                         assertEquals(examParticipant.getId(), actual.getId());
