@@ -1,5 +1,7 @@
 package casp.web.backend.presentation.layer.dtos.event.participants;
 
+import casp.web.backend.data.access.layer.commons.Payment;
+import casp.web.backend.data.access.layer.commons.PaymentConstraint;
 import casp.web.backend.data.access.layer.event.participants.Space;
 import casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerDto;
 import jakarta.validation.constraints.Digits;
@@ -7,7 +9,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDate;
 
-public class SpaceDto extends BaseParticipantDto {
+@PaymentConstraint
+public class SpaceDto extends BaseParticipantDto implements Payment {
     private DogHasHandlerDto dogHasHandler;
 
     private String note;
@@ -40,6 +43,7 @@ public class SpaceDto extends BaseParticipantDto {
         this.note = note;
     }
 
+    @Override
     public double getPaidPrice() {
         return paidPrice;
     }
@@ -48,6 +52,7 @@ public class SpaceDto extends BaseParticipantDto {
         this.paidPrice = paidPrice;
     }
 
+    @Override
     public boolean isPaid() {
         return isPaid;
     }
@@ -56,6 +61,7 @@ public class SpaceDto extends BaseParticipantDto {
         isPaid = paid;
     }
 
+    @Override
     public LocalDate getPaidDate() {
         return paidDate;
     }
