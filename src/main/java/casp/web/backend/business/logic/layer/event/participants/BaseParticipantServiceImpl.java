@@ -17,10 +17,8 @@ abstract class BaseParticipantServiceImpl<P extends BaseParticipant, E extends B
         this.participantType = participantType;
     }
 
-    @Override
-    public void replaceParticipants(final E baseEvent, final Set<P> participants) {
+    protected void replaceParticipantsAndSetMetadata(final E baseEvent, final Set<P> participants) {
         baseParticipantRepository.deleteAllByBaseEventId(baseEvent.getId());
-        participants.forEach(participant -> participant.setBaseEvent(baseEvent));
         baseParticipantRepository.saveAll(participants);
         baseEvent.setParticipantsSize(participants.size());
     }

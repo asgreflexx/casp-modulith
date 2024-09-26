@@ -42,6 +42,12 @@ public class BaseParticipant extends BaseDocument {
         this.participantType = participantType;
     }
 
+    protected BaseParticipant(final String participantType, final UUID memberOrHandlerId, final BaseEvent baseEvent) {
+        this.participantType = participantType;
+        this.memberOrHandlerId = memberOrHandlerId;
+        this.baseEvent = baseEvent;
+    }
+
     public String getParticipantType() {
         return participantType;
     }

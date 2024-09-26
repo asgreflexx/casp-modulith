@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface BaseParticipantService<P extends BaseParticipant, E extends BaseEvent> {
 
-    void replaceParticipants(E baseEvent, Set<P> participants);
+    void replaceParticipants(E baseEvent, Set<UUID> participantsId);
 
     Set<P> getParticipantsByBaseEventId(UUID baseEventId);
 

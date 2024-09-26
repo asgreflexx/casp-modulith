@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.event.participants;
 
+import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.member.Member;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
@@ -18,6 +19,11 @@ public class EventParticipant extends BaseParticipant {
 
     public EventParticipant() {
         super(PARTICIPANT_TYPE);
+    }
+
+    public EventParticipant(final BaseEvent baseEvent, final Member member) {
+        super(PARTICIPANT_TYPE, member.getId(), baseEvent);
+        this.member = member;
     }
 
     public Member getMember() {

@@ -6,6 +6,7 @@ import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.participants.EventParticipant;
 import casp.web.backend.data.access.layer.event.types.Event;
+import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -116,31 +118,39 @@ class EventParticipantServiceImplTest {
         verify(participant).setEntityStatus(EntityStatus.DELETED);
     }
 
+    private Optional<Member> findMember(final UUID id) {
+        return memberRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE);
+    }
+
     @Nested
     class ReplaceParticipants {
         @Captor
         private ArgumentCaptor<Set<EventParticipant>> captor;
-        private Set<EventParticipant> participants;
+        private Set<UUID> participantsId;
 
         @BeforeEach
         void setUp() {
             var participant2 = TestFixture.createEventParticipant();
             participant.setBaseEvent(null);
             participant2.setBaseEvent(null);
-            participants = Set.of(participant, participant2);
+            participantsId = Set.of(participant, participant2).stream().map(BaseParticipant::getId).collect(Collectors.toSet());
             event.setParticipantsSize(0);
         }
 
         @Test
         void deleteParticipants() {
-            eventParticipantService.replaceParticipants(event, participants);
+            mockMembers();
+
+            eventParticipantService.replaceParticipants(event, participantsId);
 
             verify(baseParticipantRepository).deleteAllByBaseEventId(event.getId());
         }
 
         @Test
         void setBaseEventToAllParticipantsAndSaveThem() {
-            eventParticipantService.replaceParticipants(event, participants);
+            mockMembers();
+
+            eventParticipantService.replaceParticipants(event, participantsId);
 
             verify(baseParticipantRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(event, actual.getBaseEvent()));
@@ -148,9 +158,43 @@ class EventParticipantServiceImplTest {
 
         @Test
         void setParticipantsSize() {
-            eventParticipantService.replaceParticipants(event, participants);
+            mockMembers();
+
+            eventParticipantService.replaceParticipants(event, participantsId);
 
             assertEquals(2, event.getParticipantsSize());
+        }
+
+        @Test
+        void setMember() {
+            var participantId = participantsId.stream().findAny().orElseThrow();
+            mockMember(participantId);
+
+            eventParticipantService.replaceParticipants(event, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getMember().getId()));
+        }
+
+        @Test
+        void setMemberOrHandlerId() {
+            var participantId = participantsId.stream().findAny().orElseThrow();
+            mockMember(participantId);
+
+            eventParticipantService.replaceParticipants(event, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getMemberOrHandlerId()));
+        }
+
+        private void mockMembers() {
+            participantsId.forEach(this::mockMember);
+        }
+
+        private void mockMember(final UUID id) {
+            var member = TestFixture.createMember();
+            member.setId(id);
+            when(findMember(id)).thenReturn(Optional.of(member));
         }
     }
 
@@ -164,7 +208,7 @@ class EventParticipantServiceImplTest {
         @Test
         void coTrainerIsActive() {
             var member = TestFixture.createMember();
-            when(memberRepository.findByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+            when(findMember(participant.getMemberOrHandlerId())).thenReturn(Optional.of(member));
 
             assertThat(eventParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(event.getId()))
                     .singleElement()
@@ -173,7 +217,7 @@ class EventParticipantServiceImplTest {
 
         @Test
         void coTrainerIsInactiveActive() {
-            when(memberRepository.findByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(findMember(participant.getMemberOrHandlerId())).thenReturn(Optional.empty());
 
             assertThat(eventParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(event.getId()))
                     .isEmpty();
