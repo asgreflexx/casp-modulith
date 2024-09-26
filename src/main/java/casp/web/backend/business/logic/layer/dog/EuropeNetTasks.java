@@ -1,6 +1,5 @@
-package casp.web.backend.business.logic.layer.external.apis;
+package casp.web.backend.business.logic.layer.dog;
 
-import casp.web.backend.business.logic.layer.dog.DogService;
 import casp.web.backend.data.access.layer.enumerations.EuropeNetState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
