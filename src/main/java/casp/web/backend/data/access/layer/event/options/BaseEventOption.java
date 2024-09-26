@@ -1,6 +1,7 @@
 package casp.web.backend.data.access.layer.event.options;
 
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -13,6 +14,8 @@ import java.time.LocalDate;
  */
 @BaseEventOptionRecurrencesConstraint
 public abstract class BaseEventOption {
+    @NotBlank
+    protected String optionType;
 
     @NotNull
     protected LocalDate startRecurrence;
@@ -22,6 +25,10 @@ public abstract class BaseEventOption {
 
     @Positive
     protected int repeatEvery = 1;
+
+    BaseEventOption(final String optionType) {
+        this.optionType = optionType;
+    }
 
     public LocalDate getStartRecurrence() {
         return startRecurrence;
@@ -45,5 +52,13 @@ public abstract class BaseEventOption {
 
     public void setRepeatEvery(int repeatEvery) {
         this.repeatEvery = repeatEvery;
+    }
+
+    public String getOptionType() {
+        return optionType;
+    }
+
+    public void setOptionType(final String optionType) {
+        this.optionType = optionType;
     }
 }

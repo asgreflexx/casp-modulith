@@ -9,10 +9,15 @@ import java.util.List;
 import java.util.StringJoiner;
 
 public class WeeklyEventOption extends BaseEventOption {
+    private static final String OPTION_TYPE = "WEEKLY";
 
     @Valid
     @NotEmpty
     private List<WeeklyEventOptionRecurrence> occurrences = new ArrayList<>();
+
+    public WeeklyEventOption() {
+        super(OPTION_TYPE);
+    }
 
     public List<WeeklyEventOptionRecurrence> getOccurrences() {
         occurrences.sort(WeeklyEventOptionRecurrence::compareTo);

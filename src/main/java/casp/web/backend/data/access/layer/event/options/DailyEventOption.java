@@ -8,12 +8,17 @@ import java.util.StringJoiner;
 
 @EventOptionTimesConstraint
 public class DailyEventOption extends BaseEventOption implements EventOptionTimes {
+    private static final String OPTION_TYPE = "DAILY";
 
     @NotNull
     private LocalTime startTime;
 
     @NotNull
     private LocalTime endTime;
+
+    public DailyEventOption() {
+        super(OPTION_TYPE);
+    }
 
     @Override
     public LocalTime getStartTime() {
