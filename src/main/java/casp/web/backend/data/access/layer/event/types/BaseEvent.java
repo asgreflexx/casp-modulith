@@ -33,14 +33,9 @@ public class BaseEvent extends BaseDocument {
 
     protected String description;
 
-    /**
-     * @deprecated use {@link #member} instead
-     */
-    @Deprecated(forRemoval = true)
     @NotNull
     protected UUID memberId;
 
-    //TODO @NotNull
     @Valid
     @DBRef
     protected Member member;

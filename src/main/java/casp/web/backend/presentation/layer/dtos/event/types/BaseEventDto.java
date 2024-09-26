@@ -34,6 +34,7 @@ public abstract class BaseEventDto<P> {
     @Valid
     protected List<CalendarDto> calendarEntries = new ArrayList<>();
     @Valid
+    @NotNull
     protected Set<P> participants = new HashSet<>();
 
     BaseEventDto(final String eventType) {
