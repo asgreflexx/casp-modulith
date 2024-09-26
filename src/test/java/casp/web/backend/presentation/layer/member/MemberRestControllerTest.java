@@ -176,11 +176,7 @@ class MemberRestControllerTest {
     private void assertCardDtoSet(final MemberDto memberDto) {
         assertThat(memberDto.getCardDtoSet())
                 .singleElement()
-                .satisfies(cardDto -> {
-                    assertEquals(card.getId(), cardDto.getId());
-                    assertNull(cardDto.getMemberId());
-                    assertNull(cardDto.getMember());
-                });
+                .satisfies(cardDto -> assertEquals(card.getId(), cardDto.getId()));
     }
 
     private void assertDogHasHandlerDtoSet(final MemberDto memberDto) {

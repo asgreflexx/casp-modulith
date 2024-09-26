@@ -15,10 +15,6 @@ public class MemberDto extends Member {
     }
 
     public void setCardDtoSet(final Set<CardDto> cardDtoSet) {
-        cardDtoSet.forEach(c -> {
-            c.setMember(null);
-            c.setMemberId(null);
-        });
         this.cardDtoSet = cardDtoSet;
     }
 

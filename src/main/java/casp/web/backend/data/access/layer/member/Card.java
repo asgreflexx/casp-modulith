@@ -18,14 +18,9 @@ public class Card extends BaseDocument {
     @NotBlank
     private String code;
 
-    /**
-     * @deprecated Use {@link #member} instead.
-     */
-    @Deprecated(forRemoval = true)
     @NotNull
     private UUID memberId;
 
-    //TODO @NotNull
     @Valid
     @DBRef
     private Member member;
