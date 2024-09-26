@@ -11,17 +11,15 @@ import java.util.Set;
 import java.util.UUID;
 
 public class DogHasHandlerDto {
-    private UUID id;
+    private UUID id = UUID.randomUUID();
     private long version;
     private LocalDateTime created;
     private LocalDateTime modified;
     @NotNull
     private UUID memberId;
-    @Valid
     private SimpleMemberDto member;
     @NotNull
     private UUID dogId;
-    @Valid
     private SimpleDogDto dog;
     @NotNull
     @Valid

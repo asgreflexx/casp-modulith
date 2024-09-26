@@ -17,26 +17,14 @@ import java.util.UUID;
 @Document
 public class DogHasHandler extends BaseDocument {
 
-    /**
-     * @deprecated Use {@link #member} instead.
-     */
     @NotNull
-    @Deprecated(forRemoval = true)
     private UUID memberId;
-
-    //TODO @NotNull
     @Valid
     @DBRef
     private Member member;
 
-    /**
-     * @deprecated Use {@link #dog} instead.
-     */
     @NotNull
-    @Deprecated(forRemoval = true)
     private UUID dogId;
-
-    //TODO @NotNull
     @Valid
     @DBRef
     private Dog dog;
