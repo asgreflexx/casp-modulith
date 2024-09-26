@@ -1,6 +1,8 @@
 package casp.web.backend.presentation.layer.dtos.event.calendar;
 
 
+import casp.web.backend.data.access.layer.event.calendar.CalendarFromToConstraint;
+import casp.web.backend.data.access.layer.event.calendar.CalendarValidation;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -8,7 +10,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @CalendarFromToConstraint
-public class CalendarDto implements Comparable<CalendarDto> {
+public class CalendarDto implements Comparable<CalendarDto>, CalendarValidation {
     private UUID id = UUID.randomUUID();
     @NotNull
     private LocalDateTime eventFrom;
@@ -25,6 +27,7 @@ public class CalendarDto implements Comparable<CalendarDto> {
         this.id = id;
     }
 
+    @Override
     public LocalDateTime getEventFrom() {
         return eventFrom;
     }
@@ -33,6 +36,7 @@ public class CalendarDto implements Comparable<CalendarDto> {
         this.eventFrom = eventFrom;
     }
 
+    @Override
     public LocalDateTime getEventTo() {
         return eventTo;
     }
