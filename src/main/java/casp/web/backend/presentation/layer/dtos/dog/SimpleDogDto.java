@@ -1,12 +1,9 @@
 package casp.web.backend.presentation.layer.dtos.dog;
 
-import jakarta.validation.constraints.NotBlank;
-
 import java.util.UUID;
 
 public class SimpleDogDto {
     private UUID id;
-    @NotBlank
     private String name;
 
     public UUID getId() {
