@@ -5,6 +5,8 @@ import casp.web.backend.business.logic.layer.event.participants.SpaceService;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,7 @@ import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.
 
 @Service
 class CourseFacadeImpl implements CourseFacade {
+    private static final Logger LOG = LoggerFactory.getLogger(CourseFacadeImpl.class);
     private final CoTrainerService coTrainerService;
     private final SpaceService spaceService;
 
@@ -27,10 +30,16 @@ class CourseFacadeImpl implements CourseFacade {
 
     @Override
     public CourseDto mapDocumentToDto(final BaseEvent baseEvent) {
-        var courseDto = COURSE_MAPPER.toDto((Course) baseEvent);
-        setCoTrainers(courseDto);
-        setSpaces(courseDto);
-        return courseDto;
+        if (baseEvent instanceof Course course) {
+            var courseDto = COURSE_MAPPER.toDto(course);
+            setCoTrainers(courseDto);
+            setSpaces(courseDto);
+            return courseDto;
+        } else {
+            var msg = "The parameter %s is not a course".formatted(baseEvent.getEventType());
+            LOG.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     private void setCoTrainers(final CourseDto courseDto) {

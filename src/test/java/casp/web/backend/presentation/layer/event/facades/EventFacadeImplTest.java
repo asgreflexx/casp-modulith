@@ -13,6 +13,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 
@@ -66,6 +67,13 @@ class EventFacadeImplTest {
             var eventDto = eventFacade.mapDocumentToDto(event);
 
             assertEquals(weeklyEventOption.getOptionType(), eventDto.getOption().getOptionType());
+        }
+
+        @Test
+        void mapWrongBaseEventType() {
+            var course = TestFixture.createCourse();
+
+            assertThrows(IllegalArgumentException.class, () -> eventFacade.mapDocumentToDto(course));
         }
     }
 }

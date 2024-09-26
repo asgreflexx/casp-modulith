@@ -4,6 +4,8 @@ import casp.web.backend.business.logic.layer.event.participants.EventParticipant
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.presentation.layer.dtos.event.types.EventDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import static casp.web.backend.presentation.layer.dtos.event.types.EventMapper.E
 
 @Service
 class EventFacadeImpl implements EventFacade {
+    private static final Logger LOG = LoggerFactory.getLogger(EventFacadeImpl.class);
     private final EventParticipantService eventParticipantService;
 
     @Autowired
@@ -23,9 +26,15 @@ class EventFacadeImpl implements EventFacade {
 
     @Override
     public EventDto mapDocumentToDto(final BaseEvent baseEvent) {
-        var eventDto = EVENT_MAPPER.toDto((Event) baseEvent);
-        setEventParticipants(eventDto);
-        return eventDto;
+        if (baseEvent instanceof Event event) {
+            var eventDto = EVENT_MAPPER.toDto(event);
+            setEventParticipants(eventDto);
+            return eventDto;
+        } else {
+            var msg = "The parameter %s is not an event".formatted(baseEvent.getEventType());
+            LOG.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     private void setEventParticipants(final EventDto eventDto) {

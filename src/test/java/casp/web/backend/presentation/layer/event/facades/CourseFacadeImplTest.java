@@ -14,6 +14,7 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 
@@ -87,6 +88,13 @@ class CourseFacadeImplTest {
             var courseDto = courseFacade.mapDocumentToDto(course);
 
             assertEquals(weeklyEventOption.getOptionType(), courseDto.getOption().getOptionType());
+        }
+
+        @Test
+        void mapWrongBaseEventType() {
+            var event = TestFixture.createEvent();
+
+            assertThrows(IllegalArgumentException.class, () -> courseFacade.mapDocumentToDto(event));
         }
     }
 }

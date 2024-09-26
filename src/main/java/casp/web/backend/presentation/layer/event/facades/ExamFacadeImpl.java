@@ -4,6 +4,8 @@ import casp.web.backend.business.logic.layer.event.participants.ExamParticipantS
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.presentation.layer.dtos.event.types.ExamDto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +16,7 @@ import static casp.web.backend.presentation.layer.dtos.event.types.ExamMapper.EX
 
 @Service
 class ExamFacadeImpl implements ExamFacade {
+    private static final Logger LOG = LoggerFactory.getLogger(ExamFacadeImpl.class);
     private final ExamParticipantService examParticipantService;
 
     @Autowired
@@ -23,9 +26,15 @@ class ExamFacadeImpl implements ExamFacade {
 
     @Override
     public ExamDto mapDocumentToDto(final BaseEvent baseEvent) {
-        var examDto = EXAM_MAPPER.toDto((Exam) baseEvent);
-        setExamParticipants(examDto);
-        return examDto;
+        if (baseEvent instanceof Exam exam) {
+            var examDto = EXAM_MAPPER.toDto(exam);
+            setExamParticipants(examDto);
+            return examDto;
+        } else {
+            var msg = "The parameter %s is not an exam".formatted(baseEvent.getEventType());
+            LOG.error(msg);
+            throw new IllegalArgumentException(msg);
+        }
     }
 
     private void setExamParticipants(final ExamDto examDto) {
