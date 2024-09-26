@@ -17,7 +17,7 @@ class DogHasHandlerTest extends BaseDocumentTest {
 
     @BeforeEach
     void setUp() {
-        dogHasHandler = TestFixture.createValidDogHasHandler();
+        dogHasHandler = TestFixture.createDogHasHandler();
     }
 
     @Test

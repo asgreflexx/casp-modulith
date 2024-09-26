@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CoTrainerTest extends BaseDocumentTest {
     @Test
     void happyPath() {
-        var coTrainer = TestFixture.createValidCoTrainer();
+        var coTrainer = TestFixture.createCoTrainer();
 
         assertThat(TestFixture.getViolations(coTrainer)).isEmpty();
         baseParticipantAssertions(coTrainer);

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 class WeeklyEventOptionRecurrenceTest extends BaseDocumentTest {
     @Test
     void happyPath() {
-        var weeklyEventOptionRecurrence = TestFixture.createValidWeeklyEventOptionRecurrence();
+        var weeklyEventOptionRecurrence = TestFixture.createWeeklyEventOptionRecurrence();
 
         assertThat(TestFixture.getViolations(weeklyEventOptionRecurrence)).isEmpty();
         assertNotNull(weeklyEventOptionRecurrence.getId());
@@ -23,12 +23,12 @@ class WeeklyEventOptionRecurrenceTest extends BaseDocumentTest {
 
     @Test
     void sort() {
-        var first = TestFixture.createValidWeeklyEventOptionRecurrence();
+        var first = TestFixture.createWeeklyEventOptionRecurrence();
         first.setEndTime(LocalTime.MIN.plusHours(1));
-        var second = TestFixture.createValidWeeklyEventOptionRecurrence();
+        var second = TestFixture.createWeeklyEventOptionRecurrence();
         second.setStartTime(LocalTime.MIN.plusHours(2));
         second.setEndTime(LocalTime.MIN.plusHours(3));
-        var third = TestFixture.createValidWeeklyEventOptionRecurrence();
+        var third = TestFixture.createWeeklyEventOptionRecurrence();
         third.setStartTime(LocalTime.MIN.plusHours(4));
         third.setEndTime(LocalTime.MIN.plusHours(5));
         var actualSort = new ArrayList<>(List.of(third, first, second));

@@ -46,7 +46,7 @@ class EventParticipantServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        participant = spy(TestFixture.createValidEventParticipant());
+        participant = spy(TestFixture.createEventParticipant());
         participantType = participant.getParticipantType();
         event = (Event) participant.getBaseEvent();
         expectedParticipants = Set.of(participant);
@@ -124,7 +124,7 @@ class EventParticipantServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            var participant2 = TestFixture.createValidEventParticipant();
+            var participant2 = TestFixture.createEventParticipant();
             participant.setBaseEvent(null);
             participant2.setBaseEvent(null);
             participants = Set.of(participant, participant2);
@@ -163,7 +163,7 @@ class EventParticipantServiceImplTest {
 
         @Test
         void coTrainerIsActive() {
-            var member = TestFixture.createValidMember();
+            var member = TestFixture.createMember();
             when(memberRepository.findByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
             assertThat(eventParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(event.getId()))

@@ -45,7 +45,7 @@ public final class TestFixture {
         return VALIDATOR.validate(object);
     }
 
-    public static WeeklyEventOptionRecurrence createValidWeeklyEventOptionRecurrence() {
+    public static WeeklyEventOptionRecurrence createWeeklyEventOptionRecurrence() {
         var weeklyEventOptionRecurrence = new WeeklyEventOptionRecurrence();
         weeklyEventOptionRecurrence.setDayOfWeek(DayOfWeek.MONDAY);
         weeklyEventOptionRecurrence.setStartTime(LocalTime.MIN);
@@ -53,8 +53,8 @@ public final class TestFixture {
         return weeklyEventOptionRecurrence;
     }
 
-    public static Event createValidEvent() {
-        var member = createValidMember();
+    public static Event createEvent() {
+        var member = createMember();
         var event = new Event();
         event.setName("Test Event");
         event.setMemberId(member.getId());
@@ -62,11 +62,11 @@ public final class TestFixture {
         return event;
     }
 
-    public static Member createValidMember() {
-        return createValidMember("John", "Doe");
+    public static Member createMember() {
+        return createMember("John", "Doe");
     }
 
-    public static Member createValidMember(final String firstName, final String lastName) {
+    public static Member createMember(final String firstName, final String lastName) {
         var member = new Member();
         member.setFirstName(firstName);
         member.setLastName(lastName);
@@ -74,7 +74,7 @@ public final class TestFixture {
         return member;
     }
 
-    public static Calendar createValidCalendarEntry(final BaseEvent baseEvent) {
+    public static Calendar createCalendarEntry(final BaseEvent baseEvent) {
         var calendar = new Calendar();
         calendar.setEventFrom(LocalDateTime.now());
         calendar.setEventTo(LocalDateTime.now().plusHours(1));
@@ -82,12 +82,12 @@ public final class TestFixture {
         return calendar;
     }
 
-    public static Calendar createValidCalendarEntry() {
-        return createValidCalendarEntry(createValidEvent());
+    public static Calendar createCalendarEntry() {
+        return createCalendarEntry(createEvent());
     }
 
-    public static Exam createValidExam() {
-        var member = createValidMember();
+    public static Exam createExam() {
+        var member = createMember();
         var exam = new Exam();
         exam.setName("Exam 1");
         exam.setMemberId(member.getId());
@@ -96,8 +96,8 @@ public final class TestFixture {
         return exam;
     }
 
-    public static Course createValidCourse() {
-        var member = createValidMember();
+    public static Course createCourse() {
+        var member = createMember();
         var course = new Course();
         course.setName("Course Name");
         course.setMemberId(member.getId());
@@ -105,24 +105,24 @@ public final class TestFixture {
         return course;
     }
 
-    public static Space createValidSpace() {
-        return createValidSpace(createValidCourse());
+    public static Space createSpace() {
+        return createSpace(createCourse());
     }
 
-    public static Space createValidSpace(final Course course) {
+    public static Space createSpace(final Course course) {
         var space = new Space();
-        space.setMemberOrHandlerId(createValidDogHasHandler().getId());
+        space.setMemberOrHandlerId(createDogHasHandler().getId());
         space.setBaseEvent(course);
         return space;
     }
 
-    public static DogHasHandler createValidDogHasHandler() {
-        var member = createValidMember();
-        var dog = createValidDog();
-        return createValidDogHasHandler(dog, member);
+    public static DogHasHandler createDogHasHandler() {
+        var member = createMember();
+        var dog = createDog();
+        return createDogHasHandler(dog, member);
     }
 
-    public static DogHasHandler createValidDogHasHandler(final Dog dog, final Member member) {
+    public static DogHasHandler createDogHasHandler(final Dog dog, final Member member) {
         var dogHasHandler = new DogHasHandler();
         dogHasHandler.setDogId(dog.getId());
         dogHasHandler.setDog(dog);
@@ -131,7 +131,7 @@ public final class TestFixture {
         return dogHasHandler;
     }
 
-    public static Dog createValidDog() {
+    public static Dog createDog() {
         var dog = new Dog();
         dog.setName("Riley");
         dog.setOwnerName("John Doe");
@@ -139,40 +139,40 @@ public final class TestFixture {
         return dog;
     }
 
-    public static EventParticipant createValidEventParticipant() {
-        return createValidEventParticipant(createValidEvent());
+    public static EventParticipant createEventParticipant() {
+        return createEventParticipant(createEvent());
     }
 
-    public static EventParticipant createValidEventParticipant(final Event event) {
+    public static EventParticipant createEventParticipant(final Event event) {
         var eventParticipant = new EventParticipant();
-        eventParticipant.setMemberOrHandlerId(createValidMember().getId());
+        eventParticipant.setMemberOrHandlerId(createMember().getId());
         eventParticipant.setBaseEvent(event);
         return eventParticipant;
     }
 
-    public static ExamParticipant createValidExamParticipant() {
-        return createValidExamParticipant(createValidExam());
+    public static ExamParticipant createExamParticipant() {
+        return createExamParticipant(createExam());
     }
 
-    public static ExamParticipant createValidExamParticipant(final Exam exam) {
+    public static ExamParticipant createExamParticipant(final Exam exam) {
         var examParticipant = new ExamParticipant();
-        examParticipant.setMemberOrHandlerId(createValidDogHasHandler().getId());
+        examParticipant.setMemberOrHandlerId(createDogHasHandler().getId());
         examParticipant.setBaseEvent(exam);
         return examParticipant;
     }
 
-    public static CoTrainer createValidCoTrainer() {
-        return createValidCoTrainer(createValidCourse());
+    public static CoTrainer createCoTrainer() {
+        return createCoTrainer(createCourse());
     }
 
-    public static CoTrainer createValidCoTrainer(final Course course) {
+    public static CoTrainer createCoTrainer(final Course course) {
         var coTrainer = new CoTrainer();
         coTrainer.setBaseEvent(course);
-        coTrainer.setMemberOrHandlerId(createValidMember().getId());
+        coTrainer.setMemberOrHandlerId(createMember().getId());
         return coTrainer;
     }
 
-    public static DailyEventOption createValidDailyEventOption() {
+    public static DailyEventOption createDailyEventOption() {
         var dailyEventOption = new DailyEventOption();
         dailyEventOption.setStartRecurrence(LocalDate.MIN);
         dailyEventOption.setEndRecurrence(LocalDate.MAX);
@@ -181,20 +181,20 @@ public final class TestFixture {
         return dailyEventOption;
     }
 
-    public static WeeklyEventOption createValidWeeklyEventOption() {
+    public static WeeklyEventOption createWeeklyEventOption() {
         var weeklyEventOption = new WeeklyEventOption();
         weeklyEventOption.setStartRecurrence(LocalDate.MIN);
         weeklyEventOption.setEndRecurrence(LocalDate.MAX);
-        weeklyEventOption.setOccurrences(List.of(createValidWeeklyEventOptionRecurrence()));
+        weeklyEventOption.setOccurrences(List.of(createWeeklyEventOptionRecurrence()));
         return weeklyEventOption;
     }
 
-    public static Card createValidCard() {
-        var member = createValidMember();
-        return createValidCard(member);
+    public static Card createCard() {
+        var member = createMember();
+        return createCard(member);
     }
 
-    public static Card createValidCard(final Member member) {
+    public static Card createCard(final Member member) {
         var card = new Card();
         card.setCode("code");
         card.setMemberId(member.getId());
@@ -202,7 +202,7 @@ public final class TestFixture {
         return card;
     }
 
-    public static MembershipFee createValidMembershipFee() {
+    public static MembershipFee createMembershipFee() {
         var membershipFee = new MembershipFee();
         membershipFee.setPaid(true);
         membershipFee.setPaidDate(LocalDate.now());

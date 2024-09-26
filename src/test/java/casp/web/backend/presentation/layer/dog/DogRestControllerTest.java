@@ -84,22 +84,22 @@ class DogRestControllerTest {
     }
 
     private DogDto createDog(final String name, final EntityStatus entityStatus) {
-        var dog = TestFixture.createValidDog();
+        var dog = TestFixture.createDog();
         dog.setEntityStatus(entityStatus);
         dog.setName(name);
         dog.setChipNumber(UUID.randomUUID().toString());
 
-        var member = TestFixture.createValidMember();
+        var member = TestFixture.createMember();
         member.setEntityStatus(entityStatus);
         memberRepository.save(member);
 
-        var dogHasHandler = TestFixture.createValidDogHasHandler(dog, member);
+        var dogHasHandler = TestFixture.createDogHasHandler(dog, member);
         dogHasHandler.setEntityStatus(entityStatus);
         dogHasHandlerRepository.save(dogHasHandler);
-        var space = TestFixture.createValidSpace();
+        var space = TestFixture.createSpace();
         space.setMemberOrHandlerId(dogHasHandler.getId());
         space.setEntityStatus(entityStatus);
-        var examParticipant = TestFixture.createValidExamParticipant();
+        var examParticipant = TestFixture.createExamParticipant();
         examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
         examParticipant.setEntityStatus(entityStatus);
         baseParticipantRepository.saveAll(Set.of(examParticipant, space));

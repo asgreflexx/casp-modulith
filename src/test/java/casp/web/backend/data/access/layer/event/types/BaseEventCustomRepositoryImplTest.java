@@ -22,8 +22,8 @@ class BaseEventCustomRepositoryImplTest {
     void findAllByYear() {
         baseEventRepository.deleteAll();
         memberRepository.deleteAll();
-        var member = memberRepository.save(TestFixture.createValidMember());
-        var event = TestFixture.createValidEvent();
+        var member = memberRepository.save(TestFixture.createMember());
+        var event = TestFixture.createEvent();
         event.setMember(member);
         event.setMemberId(member.getId());
         event.setMinLocalDateTime(LocalDateTime.now().minusDays(2));

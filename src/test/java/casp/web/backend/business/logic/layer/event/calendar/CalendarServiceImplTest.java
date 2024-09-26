@@ -43,7 +43,7 @@ class CalendarServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        calendarEntry = TestFixture.createValidCalendarEntry();
+        calendarEntry = TestFixture.createCalendarEntry();
         baseEvent = calendarEntry.getBaseEvent();
     }
 
@@ -64,7 +64,7 @@ class CalendarServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            var dailyEventOption = TestFixture.createValidDailyEventOption();
+            var dailyEventOption = TestFixture.createDailyEventOption();
             dailyEventOption.setStartRecurrence(calendarEntry.getEventFrom().toLocalDate());
             dailyEventOption.setEndRecurrence(calendarEntry.getEventFrom().toLocalDate().plusDays(2));
             baseEvent.setDailyOption(dailyEventOption);

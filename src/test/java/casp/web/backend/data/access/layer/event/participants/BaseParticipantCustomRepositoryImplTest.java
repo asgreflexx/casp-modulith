@@ -22,7 +22,7 @@ class BaseParticipantCustomRepositoryImplTest {
     @BeforeEach
     void setUp() {
         baseParticipantRepository.deleteAll();
-        space = baseParticipantRepository.save(TestFixture.createValidSpace());
+        space = baseParticipantRepository.save(TestFixture.createSpace());
     }
 
     @Test

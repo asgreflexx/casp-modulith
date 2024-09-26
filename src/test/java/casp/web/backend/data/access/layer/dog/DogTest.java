@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 class DogTest extends BaseDocumentTest {
     @Test
     void happyPath() {
-        var dog = TestFixture.createValidDog();
+        var dog = TestFixture.createDog();
 
         assertThat(TestFixture.getViolations(dog)).isEmpty();
         baseAssertions(dog);

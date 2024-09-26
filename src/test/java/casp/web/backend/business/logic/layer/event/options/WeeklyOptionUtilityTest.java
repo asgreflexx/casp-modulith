@@ -21,12 +21,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class WeeklyOptionUtilityTest {
     private static final String LOCATION = "Wien";
     private static final LocalDate START_RECURRENCE = LocalDate.of(2024, 1, 1);
-    private static final Event EVENT = TestFixture.createValidEvent();
+    private static final Event EVENT = TestFixture.createEvent();
     private Calendar expectedCalendarEntry;
 
     @BeforeEach
     void setUp() {
-        expectedCalendarEntry = TestFixture.createValidCalendarEntry(EVENT);
+        expectedCalendarEntry = TestFixture.createCalendarEntry(EVENT);
         expectedCalendarEntry.setEventFrom(LocalDateTime.of(START_RECURRENCE, LocalTime.of(10, 0, 0)));
         expectedCalendarEntry.setEventTo(LocalDateTime.of(START_RECURRENCE, LocalTime.of(11, 0, 0)));
     }
@@ -70,7 +70,7 @@ class WeeklyOptionUtilityTest {
     }
 
     private void createWeeklyEventOption(final int repeatEvery, final LocalDate endRecurrence, final List<WeeklyEventOptionRecurrence> occurrences) {
-        var weeklyEventOption = TestFixture.createValidWeeklyEventOption();
+        var weeklyEventOption = TestFixture.createWeeklyEventOption();
         weeklyEventOption.setStartRecurrence(START_RECURRENCE);
         weeklyEventOption.setEndRecurrence(endRecurrence);
         weeklyEventOption.setRepeatEvery(repeatEvery);

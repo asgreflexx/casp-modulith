@@ -78,27 +78,27 @@ class MemberRestControllerTest {
         memberRepository.deleteAll();
         dogRepository.deleteAll();
 
-        var johnDocument = memberRepository.save(TestFixture.createValidMember());
+        var johnDocument = memberRepository.save(TestFixture.createMember());
         john = MEMBER_MAPPER.toDto(johnDocument);
-        zephyr = MEMBER_MAPPER.toDto(memberRepository.save(TestFixture.createValidMember("Zephyr", "Starling")));
-        inactive = TestFixture.createValidMember("INACTIVE", "INACTIVE");
+        zephyr = MEMBER_MAPPER.toDto(memberRepository.save(TestFixture.createMember("Zephyr", "Starling")));
+        inactive = TestFixture.createMember("INACTIVE", "INACTIVE");
         inactive.setEntityStatus(EntityStatus.INACTIVE);
         memberRepository.save(inactive);
-        var bonsaiDocument = TestFixture.createValidDog();
+        var bonsaiDocument = TestFixture.createDog();
         dogRepository.save(bonsaiDocument);
-        var hasHandler = TestFixture.createValidDogHasHandler(bonsaiDocument, johnDocument);
+        var hasHandler = TestFixture.createDogHasHandler(bonsaiDocument, johnDocument);
         dogHasHandler = DOG_HAS_HANDLER_MAPPER.toDto(dogHasHandlerRepository.save(hasHandler));
-        var eventParticipant = TestFixture.createValidEventParticipant();
+        var eventParticipant = TestFixture.createEventParticipant();
         eventParticipant.setMemberOrHandlerId(johnDocument.getId());
         var event = eventParticipant.getBaseEvent();
         event.setMember(johnDocument);
         event.setMemberId(johnDocument.getId());
-        var coTrainer = TestFixture.createValidCoTrainer();
+        var coTrainer = TestFixture.createCoTrainer();
         coTrainer.setMemberOrHandlerId(johnDocument.getId());
         var course = coTrainer.getBaseEvent();
         course.setMember(johnDocument);
         course.setMemberId(johnDocument.getId());
-        card = TestFixture.createValidCard(johnDocument);
+        card = TestFixture.createCard(johnDocument);
         cardRepository.save(card);
         baseEventRepository.saveAll(Set.of(event, course));
         baseParticipantRepository.saveAll(Set.of(eventParticipant, coTrainer));
@@ -296,7 +296,7 @@ class MemberRestControllerTest {
 
         @Test
         void newMemberWithExistingEMail() throws Exception {
-            var member = TestFixture.createValidMember();
+            var member = TestFixture.createMember();
             member.setEmail(john.getEmail());
 
             performPost(MEMBER_MAPPER.toDto(member))
@@ -305,7 +305,7 @@ class MemberRestControllerTest {
 
         @Test
         void newMemberIsInvalid() throws Exception {
-            var member = TestFixture.createValidMember();
+            var member = TestFixture.createMember();
             member.setEmail(null);
 
             performPost(MEMBER_MAPPER.toDto(member))

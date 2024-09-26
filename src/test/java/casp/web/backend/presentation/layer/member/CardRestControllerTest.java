@@ -45,7 +45,7 @@ class CardRestControllerTest {
         memberRepository.deleteAll();
         cardRepository.deleteAll();
 
-        var cardDocument = TestFixture.createValidCard();
+        var cardDocument = TestFixture.createCard();
         memberRepository.save(cardDocument.getMember());
         card = CARD_MAPPER.toDto(cardRepository.save(cardDocument));
     }
@@ -89,7 +89,7 @@ class CardRestControllerTest {
 
         @Test
         void newCardIsInvalid() throws Exception {
-            var unknownMember = CARD_MAPPER.toDto(TestFixture.createValidCard());
+            var unknownMember = CARD_MAPPER.toDto(TestFixture.createCard());
 
             postCard(unknownMember).andExpect(status().isBadRequest());
         }

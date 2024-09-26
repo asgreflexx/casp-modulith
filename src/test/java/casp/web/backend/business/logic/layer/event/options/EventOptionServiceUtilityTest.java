@@ -24,7 +24,7 @@ class EventOptionServiceUtilityTest {
 
     @BeforeEach
     void setUp() {
-        expectedCalendarEntry = TestFixture.createValidCalendarEntry();
+        expectedCalendarEntry = TestFixture.createCalendarEntry();
         expectedCalendarEntry.setLocation("Wien");
         expectedCalendarEntry.setEventFrom(RECURRENCE.atTime(START_TIME));
         expectedCalendarEntry.setEventTo(RECURRENCE.atTime(END_TIME));
@@ -44,7 +44,7 @@ class EventOptionServiceUtilityTest {
 
     @Test
     void withDailyOption() {
-        var dailyEventOption = TestFixture.createValidDailyEventOption();
+        var dailyEventOption = TestFixture.createDailyEventOption();
         dailyEventOption.setStartRecurrence(RECURRENCE);
         dailyEventOption.setEndRecurrence(RECURRENCE);
         dailyEventOption.setStartTime(START_TIME);
@@ -70,7 +70,7 @@ class EventOptionServiceUtilityTest {
         weeklyEventOptionRecurrence.setEndTime(END_TIME);
         occurrences.add(weeklyEventOptionRecurrence);
 
-        var weeklyEventOption = TestFixture.createValidWeeklyEventOption();
+        var weeklyEventOption = TestFixture.createWeeklyEventOption();
         weeklyEventOption.setStartRecurrence(RECURRENCE);
         weeklyEventOption.setEndRecurrence(RECURRENCE);
         weeklyEventOption.setOccurrences(occurrences);

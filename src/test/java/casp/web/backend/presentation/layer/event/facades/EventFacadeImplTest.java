@@ -25,7 +25,7 @@ class EventFacadeImplTest {
 
     @Test
     void mapBaseEventToDto() {
-        var eventParticipant = TestFixture.createValidEventParticipant();
+        var eventParticipant = TestFixture.createEventParticipant();
         var event = eventParticipant.getBaseEvent();
         var member = event.getMember();
         eventParticipant.setMemberOrHandlerId(member.getId());

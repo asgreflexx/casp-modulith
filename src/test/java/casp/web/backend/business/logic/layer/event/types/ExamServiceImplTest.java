@@ -48,7 +48,7 @@ class ExamServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        exam = TestFixture.createValidExam();
+        exam = TestFixture.createExam();
     }
 
     @Test

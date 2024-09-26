@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SpaceTest extends BaseDocumentTest {
     @Test
     void happyPath() {
-        var space = TestFixture.createValidSpace();
+        var space = TestFixture.createSpace();
 
         assertThat(TestFixture.getViolations(space)).isEmpty();
         baseParticipantAssertions(space);

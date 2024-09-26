@@ -138,7 +138,7 @@ class MemberServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            event = spy(TestFixture.createValidEvent());
+            event = spy(TestFixture.createEvent());
         }
 
         @Test

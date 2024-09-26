@@ -31,18 +31,18 @@ class CalendarCustomRepositoryImplTest {
         memberRepository.deleteAll();
         eventRepository.deleteAll();
         calendarRepository.deleteAll();
-        var event = TestFixture.createValidEvent();
-        var course = TestFixture.createValidCourse();
+        var event = TestFixture.createEvent();
+        var course = TestFixture.createCourse();
 
-        yesterday = TestFixture.createValidCalendarEntry(event);
+        yesterday = TestFixture.createCalendarEntry(event);
         yesterday.setEventFrom(yesterday.getEventFrom().minusDays(1));
         yesterday.setEventTo(yesterday.getEventTo().minusDays(1));
 
-        today = TestFixture.createValidCalendarEntry(event);
+        today = TestFixture.createCalendarEntry(event);
         event.setMinLocalDateTime(yesterday.getEventFrom());
         event.setMaxLocalDateTime(today.getEventTo());
 
-        tomorrow = TestFixture.createValidCalendarEntry(course);
+        tomorrow = TestFixture.createCalendarEntry(course);
         tomorrow.setEventFrom(tomorrow.getEventFrom().plusDays(1));
         tomorrow.setEventTo(tomorrow.getEventTo().plusDays(1));
         course.setMinLocalDateTime(tomorrow.getEventFrom());

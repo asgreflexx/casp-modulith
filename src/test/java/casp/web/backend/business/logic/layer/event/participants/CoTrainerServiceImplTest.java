@@ -45,7 +45,7 @@ class CoTrainerServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        coTrainer = spy(TestFixture.createValidCoTrainer());
+        coTrainer = spy(TestFixture.createCoTrainer());
         participantType = coTrainer.getParticipantType();
         course = (Course) coTrainer.getBaseEvent();
         expectedCoTrainers = Set.of(coTrainer);
@@ -123,7 +123,7 @@ class CoTrainerServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            var coTrainer2 = TestFixture.createValidCoTrainer();
+            var coTrainer2 = TestFixture.createCoTrainer();
             coTrainer.setBaseEvent(null);
             coTrainer2.setBaseEvent(null);
             coTrainers = Set.of(coTrainer, coTrainer2);
@@ -162,7 +162,7 @@ class CoTrainerServiceImplTest {
 
         @Test
         void coTrainerIsActive() {
-            var member = TestFixture.createValidMember();
+            var member = TestFixture.createMember();
             when(memberRepository.findByIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
             assertThat(coTrainerService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId()))

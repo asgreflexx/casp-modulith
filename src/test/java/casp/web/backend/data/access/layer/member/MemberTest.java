@@ -15,7 +15,7 @@ class MemberTest extends BaseDocumentTest {
 
     @BeforeEach
     void setUp() {
-        member = TestFixture.createValidMember();
+        member = TestFixture.createMember();
     }
 
     @Test

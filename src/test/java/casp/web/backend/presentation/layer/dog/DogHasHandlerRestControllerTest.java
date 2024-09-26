@@ -66,10 +66,10 @@ class DogHasHandlerRestControllerTest {
         memberRepository.deleteAll();
         dogRepository.deleteAll();
 
-        var dogHasHandlerDocument = TestFixture.createValidDogHasHandler();
+        var dogHasHandlerDocument = TestFixture.createDogHasHandler();
         var memberDocument = dogHasHandlerDocument.getMember();
         var dogDocument = dogHasHandlerDocument.getDog();
-        var space = TestFixture.createValidSpace();
+        var space = TestFixture.createSpace();
         space.setMemberOrHandlerId(dogHasHandlerDocument.getId());
 
         member = MEMBER_MAPPER.toDto(memberRepository.save(memberDocument));

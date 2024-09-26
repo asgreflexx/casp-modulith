@@ -47,7 +47,7 @@ class EventServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        event = TestFixture.createValidEvent();
+        event = TestFixture.createEvent();
     }
 
     @Test

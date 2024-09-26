@@ -45,7 +45,7 @@ class SpaceServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        space = spy(TestFixture.createValidSpace());
+        space = spy(TestFixture.createSpace());
         participantType = space.getParticipantType();
         course = (Course) space.getBaseEvent();
         expectedSpaces = Set.of(space);
@@ -137,7 +137,7 @@ class SpaceServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            var space2 = TestFixture.createValidSpace();
+            var space2 = TestFixture.createSpace();
             space.setBaseEvent(null);
             space2.setBaseEvent(null);
             spaces = Set.of(space, space2);
@@ -176,7 +176,7 @@ class SpaceServiceImplTest {
 
         @Test
         void spaceIsActive() {
-            var dogHasHandler = TestFixture.createValidDogHasHandler();
+            var dogHasHandler = TestFixture.createDogHasHandler();
             when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
 
             assertThat(spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId()))

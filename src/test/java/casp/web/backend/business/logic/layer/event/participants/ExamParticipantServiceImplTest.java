@@ -45,7 +45,7 @@ class ExamParticipantServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        participant = spy(TestFixture.createValidExamParticipant());
+        participant = spy(TestFixture.createExamParticipant());
         participantType = participant.getParticipantType();
         exam = (Exam) participant.getBaseEvent();
         expectedParticipants = Set.of(participant);
@@ -123,7 +123,7 @@ class ExamParticipantServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            var participant2 = TestFixture.createValidExamParticipant();
+            var participant2 = TestFixture.createExamParticipant();
             participant.setBaseEvent(null);
             participant2.setBaseEvent(null);
             examParticipants = Set.of(participant, participant2);
@@ -162,7 +162,7 @@ class ExamParticipantServiceImplTest {
 
         @Test
         void spaceIsActive() {
-            var dogHasHandler = TestFixture.createValidDogHasHandler();
+            var dogHasHandler = TestFixture.createDogHasHandler();
             when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
 
             assertThat(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId()))

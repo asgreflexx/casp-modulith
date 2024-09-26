@@ -79,23 +79,23 @@ class CalendarRestControllerTest {
         dogHasHandlerRepository.deleteAll();
         memberRepository.deleteAll();
 
-        member = TestFixture.createValidMember();
+        member = TestFixture.createMember();
         member = memberRepository.save(member);
-        dogHasHandler = TestFixture.createValidDogHasHandler();
+        dogHasHandler = TestFixture.createDogHasHandler();
         dogHasHandler.setMember(member);
         dogHasHandler.setMemberId(member.getId());
         dogHasHandler = dogHasHandlerRepository.save(dogHasHandler);
-        coTrainer = TestFixture.createValidCoTrainer();
+        coTrainer = TestFixture.createCoTrainer();
         coTrainer.setMemberOrHandlerId(member.getId());
         var course = (Course) coTrainer.getBaseEvent();
         course.setMemberId(member.getId());
-        space = TestFixture.createValidSpace(course);
+        space = TestFixture.createSpace(course);
         space.setMemberOrHandlerId(dogHasHandler.getId());
-        eventParticipant = TestFixture.createValidEventParticipant();
+        eventParticipant = TestFixture.createEventParticipant();
         eventParticipant.setMemberOrHandlerId(member.getId());
         var event = (Event) eventParticipant.getBaseEvent();
         event.setMemberId(member.getId());
-        examParticipant = TestFixture.createValidExamParticipant();
+        examParticipant = TestFixture.createExamParticipant();
         examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
         var exam = (Exam) examParticipant.getBaseEvent();
         exam.setMemberId(member.getId());
@@ -105,7 +105,7 @@ class CalendarRestControllerTest {
         baseEventRepository.saveAll(baseEvents);
         IntStream.range(0, baseEvents.size()).forEach(index -> {
             var localDate = LocalDate.now().plusDays(index);
-            var calendarEntry = TestFixture.createValidCalendarEntry(baseEvents.get(index));
+            var calendarEntry = TestFixture.createCalendarEntry(baseEvents.get(index));
             calendarEntry.setEventFrom(LocalDateTime.of(localDate, LocalTime.MIN));
             calendarEntry.setEventTo(LocalDateTime.of(localDate, LocalTime.MAX));
             calendarList.add(calendarRepository.save(calendarEntry));

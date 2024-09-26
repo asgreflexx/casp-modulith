@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CourseTest extends BaseDocumentTest {
     @Test
     void happyPath() {
-        var course = TestFixture.createValidCourse();
+        var course = TestFixture.createCourse();
 
         assertThat(TestFixture.getViolations(course)).isEmpty();
         baseAssertions(course);

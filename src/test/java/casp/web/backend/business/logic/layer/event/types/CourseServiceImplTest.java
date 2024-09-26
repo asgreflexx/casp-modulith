@@ -51,7 +51,7 @@ class CourseServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        course = TestFixture.createValidCourse();
+        course = TestFixture.createCourse();
     }
 
     @Test

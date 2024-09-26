@@ -14,7 +14,6 @@ import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
 
 
@@ -32,7 +31,7 @@ class CourseFacadeImplTest {
     class MapBaseEventToDto {
         @Test
         void mapCoTrainer() {
-            var coTrainer = TestFixture.createValidCoTrainer();
+            var coTrainer = TestFixture.createCoTrainer();
             var course = coTrainer.getBaseEvent();
             var member = course.getMember();
             coTrainer.setMemberOrHandlerId(member.getId());
@@ -51,8 +50,8 @@ class CourseFacadeImplTest {
 
         @Test
         void mapSpace() {
-            var dogHasHandler = TestFixture.createValidDogHasHandler();
-            var space = TestFixture.createValidSpace();
+            var dogHasHandler = TestFixture.createDogHasHandler();
+            var space = TestFixture.createSpace();
             space.setMemberOrHandlerId(dogHasHandler.getId());
             var course = space.getBaseEvent();
             space.setDogHasHandler(dogHasHandler);

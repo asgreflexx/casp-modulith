@@ -19,7 +19,7 @@ class MembershipFeeTest extends BaseDocumentTest {
 
         @Test
         void paid() {
-            var membershipFee = TestFixture.createValidMembershipFee();
+            var membershipFee = TestFixture.createMembershipFee();
             assertThat(TestFixture.getViolations(membershipFee)).isEmpty();
         }
     }

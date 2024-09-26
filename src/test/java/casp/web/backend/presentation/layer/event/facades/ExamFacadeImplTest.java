@@ -24,8 +24,8 @@ class ExamFacadeImplTest {
 
     @Test
     void mapBaseEventToDto() {
-        var dogHasHandler = TestFixture.createValidDogHasHandler();
-        var examParticipant = TestFixture.createValidExamParticipant();
+        var dogHasHandler = TestFixture.createDogHasHandler();
+        var examParticipant = TestFixture.createExamParticipant();
         examParticipant.setMemberOrHandlerId(dogHasHandler.getId());
         examParticipant.setDogHasHandler(dogHasHandler);
         var exam = examParticipant.getBaseEvent();

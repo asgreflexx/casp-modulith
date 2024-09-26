@@ -21,12 +21,12 @@ class DailyOptionUtilityTest {
     private static final LocalTime END_TIME = LocalTime.of(2, 0, 0);
     private static final LocalDate START_RECURRENCE = LocalDate.of(2024, 1, 1);
     private static final LocalDate END_RECURRENCE = START_RECURRENCE.plusDays(9);
-    private static final Event EVENT = TestFixture.createValidEvent();
+    private static final Event EVENT = TestFixture.createEvent();
     private Calendar expectedCalendarEntry;
 
     @BeforeEach
     void setUp() {
-        expectedCalendarEntry = TestFixture.createValidCalendarEntry(EVENT);
+        expectedCalendarEntry = TestFixture.createCalendarEntry(EVENT);
         expectedCalendarEntry.setEventFrom(LocalDateTime.of(START_RECURRENCE, START_TIME));
         expectedCalendarEntry.setEventTo(LocalDateTime.of(START_RECURRENCE, END_TIME));
     }
@@ -56,7 +56,7 @@ class DailyOptionUtilityTest {
     }
 
     private void createDailyOption(final int repeatEvery) {
-        var dailyEventOption = TestFixture.createValidDailyEventOption();
+        var dailyEventOption = TestFixture.createDailyEventOption();
         dailyEventOption.setStartRecurrence(START_RECURRENCE);
         dailyEventOption.setEndRecurrence(END_RECURRENCE);
         dailyEventOption.setStartTime(START_TIME);

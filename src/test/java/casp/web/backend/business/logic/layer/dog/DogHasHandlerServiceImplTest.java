@@ -51,7 +51,7 @@ class DogHasHandlerServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        dogHasHandler = TestFixture.createValidDogHasHandler();
+        dogHasHandler = TestFixture.createDogHasHandler();
         dog = dogHasHandler.getDog();
         dogId = dog.getId();
         member = dogHasHandler.getMember();

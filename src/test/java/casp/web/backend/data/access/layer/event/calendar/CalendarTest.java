@@ -18,7 +18,7 @@ class CalendarTest extends BaseDocumentTest {
 
     @BeforeEach
     void setUp() {
-        calendar = TestFixture.createValidCalendarEntry();
+        calendar = TestFixture.createCalendarEntry();
     }
 
     @Test

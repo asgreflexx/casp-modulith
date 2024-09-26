@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class WeeklyEventOptionTest extends BaseDocumentTest {
     @Test
     void happyPath() {
-        var weeklyEventOption = TestFixture.createValidWeeklyEventOption();
+        var weeklyEventOption = TestFixture.createWeeklyEventOption();
 
         assertThat(TestFixture.getViolations(weeklyEventOption)).isEmpty();
     }

@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class EventTest extends BaseDocumentTest {
     @Test
     void happyPath() {
-        var event = TestFixture.createValidEvent();
+        var event = TestFixture.createEvent();
         assertThat(TestFixture.getViolations(event)).isEmpty();
         baseAssertions(event);
     }
