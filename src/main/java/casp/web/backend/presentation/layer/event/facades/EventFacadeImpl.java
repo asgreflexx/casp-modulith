@@ -22,7 +22,7 @@ class EventFacadeImpl implements EventFacade {
     }
 
     @Override
-    public EventDto mapBaseEventToDto(final BaseEvent baseEvent) {
+    public EventDto mapDocumentToDto(final BaseEvent baseEvent) {
         var eventDto = EVENT_MAPPER.toDto((Event) baseEvent);
         setEventParticipants(eventDto);
         return eventDto;

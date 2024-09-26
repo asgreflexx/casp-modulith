@@ -38,7 +38,7 @@ class CourseFacadeImplTest {
             coTrainer.setMember(member);
             when(coTrainerService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId())).thenReturn(Set.of(coTrainer));
 
-            var courseDto = courseFacade.mapBaseEventToDto(course);
+            var courseDto = courseFacade.mapDocumentToDto(course);
 
             assertThat(courseDto.getCoTrainers())
                     .singleElement()
@@ -57,7 +57,7 @@ class CourseFacadeImplTest {
             space.setDogHasHandler(dogHasHandler);
             when(spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId())).thenReturn(Set.of(space));
 
-            var courseDto = courseFacade.mapBaseEventToDto(course);
+            var courseDto = courseFacade.mapDocumentToDto(course);
 
             assertThat(courseDto.getParticipants())
                     .singleElement()
@@ -73,7 +73,7 @@ class CourseFacadeImplTest {
             var course = TestFixture.createCourse();
             course.setDailyOption(dailyEventOption);
 
-            var courseDto = courseFacade.mapBaseEventToDto(course);
+            var courseDto = courseFacade.mapDocumentToDto(course);
 
             assertEquals(dailyEventOption.getOptionType(), courseDto.getOption().getOptionType());
         }
@@ -84,7 +84,7 @@ class CourseFacadeImplTest {
             var course = TestFixture.createCourse();
             course.setWeeklyOption(weeklyEventOption);
 
-            var courseDto = courseFacade.mapBaseEventToDto(course);
+            var courseDto = courseFacade.mapDocumentToDto(course);
 
             assertEquals(weeklyEventOption.getOptionType(), courseDto.getOption().getOptionType());
         }

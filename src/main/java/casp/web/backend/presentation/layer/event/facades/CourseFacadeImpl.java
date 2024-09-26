@@ -26,7 +26,7 @@ class CourseFacadeImpl implements CourseFacade {
     }
 
     @Override
-    public CourseDto mapBaseEventToDto(final BaseEvent baseEvent) {
+    public CourseDto mapDocumentToDto(final BaseEvent baseEvent) {
         var courseDto = COURSE_MAPPER.toDto((Course) baseEvent);
         setCoTrainers(courseDto);
         setSpaces(courseDto);

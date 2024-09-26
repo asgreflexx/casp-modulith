@@ -1,7 +1,6 @@
 package casp.web.backend.presentation.layer.event.facades;
 
 import casp.web.backend.business.logic.layer.event.participants.ExamParticipantService;
-import casp.web.backend.data.access.layer.event.participants.ExamParticipant;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.presentation.layer.dtos.event.types.ExamDto;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
-import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.ExamParticipantMapper.EXAM_PARTICIPANT_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.ExamMapper.EXAM_MAPPER;
 
@@ -24,7 +22,7 @@ class ExamFacadeImpl implements ExamFacade {
     }
 
     @Override
-    public ExamDto mapBaseEventToDto(final BaseEvent baseEvent) {
+    public ExamDto mapDocumentToDto(final BaseEvent baseEvent) {
         var examDto = EXAM_MAPPER.toDto((Exam) baseEvent);
         setExamParticipants(examDto);
         return examDto;

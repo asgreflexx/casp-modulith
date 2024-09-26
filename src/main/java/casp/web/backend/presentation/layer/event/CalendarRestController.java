@@ -75,9 +75,9 @@ class CalendarRestController {
         var baseEvent = calendarEntry.getBaseEvent();
         memberService.setActiveMemberToBaseEvent(baseEvent);
         var baseEventDto = switch (baseEvent.getEventType()) {
-            case Course.EVENT_TYPE -> courseFacade.mapBaseEventToDto(baseEvent);
-            case Event.EVENT_TYPE -> eventFacade.mapBaseEventToDto(baseEvent);
-            default -> examFacade.mapBaseEventToDto(baseEvent);
+            case Course.EVENT_TYPE -> courseFacade.mapDocumentToDto(baseEvent);
+            case Event.EVENT_TYPE -> eventFacade.mapDocumentToDto(baseEvent);
+            default -> examFacade.mapDocumentToDto(baseEvent);
         };
         calendarEntry.setBaseEvent(null);
         baseEventDto.setCalendarEntries(CALENDAR_MAPPER.toDtoList(List.of(calendarEntry)));

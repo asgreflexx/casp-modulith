@@ -34,7 +34,7 @@ class ExamFacadeImplTest {
             var exam = examParticipant.getBaseEvent();
             when(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId())).thenReturn(Set.of(examParticipant));
 
-            var courseDto = examFacade.mapBaseEventToDto(exam);
+            var courseDto = examFacade.mapDocumentToDto(exam);
 
             assertThat(courseDto.getParticipants())
                     .singleElement()
@@ -50,7 +50,7 @@ class ExamFacadeImplTest {
             var exam = TestFixture.createExam();
             exam.setDailyOption(dailyEventOption);
 
-            var examDto = examFacade.mapBaseEventToDto(exam);
+            var examDto = examFacade.mapDocumentToDto(exam);
 
             assertEquals(dailyEventOption.getOptionType(), examDto.getOption().getOptionType());
         }
@@ -61,7 +61,7 @@ class ExamFacadeImplTest {
             var exam = TestFixture.createExam();
             exam.setWeeklyOption(weeklyEventOption);
 
-            var examDto = examFacade.mapBaseEventToDto(exam);
+            var examDto = examFacade.mapDocumentToDto(exam);
 
             assertEquals(weeklyEventOption.getOptionType(), examDto.getOption().getOptionType());
         }

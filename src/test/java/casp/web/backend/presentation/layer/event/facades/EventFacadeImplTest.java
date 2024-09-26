@@ -36,7 +36,7 @@ class EventFacadeImplTest {
 
             when(eventService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(event.getId())).thenReturn(Set.of(eventParticipant));
 
-            var eventDto = eventFacade.mapBaseEventToDto(event);
+            var eventDto = eventFacade.mapDocumentToDto(event);
 
             assertThat(eventDto.getParticipants())
                     .singleElement()
@@ -52,7 +52,7 @@ class EventFacadeImplTest {
             var event = TestFixture.createEvent();
             event.setDailyOption(dailyEventOption);
 
-            var eventDto = eventFacade.mapBaseEventToDto(event);
+            var eventDto = eventFacade.mapDocumentToDto(event);
 
             assertEquals(dailyEventOption.getOptionType(), eventDto.getOption().getOptionType());
         }
@@ -63,7 +63,7 @@ class EventFacadeImplTest {
             var event = TestFixture.createEvent();
             event.setWeeklyOption(weeklyEventOption);
 
-            var eventDto = eventFacade.mapBaseEventToDto(event);
+            var eventDto = eventFacade.mapDocumentToDto(event);
 
             assertEquals(weeklyEventOption.getOptionType(), eventDto.getOption().getOptionType());
         }
