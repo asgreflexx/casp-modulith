@@ -34,7 +34,6 @@ import static casp.web.backend.presentation.layer.dtos.dog.DogHasHandlerMapper.D
 import static casp.web.backend.presentation.layer.dtos.member.MemberMapper.MEMBER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -185,8 +184,6 @@ class MemberRestControllerTest {
                 .satisfies(dh -> {
                     assertEquals(dh.getId(), dogHasHandler.getId());
                     assertEquals(dh.getDog().getId(), dogHasHandler.getDog().getId());
-                    assertNull(dh.getMemberId());
-                    assertNull(dh.getMember());
                 });
     }
 

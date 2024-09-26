@@ -23,10 +23,6 @@ public class MemberDto extends Member {
     }
 
     public void setDogHasHandlerDtoSet(final Set<DogHasHandlerDto> dogHasHandlerDtoSet) {
-        dogHasHandlerDtoSet.forEach(d -> {
-            d.setMember(null);
-            d.setMemberId(null);
-        });
         this.dogHasHandlerDtoSet = dogHasHandlerDtoSet;
     }
 }
