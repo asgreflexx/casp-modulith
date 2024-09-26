@@ -6,6 +6,7 @@ import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,31 +117,40 @@ class CoTrainerServiceImplTest {
         verify(coTrainer).setEntityStatus(EntityStatus.DELETED);
     }
 
+    private Optional<Member> findMember(final UUID id) {
+        return memberRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE);
+    }
+
     @Nested
     class ReplaceParticipants {
         @Captor
         private ArgumentCaptor<Set<CoTrainer>> captor;
-        private Set<CoTrainer> coTrainers;
+        private Set<UUID> coTrainersId;
+
 
         @BeforeEach
         void setUp() {
             var coTrainer2 = TestFixture.createCoTrainer();
             coTrainer.setBaseEvent(null);
             coTrainer2.setBaseEvent(null);
-            coTrainers = Set.of(coTrainer, coTrainer2);
             course.setParticipantsSize(0);
+            coTrainersId = Set.of(coTrainer, coTrainer2).stream().map(CoTrainer::getId).collect(Collectors.toSet());
         }
 
         @Test
         void deleteParticipants() {
-            coTrainerService.replaceParticipants(course, coTrainers);
+            mockMembers();
+
+            coTrainerService.replaceParticipants(course, coTrainersId);
 
             verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
         }
 
         @Test
         void setBaseEventToAllParticipantsAndSaveThem() {
-            coTrainerService.replaceParticipants(course, coTrainers);
+            mockMembers();
+
+            coTrainerService.replaceParticipants(course, coTrainersId);
 
             verify(baseParticipantRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(course, actual.getBaseEvent()));
@@ -147,9 +158,43 @@ class CoTrainerServiceImplTest {
 
         @Test
         void setParticipantsSize() {
-            coTrainerService.replaceParticipants(course, coTrainers);
+            mockMembers();
+
+            coTrainerService.replaceParticipants(course, coTrainersId);
 
             assertEquals(2, course.getParticipantsSize());
+        }
+
+        @Test
+        void setMember() {
+            var participantId = coTrainersId.stream().findAny().orElseThrow();
+            mockMember(participantId);
+
+            coTrainerService.replaceParticipants(course, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getMember().getId()));
+        }
+
+        @Test
+        void setMemberOrHandlerId() {
+            var participantId = coTrainersId.stream().findAny().orElseThrow();
+            mockMember(participantId);
+
+            coTrainerService.replaceParticipants(course, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getMemberOrHandlerId()));
+        }
+
+        private void mockMembers() {
+            coTrainersId.forEach(this::mockMember);
+        }
+
+        private void mockMember(final UUID id) {
+            var member = TestFixture.createMember();
+            member.setId(id);
+            when(findMember(id)).thenReturn(Optional.of(member));
         }
     }
 
@@ -163,7 +208,7 @@ class CoTrainerServiceImplTest {
         @Test
         void coTrainerIsActive() {
             var member = TestFixture.createMember();
-            when(memberRepository.findByIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+            when(findMember(coTrainer.getMemberOrHandlerId())).thenReturn(Optional.of(member));
 
             assertThat(coTrainerService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId()))
                     .singleElement()
@@ -172,7 +217,7 @@ class CoTrainerServiceImplTest {
 
         @Test
         void coTrainerIsInactiveActive() {
-            when(memberRepository.findByIdAndEntityStatus(coTrainer.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(findMember(coTrainer.getMemberOrHandlerId())).thenReturn(Optional.empty());
 
             assertThat(coTrainerService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId()))
                     .isEmpty();

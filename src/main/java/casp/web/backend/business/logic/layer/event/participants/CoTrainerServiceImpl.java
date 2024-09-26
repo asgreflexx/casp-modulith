@@ -4,10 +4,12 @@ import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -24,15 +26,32 @@ class CoTrainerServiceImpl extends BaseParticipantServiceImpl<CoTrainer, Course>
     }
 
     @Override
+    public void replaceParticipants(final Course course, final Set<UUID> coTrainersId) {
+        var coTrainerSet = createCoTrainers(course, coTrainersId);
+        replaceParticipantsAndSetMetadata(course, coTrainerSet);
+    }
+
+    @Override
     public Set<CoTrainer> getActiveParticipantsIfMembersOrDogHasHandlerAreActive(final UUID baseEventId) {
         return getParticipantsByBaseEventId(baseEventId)
                 .stream()
-                .flatMap(ct -> memberRepository.findByIdAndEntityStatus(ct.getMemberOrHandlerId(), EntityStatus.ACTIVE)
+                .flatMap(ct -> findMember(ct.getMemberOrHandlerId())
                         .map(m -> {
                             ct.setMember(m);
                             return ct;
                         })
                         .stream())
                 .collect(Collectors.toSet());
+    }
+
+    private Set<CoTrainer> createCoTrainers(final Course course, final Set<UUID> participantsId) {
+        return participantsId
+                .stream()
+                .flatMap(id -> findMember(id).map(m -> new CoTrainer(course, m)).stream())
+                .collect(Collectors.toSet());
+    }
+
+    private Optional<Member> findMember(final UUID memberId) {
+        return memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 }
