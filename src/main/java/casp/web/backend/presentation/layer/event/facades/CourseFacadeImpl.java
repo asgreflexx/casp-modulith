@@ -65,8 +65,8 @@ class CourseFacadeImpl implements CourseFacade {
     }
 
     @Override
-    public CourseDto getById(final UUID id) {
-        var course = courseService.getById(id);
+    public CourseDto getOneById(final UUID id) {
+        var course = courseService.getOneById(id);
         return mapDocumentToDto(course);
     }
 

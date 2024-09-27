@@ -44,11 +44,11 @@ class ExamFacadeImplTest {
     private ExamFacadeImpl examFacade;
 
     @Test
-    void getById() {
+    void getOneById() {
         var exam = TestFixture.createExam();
-        when(examService.getById(exam.getId())).thenReturn(exam);
+        when(examService.getOneById(exam.getId())).thenReturn(exam);
 
-        var examDto = examFacade.getById(exam.getId());
+        var examDto = examFacade.getOneById(exam.getId());
 
         assertEquals(exam.getId(), examDto.getId());
         verify(examFacade).mapDocumentToDto(exam);

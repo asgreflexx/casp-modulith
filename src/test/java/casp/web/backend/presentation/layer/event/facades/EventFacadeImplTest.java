@@ -45,11 +45,11 @@ class EventFacadeImplTest {
     private EventFacadeImpl eventFacade;
 
     @Test
-    void getById() {
+    void getOneById() {
         var event = TestFixture.createEvent();
-        when(eventService.getById(event.getId())).thenReturn(event);
+        when(eventService.getOneById(event.getId())).thenReturn(event);
 
-        var eventDto = eventFacade.getById(event.getId());
+        var eventDto = eventFacade.getOneById(event.getId());
 
         assertEquals(event.getId(), eventDto.getId());
         verify(eventFacade).mapDocumentToDto(event);

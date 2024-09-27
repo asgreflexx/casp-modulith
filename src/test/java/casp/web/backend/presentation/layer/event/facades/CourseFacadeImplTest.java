@@ -48,11 +48,11 @@ class CourseFacadeImplTest {
     private CourseFacadeImpl courseFacade;
 
     @Test
-    void getById() {
+    void getOneById() {
         var course = TestFixture.createCourse();
-        when(courseService.getById(course.getId())).thenReturn(course);
+        when(courseService.getOneById(course.getId())).thenReturn(course);
 
-        var courseDto = courseFacade.getById(course.getId());
+        var courseDto = courseFacade.getOneById(course.getId());
 
         assertEquals(course.getId(), courseDto.getId());
         verify(courseFacade).mapDocumentToDto(course);
