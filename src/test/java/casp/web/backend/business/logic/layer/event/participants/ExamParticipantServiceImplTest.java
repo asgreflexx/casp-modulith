@@ -142,7 +142,7 @@ class ExamParticipantServiceImplTest {
 
             examParticipantService.replaceParticipants(exam, examParticipantsId);
 
-            verify(baseParticipantRepository).deleteAllByBaseEventId(exam.getId());
+            verify(baseParticipantRepository).deleteAllByBaseEventIdAndParticipantType(exam.getId(), participantType);
         }
 
         @Test

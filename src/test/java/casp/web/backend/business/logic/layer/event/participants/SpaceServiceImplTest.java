@@ -156,7 +156,7 @@ class SpaceServiceImplTest {
 
             spaceService.replaceParticipants(course, spacesId);
 
-            verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
+            verify(baseParticipantRepository).deleteAllByBaseEventIdAndParticipantType(course.getId(), participantType);
         }
 
         @Test

@@ -8,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface BaseParticipantRepository extends MongoRepository<BaseParticipant, UUID>, QuerydslPredicateExecutor<BaseParticipant>, BaseParticipantCustomRepository {
-    void deleteAllByBaseEventId(UUID baseEventId);
+    void deleteAllByBaseEventIdAndParticipantType(UUID baseEventId, String participantType);
 
     Set<BaseParticipant> findAllByBaseEventIdAndEntityStatusAndParticipantType(UUID baseEventId, EntityStatus entityStatus, String participantType);
 
