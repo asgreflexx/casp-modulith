@@ -63,6 +63,11 @@ class EventFacadeImpl implements EventFacade {
         return mapDocumentToDto(event);
     }
 
+    @Override
+    public void deleteById(final UUID id) {
+        eventService.deleteBaseEventById(id);
+    }
+
     private void setEventParticipants(final EventDto eventDto) {
         var coTrainerDtoSet = eventParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(eventDto.getId())
                 .stream()
