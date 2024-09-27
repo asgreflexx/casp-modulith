@@ -36,6 +36,9 @@ public abstract class BaseEventDto<P> {
     @Valid
     protected Set<P> participantsToRead = new HashSet<>();
 
+    @NotNull
+    protected Set<UUID> participantsIdToWrite = new HashSet<>();
+
     BaseEventDto(final String eventType) {
         this.eventType = eventType;
     }
@@ -126,5 +129,13 @@ public abstract class BaseEventDto<P> {
 
     public void setParticipantsToRead(final Set<P> participantsToRead) {
         this.participantsToRead = participantsToRead;
+    }
+
+    public Set<UUID> getParticipantsIdToWrite() {
+        return participantsIdToWrite;
+    }
+
+    public void setParticipantsIdToWrite(final Set<UUID> participantsIdToWrite) {
+        this.participantsIdToWrite = participantsIdToWrite;
     }
 }
