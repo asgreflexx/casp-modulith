@@ -58,10 +58,10 @@ class EventServiceImplTest {
     }
 
     @Test
-    void deleteBaseEventById() {
+    void deleteById() {
         when(eventRepository.findByIdAndEntityStatusNot(event.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(event));
 
-        eventService.deleteBaseEventById(event.getId());
+        eventService.deleteById(event.getId());
 
         verify(participantService).deleteParticipantsByBaseEventId(event.getId());
         verify(calendarService).deleteCalendarEntriesByBaseEventId(event.getId());

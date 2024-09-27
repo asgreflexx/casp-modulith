@@ -32,7 +32,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, Space> implements C
     }
 
     @Override
-    public void deleteBaseEventById(final UUID id) {
+    public void deleteById(final UUID id) {
         findBaseEventNotDeleted(id).ifPresent(this::deleteCourse);
     }
 

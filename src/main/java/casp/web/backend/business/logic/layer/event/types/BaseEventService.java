@@ -11,7 +11,7 @@ public interface BaseEventService<E extends BaseEvent> {
 
     E save(E actualBaseEventDto);
 
-    void deleteBaseEventById(UUID id);
+    void deleteById(UUID id);
 
     E getById(UUID id);
 

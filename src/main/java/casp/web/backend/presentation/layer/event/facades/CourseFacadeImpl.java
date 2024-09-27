@@ -72,7 +72,7 @@ class CourseFacadeImpl implements CourseFacade {
 
     @Override
     public void deleteById(final UUID id) {
-        courseService.deleteBaseEventById(id);
+        courseService.deleteById(id);
     }
 
     private void setCoTrainers(final CourseDto courseDto) {

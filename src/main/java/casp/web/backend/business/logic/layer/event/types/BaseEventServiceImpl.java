@@ -52,7 +52,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     }
 
     @Override
-    public void deleteBaseEventById(final UUID id) {
+    public void deleteById(final UUID id) {
         findBaseEventNotDeleted(id).ifPresent(this::deleteBaseEvent);
     }
 

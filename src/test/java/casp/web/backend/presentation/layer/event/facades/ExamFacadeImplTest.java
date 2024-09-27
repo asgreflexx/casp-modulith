@@ -59,7 +59,7 @@ class ExamFacadeImplTest {
         var id = UUID.randomUUID();
         examFacade.deleteById(id);
 
-        verify(examService).deleteBaseEventById(id);
+        verify(examService).deleteById(id);
     }
 
     @Nested

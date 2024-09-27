@@ -63,7 +63,7 @@ class CourseFacadeImplTest {
         var id = UUID.randomUUID();
         courseFacade.deleteById(id);
 
-        verify(courseService).deleteBaseEventById(id);
+        verify(courseService).deleteById(id);
     }
 
     @Nested

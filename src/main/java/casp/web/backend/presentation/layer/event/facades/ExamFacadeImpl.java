@@ -65,7 +65,7 @@ class ExamFacadeImpl implements ExamFacade {
 
     @Override
     public void deleteById(final UUID id) {
-        examService.deleteBaseEventById(id);
+        examService.deleteById(id);
     }
 
     private void setExamParticipants(final ExamDto examDto) {

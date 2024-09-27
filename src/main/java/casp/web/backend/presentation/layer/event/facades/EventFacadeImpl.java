@@ -65,7 +65,7 @@ class EventFacadeImpl implements EventFacade {
 
     @Override
     public void deleteById(final UUID id) {
-        eventService.deleteBaseEventById(id);
+        eventService.deleteById(id);
     }
 
     private void setEventParticipants(final EventDto eventDto) {

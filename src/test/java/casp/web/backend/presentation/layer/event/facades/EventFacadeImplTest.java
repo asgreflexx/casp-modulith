@@ -60,7 +60,7 @@ class EventFacadeImplTest {
         var id = UUID.randomUUID();
         eventFacade.deleteById(id);
 
-        verify(eventService).deleteBaseEventById(id);
+        verify(eventService).deleteById(id);
     }
 
     @Nested
