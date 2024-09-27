@@ -15,6 +15,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -38,8 +39,20 @@ class ExamFacadeImplTest {
     @Mock
     private ExamService examService;
 
+    @Spy
     @InjectMocks
     private ExamFacadeImpl examFacade;
+
+    @Test
+    void getById() {
+        var exam = TestFixture.createExam();
+        when(examService.getBaseEventById(exam.getId())).thenReturn(exam);
+
+        var examDto = examFacade.getById(exam.getId());
+
+        assertEquals(exam.getId(), examDto.getId());
+        verify(examFacade).mapDocumentToDto(exam);
+    }
 
     @Nested
     class Save {
