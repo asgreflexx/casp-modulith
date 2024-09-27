@@ -60,7 +60,7 @@ class CourseFacadeImpl implements CourseFacade {
         spaceService.replaceParticipants(course, courseDto.getParticipantsIdToWrite());
         coTrainerService.replaceParticipants(course, courseDto.getCoTrainersIdToWrite());
 
-        courseService.saveBaseEvent(course);
+        courseService.save(course);
     }
 
     private void setCoTrainers(final CourseDto courseDto) {

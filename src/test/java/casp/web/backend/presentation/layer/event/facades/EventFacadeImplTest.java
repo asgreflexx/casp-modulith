@@ -92,7 +92,7 @@ class EventFacadeImplTest {
         void saveEvent() {
             eventFacade.save(eventDto);
 
-            verify(eventService).saveBaseEvent(eventCaptor.capture());
+            verify(eventService).save(eventCaptor.capture());
             assertEquals(event.getId(), eventCaptor.getValue().getId());
         }
     }

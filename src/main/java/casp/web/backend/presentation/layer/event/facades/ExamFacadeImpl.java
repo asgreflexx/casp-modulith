@@ -53,7 +53,7 @@ class ExamFacadeImpl implements ExamFacade {
         calendarService.replaceCalendarEntries(exam, CALENDAR_MAPPER.toDocumentList(examDto.getCalendarEntries()));
         examParticipantService.replaceParticipants(exam, examDto.getParticipantsIdToWrite());
 
-        examService.saveBaseEvent(exam);
+        examService.save(exam);
     }
 
     private void setExamParticipants(final ExamDto examDto) {

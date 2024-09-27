@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface BaseEventService<E extends BaseEvent> {
 
-    E saveBaseEvent(E actualBaseEventDto);
+    E save(E actualBaseEventDto);
 
     void deleteBaseEventById(UUID id);
 

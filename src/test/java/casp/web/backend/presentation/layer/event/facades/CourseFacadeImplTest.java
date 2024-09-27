@@ -107,7 +107,7 @@ class CourseFacadeImplTest {
         void saveCourse() {
             courseFacade.save(courseDto);
 
-            verify(courseService).saveBaseEvent(courseCaptor.capture());
+            verify(courseService).save(courseCaptor.capture());
             assertEquals(course.getId(), courseCaptor.getValue().getId());
         }
     }

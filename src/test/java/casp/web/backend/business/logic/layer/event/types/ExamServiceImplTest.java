@@ -55,7 +55,7 @@ class ExamServiceImplTest {
     void saveBaseEvent() {
         when(eventRepository.save(exam)).thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertSame(exam, examService.saveBaseEvent(exam));
+        assertSame(exam, examService.save(exam));
     }
 
     @Test

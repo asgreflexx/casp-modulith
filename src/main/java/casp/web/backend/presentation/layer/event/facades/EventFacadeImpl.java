@@ -53,7 +53,7 @@ class EventFacadeImpl implements EventFacade {
         calendarService.replaceCalendarEntries(event, CALENDAR_MAPPER.toDocumentList(eventDto.getCalendarEntries()));
         eventParticipantService.replaceParticipants(event, eventDto.getParticipantsIdToWrite());
 
-        eventService.saveBaseEvent(event);
+        eventService.save(event);
     }
 
     private void setEventParticipants(final EventDto eventDto) {

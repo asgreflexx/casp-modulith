@@ -91,7 +91,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     }
 
     @Override
-    public E saveBaseEvent(final E actualBaseEvent) {
+    public E save(final E actualBaseEvent) {
         return eventRepository.save(actualBaseEvent);
     }
 

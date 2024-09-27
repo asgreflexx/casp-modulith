@@ -91,7 +91,7 @@ class ExamFacadeImplTest {
         void saveCourse() {
             examFacade.save(examDto);
 
-            verify(examService).saveBaseEvent(examCaptor.capture());
+            verify(examService).save(examCaptor.capture());
             assertEquals(exam.getId(), examCaptor.getValue().getId());
         }
     }

@@ -58,7 +58,7 @@ class CourseServiceImplTest {
     void saveBaseEvent() {
         when(eventRepository.save(course)).thenAnswer(invocation -> invocation.getArgument(0));
 
-        assertSame(course, courseService.saveBaseEvent(course));
+        assertSame(course, courseService.save(course));
     }
 
     @Test
