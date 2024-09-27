@@ -9,6 +9,7 @@ import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
 import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -27,6 +28,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
@@ -43,6 +45,8 @@ class CourseServiceImplTest {
     private CoTrainerService coTrainerService;
     @Mock
     private BaseEventRepository eventRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private CourseServiceImpl courseService;
@@ -125,6 +129,11 @@ class CourseServiceImplTest {
 
     @Nested
     class GetBaseEventById {
+        @BeforeEach
+        void setUp() {
+            course.setMember(null);
+        }
+
         @Test
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
@@ -138,6 +147,28 @@ class CourseServiceImplTest {
             when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.getOneById(id));
+        }
+
+        @Test
+        void memberExist() {
+            var member = TestFixture.createMember();
+            course.setMemberId(member.getId());
+            when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+            when(memberRepository.findByIdAndEntityStatus(course.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+
+            var actualCourse = courseService.getOneById(course.getId());
+
+            assertSame(course.getMemberId(), actualCourse.getMember().getId());
+        }
+
+        @Test
+        void memberDoesNotExist() {
+            when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+            when(memberRepository.findByIdAndEntityStatus(course.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            var actualCourse = courseService.getOneById(course.getId());
+
+            assertNull(actualCourse.getMember());
         }
     }
 }

@@ -6,6 +6,7 @@ import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -21,12 +22,18 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     protected final CalendarService calendarService;
     protected final BaseParticipantService<P, E> participantService;
     protected final BaseEventRepository eventRepository;
+    protected final MemberRepository memberRepository;
     protected final String eventType;
 
-    protected BaseEventServiceImpl(final CalendarService calendarService, final BaseParticipantService<P, E> participantService, final BaseEventRepository eventRepository, final String eventType) {
+    protected BaseEventServiceImpl(final CalendarService calendarService,
+                                   final BaseParticipantService<P, E> participantService,
+                                   final BaseEventRepository eventRepository,
+                                   final MemberRepository memberRepository,
+                                   final String eventType) {
         this.calendarService = calendarService;
         this.participantService = participantService;
         this.eventRepository = eventRepository;
+        this.memberRepository = memberRepository;
         this.eventType = eventType;
     }
 
@@ -76,11 +83,14 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     @SuppressWarnings("unchecked")
     @Override
     public E getOneById(final UUID id) {
-        return (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
+        var baseEvent = eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "This %s[%s] doesn't exist or it isn't active".formatted(eventType, id);
             LOG.error(msg);
             return new NoSuchElementException(msg);
         });
+        memberRepository.findByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
+                .ifPresent(baseEvent::setMember);
+        return (E) baseEvent;
     }
 
     // It cast to the correct type

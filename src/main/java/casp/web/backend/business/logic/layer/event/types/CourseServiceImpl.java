@@ -7,6 +7,7 @@ import casp.web.backend.data.access.layer.event.participants.Space;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
 import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +20,11 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, Space> implements C
 
     @Autowired
     CourseServiceImpl(final CalendarService calendarService,
-                             final SpaceService participantService,
-                             final BaseEventRepository eventRepository,
-                             final CoTrainerService coTrainerService) {
-        super(calendarService, participantService, eventRepository, Course.EVENT_TYPE);
+                      final SpaceService participantService,
+                      final BaseEventRepository eventRepository,
+                      final CoTrainerService coTrainerService,
+                      final MemberRepository memberRepository) {
+        super(calendarService, participantService, eventRepository, memberRepository, Course.EVENT_TYPE);
         this.coTrainerService = coTrainerService;
     }
 
