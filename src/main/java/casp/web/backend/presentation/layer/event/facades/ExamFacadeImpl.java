@@ -1,6 +1,8 @@
 package casp.web.backend.presentation.layer.event.facades;
 
+import casp.web.backend.business.logic.layer.event.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.event.participants.ExamParticipantService;
+import casp.web.backend.business.logic.layer.event.types.ExamService;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.presentation.layer.dtos.event.types.ExamDto;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.ExamParticipantMapper.EXAM_PARTICIPANT_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.ExamMapper.EXAM_MAPPER;
 
@@ -18,10 +21,16 @@ import static casp.web.backend.presentation.layer.dtos.event.types.ExamMapper.EX
 class ExamFacadeImpl implements ExamFacade {
     private static final Logger LOG = LoggerFactory.getLogger(ExamFacadeImpl.class);
     private final ExamParticipantService examParticipantService;
+    private final CalendarService calendarService;
+    private final ExamService examService;
 
     @Autowired
-    ExamFacadeImpl(final ExamParticipantService examParticipantService) {
+    ExamFacadeImpl(final ExamParticipantService examParticipantService,
+                   final CalendarService calendarService,
+                   final ExamService examService) {
         this.examParticipantService = examParticipantService;
+        this.calendarService = calendarService;
+        this.examService = examService;
     }
 
     @Override
@@ -35,6 +44,16 @@ class ExamFacadeImpl implements ExamFacade {
             LOG.error(msg);
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    @Override
+    public void save(final ExamDto examDto) {
+        var exam = EXAM_MAPPER.toDocument(examDto);
+
+        calendarService.replaceCalendarEntries(exam, CALENDAR_MAPPER.toDocumentList(examDto.getCalendarEntries()));
+        examParticipantService.replaceParticipants(exam, examDto.getParticipantsIdToWrite());
+
+        examService.saveBaseEvent(exam);
     }
 
     private void setExamParticipants(final ExamDto examDto) {
