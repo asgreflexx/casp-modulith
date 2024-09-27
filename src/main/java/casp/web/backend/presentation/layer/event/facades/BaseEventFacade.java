@@ -11,4 +11,6 @@ interface BaseEventFacade<D extends BaseEventDto<?>> {
     void save(D dto);
 
     D getById(UUID id);
+
+    void deleteById(UUID id);
 }

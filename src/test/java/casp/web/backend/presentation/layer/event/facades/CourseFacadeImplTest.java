@@ -58,6 +58,14 @@ class CourseFacadeImplTest {
         verify(courseFacade).mapDocumentToDto(course);
     }
 
+    @Test
+    void deleteById() {
+        var id = UUID.randomUUID();
+        courseFacade.deleteById(id);
+
+        verify(courseService).deleteBaseEventById(id);
+    }
+
     @Nested
     class Save {
         @Captor

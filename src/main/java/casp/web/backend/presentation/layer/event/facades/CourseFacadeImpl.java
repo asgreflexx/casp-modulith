@@ -70,6 +70,11 @@ class CourseFacadeImpl implements CourseFacade {
         return mapDocumentToDto(course);
     }
 
+    @Override
+    public void deleteById(final UUID id) {
+        courseService.deleteBaseEventById(id);
+    }
+
     private void setCoTrainers(final CourseDto courseDto) {
         var coTrainerDtoSet = coTrainerService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(courseDto.getId())
                 .stream()
