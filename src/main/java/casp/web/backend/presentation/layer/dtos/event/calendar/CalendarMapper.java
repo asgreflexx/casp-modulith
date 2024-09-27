@@ -15,4 +15,6 @@ public interface CalendarMapper {
     CalendarDto toDto(Calendar document);
 
     List<CalendarDto> toDtoList(List<Calendar> documents);
+
+    List<Calendar> toDocumentList(List<CalendarDto> dtoList);
 }

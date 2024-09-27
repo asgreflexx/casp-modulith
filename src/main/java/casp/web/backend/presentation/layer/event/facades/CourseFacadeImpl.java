@@ -1,7 +1,9 @@
 package casp.web.backend.presentation.layer.event.facades;
 
+import casp.web.backend.business.logic.layer.event.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.event.participants.CoTrainerService;
 import casp.web.backend.business.logic.layer.event.participants.SpaceService;
+import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.CoTrainerMapper.CO_TRAINER_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.SpaceMapper.SPACE_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.COURSE_MAPPER;
@@ -21,11 +24,18 @@ class CourseFacadeImpl implements CourseFacade {
     private static final Logger LOG = LoggerFactory.getLogger(CourseFacadeImpl.class);
     private final CoTrainerService coTrainerService;
     private final SpaceService spaceService;
+    private final CalendarService calendarService;
+    private final CourseService courseService;
 
     @Autowired
-    CourseFacadeImpl(final CoTrainerService coTrainerService, final SpaceService spaceService) {
+    CourseFacadeImpl(final CoTrainerService coTrainerService,
+                     final SpaceService spaceService,
+                     final CalendarService calendarService,
+                     final CourseService courseService) {
         this.coTrainerService = coTrainerService;
         this.spaceService = spaceService;
+        this.calendarService = calendarService;
+        this.courseService = courseService;
     }
 
     @Override
@@ -40,6 +50,17 @@ class CourseFacadeImpl implements CourseFacade {
             LOG.error(msg);
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    @Override
+    public void save(final CourseDto courseDto) {
+        var course = COURSE_MAPPER.toDocument(courseDto);
+
+        calendarService.replaceCalendarEntries(course, CALENDAR_MAPPER.toDocumentList(courseDto.getCalendarEntries()));
+        spaceService.replaceParticipants(course, courseDto.getParticipantsIdToWrite());
+        coTrainerService.replaceParticipants(course, courseDto.getCoTrainersIdToWrite());
+
+        courseService.saveBaseEvent(course);
     }
 
     private void setCoTrainers(final CourseDto courseDto) {

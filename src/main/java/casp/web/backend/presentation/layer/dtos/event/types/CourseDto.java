@@ -16,7 +16,7 @@ public class CourseDto extends BaseEventDto<SpaceDto> {
     @Valid
     private Set<CoTrainerDto> coTrainersToRead = new HashSet<>();
     @NotNull
-    private Set<UUID> coTrainersIdToRead = new HashSet<>();
+    private Set<UUID> coTrainersIdToWrite = new HashSet<>();
 
     @PositiveOrZero
     private int spaceLimit;
@@ -33,12 +33,12 @@ public class CourseDto extends BaseEventDto<SpaceDto> {
         this.coTrainersToRead = coTrainersToRead;
     }
 
-    public Set<UUID> getCoTrainersIdToRead() {
-        return coTrainersIdToRead;
+    public Set<UUID> getCoTrainersIdToWrite() {
+        return coTrainersIdToWrite;
     }
 
-    public void setCoTrainersIdToRead(final Set<UUID> coTrainersIdToRead) {
-        this.coTrainersIdToRead = coTrainersIdToRead;
+    public void setCoTrainersIdToWrite(final Set<UUID> coTrainersIdToWrite) {
+        this.coTrainersIdToWrite = coTrainersIdToWrite;
     }
 
     public int getSpaceLimit() {
