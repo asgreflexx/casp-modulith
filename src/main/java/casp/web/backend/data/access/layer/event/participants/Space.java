@@ -3,6 +3,7 @@ package casp.web.backend.data.access.layer.event.participants;
 import casp.web.backend.data.access.layer.commons.Payment;
 import casp.web.backend.data.access.layer.commons.PaymentConstraint;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
+import casp.web.backend.data.access.layer.event.types.Course;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
@@ -37,6 +38,11 @@ public class Space extends BaseParticipant implements Payment {
 
     public Space() {
         super(PARTICIPANT_TYPE);
+    }
+
+    public Space(final Course course, final DogHasHandler dogHasHandler) {
+        super(PARTICIPANT_TYPE, dogHasHandler.getId(), course);
+        this.dogHasHandler = dogHasHandler;
     }
 
 

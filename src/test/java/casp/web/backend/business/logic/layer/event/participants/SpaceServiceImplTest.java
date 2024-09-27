@@ -1,6 +1,7 @@
 package casp.web.backend.business.logic.layer.event.participants;
 
 import casp.web.backend.TestFixture;
+import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -129,31 +131,39 @@ class SpaceServiceImplTest {
         verify(space).setEntityStatus(EntityStatus.DELETED);
     }
 
+    private Optional<DogHasHandler> findDogHasHandler(final UUID id) {
+        return dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(id, EntityStatus.ACTIVE);
+    }
+
     @Nested
     class ReplaceParticipants {
         @Captor
         private ArgumentCaptor<Set<Space>> captor;
-        private Set<Space> spaces;
+        private Set<UUID> spacesId;
 
         @BeforeEach
         void setUp() {
             var space2 = TestFixture.createSpace();
             space.setBaseEvent(null);
             space2.setBaseEvent(null);
-            spaces = Set.of(space, space2);
+            spacesId = Set.of(space, space2).stream().map(BaseParticipant::getId).collect(Collectors.toSet());
             course.setParticipantsSize(0);
         }
 
         @Test
         void deleteParticipants() {
-            spaceService.replaceParticipants(course, spaces);
+            mockDogHasHandlers();
+
+            spaceService.replaceParticipants(course, spacesId);
 
             verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
         }
 
         @Test
         void setBaseEventToAllParticipantsAndSaveThem() {
-            spaceService.replaceParticipants(course, spaces);
+            mockDogHasHandlers();
+
+            spaceService.replaceParticipants(course, spacesId);
 
             verify(baseParticipantRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(course, actual.getBaseEvent()));
@@ -161,9 +171,43 @@ class SpaceServiceImplTest {
 
         @Test
         void setParticipantsSize() {
-            spaceService.replaceParticipants(course, spaces);
+            mockDogHasHandlers();
+
+            spaceService.replaceParticipants(course, spacesId);
 
             assertEquals(2, course.getParticipantsSize());
+        }
+
+        @Test
+        void setDogHasHandler() {
+            var participantId = spacesId.stream().findAny().orElseThrow();
+            mockDogHasHandler(participantId);
+
+            spaceService.replaceParticipants(course, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getDogHasHandler().getId()));
+        }
+
+        @Test
+        void setMemberOrHandlerId() {
+            var participantId = spacesId.stream().findAny().orElseThrow();
+            mockDogHasHandler(participantId);
+
+            spaceService.replaceParticipants(course, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getMemberOrHandlerId()));
+        }
+
+        private void mockDogHasHandlers() {
+            spacesId.forEach(this::mockDogHasHandler);
+        }
+
+        private void mockDogHasHandler(final UUID id) {
+            var dogHasHandler = TestFixture.createDogHasHandler();
+            dogHasHandler.setId(id);
+            when(findDogHasHandler(id)).thenReturn(Optional.of(dogHasHandler));
         }
     }
 
@@ -177,7 +221,7 @@ class SpaceServiceImplTest {
         @Test
         void spaceIsActive() {
             var dogHasHandler = TestFixture.createDogHasHandler();
-            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(findDogHasHandler(space.getMemberOrHandlerId())).thenReturn(Optional.of(dogHasHandler));
 
             assertThat(spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId()))
                     .singleElement()
@@ -186,7 +230,7 @@ class SpaceServiceImplTest {
 
         @Test
         void spaceIsInActive() {
-            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(findDogHasHandler(space.getMemberOrHandlerId())).thenReturn(Optional.empty());
 
             assertThat(spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId()))
                     .isEmpty();
