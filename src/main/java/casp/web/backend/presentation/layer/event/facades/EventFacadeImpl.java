@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
@@ -54,6 +55,12 @@ class EventFacadeImpl implements EventFacade {
         eventParticipantService.replaceParticipants(event, eventDto.getParticipantsIdToWrite());
 
         eventService.save(event);
+    }
+
+    @Override
+    public EventDto getById(final UUID id) {
+        var event = eventService.getBaseEventById(id);
+        return mapDocumentToDto(event);
     }
 
     private void setEventParticipants(final EventDto eventDto) {
