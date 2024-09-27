@@ -1,6 +1,8 @@
 package casp.web.backend.presentation.layer.event.facades;
 
+import casp.web.backend.business.logic.layer.event.calendar.CalendarService;
 import casp.web.backend.business.logic.layer.event.participants.EventParticipantService;
+import casp.web.backend.business.logic.layer.event.types.EventService;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.presentation.layer.dtos.event.types.EventDto;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.stream.Collectors;
 
+import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.participants.EventParticipantMapper.EVENT_PARTICIPANT_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.EventMapper.EVENT_MAPPER;
 
@@ -18,10 +21,16 @@ import static casp.web.backend.presentation.layer.dtos.event.types.EventMapper.E
 class EventFacadeImpl implements EventFacade {
     private static final Logger LOG = LoggerFactory.getLogger(EventFacadeImpl.class);
     private final EventParticipantService eventParticipantService;
+    private final CalendarService calendarService;
+    private final EventService eventService;
 
     @Autowired
-    EventFacadeImpl(final EventParticipantService eventParticipantService) {
+    EventFacadeImpl(final EventParticipantService eventParticipantService,
+                    final CalendarService calendarService,
+                    final EventService eventService) {
         this.eventParticipantService = eventParticipantService;
+        this.calendarService = calendarService;
+        this.eventService = eventService;
     }
 
     @Override
@@ -35,6 +44,16 @@ class EventFacadeImpl implements EventFacade {
             LOG.error(msg);
             throw new IllegalArgumentException(msg);
         }
+    }
+
+    @Override
+    public void save(final EventDto eventDto) {
+        var event = EVENT_MAPPER.toDocument(eventDto);
+
+        calendarService.replaceCalendarEntries(event, CALENDAR_MAPPER.toDocumentList(eventDto.getCalendarEntries()));
+        eventParticipantService.replaceParticipants(event, eventDto.getParticipantsIdToWrite());
+
+        eventService.saveBaseEvent(event);
     }
 
     private void setEventParticipants(final EventDto eventDto) {
