@@ -10,6 +10,8 @@ import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -73,6 +75,12 @@ class CourseFacadeImpl implements CourseFacade {
     @Override
     public void deleteById(final UUID id) {
         courseService.deleteById(id);
+    }
+
+    @Override
+    public Page<CourseDto> getAllByYear(final int year, final Pageable pageable) {
+        var coursePage = courseService.getBaseEventsAsPage(year, pageable);
+        return COURSE_MAPPER.toDtoPage(coursePage);
     }
 
     private void setCoTrainers(final CourseDto courseDto) {
