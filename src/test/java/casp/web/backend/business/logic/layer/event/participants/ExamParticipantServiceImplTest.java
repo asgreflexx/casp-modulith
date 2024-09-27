@@ -1,6 +1,7 @@
 package casp.web.backend.business.logic.layer.event.participants;
 
 import casp.web.backend.TestFixture;
+import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
@@ -19,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -115,31 +117,39 @@ class ExamParticipantServiceImplTest {
         verify(participant).setEntityStatus(EntityStatus.DELETED);
     }
 
+    private Optional<DogHasHandler> findDogHasHandler(final UUID id) {
+        return dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(id, EntityStatus.ACTIVE);
+    }
+
     @Nested
     class ReplaceParticipants {
         @Captor
         private ArgumentCaptor<Set<ExamParticipant>> captor;
-        private Set<ExamParticipant> examParticipants;
+        private Set<UUID> examParticipantsId;
 
         @BeforeEach
         void setUp() {
             var participant2 = TestFixture.createExamParticipant();
             participant.setBaseEvent(null);
             participant2.setBaseEvent(null);
-            examParticipants = Set.of(participant, participant2);
+            examParticipantsId = Set.of(participant, participant2).stream().map(ExamParticipant::getId).collect(Collectors.toSet());
             exam.setParticipantsSize(0);
         }
 
         @Test
         void deleteParticipants() {
-            examParticipantService.replaceParticipants(exam, examParticipants);
+            mockDogHasHandlers();
+
+            examParticipantService.replaceParticipants(exam, examParticipantsId);
 
             verify(baseParticipantRepository).deleteAllByBaseEventId(exam.getId());
         }
 
         @Test
         void setBaseEventToAllParticipantsAndSaveThem() {
-            examParticipantService.replaceParticipants(exam, examParticipants);
+            mockDogHasHandlers();
+
+            examParticipantService.replaceParticipants(exam, examParticipantsId);
 
             verify(baseParticipantRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(exam, actual.getBaseEvent()));
@@ -147,9 +157,43 @@ class ExamParticipantServiceImplTest {
 
         @Test
         void setParticipantsSize() {
-            examParticipantService.replaceParticipants(exam, examParticipants);
+            mockDogHasHandlers();
+
+            examParticipantService.replaceParticipants(exam, examParticipantsId);
 
             assertEquals(2, exam.getParticipantsSize());
+        }
+
+        @Test
+        void setDogHasHandler() {
+            var participantId = examParticipantsId.stream().findAny().orElseThrow();
+            mockDogHasHandler(participantId);
+
+            examParticipantService.replaceParticipants(exam, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getDogHasHandler().getId()));
+        }
+
+        @Test
+        void setMemberOrHandlerId() {
+            var participantId = examParticipantsId.stream().findAny().orElseThrow();
+            mockDogHasHandler(participantId);
+
+            examParticipantService.replaceParticipants(exam, Set.of(participantId));
+
+            verify(baseParticipantRepository).saveAll(captor.capture());
+            assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getMemberOrHandlerId()));
+        }
+
+        private void mockDogHasHandlers() {
+            examParticipantsId.forEach(this::mockDogHasHandler);
+        }
+
+        private void mockDogHasHandler(final UUID id) {
+            var dogHasHandler = TestFixture.createDogHasHandler();
+            dogHasHandler.setId(id);
+            when(findDogHasHandler(id)).thenReturn(Optional.of(dogHasHandler));
         }
     }
 
@@ -163,7 +207,7 @@ class ExamParticipantServiceImplTest {
         @Test
         void spaceIsActive() {
             var dogHasHandler = TestFixture.createDogHasHandler();
-            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(findDogHasHandler(participant.getMemberOrHandlerId())).thenReturn(Optional.of(dogHasHandler));
 
             assertThat(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId()))
                     .singleElement()
@@ -172,7 +216,7 @@ class ExamParticipantServiceImplTest {
 
         @Test
         void spaceIsInActive() {
-            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(participant.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(findDogHasHandler(participant.getMemberOrHandlerId())).thenReturn(Optional.empty());
 
             assertThat(examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(exam.getId()))
                     .isEmpty();

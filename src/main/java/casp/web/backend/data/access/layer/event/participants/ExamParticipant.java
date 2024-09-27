@@ -1,6 +1,7 @@
 package casp.web.backend.data.access.layer.event.participants;
 
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
+import casp.web.backend.data.access.layer.event.types.Exam;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import org.springframework.data.annotation.TypeAlias;
@@ -19,6 +20,11 @@ public class ExamParticipant extends BaseParticipant {
 
     public ExamParticipant() {
         super(PARTICIPANT_TYPE);
+    }
+
+    public ExamParticipant(final Exam exam, final DogHasHandler dogHasHandler) {
+        super(PARTICIPANT_TYPE, dogHasHandler.getId(), exam);
+        this.dogHasHandler = dogHasHandler;
     }
 
     public DogHasHandler getDogHasHandler() {
