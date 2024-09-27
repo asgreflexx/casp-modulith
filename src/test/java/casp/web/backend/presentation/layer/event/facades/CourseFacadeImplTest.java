@@ -16,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -42,8 +43,20 @@ class CourseFacadeImplTest {
     @Mock
     private CourseService courseService;
 
+    @Spy
     @InjectMocks
     private CourseFacadeImpl courseFacade;
+
+    @Test
+    void getById() {
+        var course = TestFixture.createCourse();
+        when(courseService.getBaseEventById(course.getId())).thenReturn(course);
+
+        var courseDto = courseFacade.getById(course.getId());
+
+        assertEquals(course.getId(), courseDto.getId());
+        verify(courseFacade).mapDocumentToDto(course);
+    }
 
     @Nested
     class Save {
