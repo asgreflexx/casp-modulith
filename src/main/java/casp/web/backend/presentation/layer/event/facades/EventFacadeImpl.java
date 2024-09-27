@@ -9,6 +9,8 @@ import casp.web.backend.presentation.layer.dtos.event.types.EventDto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -66,6 +68,12 @@ class EventFacadeImpl implements EventFacade {
     @Override
     public void deleteById(final UUID id) {
         eventService.deleteById(id);
+    }
+
+    @Override
+    public Page<EventDto> getAllByYear(final int year, final Pageable pageable) {
+        var eventPage = eventService.getBaseEventsAsPage(year, pageable);
+        return EVENT_MAPPER.toDtoPage(eventPage);
     }
 
     private void setEventParticipants(final EventDto eventDto) {

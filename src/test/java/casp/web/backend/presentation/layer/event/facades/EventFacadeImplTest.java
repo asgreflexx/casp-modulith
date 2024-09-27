@@ -17,6 +17,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Set;
@@ -61,6 +63,20 @@ class EventFacadeImplTest {
         eventFacade.deleteById(id);
 
         verify(eventService).deleteById(id);
+    }
+
+    @Test
+    void getAllByYear() {
+        int year = 2023;
+        var pageable = Pageable.unpaged();
+        var event = TestFixture.createEvent();
+        when(eventService.getBaseEventsAsPage(year, pageable)).thenReturn(new PageImpl<>(List.of(event)));
+
+        var eventPage = eventFacade.getAllByYear(year, pageable);
+
+        assertThat(eventPage.getContent())
+                .singleElement()
+                .satisfies(eventDto -> assertEquals(event.getId(), eventDto.getId()));
     }
 
     @Nested
