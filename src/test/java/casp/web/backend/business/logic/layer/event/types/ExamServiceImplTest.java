@@ -75,7 +75,7 @@ class ExamServiceImplTest {
         var year = LocalDate.now().getYear();
         when(eventRepository.findAllByYearAndEventType(year, exam.getEventType(), Pageable.unpaged())).thenReturn(page);
 
-        assertThat(examService.getBaseEventsAsPage(year, Pageable.unpaged()).getContent()).
+        assertThat(examService.getAllByYear(year, Pageable.unpaged()).getContent()).
                 singleElement()
                 .isEqualTo(exam);
     }

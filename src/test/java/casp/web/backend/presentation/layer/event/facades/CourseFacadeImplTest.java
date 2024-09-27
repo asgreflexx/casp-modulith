@@ -73,7 +73,7 @@ class CourseFacadeImplTest {
         int year = 2023;
         var pageable = Pageable.unpaged();
         var course = TestFixture.createCourse();
-        when(courseService.getBaseEventsAsPage(year, pageable)).thenReturn(new PageImpl<>(List.of(course)));
+        when(courseService.getAllByYear(year, pageable)).thenReturn(new PageImpl<>(List.of(course)));
 
         var coursePage = courseFacade.getAllByYear(year, pageable);
 

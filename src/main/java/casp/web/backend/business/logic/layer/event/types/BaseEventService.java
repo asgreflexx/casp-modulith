@@ -15,7 +15,7 @@ public interface BaseEventService<E extends BaseEvent> {
 
     E getOneById(UUID id);
 
-    Page<E> getBaseEventsAsPage(int year, Pageable pageable);
+    Page<E> getAllByYear(int year, Pageable pageable);
 
     void deleteBaseEventsByMemberId(UUID memberId);
 

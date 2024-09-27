@@ -72,7 +72,7 @@ class EventFacadeImpl implements EventFacade {
 
     @Override
     public Page<EventDto> getAllByYear(final int year, final Pageable pageable) {
-        var eventPage = eventService.getBaseEventsAsPage(year, pageable);
+        var eventPage = eventService.getAllByYear(year, pageable);
         return EVENT_MAPPER.toDtoPage(eventPage);
     }
 

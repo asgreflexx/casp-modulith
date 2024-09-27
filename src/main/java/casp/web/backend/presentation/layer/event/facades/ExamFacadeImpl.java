@@ -72,7 +72,7 @@ class ExamFacadeImpl implements ExamFacade {
 
     @Override
     public Page<ExamDto> getAllByYear(final int year, final Pageable pageable) {
-        var examPage = examService.getBaseEventsAsPage(year, pageable);
+        var examPage = examService.getAllByYear(year, pageable);
         return EXAM_MAPPER.toDtoPage(examPage);
     }
 

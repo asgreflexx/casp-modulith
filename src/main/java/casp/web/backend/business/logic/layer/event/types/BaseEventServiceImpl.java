@@ -86,7 +86,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     // It cast to the correct type
     @SuppressWarnings("unchecked")
     @Override
-    public Page<E> getBaseEventsAsPage(final int year, final Pageable pageable) {
+    public Page<E> getAllByYear(final int year, final Pageable pageable) {
         return (Page<E>) eventRepository.findAllByYearAndEventType(year, eventType, pageable);
     }
 

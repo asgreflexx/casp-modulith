@@ -79,7 +79,7 @@ class CourseFacadeImpl implements CourseFacade {
 
     @Override
     public Page<CourseDto> getAllByYear(final int year, final Pageable pageable) {
-        var coursePage = courseService.getBaseEventsAsPage(year, pageable);
+        var coursePage = courseService.getAllByYear(year, pageable);
         return COURSE_MAPPER.toDtoPage(coursePage);
     }
 
