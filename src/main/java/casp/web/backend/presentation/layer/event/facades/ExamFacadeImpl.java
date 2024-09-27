@@ -63,6 +63,11 @@ class ExamFacadeImpl implements ExamFacade {
         return mapDocumentToDto(exam);
     }
 
+    @Override
+    public void deleteById(final UUID id) {
+        examService.deleteBaseEventById(id);
+    }
+
     private void setExamParticipants(final ExamDto examDto) {
         var examParticipantDtoSet = examParticipantService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(examDto.getId())
                 .stream()
