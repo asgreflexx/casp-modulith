@@ -7,6 +7,7 @@ import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
 import casp.web.backend.data.access.layer.event.types.Event;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,8 @@ class EventServiceImplTest {
     private EventParticipantService participantService;
     @Mock
     private BaseEventRepository eventRepository;
+    @Mock
+    private MemberRepository memberRepository;
 
     @InjectMocks
     private EventServiceImpl eventService;
@@ -122,6 +125,7 @@ class EventServiceImplTest {
             when(eventRepository.findByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
 
             assertSame(event, eventService.getOneById(event.getId()));
+            verify(memberRepository).findByIdAndEntityStatus(event.getMemberId(), EntityStatus.ACTIVE);
         }
 
         @Test

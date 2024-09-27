@@ -5,6 +5,7 @@ import casp.web.backend.business.logic.layer.event.participants.EventParticipant
 import casp.web.backend.data.access.layer.event.participants.EventParticipant;
 import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
 import casp.web.backend.data.access.layer.event.types.Event;
+import casp.web.backend.data.access.layer.member.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,8 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventParticipant> imp
     @Autowired
     EventServiceImpl(final CalendarService calendarService,
                      final EventParticipantService participantService,
-                     final BaseEventRepository eventRepository) {
-        super(calendarService, participantService, eventRepository, Event.EVENT_TYPE);
+                     final BaseEventRepository eventRepository,
+                     final MemberRepository memberRepository) {
+        super(calendarService, participantService, eventRepository, memberRepository, Event.EVENT_TYPE);
     }
 }
