@@ -143,7 +143,7 @@ class CoTrainerServiceImplTest {
 
             coTrainerService.replaceParticipants(course, coTrainersId);
 
-            verify(baseParticipantRepository).deleteAllByBaseEventId(course.getId());
+            verify(baseParticipantRepository).deleteAllByBaseEventIdAndParticipantType(course.getId(), participantType);
         }
 
         @Test
@@ -154,15 +154,6 @@ class CoTrainerServiceImplTest {
 
             verify(baseParticipantRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(course, actual.getBaseEvent()));
-        }
-
-        @Test
-        void setParticipantsSize() {
-            mockMembers();
-
-            coTrainerService.replaceParticipants(course, coTrainersId);
-
-            assertEquals(2, course.getParticipantsSize());
         }
 
         @Test

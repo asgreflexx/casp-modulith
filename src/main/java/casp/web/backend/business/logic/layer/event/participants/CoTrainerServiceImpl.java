@@ -28,7 +28,8 @@ class CoTrainerServiceImpl extends BaseParticipantServiceImpl<CoTrainer, Course>
     @Override
     public void replaceParticipants(final Course course, final Set<UUID> coTrainersId) {
         var coTrainerSet = createCoTrainers(course, coTrainersId);
-        replaceParticipantsAndSetMetadata(course, coTrainerSet);
+        baseParticipantRepository.deleteAllByBaseEventIdAndParticipantType(course.getId(), participantType);
+        baseParticipantRepository.saveAll(coTrainerSet);
     }
 
     @Override
