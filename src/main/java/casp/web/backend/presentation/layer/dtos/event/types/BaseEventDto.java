@@ -27,6 +27,8 @@ public abstract class BaseEventDto<P> {
     protected String eventType;
     protected String name;
     protected String description;
+    @NotNull
+    protected UUID memberId;
     protected SimpleMemberDto member;
     @Valid
     protected BaseEventOption option;
@@ -97,6 +99,14 @@ public abstract class BaseEventDto<P> {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    public UUID getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(final UUID memberId) {
+        this.memberId = memberId;
     }
 
     public SimpleMemberDto getMember() {
