@@ -82,6 +82,19 @@ class CourseFacadeImplTest {
                 .satisfies(courseDto -> assertEquals(course.getId(), courseDto.getId()));
     }
 
+    @Test
+    void getSpacesEmail() {
+        var dogHasHandler = TestFixture.createDogHasHandler();
+        var space = TestFixture.createSpace();
+        space.setDogHasHandler(dogHasHandler);
+        var course = space.getBaseEvent();
+        when(spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(course.getId())).thenReturn(Set.of(space));
+
+        var spacesEmail = courseFacade.getSpacesEmail(course.getId());
+
+        assertThat(spacesEmail).containsExactly(dogHasHandler.getMember().getEmail());
+    }
+
     @Nested
     class Save {
         @Captor

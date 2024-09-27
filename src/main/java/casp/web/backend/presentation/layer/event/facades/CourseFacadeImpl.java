@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -81,6 +82,14 @@ class CourseFacadeImpl implements CourseFacade {
     public Page<CourseDto> getAllByYear(final int year, final Pageable pageable) {
         var coursePage = courseService.getAllByYear(year, pageable);
         return COURSE_MAPPER.toDtoPage(coursePage);
+    }
+
+    @Override
+    public Set<String> getSpacesEmail(final UUID id) {
+        return spaceService.getActiveParticipantsIfMembersOrDogHasHandlerAreActive(id)
+                .stream()
+                .map(s -> s.getDogHasHandler().getMember().getEmail())
+                .collect(Collectors.toSet());
     }
 
     private void setCoTrainers(final CourseDto courseDto) {
