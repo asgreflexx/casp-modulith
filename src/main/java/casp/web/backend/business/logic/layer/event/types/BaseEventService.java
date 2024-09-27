@@ -13,7 +13,7 @@ public interface BaseEventService<E extends BaseEvent> {
 
     void deleteBaseEventById(UUID id);
 
-    E getBaseEventById(UUID id);
+    E getById(UUID id);
 
     Page<E> getBaseEventsAsPage(int year, Pageable pageable);
 

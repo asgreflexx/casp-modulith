@@ -59,7 +59,7 @@ class ExamFacadeImpl implements ExamFacade {
 
     @Override
     public ExamDto getById(final UUID id) {
-        var exam = examService.getBaseEventById(id);
+        var exam = examService.getById(id);
         return mapDocumentToDto(exam);
     }
 

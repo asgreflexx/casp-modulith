@@ -47,7 +47,7 @@ class EventFacadeImplTest {
     @Test
     void getById() {
         var event = TestFixture.createEvent();
-        when(eventService.getBaseEventById(event.getId())).thenReturn(event);
+        when(eventService.getById(event.getId())).thenReturn(event);
 
         var eventDto = eventFacade.getById(event.getId());
 

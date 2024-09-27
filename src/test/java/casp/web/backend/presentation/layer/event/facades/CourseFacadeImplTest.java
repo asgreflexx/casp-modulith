@@ -50,7 +50,7 @@ class CourseFacadeImplTest {
     @Test
     void getById() {
         var course = TestFixture.createCourse();
-        when(courseService.getBaseEventById(course.getId())).thenReturn(course);
+        when(courseService.getById(course.getId())).thenReturn(course);
 
         var courseDto = courseFacade.getById(course.getId());
 

@@ -46,7 +46,7 @@ class ExamFacadeImplTest {
     @Test
     void getById() {
         var exam = TestFixture.createExam();
-        when(examService.getBaseEventById(exam.getId())).thenReturn(exam);
+        when(examService.getById(exam.getId())).thenReturn(exam);
 
         var examDto = examFacade.getById(exam.getId());
 

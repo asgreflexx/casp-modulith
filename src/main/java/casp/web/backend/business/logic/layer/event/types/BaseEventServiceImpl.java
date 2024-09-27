@@ -75,7 +75,7 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     // It cast to the correct type
     @SuppressWarnings("unchecked")
     @Override
-    public E getBaseEventById(final UUID id) {
+    public E getById(final UUID id) {
         return (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "This %s[%s] doesn't exist or it isn't active".formatted(eventType, id);
             LOG.error(msg);

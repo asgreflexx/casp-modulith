@@ -129,7 +129,7 @@ class CourseServiceImplTest {
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
-            assertSame(course, courseService.getBaseEventById(course.getId()));
+            assertSame(course, courseService.getById(course.getId()));
         }
 
         @Test
@@ -137,7 +137,7 @@ class CourseServiceImplTest {
             var id = UUID.randomUUID();
             when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> courseService.getBaseEventById(id));
+            assertThrows(NoSuchElementException.class, () -> courseService.getById(id));
         }
     }
 }

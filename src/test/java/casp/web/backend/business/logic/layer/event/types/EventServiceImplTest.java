@@ -121,7 +121,7 @@ class EventServiceImplTest {
         void eventExist() {
             when(eventRepository.findByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
 
-            assertSame(event, eventService.getBaseEventById(event.getId()));
+            assertSame(event, eventService.getById(event.getId()));
         }
 
         @Test
@@ -129,7 +129,7 @@ class EventServiceImplTest {
             var id = UUID.randomUUID();
             when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> eventService.getBaseEventById(id));
+            assertThrows(NoSuchElementException.class, () -> eventService.getById(id));
         }
     }
 }

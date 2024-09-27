@@ -59,7 +59,7 @@ class EventFacadeImpl implements EventFacade {
 
     @Override
     public EventDto getById(final UUID id) {
-        var event = eventService.getBaseEventById(id);
+        var event = eventService.getById(id);
         return mapDocumentToDto(event);
     }
 
