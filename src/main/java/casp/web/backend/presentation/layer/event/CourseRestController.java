@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -52,5 +53,10 @@ class CourseRestController {
     @GetMapping
     ResponseEntity<Page<CourseDto>> getAllByYear(final @RequestParam @Positive int year, final @ParameterObject Pageable pageable) {
         return ResponseEntity.ok(courseFacade.getAllByYear(year, pageable));
+    }
+
+    @GetMapping("/spaces-email/{id}")
+    ResponseEntity<Set<String>> getSpacesEmail(final @PathVariable UUID id) {
+        return ResponseEntity.ok(courseFacade.getSpacesEmail(id));
     }
 }

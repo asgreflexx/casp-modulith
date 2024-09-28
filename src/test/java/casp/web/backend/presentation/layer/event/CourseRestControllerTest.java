@@ -75,6 +75,21 @@ class CourseRestControllerTest {
         dogHasHandlerRepository.save(dogHasHandler);
     }
 
+    @Test
+    void getSpacesEmail() throws Exception {
+        var course = TestFixture.createCourse();
+        var space = TestFixture.createSpace();
+        space.setDogHasHandler(dogHasHandler);
+        space.setMemberOrHandlerId(dogHasHandler.getId());
+        space.setBaseEvent(course);
+        baseParticipantRepository.save(space);
+        baseEventRepository.save(course);
+
+        mockMvc.perform(get(COURSE_URL_PREFIX + "/spaces-email/{id}", course.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0]").value(dogHasHandler.getMember().getEmail()));
+    }
+
     @Nested
     class Save {
 
