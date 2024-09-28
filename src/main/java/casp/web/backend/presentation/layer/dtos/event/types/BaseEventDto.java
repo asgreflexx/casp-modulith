@@ -6,6 +6,7 @@ import casp.web.backend.data.access.layer.event.options.BaseEventOption;
 import casp.web.backend.presentation.layer.dtos.event.calendar.CalendarDto;
 import casp.web.backend.presentation.layer.dtos.member.SimpleMemberDto;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -25,6 +26,7 @@ public abstract class BaseEventDto<P> {
     @NotNull
     @Pattern(regexp = TypesRegex.BASE_EVENT_TYPES_REGEX)
     protected String eventType;
+    @NotBlank
     protected String name;
     protected String description;
     @NotNull
