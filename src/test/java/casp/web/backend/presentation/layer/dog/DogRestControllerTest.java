@@ -34,12 +34,14 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class DogRestControllerTest {
     private static final String DOG_URL_PREFIX = "/dog";
+    private static final String DOG_NOT_FOUND_MSG = "Dog with id %s not found or it isn't active.";
 
     @Autowired
     private MockMvc mockMvc;
@@ -113,6 +115,22 @@ class DogRestControllerTest {
         return mockMvc.perform(get(DOG_URL_PREFIX + "/{id}", dogId));
     }
 
+    private void assertDogHasHandler(final DogDto actual) {
+        assertThat(actual.getDogHasHandlerSet())
+                .singleElement()
+                .satisfies(dh -> {
+                    assertEquals(getDogHasHandler().getId(), dh.getId());
+                    assertEquals(getDogHasHandler().getMemberId(), dh.getMemberId());
+                    assertEquals(getDogHasHandler().getMember().getId(), dh.getMember().getId());
+                    assertNull(dh.getDogId());
+                    assertNull(dh.getDog());
+                });
+    }
+
+    private DogHasHandlerDto getDogHasHandler() {
+        return charlie.getDogHasHandlerSet().stream().findAny().orElseThrow();
+    }
+
     @Nested
     class DeleteDogById {
         @Test
@@ -138,7 +156,8 @@ class DogRestControllerTest {
         @Test
         void dogNotFound() throws Exception {
             deleteDog(inactive.getId())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(DOG_NOT_FOUND_MSG.formatted(inactive.getId())));
         }
 
         private ResultActions deleteDog(final UUID dogId) throws Exception {
@@ -166,10 +185,14 @@ class DogRestControllerTest {
 
         @Test
         void bodyIsInvalid() throws Exception {
-            charlie.setName(null);
+            var exception = performPost(new DogDto())
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
 
-            performPost(charlie)
-                    .andExpect(status().isBadRequest());
+            assertThat(exception)
+                    .isNotNull()
+                    .satisfies(e -> assertThat(e.getMessage()).contains("NotBlank.ownerName", "NotBlank.ownerAddress", "NotBlank.name"));
         }
 
         private ResultActions performPost(final DogDto dogDto) throws Exception {
@@ -178,22 +201,6 @@ class DogRestControllerTest {
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON));
         }
-    }
-
-    private void assertDogHasHandler(final DogDto actual) {
-        assertThat(actual.getDogHasHandlerSet())
-                .singleElement()
-                .satisfies(dh -> {
-                    assertEquals(getDogHasHandler().getId(), dh.getId());
-                    assertEquals(getDogHasHandler().getMemberId(), dh.getMemberId());
-                    assertEquals(getDogHasHandler().getMember().getId(), dh.getMember().getId());
-                    assertNull(dh.getDogId());
-                    assertNull(dh.getDog());
-                });
-    }
-
-    private DogHasHandlerDto getDogHasHandler() {
-        return charlie.getDogHasHandlerSet().stream().findAny().orElseThrow();
     }
 
     @Nested
@@ -271,7 +278,8 @@ class DogRestControllerTest {
         @Test
         void dogNotFound() throws Exception {
             getDogById(DogRestControllerTest.this.inactive.getId())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value(DOG_NOT_FOUND_MSG.formatted(inactive.getId())));
         }
     }
 }
