@@ -28,14 +28,9 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, Space> implements C
         this.coTrainerService = coTrainerService;
     }
 
-    private void deleteCourse(final BaseEvent course) {
-        coTrainerService.deleteParticipantsByBaseEventId(course.getId());
-        deleteBaseEvent(course);
-    }
-
     @Override
     public void deleteById(final UUID id) {
-        findBaseEventNotDeleted(id).ifPresent(this::deleteCourse);
+        deleteCourse(getOneById(id));
     }
 
     @Override
@@ -57,5 +52,10 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, Space> implements C
             coTrainerService.activateParticipantsByBaseEventId(course.getId());
             activateBaseEvent(course);
         });
+    }
+
+    private void deleteCourse(final BaseEvent course) {
+        coTrainerService.deleteParticipantsByBaseEventId(course.getId());
+        deleteBaseEvent(course);
     }
 }

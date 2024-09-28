@@ -73,7 +73,7 @@ class CourseServiceImplTest {
 
     @Test
     void deleteById() {
-        when(eventRepository.findByIdAndEntityStatusNot(course.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(course));
+        when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
         courseService.deleteById(course.getId());
 

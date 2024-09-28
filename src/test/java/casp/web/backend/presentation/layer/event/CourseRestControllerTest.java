@@ -4,6 +4,7 @@ import casp.web.backend.TestFixture;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.dog.DogRepository;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.calendar.CalendarRepository;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
@@ -22,12 +23,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class CourseRestControllerTest {
     private static final String COURSE_URL_PREFIX = "/course";
+    private static final String DOES_NOT_EXIST_MESSAGE = "This %s[%s] doesn't exist or it isn't active";
     @Autowired
     private MockMvc mockMvc;
     @Autowired
@@ -111,7 +116,7 @@ class CourseRestControllerTest {
         @Test
         void doesNotExist() throws Exception {
             var id = UUID.randomUUID();
-            var msg = "This %s[%s] doesn't exist or it isn't active".formatted(Course.EVENT_TYPE, id);
+            var msg = DOES_NOT_EXIST_MESSAGE.formatted(Course.EVENT_TYPE, id);
 
             performGet(id)
                     .andExpect(status().is4xxClientError())
@@ -137,4 +142,47 @@ class CourseRestControllerTest {
         }
     }
 
+    @Nested
+    class DeleteById {
+        @Test
+        void doesNotExist() throws Exception {
+            var id = UUID.randomUUID();
+            var msg = DOES_NOT_EXIST_MESSAGE.formatted(Course.EVENT_TYPE, id);
+
+            performDelete(id)
+                    .andExpect(status().is4xxClientError())
+                    .andExpect(jsonPath("$.message").value(msg));
+        }
+
+        @Test
+        void exist() throws Exception {
+            var course = TestFixture.createCourse();
+            var coTrainer = TestFixture.createCoTrainer();
+            coTrainer.setBaseEvent(course);
+            var space = TestFixture.createSpace();
+            space.setBaseEvent(course);
+            var calendarEntry = TestFixture.createCalendarEntry();
+            calendarEntry.setBaseEvent(course);
+            calendarRepository.save(calendarEntry);
+            baseParticipantRepository.saveAll(Set.of(coTrainer, space));
+            baseEventRepository.save(course);
+
+            performDelete(course.getId())
+                    .andExpect(status().isNoContent());
+
+            assertThat(baseEventRepository.findAll())
+                    .allSatisfy(c -> assertSame(EntityStatus.DELETED, c.getEntityStatus()));
+
+            assertThat(baseParticipantRepository.findAll())
+                    .allSatisfy(p -> assertSame(EntityStatus.DELETED, p.getEntityStatus()));
+
+            assertThat(calendarRepository.findAll())
+                    .allSatisfy(c -> assertSame(EntityStatus.DELETED, c.getEntityStatus()));
+
+        }
+
+        private ResultActions performDelete(final UUID id) throws Exception {
+            return mockMvc.perform(delete(COURSE_URL_PREFIX + "/{id}", id));
+        }
+    }
 }

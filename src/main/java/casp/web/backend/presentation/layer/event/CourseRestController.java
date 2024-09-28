@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,5 +36,11 @@ class CourseRestController {
     @GetMapping("/{id}")
     ResponseEntity<CourseDto> getOneById(final @PathVariable UUID id) {
         return ResponseEntity.ok(courseFacade.getOneById(id));
+    }
+
+    @DeleteMapping("/{id}")
+    ResponseEntity<Void> deleteById(final @PathVariable UUID id) {
+        courseFacade.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
