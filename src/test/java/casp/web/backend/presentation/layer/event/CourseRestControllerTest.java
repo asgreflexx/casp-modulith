@@ -22,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -183,6 +184,36 @@ class CourseRestControllerTest {
 
         private ResultActions performDelete(final UUID id) throws Exception {
             return mockMvc.perform(delete(COURSE_URL_PREFIX + "/{id}", id));
+        }
+    }
+
+    @Nested
+    class GetAllByYear {
+        @Test
+        void invalid() throws Exception {
+            performGet(-1)
+                    .andExpect(status().is4xxClientError())
+                    .andExpect(jsonPath("$.message").value("getAllByYear.year: must be greater than 0"));
+        }
+
+        @Test
+        void courseExist() throws Exception {
+            var course = TestFixture.createCourse();
+            var now = LocalDateTime.now();
+            course.setMaxLocalDateTime(now.plusDays(1));
+            course.setMinLocalDateTime(now);
+            baseEventRepository.save(course);
+
+            performGet(now.getYear())
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.content[0].id").value(course.getId().toString()));
+        }
+
+        private ResultActions performGet(final int year) throws Exception {
+            return mockMvc.perform(get(COURSE_URL_PREFIX)
+                    .param("page", "0")
+                    .param("size", "10")
+                    .param("year", Integer.toString(year)));
         }
     }
 }
