@@ -7,6 +7,7 @@ import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.enumerations.Role;
 import casp.web.backend.presentation.layer.dtos.member.MemberDto;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +68,8 @@ class MemberRestController {
     }
 
     @GetMapping("/search-members-by-firstname-and-lastname")
-    ResponseEntity<List<MemberDto>> getMemberByFirstNameAndLastName(final @RequestParam String firstName,
-                                                                    final @RequestParam String lastName) {
+    ResponseEntity<List<MemberDto>> getMemberByFirstNameAndLastName(final @RequestParam @NotBlank String firstName,
+                                                                    final @RequestParam @NotBlank String lastName) {
         var members = memberService.getMembersByFirstNameAndLastName(firstName, lastName);
         return ResponseEntity.ok(MEMBER_MAPPER.toDtoList(members));
     }

@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -46,6 +47,7 @@ class MemberRestControllerTest {
     private static final String MEMBER_URL_PREFIX = "/member";
     private static final TypeReference<RestResponsePage<MemberDto>> PAGE_TYPE_REFERENCE = new TypeReference<>() {
     };
+    private static final String MEMBER_NOT_FOUND_MESSAGE = "Member with id %s not found or it isn't %s.";
 
     @Autowired
     private MockMvc mockMvc;
@@ -117,19 +119,6 @@ class MemberRestControllerTest {
     }
 
     @Test
-    void getMembersByFirstNameAndLastName() throws Exception {
-        TypeReference<List<MemberDto>> typeReference = new TypeReference<>() {
-        };
-        var mvcResult = mockMvc.perform(get(MEMBER_URL_PREFIX + "/search-members-by-firstname-and-lastname")
-                        .param("firstName", john.getFirstName())
-                        .param("lastName", john.getLastName()))
-                .andExpect(status().isOk())
-                .andReturn();
-
-        assertThat(MvcMapper.toObject(mvcResult, typeReference)).containsExactly(john);
-    }
-
-    @Test
     void searchMembersByFirstNameOrLastName() throws Exception {
         var mvcResult = mockMvc.perform(get(MEMBER_URL_PREFIX + "/search-members-by-name")
                         .param("page", "0")
@@ -188,6 +177,52 @@ class MemberRestControllerTest {
     }
 
     @Nested
+    class GetMembersByFirstNameAndLastName {
+        private static final String URL = MEMBER_URL_PREFIX + "/search-members-by-firstname-and-lastname";
+
+        @Test
+        void validRequest() throws Exception {
+            TypeReference<List<MemberDto>> typeReference = new TypeReference<>() {
+            };
+            var mvcResult = performGet(john.getFirstName(), john.getLastName())
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            assertThat(MvcMapper.toObject(mvcResult, typeReference)).containsExactly(john);
+        }
+
+        @Test
+        void requestWithoutParameters() throws Exception {
+            var exception = mockMvc.perform(get(URL))
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .satisfies(e -> assertThat(e.getMessage()).contains("Required request parameter"));
+        }
+
+        @Test
+        void requestWithBadParameters() throws Exception {
+            var exception = performGet(" ", " ")
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .satisfies(e -> assertThat(e.getMessage()).contains("firstName: must not be blank", "lastName: must not be blank"));
+        }
+
+        private ResultActions performGet(final String firstName, final String lastName) throws Exception {
+            return mockMvc.perform(get(URL)
+                    .param("firstName", firstName)
+                    .param("lastName", lastName));
+        }
+    }
+
+    @Nested
     class ActivateMember {
         @Test
         void cascadeActivateMember() throws Exception {
@@ -212,7 +247,10 @@ class MemberRestControllerTest {
 
         @Test
         void memberNotFound() throws Exception {
-            activateMember(john.getId()).andExpect(status().isBadRequest());
+            activateMember(john.getId())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value(MEMBER_NOT_FOUND_MESSAGE.formatted(john.getId(), EntityStatus.INACTIVE)));
         }
 
         private ResultActions activateMember(final UUID memberId) throws Exception {
@@ -240,9 +278,11 @@ class MemberRestControllerTest {
 
         @Test
         void memberNotFound() throws Exception {
-            deactivateMember(inactive.getId()).andExpect(status().isBadRequest());
+            deactivateMember(inactive.getId())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value(MEMBER_NOT_FOUND_MESSAGE.formatted(inactive.getId(), EntityStatus.ACTIVE)));
         }
-
     }
 
     @Nested
@@ -261,7 +301,10 @@ class MemberRestControllerTest {
 
         @Test
         void memberNotFound() throws Exception {
-            deleteMember(inactive.getId()).andExpect(status().isBadRequest());
+            deleteMember(inactive.getId())
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value(MEMBER_NOT_FOUND_MESSAGE.formatted(inactive.getId(), EntityStatus.ACTIVE)));
         }
 
         private ResultActions deleteMember(final UUID memberId) throws Exception {
@@ -293,16 +336,21 @@ class MemberRestControllerTest {
             member.setEmail(john.getEmail());
 
             performPost(MEMBER_MAPPER.toDto(member))
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value("Member with email %s already exists.".formatted(john.getEmail())));
         }
 
         @Test
         void newMemberIsInvalid() throws Exception {
-            var member = TestFixture.createMember();
-            member.setEmail(null);
+            var exception = performPost(new MemberDto())
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
 
-            performPost(MEMBER_MAPPER.toDto(member))
-                    .andExpect(status().isBadRequest());
+            assertThat(exception)
+                    .isNotNull()
+                    .satisfies(e -> assertThat(e.getMessage())
+                            .contains("NotBlank.lastName", "NotBlank.firstName", "NotNull.email"));
         }
 
         private ResultActions performPost(final MemberDto memberDto) throws Exception {
@@ -330,7 +378,9 @@ class MemberRestControllerTest {
         @Test
         void memberDoesNotExist() throws Exception {
             getMemberById(inactive.getId())
-                    .andExpect(status().isBadRequest());
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value(MEMBER_NOT_FOUND_MESSAGE.formatted(inactive.getId(), EntityStatus.ACTIVE)));
         }
     }
 }
