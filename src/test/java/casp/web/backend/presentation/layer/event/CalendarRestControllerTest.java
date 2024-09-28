@@ -29,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -181,6 +183,14 @@ class CalendarRestControllerTest {
             });
         }
 
+        @Test
+        void notFound() throws Exception {
+            var id = UUID.randomUUID();
+            performGet(id)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value("Calendar entry with id %s and entity status active not found".formatted(id)));
+        }
+
         private void setCalendarEntryId(final String eventType) {
             calendarEntryId = calendarList.stream()
                     .filter(ce -> ce.getBaseEvent().getEventType().equals(eventType))
@@ -190,11 +200,15 @@ class CalendarRestControllerTest {
         }
 
         private <T> T getBaseEventDto(Class<T> clazz) throws Exception {
-            var mvcResult = mockMvc.perform(get(CALENDAR_URL_PREFIX + "/{id}", calendarEntryId))
+            var mvcResult = performGet(calendarEntryId)
                     .andExpect(status().isOk())
                     .andReturn();
 
             return MvcMapper.toObject(mvcResult, clazz);
+        }
+
+        private ResultActions performGet(final UUID id) throws Exception {
+            return mockMvc.perform(get(CALENDAR_URL_PREFIX + "/{id}", id));
         }
 
         private void assertCalendarEntry(final CalendarDto ce) {
