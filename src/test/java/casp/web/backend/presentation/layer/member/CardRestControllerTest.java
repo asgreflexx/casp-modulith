@@ -1,6 +1,7 @@
 package casp.web.backend.presentation.layer.member;
 
 import casp.web.backend.TestFixture;
+import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.member.CardRepository;
 import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
@@ -25,12 +26,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 class CardRestControllerTest {
     private static final String CARD_URL_PREFIX = "/card";
+    private static final String CARD_NOT_FOUND_MESSAGE = "Card with id %s not found or it isn't %s.";
 
     @Autowired
     private MockMvc mockMvc;
@@ -64,16 +67,34 @@ class CardRestControllerTest {
                 .satisfies(cardDto -> assertEquals(card.getId(), cardDto.getId()));
     }
 
-    @Test
-    void deleteCardById() throws Exception {
-        mockMvc.perform(delete(CARD_URL_PREFIX + "/{id}", card.getId()))
-                .andExpect(status().isNoContent());
-
-        getCardById(card.getId()).andExpect(status().isBadRequest());
-    }
-
     private ResultActions getCardById(final UUID id) throws Exception {
         return mockMvc.perform(get(CARD_URL_PREFIX + "/{id}", id));
+    }
+
+    @Nested
+    class DeleteCardById {
+        @Test
+        void exist() throws Exception {
+            performDelete(card.getId())
+                    .andExpect(status().isNoContent());
+
+            assertThat(cardRepository.findAll())
+                    .singleElement()
+                    .satisfies(c -> assertEquals(EntityStatus.DELETED, c.getEntityStatus()));
+        }
+
+        @Test
+        void doesNotExist() throws Exception {
+            var id = UUID.randomUUID();
+            performDelete(id)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value(CARD_NOT_FOUND_MESSAGE.formatted(id, EntityStatus.ACTIVE)));
+        }
+
+        private ResultActions performDelete(final UUID id) throws Exception {
+            return mockMvc.perform(delete(CARD_URL_PREFIX + "/{id}", id));
+        }
     }
 
     @Nested
@@ -89,10 +110,25 @@ class CardRestControllerTest {
         }
 
         @Test
-        void newCardIsInvalid() throws Exception {
-            var unknownMember = CARD_MAPPER.toDto(TestFixture.createCard());
+        void cardMemberIsUnknown() throws Exception {
+            var cardWithUnknownMember = CARD_MAPPER.toDto(TestFixture.createCard());
 
-            postCard(unknownMember).andExpect(status().isBadRequest());
+            postCard(cardWithUnknownMember)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value("Member with id %s not found or it isn't %s.".formatted(cardWithUnknownMember.getMemberId(), EntityStatus.ACTIVE)));
+        }
+
+        @Test
+        void cardIsInvalid() throws Exception {
+            var exception = postCard(new CardDto())
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .satisfies(e -> assertThat(e.getMessage()).contains("NotNull.memberId", "NotBlank.code"));
         }
 
         private ResultActions postCard(final CardDto card) throws Exception {
@@ -116,7 +152,11 @@ class CardRestControllerTest {
 
         @Test
         void cardDoesNotExists() throws Exception {
-            getCardById(UUID.randomUUID()).andExpect(status().isBadRequest());
+            var id = UUID.randomUUID();
+            getCardById(id)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message")
+                            .value(CARD_NOT_FOUND_MESSAGE.formatted(id, EntityStatus.ACTIVE)));
         }
     }
 }

@@ -46,8 +46,7 @@ class CardServiceImpl implements CardService {
 
     @Override
     public void deleteCardById(final UUID id) {
-        cardRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED)
-                .ifPresent(card -> saveItWithStatus(card, EntityStatus.DELETED));
+        saveItWithStatus(getCardById(id), EntityStatus.DELETED);
     }
 
     @Override

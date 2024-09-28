@@ -61,13 +61,24 @@ class CardServiceImplTest {
         assertThat(cardService.getCardsByMemberId(member.getId())).containsExactly(card);
     }
 
-    @Test
-    void deleteCardById() {
-        when(cardRepository.findByIdAndEntityStatusNot(card.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(card));
+    @Nested
+    class DeleteCardById {
+        @Test
+        void cardExist() {
+            when(cardRepository.findByIdAndEntityStatus(card.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(card));
 
-        cardService.deleteCardById(card.getId());
+            cardService.deleteCardById(card.getId());
 
-        assertSame(EntityStatus.DELETED, card.getEntityStatus());
+            assertSame(EntityStatus.DELETED, card.getEntityStatus());
+        }
+
+        @Test
+        void cardDoesNotExist() {
+            var cardId = UUID.randomUUID();
+            when(cardRepository.findByIdAndEntityStatus(cardId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> cardService.deleteCardById(cardId));
+        }
     }
 
     @Test
