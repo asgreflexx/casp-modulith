@@ -28,6 +28,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,14 +51,18 @@ class EventServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        event = TestFixture.createEvent();
+        event = spy(TestFixture.createEvent());
     }
 
     @Test
     void saveBaseEvent() {
+        var member = event.getMember();
+        event.setMember(null);
         when(eventRepository.save(event)).thenAnswer(invocation -> invocation.getArgument(0));
+        when(memberRepository.findByIdAndEntityStatus(event.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
         assertSame(event, eventService.save(event));
+        verify(event).setMember(member);
     }
 
     @Test
@@ -122,6 +127,7 @@ class EventServiceImplTest {
     class GetBaseEventById {
         @Test
         void eventExist() {
+            event.setMember(null);
             when(eventRepository.findByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
 
             assertSame(event, eventService.getOneById(event.getId()));

@@ -31,7 +31,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -55,14 +57,18 @@ class CourseServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        course = TestFixture.createCourse();
+        course = spy(TestFixture.createCourse());
     }
 
     @Test
     void saveBaseEvent() {
+        var member = course.getMember();
+        course.setMember(null);
         when(eventRepository.save(course)).thenAnswer(invocation -> invocation.getArgument(0));
+        when(memberRepository.findByIdAndEntityStatus(course.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
         assertSame(course, courseService.save(course));
+        verify(course).setMember(member);
     }
 
     @Test
@@ -169,6 +175,18 @@ class CourseServiceImplTest {
             var actualCourse = courseService.getOneById(course.getId());
 
             assertNull(actualCourse.getMember());
+        }
+
+        @Test
+        void memberWasAlreadySet() {
+            var member = TestFixture.createMember();
+            course.setMemberId(member.getId());
+            course.setMember(member);
+            when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+
+            courseService.getOneById(course.getId());
+
+            verifyNoInteractions(memberRepository);
         }
     }
 }

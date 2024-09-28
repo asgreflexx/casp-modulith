@@ -88,9 +88,11 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
             LOG.error(msg);
             return new NoSuchElementException(msg);
         });
-        memberRepository.findByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
-                .ifPresent(baseEvent::setMember);
-        return (E) baseEvent;
+        var baseEventCasted = (E) baseEvent;
+        if (baseEventCasted.getMember() == null) {
+            setMemberIfNull(baseEventCasted);
+        }
+        return baseEventCasted;
     }
 
     // It cast to the correct type
@@ -101,8 +103,9 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     }
 
     @Override
-    public E save(final E actualBaseEvent) {
-        return eventRepository.save(actualBaseEvent);
+    public E save(final E baseEvent) {
+        setMemberIfNull(baseEvent);
+        return eventRepository.save(baseEvent);
     }
 
     protected Optional<BaseEvent> findBaseEventNotDeleted(final UUID id) {
@@ -121,4 +124,8 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
         return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, eventType);
     }
 
+    private void setMemberIfNull(final E baseEvent) {
+        memberRepository.findByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
+                .ifPresent(baseEvent::setMember);
+    }
 }
