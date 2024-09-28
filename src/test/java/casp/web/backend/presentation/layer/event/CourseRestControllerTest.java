@@ -7,6 +7,7 @@ import casp.web.backend.data.access.layer.dog.DogRepository;
 import casp.web.backend.data.access.layer.event.calendar.CalendarRepository;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.types.BaseEventRepository;
+import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.dtos.event.types.CourseDto;
@@ -21,12 +22,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.util.List;
+import java.util.UUID;
 
 import static casp.web.backend.presentation.layer.dtos.event.calendar.CalendarMapper.CALENDAR_MAPPER;
 import static casp.web.backend.presentation.layer.dtos.event.types.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -101,4 +105,36 @@ class CourseRestControllerTest {
                     .accept(MediaType.APPLICATION_JSON));
         }
     }
+
+    @Nested
+    class GetOneById {
+        @Test
+        void doesNotExist() throws Exception {
+            var id = UUID.randomUUID();
+            var msg = "This %s[%s] doesn't exist or it isn't active".formatted(Course.EVENT_TYPE, id);
+
+            performGet(id)
+                    .andExpect(status().is4xxClientError())
+                    .andExpect(jsonPath("$.message").value(msg));
+        }
+
+        @Test
+        void exist() throws Exception {
+            var course = TestFixture.createCourse();
+            course.setMemberId(dogHasHandler.getMember().getId());
+            baseEventRepository.save(course);
+
+            var mvcResult = performGet(course.getId())
+                    .andExpect(status().isOk())
+                    .andReturn();
+            var courseDto = MvcMapper.toObject(mvcResult, CourseDto.class);
+
+            assertEquals(course.getMemberId(), courseDto.getMemberId());
+        }
+
+        private ResultActions performGet(final UUID id) throws Exception {
+            return mockMvc.perform(get(COURSE_URL_PREFIX + "/{id}", id));
+        }
+    }
+
 }
