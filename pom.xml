@@ -23,11 +23,11 @@
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <jacoco-maven-plugin.version>0.8.11</jacoco-maven-plugin.version>
-        <de.flapdoodle.embed.mongo.spring31x.version>4.11.0</de.flapdoodle.embed.mongo.spring31x.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
         <junit-platform-suite.version>1.10.1</junit-platform-suite.version>
         <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
+        <de.flapdoodle.embed.mongo.spring3x.version>4.16.1</de.flapdoodle.embed.mongo.spring3x.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -57,14 +57,6 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- How to add embedded mongoDb to a spring boot project -->
-        <!-- https://stackoverflow.com/questions/74734106/how-to-use-embedded-mongodb-with-springboot-v3-0-0 -->
-        <dependency>
-            <groupId>de.flapdoodle.embed</groupId>
-            <artifactId>de.flapdoodle.embed.mongo.spring31x</artifactId>
-            <version>${de.flapdoodle.embed.mongo.spring31x.version}</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -83,6 +75,13 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <!-- Embedded Mongo https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo.spring -->
+        <dependency>
+            <groupId>de.flapdoodle.embed</groupId>
+            <artifactId>de.flapdoodle.embed.mongo.spring3x</artifactId>
+            <version>${de.flapdoodle.embed.mongo.spring3x.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

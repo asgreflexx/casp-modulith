@@ -13,12 +13,13 @@ eureka:
   client:
     enabled: false
 
-# MongoDb releases: https://www.mongodb.com/download-center/community/releases
+# For the latest version see: de.flapdoodle.embed.mongo.distribution.Version
 de:
   flapdoodle:
     mongodb:
       embedded:
-        version: 6.0.11
+        version: 7.0.12
+
 logging:
   level:
     org:
