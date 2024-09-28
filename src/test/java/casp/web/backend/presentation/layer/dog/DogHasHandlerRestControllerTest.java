@@ -33,6 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -227,10 +228,14 @@ class DogHasHandlerRestControllerTest {
 
         @Test
         void itIsInvalid() throws Exception {
-            dogHasHandler.setDog(null);
-            dogHasHandler.setDogId(null);
-            performPost(dogHasHandler)
-                    .andExpect(status().isBadRequest());
+            var exception = performPost(new DogHasHandlerDto())
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .satisfies(e -> assertThat(e.getMessage()).contains("NotNull.dogId", "NotNull.memberId"));
         }
 
         private ResultActions performPost(final DogHasHandlerDto dogHasHandlerDto) throws Exception {
@@ -255,8 +260,10 @@ class DogHasHandlerRestControllerTest {
 
         @Test
         void doesNotExist() throws Exception {
-            getDogHasHandlerById(UUID.randomUUID())
-                    .andExpect(status().isBadRequest());
+            var id = UUID.randomUUID();
+            getDogHasHandlerById(id)
+                    .andExpect(status().isBadRequest())
+                    .andExpect(jsonPath("$.message").value("DogHasHandler with id %s not found or it isn't active".formatted(id)));
         }
     }
 }
