@@ -111,7 +111,9 @@ public final class TestFixture {
 
     public static Space createSpace(final Course course) {
         var space = new Space();
-        space.setMemberOrHandlerId(createDogHasHandler().getId());
+        var dogHasHandler = createDogHasHandler();
+        space.setMemberOrHandlerId(dogHasHandler.getId());
+        space.setDogHasHandler(dogHasHandler);
         space.setBaseEvent(course);
         return space;
     }
