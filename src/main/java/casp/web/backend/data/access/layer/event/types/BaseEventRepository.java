@@ -12,8 +12,6 @@ public interface BaseEventRepository extends MongoRepository<BaseEvent, UUID>, Q
 
     Optional<BaseEvent> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 
-    Optional<BaseEvent> findByIdAndEntityStatusNot(UUID id, EntityStatus entityStatus);
-
     Set<BaseEvent> findAllByMemberIdAndEntityStatusNotAndEventType(UUID memberId, EntityStatus entityStatus, String eventType);
 
     Set<BaseEvent> findAllByMemberIdAndEntityStatusAndEventType(UUID memberId, EntityStatus entityStatus, String eventType);

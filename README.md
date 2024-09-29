@@ -7,3 +7,9 @@
     `transactionTemplate.executeWithoutResult(ignore -> dogHasHandlers.forEach(this::setDogAndMemberIfTheyAreNull));`
     * See `casp.web.backend.business.logic.layer.dog.DogHasHandlerServiceImpl.getDogHasHandlersByIds`
     * See how to configure a TransactionTemplate on commit: `#1 Remove unneeded MongoClient`
+
+## How to Unit Test an Abstract Class
+
+See [How to Unit Test an Abstract Class](https://enterprisecraftsmanship.com/posts/how-to-unit-test-an-abstract-class/)
+
+    ...  test class per concrete production class, where you create a test class per each concrete class of the hierarchy.

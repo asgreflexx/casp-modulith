@@ -30,7 +30,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, Space> implements C
 
     @Override
     public void deleteById(final UUID id) {
-        deleteCourse(getOneById(id));
+        deleteCourse(getOneByIdOrThrowException(id));
     }
 
     @Override

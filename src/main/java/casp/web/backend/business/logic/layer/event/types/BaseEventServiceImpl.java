@@ -13,7 +13,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -37,6 +36,61 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
         this.eventType = eventType;
     }
 
+    @Override
+    public void deleteById(final UUID id) {
+        deleteBaseEvent(getOneByIdOrThrowException(id));
+    }
+
+    @Override
+    public void deleteBaseEventsByMemberId(final UUID memberId) {
+        findAllByMemberIdAndNotDeleted(memberId).forEach(this::deleteBaseEvent);
+    }
+
+    @Override
+    public void deactivateBaseEventsByMemberId(final UUID memberId) {
+        findAllByMemberIdAndIsActive(memberId).forEach(this::deactivateBaseEvent);
+    }
+
+    @Override
+    public void activateBaseEventsByMemberId(final UUID memberId) {
+        findAllByMemberIdAndIsInactive(memberId).forEach(this::activateBaseEvent);
+
+    }
+
+    @Override
+    public E getOneById(final UUID id) {
+        var baseEvent = getOneByIdOrThrowException(id);
+        if (baseEvent.getMember() == null) {
+            setMemberIfNull(baseEvent);
+        }
+        return baseEvent;
+    }
+
+    // It cast to the correct type
+    @SuppressWarnings("unchecked")
+    @Override
+    public Page<E> getAllByYear(final int year, final Pageable pageable) {
+        return (Page<E>) eventRepository.findAllByYearAndEventType(year, eventType, pageable);
+    }
+
+    @Override
+    public E save(final E baseEvent) {
+        setMemberIfNull(baseEvent);
+        return eventRepository.save(baseEvent);
+    }
+
+    protected Set<BaseEvent> findAllByMemberIdAndNotDeleted(final UUID memberId) {
+        return eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, eventType);
+    }
+
+    protected Set<BaseEvent> findAllByMemberIdAndIsActive(final UUID memberId) {
+        return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, eventType);
+    }
+
+    protected Set<BaseEvent> findAllByMemberIdAndIsInactive(final UUID memberId) {
+        return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, eventType);
+    }
+
     protected void deleteBaseEvent(final BaseEvent baseEvent) {
         participantService.deleteParticipantsByBaseEventId(baseEvent.getId());
         calendarService.deleteCalendarEntriesByBaseEventId(baseEvent.getId());
@@ -58,70 +112,14 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
         eventRepository.save(baseEvent);
     }
 
-    @Override
-    public void deleteById(final UUID id) {
-        findBaseEventNotDeleted(id).ifPresent(this::deleteBaseEvent);
-    }
-
-    @Override
-    public void deleteBaseEventsByMemberId(final UUID memberId) {
-        findAllByMemberIdAndNotDeleted(memberId).forEach(this::deleteBaseEvent);
-    }
-
-    @Override
-    public void deactivateBaseEventsByMemberId(final UUID memberId) {
-        findAllByMemberIdAndIsActive(memberId).forEach(this::deactivateBaseEvent);
-    }
-
-    @Override
-    public void activateBaseEventsByMemberId(final UUID memberId) {
-        findAllByMemberIdAndIsInactive(memberId).forEach(this::activateBaseEvent);
-
-    }
-
     // It cast to the correct type
     @SuppressWarnings("unchecked")
-    @Override
-    public E getOneById(final UUID id) {
-        var baseEvent = eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
+    protected E getOneByIdOrThrowException(final UUID id) {
+        return (E) eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "This %s[%s] doesn't exist or it isn't active".formatted(eventType, id);
             LOG.error(msg);
             return new NoSuchElementException(msg);
         });
-        var baseEventCasted = (E) baseEvent;
-        if (baseEventCasted.getMember() == null) {
-            setMemberIfNull(baseEventCasted);
-        }
-        return baseEventCasted;
-    }
-
-    // It cast to the correct type
-    @SuppressWarnings("unchecked")
-    @Override
-    public Page<E> getAllByYear(final int year, final Pageable pageable) {
-        return (Page<E>) eventRepository.findAllByYearAndEventType(year, eventType, pageable);
-    }
-
-    @Override
-    public E save(final E baseEvent) {
-        setMemberIfNull(baseEvent);
-        return eventRepository.save(baseEvent);
-    }
-
-    protected Optional<BaseEvent> findBaseEventNotDeleted(final UUID id) {
-        return eventRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED);
-    }
-
-    protected Set<BaseEvent> findAllByMemberIdAndNotDeleted(final UUID memberId) {
-        return eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, eventType);
-    }
-
-    protected Set<BaseEvent> findAllByMemberIdAndIsActive(final UUID memberId) {
-        return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, eventType);
-    }
-
-    protected Set<BaseEvent> findAllByMemberIdAndIsInactive(final UUID memberId) {
-        return eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, eventType);
     }
 
     private void setMemberIfNull(final E baseEvent) {

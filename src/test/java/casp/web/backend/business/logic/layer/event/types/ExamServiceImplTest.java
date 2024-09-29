@@ -66,15 +66,26 @@ class ExamServiceImplTest {
         verify(exam).setMember(member);
     }
 
-    @Test
-    void deleteById() {
-        when(eventRepository.findByIdAndEntityStatusNot(exam.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(exam));
+    @Nested
+    class DeleteById {
+        @Test
+        void exist() {
+            when(eventRepository.findByIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(exam));
 
-        examService.deleteById(exam.getId());
+            examService.deleteById(exam.getId());
 
-        verify(participantService).deleteParticipantsByBaseEventId(exam.getId());
-        verify(calendarService).deleteCalendarEntriesByBaseEventId(exam.getId());
-        assertSame(EntityStatus.DELETED, exam.getEntityStatus());
+            verify(participantService).deleteParticipantsByBaseEventId(exam.getId());
+            verify(calendarService).deleteCalendarEntriesByBaseEventId(exam.getId());
+            assertSame(EntityStatus.DELETED, exam.getEntityStatus());
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> examService.deleteById(id));
+        }
     }
 
     @Test
