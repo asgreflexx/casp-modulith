@@ -63,6 +63,15 @@ class SpaceRestControllerTest {
                 .satisfies(this::assertSpaceToReadDto);
     }
 
+    @Test
+    void getSpacesByDogId() throws Exception {
+        var spaceReadDtoSet = getSpacesBy("/by-dog-id/{dogId}", space.getDogHasHandler().getDogId());
+
+        assertThat(spaceReadDtoSet)
+                .singleElement()
+                .satisfies(this::assertSpaceToReadDto);
+    }
+
     private Set<SpaceReadDto> getSpacesBy(final String postfix, final UUID id) throws Exception {
         TypeReference<Set<SpaceReadDto>> typeReference = new TypeReference<>() {
         };

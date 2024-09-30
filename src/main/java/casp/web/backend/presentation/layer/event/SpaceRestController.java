@@ -29,4 +29,9 @@ class SpaceRestController {
     ResponseEntity<Set<SpaceReadDto>> getSpacesByMemberId(final @PathVariable UUID memberId) {
         return ResponseEntity.ok(spaceFacade.getSpacesByMemberId(memberId));
     }
+
+    @GetMapping("/by-dog-id/{dogId}")
+    ResponseEntity<Set<SpaceReadDto>> getSpacesByDogId(final @PathVariable UUID dogId) {
+        return ResponseEntity.ok(spaceFacade.getSpacesByDogId(dogId));
+    }
 }
