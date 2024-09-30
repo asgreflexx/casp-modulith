@@ -127,6 +127,24 @@ class SpaceServiceImplTest {
         verify(space).setEntityStatus(EntityStatus.DELETED);
     }
 
+    @Test
+    void getSpacesByMemberId() {
+        when(spaceRepository.findAllByMemberId(space.getMemberOrHandlerId())).thenReturn(expectedSpaces);
+
+        var actualSpaces = spaceService.getSpacesByMemberId(space.getMemberOrHandlerId());
+
+        assertThat(actualSpaces).containsAll(expectedSpaces);
+    }
+
+    @Test
+    void getSpacesByDogId() {
+        when(spaceRepository.findAllByDogId(space.getMemberOrHandlerId())).thenReturn(expectedSpaces);
+
+        var actualSpaces = spaceService.getSpacesByDogId(space.getMemberOrHandlerId());
+
+        assertThat(actualSpaces).containsAll(expectedSpaces);
+    }
+
     private Set<BaseParticipant> castToBaseParticipants() {
         return expectedSpaces
                 .stream()

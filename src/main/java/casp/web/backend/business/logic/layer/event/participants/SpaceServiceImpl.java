@@ -35,7 +35,6 @@ class SpaceServiceImpl implements SpaceService {
     public Set<Space> getSpacesByDogHasHandlersId(final Set<UUID> dogHasHandlersId) {
         return spaceRepository.findAllByMemberOrHandlerIdIn(dogHasHandlersId, Space.PARTICIPANT_TYPE);
     }
-    }
 
     @Override
     public void replaceParticipants(final Course course, final Set<UUID> spacesId) {
@@ -97,6 +96,16 @@ class SpaceServiceImpl implements SpaceService {
     public void activateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
         spaceRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.INACTIVE, Space.PARTICIPANT_TYPE)
                 .forEach(participant -> saveItWithStatus((Space) participant, EntityStatus.ACTIVE));
+    }
+
+    @Override
+    public Set<Space> getSpacesByMemberId(final UUID memberId) {
+        return spaceRepository.findAllByMemberId(memberId);
+    }
+
+    @Override
+    public Set<Space> getSpacesByDogId(final UUID dogId) {
+        return spaceRepository.findAllByDogId(dogId);
     }
 
     private Set<Space> createSpaces(final Course course, final Set<UUID> spacesId) {
