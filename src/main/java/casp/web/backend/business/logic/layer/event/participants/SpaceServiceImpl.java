@@ -28,6 +28,9 @@ class SpaceServiceImpl implements SpaceService {
 
     @Override
     public Space saveParticipant(final Space space) {
+        findDogHasHandler(space.getMemberOrHandlerId())
+                .ifPresent(space::setDogHasHandler);
+
         return spaceRepository.save(space);
     }
 

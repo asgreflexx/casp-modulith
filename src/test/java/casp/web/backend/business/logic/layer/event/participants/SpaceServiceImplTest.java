@@ -87,13 +87,6 @@ class SpaceServiceImplTest {
     }
 
     @Test
-    void saveParticipant() {
-        when(spaceRepository.save(space)).thenAnswer(invocation -> invocation.getArgument(0));
-
-        assertThat(spaceService.saveParticipant(space)).isEqualTo(space);
-    }
-
-    @Test
     void getSpacesByDogHasHandlersId() {
         when(spaceRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), participantType)).thenReturn(castToBaseParticipants());
 
@@ -154,6 +147,26 @@ class SpaceServiceImplTest {
 
     private Optional<DogHasHandler> findDogHasHandler(final UUID id) {
         return dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(id, EntityStatus.ACTIVE);
+    }
+
+    @Nested
+    class SaveParticipant {
+        @Test
+        void saveSpace() {
+            when(spaceRepository.save(space)).thenAnswer(invocation -> invocation.getArgument(0));
+
+            assertThat(spaceService.saveParticipant(space)).isEqualTo(space);
+        }
+
+        @Test
+        void setDogHasHandler() {
+            var dogHasHandler = TestFixture.createDogHasHandler();
+            when(dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+
+            spaceService.saveParticipant(space);
+
+            verify(space).setDogHasHandler(dogHasHandler);
+        }
     }
 
     @Nested
