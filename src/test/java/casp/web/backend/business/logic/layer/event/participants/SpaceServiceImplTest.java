@@ -5,8 +5,8 @@ import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.event.participants.BaseParticipant;
-import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.data.access.layer.event.participants.SpaceRepository;
 import casp.web.backend.data.access.layer.event.types.Course;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class SpaceServiceImplTest {
     @Mock
-    private BaseParticipantRepository baseParticipantRepository;
+    private SpaceRepository spaceRepository;
     @Mock
     private DogHasHandlerRepository dogHasHandlerRepository;
 
@@ -42,7 +42,6 @@ class SpaceServiceImplTest {
     private Space space;
     private Course course;
     private Set<Space> expectedSpaces;
-    private Set<BaseParticipant> baseParticipants;
     private String participantType;
 
     @BeforeEach
@@ -51,21 +50,18 @@ class SpaceServiceImplTest {
         participantType = space.getParticipantType();
         course = (Course) space.getBaseEvent();
         expectedSpaces = Set.of(space);
-        baseParticipants = expectedSpaces.stream()
-                .map(BaseParticipant.class::cast)
-                .collect(Collectors.toSet());
     }
 
     @Test
     void getParticipantsByBaseEvent() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(expectedSpaces);
 
         assertThat(spaceService.getParticipantsByBaseEventId(course.getId())).containsAll(expectedSpaces);
     }
 
     @Test
     void deactivateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(expectedSpaces);
 
         spaceService.deactivateParticipantsByBaseEventId(course.getId());
 
@@ -74,7 +70,7 @@ class SpaceServiceImplTest {
 
     @Test
     void activateParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.INACTIVE, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.INACTIVE)).thenReturn(expectedSpaces);
 
         spaceService.activateParticipantsByBaseEventId(course.getId());
 
@@ -83,7 +79,7 @@ class SpaceServiceImplTest {
 
     @Test
     void deleteParticipantsByBaseEventId() {
-        when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusNotAndParticipantType(course.getId(), EntityStatus.DELETED, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByBaseEventIdAndEntityStatusNot(course.getId(), EntityStatus.DELETED)).thenReturn(expectedSpaces);
 
         spaceService.deleteParticipantsByBaseEventId(course.getId());
 
@@ -92,21 +88,21 @@ class SpaceServiceImplTest {
 
     @Test
     void saveParticipant() {
-        when(baseParticipantRepository.save(space)).thenAnswer(invocation -> invocation.getArgument(0));
+        when(spaceRepository.save(space)).thenAnswer(invocation -> invocation.getArgument(0));
 
         assertThat(spaceService.saveParticipant(space)).isEqualTo(space);
     }
 
     @Test
     void getSpacesByDogHasHandlersId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), participantType)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), participantType)).thenReturn(castToBaseParticipants());
 
         assertThat(spaceService.getSpacesByDogHasHandlersId(Set.of(space.getMemberOrHandlerId()))).containsAll(expectedSpaces);
     }
 
     @Test
     void deactivateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE, participantType)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE, participantType)).thenReturn(castToBaseParticipants());
 
         spaceService.deactivateParticipantsByMemberOrHandlerId(space.getMemberOrHandlerId());
 
@@ -115,7 +111,7 @@ class SpaceServiceImplTest {
 
     @Test
     void activateParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.INACTIVE, participantType)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.INACTIVE, participantType)).thenReturn(castToBaseParticipants());
 
         spaceService.activateParticipantsByMemberOrHandlerId(space.getMemberOrHandlerId());
 
@@ -124,11 +120,18 @@ class SpaceServiceImplTest {
 
     @Test
     void deleteParticipantsByMemberOrHandlerId() {
-        when(baseParticipantRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(space.getMemberOrHandlerId(), EntityStatus.DELETED, participantType)).thenReturn(baseParticipants);
+        when(spaceRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(space.getMemberOrHandlerId(), EntityStatus.DELETED, participantType)).thenReturn(castToBaseParticipants());
 
         spaceService.deleteParticipantsByMemberOrHandlerId(space.getMemberOrHandlerId());
 
         verify(space).setEntityStatus(EntityStatus.DELETED);
+    }
+
+    private Set<BaseParticipant> castToBaseParticipants() {
+        return expectedSpaces
+                .stream()
+                .map(BaseParticipant.class::cast)
+                .collect(Collectors.toSet());
     }
 
     private Optional<DogHasHandler> findDogHasHandler(final UUID id) {
@@ -156,7 +159,7 @@ class SpaceServiceImplTest {
 
             spaceService.replaceParticipants(course, spacesId);
 
-            verify(baseParticipantRepository).deleteAllByBaseEventIdAndParticipantType(course.getId(), participantType);
+            verify(spaceRepository).deleteAllByBaseEventId(course.getId());
         }
 
         @Test
@@ -165,7 +168,7 @@ class SpaceServiceImplTest {
 
             spaceService.replaceParticipants(course, spacesId);
 
-            verify(baseParticipantRepository).saveAll(captor.capture());
+            verify(spaceRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(course, actual.getBaseEvent()));
         }
 
@@ -185,7 +188,7 @@ class SpaceServiceImplTest {
 
             spaceService.replaceParticipants(course, Set.of(participantId));
 
-            verify(baseParticipantRepository).saveAll(captor.capture());
+            verify(spaceRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getDogHasHandler().getId()));
         }
 
@@ -196,7 +199,7 @@ class SpaceServiceImplTest {
 
             spaceService.replaceParticipants(course, Set.of(participantId));
 
-            verify(baseParticipantRepository).saveAll(captor.capture());
+            verify(spaceRepository).saveAll(captor.capture());
             assertThat(captor.getValue()).allSatisfy(actual -> assertSame(participantId, actual.getMemberOrHandlerId()));
         }
 
@@ -215,7 +218,7 @@ class SpaceServiceImplTest {
     class GetActiveSpacesIfDogHasHandlersAreActive {
         @BeforeEach
         void setUp() {
-            when(baseParticipantRepository.findAllByBaseEventIdAndEntityStatusAndParticipantType(course.getId(), EntityStatus.ACTIVE, Space.PARTICIPANT_TYPE)).thenReturn(baseParticipants);
+            when(spaceRepository.findAllByBaseEventIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(expectedSpaces);
         }
 
         @Test

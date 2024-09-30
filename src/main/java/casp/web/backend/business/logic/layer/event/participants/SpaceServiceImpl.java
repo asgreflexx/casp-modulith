@@ -3,8 +3,8 @@ package casp.web.backend.business.logic.layer.event.participants;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.enumerations.EntityStatus;
-import casp.web.backend.data.access.layer.event.participants.BaseParticipantRepository;
 import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.data.access.layer.event.participants.SpaceRepository;
 import casp.web.backend.data.access.layer.event.types.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,29 +16,33 @@ import java.util.stream.Collectors;
 
 
 @Service
-class SpaceServiceImpl extends BaseParticipantServiceImpl<Space, Course> implements SpaceService {
+class SpaceServiceImpl implements SpaceService {
     private final DogHasHandlerRepository dogHasHandlerRepository;
+    private final SpaceRepository spaceRepository;
 
     @Autowired
-    SpaceServiceImpl(final BaseParticipantRepository baseParticipantRepository, final DogHasHandlerRepository dogHasHandlerRepository) {
-        super(baseParticipantRepository, Space.PARTICIPANT_TYPE);
+    SpaceServiceImpl(final DogHasHandlerRepository dogHasHandlerRepository, final SpaceRepository spaceRepository) {
         this.dogHasHandlerRepository = dogHasHandlerRepository;
+        this.spaceRepository = spaceRepository;
     }
 
     @Override
     public Space saveParticipant(final Space space) {
-        return baseParticipantRepository.save(space);
+        return spaceRepository.save(space);
     }
 
     @Override
     public Set<Space> getSpacesByDogHasHandlersId(final Set<UUID> dogHasHandlersId) {
-        return baseParticipantRepository.findAllByMemberOrHandlerIdIn(dogHasHandlersId, participantType);
+        return spaceRepository.findAllByMemberOrHandlerIdIn(dogHasHandlersId, Space.PARTICIPANT_TYPE);
+    }
     }
 
     @Override
     public void replaceParticipants(final Course course, final Set<UUID> spacesId) {
         var spaces = createSpaces(course, spacesId);
-        replaceParticipantsAndSetMetadata(course, spaces);
+        spaceRepository.deleteAllByBaseEventId(course.getId());
+        spaceRepository.saveAll(spaces);
+        course.setParticipantsSize(spaces.size());
     }
 
     @Override
@@ -54,6 +58,47 @@ class SpaceServiceImpl extends BaseParticipantServiceImpl<Space, Course> impleme
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public Set<Space> getParticipantsByBaseEventId(final UUID courseId) {
+        return spaceRepository.findAllByBaseEventIdAndEntityStatus(courseId, EntityStatus.ACTIVE);
+    }
+
+    @Override
+    public void deleteParticipantsByBaseEventId(final UUID courseId) {
+        spaceRepository.findAllByBaseEventIdAndEntityStatusNot(courseId, EntityStatus.DELETED)
+                .forEach(participant -> saveItWithStatus(participant, EntityStatus.DELETED));
+    }
+
+    @Override
+    public void deactivateParticipantsByBaseEventId(final UUID courseId) {
+        getParticipantsByBaseEventId(courseId)
+                .forEach(participant -> saveItWithStatus(participant, EntityStatus.INACTIVE));
+    }
+
+    @Override
+    public void activateParticipantsByBaseEventId(final UUID courseId) {
+        spaceRepository.findAllByBaseEventIdAndEntityStatus(courseId, EntityStatus.INACTIVE)
+                .forEach(participant -> saveItWithStatus(participant, EntityStatus.ACTIVE));
+    }
+
+    @Override
+    public void deleteParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
+        spaceRepository.findAllByMemberOrHandlerIdAndEntityStatusNot(memberOrHandlerId, EntityStatus.DELETED, Space.PARTICIPANT_TYPE)
+                .forEach(participant -> saveItWithStatus((Space) participant, EntityStatus.DELETED));
+    }
+
+    @Override
+    public void deactivateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
+        spaceRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.ACTIVE, Space.PARTICIPANT_TYPE)
+                .forEach(participant -> saveItWithStatus((Space) participant, EntityStatus.INACTIVE));
+    }
+
+    @Override
+    public void activateParticipantsByMemberOrHandlerId(final UUID memberOrHandlerId) {
+        spaceRepository.findAllByMemberOrHandlerIdAndEntityStatus(memberOrHandlerId, EntityStatus.INACTIVE, Space.PARTICIPANT_TYPE)
+                .forEach(participant -> saveItWithStatus((Space) participant, EntityStatus.ACTIVE));
+    }
+
     private Set<Space> createSpaces(final Course course, final Set<UUID> spacesId) {
         return spacesId.stream()
                 .flatMap(id ->
@@ -63,5 +108,10 @@ class SpaceServiceImpl extends BaseParticipantServiceImpl<Space, Course> impleme
 
     private Optional<DogHasHandler> findDogHasHandler(final UUID dogHasHandlerId) {
         return dogHasHandlerRepository.findDogHasHandlerByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE);
+    }
+
+    private void saveItWithStatus(final Space space, final EntityStatus entityStatus) {
+        space.setEntityStatus(entityStatus);
+        spaceRepository.save(space);
     }
 }
