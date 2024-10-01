@@ -8,6 +8,11 @@ pipeline {
 
     agent any
 
+    environment {
+        EXPECTED_BRANCH_NAME = 'develop'
+        EXPECTED_RESULT = 'SUCCESS'
+    }
+
     options {
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '5'))
@@ -23,7 +28,7 @@ pipeline {
                 script {
                     sh 'mvn -B clean verify'
                 }
-                jacoco  changeBuildStatus: true,
+                jacoco changeBuildStatus: true,
                         exclusionPattern: createExclusionPattern(),
                         maximumBranchCoverage: '80',
                         maximumClassCoverage: '80',
@@ -35,6 +40,27 @@ pipeline {
                         minimumComplexityCoverage: '50',
                         minimumLineCoverage: '50',
                         minimumMethodCoverage: '50'
+            }
+        }
+        stage('Docker Build and Push') {
+            when {
+                expression {
+                    env.BRANCH_NAME == env.EXPECTED_BRANCH_NAME && currentBuild.currentResult == env.EXPECTED_RESULT
+                }
+            }
+            steps {
+                buildImageAndPush(Service.ADMIN_V2)
+            }
+        }
+        stage('Restart Service') {
+            when {
+                expression {
+                    env.BRANCH_NAME == env.EXPECTED_BRANCH_NAME && currentBuild.currentResult == env.EXPECTED_RESULT
+                }
+            }
+            steps {
+                updateAndRestartService(Environment.TEST, Service.ADMIN_V2)
+                checkIfServiceIsRunningInTestEnvironment(Service.ADMIN_V2)
             }
         }
     }
@@ -53,7 +79,7 @@ def createExclusionPattern() {
     def plugin = pom.getBuild().getPlugins().find { p -> 'jacoco-maven-plugin' == p.getArtifactId() }
     if (plugin) {
         def lines = plugin.getConfiguration().toString().split('\n')
-        lines.each{ line ->
+        lines.each { line ->
             if (line.contains('<exclude>')) {
                 exclusions.add(line.replace('<exclude>', '').replace('</exclude>', '').replace(' ', ''))
             }
