@@ -1,6 +1,6 @@
 spring:
   application:
-    name: admin
+    name: admin-v2
   jackson:
     time-zone: UTC
 
