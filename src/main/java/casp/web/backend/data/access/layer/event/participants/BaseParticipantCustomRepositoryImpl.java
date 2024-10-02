@@ -21,15 +21,6 @@ class BaseParticipantCustomRepositoryImpl implements BaseParticipantCustomReposi
         this.mongoOperations = mongoOperations;
     }
 
-
-    @Override
-    public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdIn(final Set<UUID> memberOrHandlersId, final String participantType) {
-        var expression = BASE_PARTICIPANT.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(BASE_PARTICIPANT.memberOrHandlerId.in(memberOrHandlersId))
-                .and(BASE_PARTICIPANT.participantType.eq(participantType));
-        return runQueryAndMapBaseParticipants(expression);
-    }
-
     @Override
     public <P extends BaseParticipant> Set<P> findAllByMemberOrHandlerIdAndEntityStatus(final UUID memberOrHandlerId, final EntityStatus entityStatus, final String participantType) {
         var expression = BASE_PARTICIPANT.memberOrHandlerId.eq(memberOrHandlerId)

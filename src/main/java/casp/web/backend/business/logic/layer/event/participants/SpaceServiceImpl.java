@@ -35,11 +35,6 @@ class SpaceServiceImpl implements SpaceService {
     }
 
     @Override
-    public Set<Space> getSpacesByDogHasHandlersId(final Set<UUID> dogHasHandlersId) {
-        return spaceRepository.findAllByMemberOrHandlerIdIn(dogHasHandlersId, Space.PARTICIPANT_TYPE);
-    }
-
-    @Override
     public void replaceParticipants(final Course course, final Set<UUID> spacesId) {
         var spaces = createSpaces(course, spacesId);
         spaceRepository.deleteAllByBaseEventId(course.getId());

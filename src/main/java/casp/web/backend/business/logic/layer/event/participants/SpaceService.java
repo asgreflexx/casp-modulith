@@ -10,8 +10,6 @@ import java.util.UUID;
 public interface SpaceService extends BaseParticipantService<Space, Course> {
     Space saveParticipant(Space space);
 
-    Set<Space> getSpacesByDogHasHandlersId(Set<UUID> dogHasHandlersId);
-
     Set<Space> getSpacesByMemberId(UUID memberId);
 
     Set<Space> getSpacesByDogId(UUID dogId);

@@ -87,13 +87,6 @@ class SpaceServiceImplTest {
     }
 
     @Test
-    void getSpacesByDogHasHandlersId() {
-        when(spaceRepository.findAllByMemberOrHandlerIdIn(Set.of(space.getMemberOrHandlerId()), participantType)).thenReturn(castToBaseParticipants());
-
-        assertThat(spaceService.getSpacesByDogHasHandlersId(Set.of(space.getMemberOrHandlerId()))).containsAll(expectedSpaces);
-    }
-
-    @Test
     void deactivateParticipantsByMemberOrHandlerId() {
         when(spaceRepository.findAllByMemberOrHandlerIdAndEntityStatus(space.getMemberOrHandlerId(), EntityStatus.ACTIVE, participantType)).thenReturn(castToBaseParticipants());
 
