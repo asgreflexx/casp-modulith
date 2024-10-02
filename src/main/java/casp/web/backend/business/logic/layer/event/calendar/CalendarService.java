@@ -29,12 +29,6 @@ public interface CalendarService {
      */
     void replaceCalendarEntries(BaseEvent baseEvent, List<Calendar> calendarEntries);
 
-    List<Calendar> getCalendarEntriesByBaseEvent(BaseEvent baseEvent);
-
-    Calendar saveCalendarEntry(Calendar calendarEntry);
-
-    void deleteCalendarEntryById(UUID id);
-
     /**
      * Set all calendar entries status with the given base event id to delete.
      * This is used when a base event is deleted.

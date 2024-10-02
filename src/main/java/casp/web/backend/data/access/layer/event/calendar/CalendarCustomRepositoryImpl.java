@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 @Component
 class CalendarCustomRepositoryImpl implements CalendarCustomRepository {
@@ -38,16 +37,6 @@ class CalendarCustomRepositoryImpl implements CalendarCustomRepository {
 
         return calendarQuery().where(expression).stream()
                 .filter(calendarEntry -> checkIfCalendarEntryIsOfEventTypes(calendarEntry, eventTypes))
-                .sorted()
-                .toList();
-    }
-
-    @Override
-    public List<Calendar> findAllByBaseEventId(final UUID baseEventId) {
-        var expression = CALENDAR.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(CALENDAR.baseEvent.id.eq(baseEventId));
-
-        return calendarQuery().where(expression).stream()
                 .sorted()
                 .toList();
     }

@@ -101,32 +101,6 @@ class CalendarServiceImplTest {
     }
 
     @Test
-    void getCalendarEntriesByBaseEvent() {
-        when(calendarRepository.findAllByBaseEventId(baseEvent.getId())).thenReturn(List.of(calendarEntry));
-
-        assertThat(calendarService.getCalendarEntriesByBaseEvent(baseEvent))
-                .containsExactly(calendarEntry);
-    }
-
-    @Test
-    void saveCalendarEntry() {
-        when(calendarRepository.save(calendarEntry)).thenAnswer(invocation -> invocation.getArgument(0));
-
-        assertThat(calendarService.saveCalendarEntry(calendarEntry))
-                .isSameAs(calendarEntry);
-    }
-
-    @Test
-    void deleteCalendarEntryById() {
-        when(calendarRepository.findByIdAndEntityStatusNot(calendarEntry.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(calendarEntry));
-
-        calendarService.deleteCalendarEntryById(calendarEntry.getId());
-
-        assertSame(EntityStatus.DELETED, calendarEntry.getEntityStatus());
-        verify(calendarRepository).save(calendarEntry);
-    }
-
-    @Test
     void deleteCalendarEntriesByBaseEventId() {
         var baseEventId = baseEvent.getId();
         when(calendarRepository.findAllByBaseEventIdAndEntityStatusNot(baseEventId, EntityStatus.DELETED))

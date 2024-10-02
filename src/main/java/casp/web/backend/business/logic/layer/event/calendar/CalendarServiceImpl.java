@@ -52,22 +52,6 @@ class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public List<Calendar> getCalendarEntriesByBaseEvent(final BaseEvent baseEvent) {
-        return calendarRepository.findAllByBaseEventId(baseEvent.getId());
-    }
-
-    @Override
-    public Calendar saveCalendarEntry(final Calendar calendarEntry) {
-        return calendarRepository.save(calendarEntry);
-    }
-
-    @Override
-    public void deleteCalendarEntryById(final UUID id) {
-        calendarRepository.findByIdAndEntityStatusNot(id, EntityStatus.DELETED)
-                .ifPresent(calendarEntry -> saveItWithStatus(calendarEntry, EntityStatus.DELETED));
-    }
-
-    @Override
     public void deleteCalendarEntriesByBaseEventId(final UUID baseEventId) {
         calendarRepository.findAllByBaseEventIdAndEntityStatusNot(baseEventId, EntityStatus.DELETED)
                 .forEach(calendarEntry -> saveItWithStatus(calendarEntry, EntityStatus.DELETED));

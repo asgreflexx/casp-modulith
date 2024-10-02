@@ -14,8 +14,6 @@ public interface CalendarRepository extends MongoRepository<Calendar, UUID>, Que
 
     Optional<Calendar> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 
-    Optional<Calendar> findByIdAndEntityStatusNot(UUID id, EntityStatus entityStatus);
-
     Set<Calendar> findAllByBaseEventIdAndEntityStatusNot(UUID baseEventId, EntityStatus entityStatus);
 
     Set<Calendar> findAllByBaseEventIdAndEntityStatus(UUID baseEventId, EntityStatus entityStatus);

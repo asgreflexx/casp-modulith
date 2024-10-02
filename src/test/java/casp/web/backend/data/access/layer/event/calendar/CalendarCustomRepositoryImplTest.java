@@ -53,12 +53,6 @@ class CalendarCustomRepositoryImplTest {
         calendarRepository.saveAll(Set.of(tomorrow, today, yesterday));
     }
 
-    @Test
-    void findAllByBaseEventId() {
-        assertThat(calendarRepository.findAllByBaseEventId(yesterday.getBaseEvent().getId()))
-                .containsExactly(yesterday, today);
-    }
-
     @Nested
     class FindAllBetweenEventFromAndEventToAndEventTypes {
         @Test
