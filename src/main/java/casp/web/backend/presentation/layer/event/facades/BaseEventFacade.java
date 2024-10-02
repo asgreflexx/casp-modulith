@@ -8,6 +8,13 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 interface BaseEventFacade<D extends BaseEventDto<?>> {
+    /**
+     * Map document to dto.
+     * Set participants, spaces or coTrainers to the baseEvents
+     *
+     * @param baseEvent instance of BaseEvent
+     * @return a dto with participants, spaces or coTrainers
+     */
     D mapDocumentToDto(BaseEvent baseEvent);
 
     void save(D dto);
