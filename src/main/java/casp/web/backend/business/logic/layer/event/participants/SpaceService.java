@@ -8,6 +8,12 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface SpaceService extends BaseParticipantService<Space, Course> {
+    /**
+     * It sets the dogHasHandler, before saving it.
+     *
+     * @param space instance of Space
+     * @return saved instance of Space
+     */
     Space saveParticipant(Space space);
 
     Set<Space> getSpacesByMemberId(UUID memberId);
