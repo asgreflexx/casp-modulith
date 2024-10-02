@@ -74,9 +74,9 @@ abstract class BaseEventServiceImpl<E extends BaseEvent, P extends BaseParticipa
     }
 
     @Override
-    public E save(final E baseEvent) {
-        setMemberIfNull(baseEvent);
-        return eventRepository.save(baseEvent);
+    public E save(final E actualBaseEvent) {
+        setMemberIfNull(actualBaseEvent);
+        return eventRepository.save(actualBaseEvent);
     }
 
     protected Set<BaseEvent> findAllByMemberIdAndNotDeleted(final UUID memberId) {
