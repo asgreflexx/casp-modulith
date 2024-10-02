@@ -19,12 +19,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-/**
- * DogHasHandlerService
- *
- * @author sarah
- */
-
 @Service
 class DogHasHandlerServiceImpl implements DogHasHandlerService {
     private static final Logger LOG = LoggerFactory.getLogger(DogHasHandlerServiceImpl.class);

@@ -8,20 +8,39 @@ import jakarta.annotation.Nullable;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * IDogHasHandlerService
- *
- * @author sarah
- */
 
 public interface DogHasHandlerService {
 
+    /**
+     * It sets the member and dog to the dogHasHandler, before saving it.
+     *
+     * @param dogHasHandler instance of DogHasHandler
+     * @return saved instance of DogHasHandler
+     */
     DogHasHandler saveDogHasHandler(DogHasHandler dogHasHandler);
 
+    /**
+     * Search for an active DogHasHandler by its id.
+     *
+     * @param id of the DogHasHandler
+     * @return an instance of DogHasHandler with the given id, or throws an exception if not found
+     */
     DogHasHandler getDogHasHandlerById(UUID id);
 
+    /**
+     * Set all DogHasHandlers with the given memberId to deleted status.
+     * This is used when a member is deleted.
+     *
+     * @param memberId the id of the member
+     */
     void deleteDogHasHandlersByMemberId(UUID memberId);
 
+    /**
+     * Set all DogHasHandlers with the given dogId to deleted status.
+     * This is used when a dog is deleted.
+     *
+     * @param dogId the id of the dog
+     */
     void deleteDogHasHandlersByDogId(UUID dogId);
 
     Set<Dog> getDogsByMemberId(UUID memberId);
@@ -32,6 +51,12 @@ public interface DogHasHandlerService {
 
     Set<DogHasHandler> getDogHasHandlersByDogId(UUID dogId);
 
+    /**
+     * Search for an active DogHasHandler by name in members and dogs.
+     *
+     * @param name of the DogHasHandler
+     * @return a set of DogHasHandler with the given name, or an empty set if not found
+     */
     Set<DogHasHandler> searchByName(@Nullable String name);
 
     Set<DogHasHandler> getAllDogHasHandler();
@@ -44,7 +69,19 @@ public interface DogHasHandlerService {
 
     Set<String> getMembersEmailByIds(Set<UUID> handlerIds);
 
+    /**
+     * Set all DogHasHandlers with the given memberId to inactive status.
+     * This is used when a member is deactivated.
+     *
+     * @param memberId the id of the member
+     */
     void deactivateDogHasHandlersByMemberId(UUID memberId);
 
+    /**
+     * Set all DogHasHandlers with the given memberId to active status.
+     * This is used when a member is activated.
+     *
+     * @param memberId the id of the member
+     */
     void activateDogHasHandlersByMemberId(UUID memberId);
 }
