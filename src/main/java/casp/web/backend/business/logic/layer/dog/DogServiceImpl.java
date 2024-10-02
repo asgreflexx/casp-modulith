@@ -15,12 +15,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 
-/**
- * DogService
- *
- * @author sarah
- */
-
 @Service
 class DogServiceImpl implements DogService {
     private static final Logger LOG = LoggerFactory.getLogger(DogServiceImpl.class);
