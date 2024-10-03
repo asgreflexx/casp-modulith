@@ -44,7 +44,7 @@ class DogCustomRepositoryImpl implements DogCustomRepository {
     @Override
     public Page<Dog> findAllByEuropeNetStateNotChecked(final Pageable pageable) {
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(dog.chipNumber.isNotEmpty())
+                .and(dog.chipNumber.isNotNull().and(dog.chipNumber.isNotEmpty()))
                 .and(dog.europeNetState.ne(EuropeNetState.DOG_IS_REGISTERED));
 
         return createQuery().where(expression).fetchPage(pageable);

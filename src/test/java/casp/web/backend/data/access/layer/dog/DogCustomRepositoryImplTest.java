@@ -6,6 +6,8 @@ import casp.web.backend.data.access.layer.enumerations.EuropeNetState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Pageable;
@@ -26,22 +28,25 @@ class DogCustomRepositoryImplTest {
     void setUp() {
         dogRepository.deleteAll();
 
-        charlie = createDog("Charlie", EntityStatus.ACTIVE, EuropeNetState.DOG_IS_REGISTERED);
-        bonsai = createDog("Bonsai", EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED);
-        createDog("INACTIVE", EntityStatus.INACTIVE, EuropeNetState.NOT_CHECKED);
+        charlie = createDog("Charlie", EntityStatus.ACTIVE, EuropeNetState.DOG_IS_REGISTERED, UUID.randomUUID().toString());
+        bonsai = createDog("Bonsai", EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, UUID.randomUUID().toString());
+        createDog("INACTIVE", EntityStatus.INACTIVE, EuropeNetState.NOT_CHECKED, UUID.randomUUID().toString());
+
     }
 
-    @Test
-    void findAllByEuropeNetStateNotChecked() {
+    @ParameterizedTest
+    @NullAndEmptySource
+    void findAllByEuropeNetStateNotChecked(String chipNumber) {
+        createDog("BAD_CHIP_NUMBER", EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, chipNumber);
         assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
     }
 
-    private Dog createDog(final String name, final EntityStatus entityStatus, final EuropeNetState europeNetState) {
+    private Dog createDog(final String name, final EntityStatus entityStatus, final EuropeNetState europeNetState, final String chipNumber) {
         var dog = new Dog();
         dog.setEntityStatus(entityStatus);
         dog.setEuropeNetState(europeNetState);
         dog.setName(name);
-        dog.setChipNumber(UUID.randomUUID().toString());
+        dog.setChipNumber(chipNumber);
         dog.setOwnerName("John Doe");
         return dogRepository.save(dog);
     }
