@@ -20,6 +20,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 
@@ -44,16 +45,29 @@ class EuropeNetTasksTest {
 
     @BeforeEach
     void setUp() {
-        dog = spy(new Dog());
-        dog.setChipNumber("chipNumber");
-        var dogPage = new PageImpl<>(List.of(dog));
-        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(dogPage);
         when(restTemplateBuilder.build()).thenReturn(restTemplate);
         europeNetTasks = new EuropeNetTasks(dogService, restTemplateBuilder, EURO_PET_NET_API);
     }
 
+    @Test
+    void theAreNoDogsToRegister() {
+        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(new PageImpl<>(List.of()));
+
+        europeNetTasks.scheduleChipNumbersCheckTask();
+
+        verifyNoInteractions(restTemplate);
+    }
+
     @Nested
     class ScheduleChipNumbersCheckTask {
+        @BeforeEach
+        void setUp() {
+            dog = spy(new Dog());
+            dog.setChipNumber("chipNumber");
+            var dogPage = new PageImpl<>(List.of(dog));
+            when(dogService.getDogsThatWereNotChecked(null)).thenReturn(dogPage);
+        }
+
         @Test
         void responseStatusIsNotOk() {
             when(responseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);

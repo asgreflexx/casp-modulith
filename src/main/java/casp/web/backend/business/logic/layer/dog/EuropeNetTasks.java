@@ -39,8 +39,14 @@ class EuropeNetTasks {
 
     @Scheduled(cron = "${casp.cron}")
     void scheduleChipNumbersCheckTask() {
-        LOG.info("Start chip number check task");
-        dogService.getDogsThatWereNotChecked(null).forEach(dog -> {
+        var dogPage = dogService.getDogsThatWereNotChecked(null);
+        if (dogPage.isEmpty()) {
+            LOG.info("No dogs to check");
+            return;
+        }
+
+        LOG.info("Start chip number check task. Amount of chips to check: {}", dogPage.getNumberOfElements());
+        dogPage.forEach(dog -> {
             dog.setEuropeNetState(callChipNumberCheckApi(dog.getChipNumber()));
             dogService.saveDog(dog);
         });
