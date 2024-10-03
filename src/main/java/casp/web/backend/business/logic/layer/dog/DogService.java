@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public interface DogService {
@@ -41,7 +40,7 @@ public interface DogService {
      * Get all dogs that were not checked.
      * A dog is not checked, if its EuropeNet state is not checked and its chip number isn't empty.
      *
-     * @return a set of dogs that were not checked.
+     * @return a page of dogs that were not checked.
      */
-    Set<Dog> getDogsThatWereNotChecked();
+    Page<Dog> getDogsThatWereNotChecked(final @Nullable Pageable pageable);
 }

@@ -4,13 +4,13 @@ import casp.web.backend.data.access.layer.enumerations.EntityStatus;
 import casp.web.backend.data.access.layer.enumerations.EuropeNetState;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 class DogCustomRepositoryImpl implements DogCustomRepository {
@@ -25,7 +25,6 @@ class DogCustomRepositoryImpl implements DogCustomRepository {
 
     @Override
     public List<Dog> findAllByChipNumberOrDogNameOrOwnerName(final String chipNumber, final String dogName, final String ownerName) {
-        var query = new SpringDataMongodbQuery<>(mongoOperations, Dog.class);
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE);
         if (StringUtils.isNotBlank(chipNumber)) {
             expression = expression.and(dog.chipNumber.equalsIgnoreCase(chipNumber));
@@ -37,18 +36,21 @@ class DogCustomRepositoryImpl implements DogCustomRepository {
                 expression = expression.and(dog.ownerName.equalsIgnoreCase(ownerName));
             }
         }
-        return query.where(expression)
+        return createQuery().where(expression)
                 .orderBy(dog.name.asc(), dog.ownerName.asc())
                 .fetch();
     }
 
     @Override
-    public Set<Dog> findAllByEuropeNetStateNotChecked() {
-        var query = new SpringDataMongodbQuery<>(mongoOperations, Dog.class);
+    public Page<Dog> findAllByEuropeNetStateNotChecked(final Pageable pageable) {
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE)
                 .and(dog.chipNumber.isNotEmpty())
-                .and(dog.europeNetState.eq(EuropeNetState.NOT_CHECKED));
+                .and(dog.europeNetState.ne(EuropeNetState.DOG_IS_REGISTERED));
 
-        return query.where(expression).stream().collect(Collectors.toSet());
+        return createQuery().where(expression).fetchPage(pageable);
+    }
+
+    private SpringDataMongodbQuery<Dog> createQuery() {
+        return new SpringDataMongodbQuery<>(mongoOperations, Dog.class);
     }
 }

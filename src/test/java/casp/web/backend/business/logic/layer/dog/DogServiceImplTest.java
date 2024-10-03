@@ -11,12 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -57,15 +57,6 @@ class DogServiceImplTest {
     }
 
     @Test
-    void getDogsThatWereNotChecked() {
-        var dog = new Dog();
-        dog.setChipNumber("1234");
-        when(dogRepository.findAllByEuropeNetStateNotChecked()).thenReturn(Set.of(dog));
-
-        assertThat(dogService.getDogsThatWereNotChecked()).containsExactly(dog);
-    }
-
-    @Test
     void getDogsByOwnerNameAndDogsNameOrChipNumber() {
         var dog = new Dog();
         var chipNumber = UUID.randomUUID().toString();
@@ -75,6 +66,28 @@ class DogServiceImplTest {
                 .containsExactly(dog);
     }
 
+    @Nested
+    class GetDogsThatWereNotChecked {
+        private Dog dog;
+
+        @BeforeEach
+        void setUp() {
+            dog = new Dog();
+            dog.setChipNumber("1234");
+            var dogPage = new PageImpl<>(List.of(dog));
+            when(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).thenReturn(dogPage);
+        }
+
+        @Test
+        void pageableIsNull() {
+            assertThat(dogService.getDogsThatWereNotChecked(null)).containsExactly(dog);
+        }
+
+        @Test
+        void pageableIsNotNull() {
+            assertThat(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).containsExactly(dog);
+        }
+    }
 
     @Nested
     class DeleteDogById {

@@ -10,12 +10,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -45,7 +46,8 @@ class EuropeNetTasksTest {
     void setUp() {
         dog = spy(new Dog());
         dog.setChipNumber("chipNumber");
-        when(dogService.getDogsThatWereNotChecked()).thenReturn(Set.of(dog));
+        var dogPage = new PageImpl<>(List.of(dog));
+        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(dogPage);
         when(restTemplateBuilder.build()).thenReturn(restTemplate);
         europeNetTasks = new EuropeNetTasks(dogService, restTemplateBuilder, EURO_PET_NET_API);
     }
