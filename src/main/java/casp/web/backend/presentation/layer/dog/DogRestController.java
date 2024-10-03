@@ -2,7 +2,9 @@ package casp.web.backend.presentation.layer.dog;
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.dog.DogService;
+import casp.web.backend.business.logic.layer.dog.EuropeNetTasks;
 import casp.web.backend.presentation.layer.dtos.dog.DogDto;
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +34,13 @@ class DogRestController {
 
     private final DogService dogService;
     private final DogHasHandlerService dogHasHandlerService;
+    private final EuropeNetTasks europeNetTasks;
 
     @Autowired
-    DogRestController(final DogService dogService, final DogHasHandlerService dogHasHandlerService) {
+    DogRestController(final DogService dogService, final DogHasHandlerService dogHasHandlerService, final EuropeNetTasks europeNetTasks) {
         this.dogService = dogService;
         this.dogHasHandlerService = dogHasHandlerService;
+        this.europeNetTasks = europeNetTasks;
     }
 
     @GetMapping("/{id}")
@@ -72,5 +76,11 @@ class DogRestController {
     ResponseEntity<Void> deleteDogById(final @PathVariable UUID id) {
         dogService.deleteDogById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/register")
+    ResponseEntity<Page<DogDto>> register(final @ParameterObject @Nullable Pageable pageable) {
+        var dogPage = europeNetTasks.registerDogsManually(pageable);
+        return ResponseEntity.ok(DOG_MAPPER.toDtoPage(dogPage));
     }
 }

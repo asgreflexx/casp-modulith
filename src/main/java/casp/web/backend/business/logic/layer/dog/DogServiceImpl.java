@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -61,7 +60,8 @@ class DogServiceImpl implements DogService {
     }
 
     @Override
-    public Set<Dog> getDogsThatWereNotChecked() {
-        return dogRepository.findAllByEuropeNetStateNotChecked();
+    public Page<Dog> getDogsThatWereNotChecked(final Pageable pageable) {
+        var pageRequest = pageable != null ? pageable : Pageable.unpaged();
+        return dogRepository.findAllByEuropeNetStateNotChecked(pageRequest);
     }
 }

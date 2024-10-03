@@ -10,20 +10,23 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-class EuropeNetTasksTest {
+class EuropeNetTasksImplTest {
     private static final String EURO_PET_NET_API = "euroPetNetApi";
     private static final Map<String, String> URI_VARIABLES = Map.of("chipNumber", "chipNumber");
     private static final String DOG_IS_REGISTERED = "Der Hund ist registriert";
@@ -39,19 +42,43 @@ class EuropeNetTasksTest {
 
     private Dog dog;
 
-    private EuropeNetTasks europeNetTasks;
+    private EuropeNetTasksImpl europeNetTasks;
 
     @BeforeEach
     void setUp() {
-        dog = spy(new Dog());
-        dog.setChipNumber("chipNumber");
-        when(dogService.getDogsThatWereNotChecked()).thenReturn(Set.of(dog));
         when(restTemplateBuilder.build()).thenReturn(restTemplate);
-        europeNetTasks = new EuropeNetTasks(dogService, restTemplateBuilder, EURO_PET_NET_API);
+        europeNetTasks = new EuropeNetTasksImpl(dogService, restTemplateBuilder, EURO_PET_NET_API);
+    }
+
+    @Test
+    void theAreNoDogsToRegister() {
+        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(new PageImpl<>(List.of()));
+
+        europeNetTasks.scheduleChipNumbersCheckTask();
+
+        verifyNoInteractions(restTemplate);
+    }
+
+    @Test
+    void registerDogsManually() {
+        var expectedPage = new PageImpl<Dog>(List.of());
+        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(new PageImpl<>(List.of()));
+
+        var actualPage = europeNetTasks.registerDogsManually(null);
+
+        assertEquals(expectedPage, actualPage);
     }
 
     @Nested
     class ScheduleChipNumbersCheckTask {
+        @BeforeEach
+        void setUp() {
+            dog = spy(new Dog());
+            dog.setChipNumber("chipNumber");
+            var dogPage = new PageImpl<>(List.of(dog));
+            when(dogService.getDogsThatWereNotChecked(null)).thenReturn(dogPage);
+        }
+
         @Test
         void responseStatusIsNotOk() {
             when(responseEntity.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);

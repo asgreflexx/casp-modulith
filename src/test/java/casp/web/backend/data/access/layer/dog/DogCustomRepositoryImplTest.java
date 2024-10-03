@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.UUID;
 
@@ -32,7 +33,7 @@ class DogCustomRepositoryImplTest {
 
     @Test
     void findAllByEuropeNetStateNotChecked() {
-        assertThat(dogRepository.findAllByEuropeNetStateNotChecked()).containsExactly(bonsai);
+        assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
     }
 
     private Dog createDog(final String name, final EntityStatus entityStatus, final EuropeNetState europeNetState) {
