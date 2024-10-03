@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -25,7 +26,7 @@ import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
-class EuropeNetTasksTest {
+class EuropeNetTasksImplTest {
     private static final String EURO_PET_NET_API = "euroPetNetApi";
     private static final Map<String, String> URI_VARIABLES = Map.of("chipNumber", "chipNumber");
     private static final String DOG_IS_REGISTERED = "Der Hund ist registriert";
@@ -41,12 +42,12 @@ class EuropeNetTasksTest {
 
     private Dog dog;
 
-    private EuropeNetTasks europeNetTasks;
+    private EuropeNetTasksImpl europeNetTasks;
 
     @BeforeEach
     void setUp() {
         when(restTemplateBuilder.build()).thenReturn(restTemplate);
-        europeNetTasks = new EuropeNetTasks(dogService, restTemplateBuilder, EURO_PET_NET_API);
+        europeNetTasks = new EuropeNetTasksImpl(dogService, restTemplateBuilder, EURO_PET_NET_API);
     }
 
     @Test
@@ -56,6 +57,16 @@ class EuropeNetTasksTest {
         europeNetTasks.scheduleChipNumbersCheckTask();
 
         verifyNoInteractions(restTemplate);
+    }
+
+    @Test
+    void registerDogsManually() {
+        var expectedPage = new PageImpl<Dog>(List.of());
+        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(new PageImpl<>(List.of()));
+
+        var actualPage = europeNetTasks.registerDogsManually(null);
+
+        assertEquals(expectedPage, actualPage);
     }
 
     @Nested

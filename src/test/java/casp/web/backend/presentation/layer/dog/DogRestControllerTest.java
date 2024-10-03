@@ -42,6 +42,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DogRestControllerTest {
     private static final String DOG_URL_PREFIX = "/dog";
     private static final String DOG_NOT_FOUND_MSG = "Dog with id %s not found or it isn't active.";
+    private static final TypeReference<RestResponsePage<DogDto>> DOG_PAGE_RESPONSE = new TypeReference<>() {
+    };
 
     @Autowired
     private MockMvc mockMvc;
@@ -72,8 +74,6 @@ class DogRestControllerTest {
 
     @Test
     void getDogs() throws Exception {
-        TypeReference<RestResponsePage<DogDto>> typeReference = new TypeReference<>() {
-        };
         var mvcResult = mockMvc.perform(get(DOG_URL_PREFIX)
                         .param("page", "0")
                         .param("size", "10")
@@ -81,7 +81,17 @@ class DogRestControllerTest {
                 .andExpect(status().isOk())
                 .andReturn();
 
-        var dogDtoPage = MvcMapper.toObject(mvcResult, typeReference);
+        var dogDtoPage = MvcMapper.toObject(mvcResult, DOG_PAGE_RESPONSE);
+        assertThat(dogDtoPage.getContent()).containsExactly(charlie, bonsai);
+    }
+
+    @Test
+    void register() throws Exception {
+        var mvcResult = mockMvc.perform(post(DOG_URL_PREFIX + "/register"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        var dogDtoPage = MvcMapper.toObject(mvcResult, DOG_PAGE_RESPONSE);
         assertThat(dogDtoPage.getContent()).containsExactly(charlie, bonsai);
     }
 
