@@ -34,13 +34,6 @@ class DogCustomRepositoryImplTest {
 
     }
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    void findAllByEuropeNetStateNotChecked(String chipNumber) {
-        createDog("BAD_CHIP_NUMBER", EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, chipNumber);
-        assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
-    }
-
     private Dog createDog(final String name, final EntityStatus entityStatus, final EuropeNetState europeNetState, final String chipNumber) {
         var dog = new Dog();
         dog.setEntityStatus(entityStatus);
@@ -49,6 +42,22 @@ class DogCustomRepositoryImplTest {
         dog.setChipNumber(chipNumber);
         dog.setOwnerName("John Doe");
         return dogRepository.save(dog);
+    }
+
+    @Nested
+    class FindAllByEuropeNetStateNotChecked {
+        @ParameterizedTest
+        @NullAndEmptySource
+        void findAllByEuropeNetStateNotChecked(String chipNumber) {
+            createDog("BAD_CHIP_NUMBER", EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, chipNumber);
+            assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
+        }
+
+        @Test
+        void notRegistered() {
+            createDog("DOG_NOT_REGISTERED", EntityStatus.ACTIVE, EuropeNetState.DOG_NOT_REGISTERED, UUID.randomUUID().toString());
+            assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
+        }
     }
 
     @Nested
