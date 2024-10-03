@@ -9,10 +9,6 @@ import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.data.access.layer.event.types.Exam;
 
 public final class TypesRegex {
-
-    private TypesRegex() {
-    }
-
     public static final String BASE_EVENT_TYPES_REGEX = "^" + Event.EVENT_TYPE
             + "|" + Course.EVENT_TYPE
             + "|" + Exam.EVENT_TYPE + "$";
@@ -21,4 +17,6 @@ public final class TypesRegex {
             + "|" + ExamParticipant.PARTICIPANT_TYPE
             + "|" + Space.PARTICIPANT_TYPE + "$";
 
+    private TypesRegex() {
+    }
 }
