@@ -13,9 +13,6 @@ class BaseEventObserverImpl implements BaseEventObserver {
 
     @Autowired
     BaseEventObserverImpl(final CourseService courseService, final EventService eventService, final ExamService examService) {
-        observers.add(courseService);
-        observers.add(eventService);
-        observers.add(examService);
     }
 
     @Override

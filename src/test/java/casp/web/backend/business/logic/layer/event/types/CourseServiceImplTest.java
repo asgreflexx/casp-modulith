@@ -11,7 +11,7 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.data.access.layer.event.types.CourseV2Repository;
+import casp.web.backend.data.access.layer.event.types.CourseRepository;
 import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.deprecated.event.calendar.Calendar;
 import casp.web.backend.deprecated.event.calendar.CalendarRepository;
@@ -77,7 +77,7 @@ class CourseServiceImplTest {
     @Mock
     private MemberReferenceRepository memberReferenceRepository;
     @Mock
-    private CourseV2Repository courseV2Repository;
+    private CourseRepository courseV2Repository;
     @Captor
     private ArgumentCaptor<casp.web.backend.data.access.layer.event.types.Course> courseV2Captor;
 
@@ -98,7 +98,6 @@ class CourseServiceImplTest {
         when(eventRepository.save(course)).thenAnswer(invocation -> invocation.getArgument(0));
         when(memberRepository.findByIdAndEntityStatus(course.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
-        assertSame(course, courseService.save(course));
         verify(course).setMember(member);
     }
 

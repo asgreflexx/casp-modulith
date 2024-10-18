@@ -5,5 +5,5 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.util.UUID;
 
-public interface CourseV2Repository extends MongoRepository<Course, UUID>, QuerydslPredicateExecutor<Course> {
+public interface CourseRepository extends MongoRepository<Course, UUID>, QuerydslPredicateExecutor<Course> {
 }

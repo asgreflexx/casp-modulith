@@ -1,6 +1,7 @@
 package casp.web.backend.data.access.layer.event.types;
 
 
+import casp.web.backend.business.logic.layer.event.types.BaseEventRequiredFields;
 import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.enums.EntityStatus;
@@ -8,43 +9,30 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.BaseEventOption;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseEvent extends BaseDocument {
-    @NotNull
+public abstract class BaseEvent extends BaseDocument implements BaseEventRequiredFields {
     BaseEventType eventType;
 
-    @NotBlank
     String name;
 
     String description;
 
     String location;
 
-    @Valid
-    @NotNull
     @DBRef
     MemberReference member;
 
-    @Valid
     BaseEventOption baseEventOption;
 
-    @NotNull
     LocalDateTime minLocalDateTime;
 
-    @NotNull
     LocalDateTime maxLocalDateTime;
 
-    @Valid
-    @NotEmpty
     List<CalendarEntry> calendarEntries = new ArrayList<>();
 
     BaseEvent(BaseEventType eventType) {
@@ -59,74 +47,92 @@ public abstract class BaseEvent extends BaseDocument {
         return dogHasHandler.isActive();
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getLocation() {
         return location;
     }
 
+    @Override
     public void setLocation(String location) {
         this.location = location;
     }
 
+    @Override
     public MemberReference getMember() {
         return member;
     }
 
+    @Override
     public void setMember(final MemberReference member) {
         this.member = member;
     }
 
+    @Override
     public BaseEventOption getBaseEventOption() {
         return baseEventOption;
     }
 
+    @Override
     public void setBaseEventOption(BaseEventOption option) {
         this.baseEventOption = option;
     }
 
+    @Override
     public BaseEventType getEventType() {
         return eventType;
     }
 
+    @Override
     public void setEventType(BaseEventType eventType) {
         this.eventType = eventType;
     }
 
+    @Override
     public LocalDateTime getMinLocalDateTime() {
         return minLocalDateTime;
     }
 
+    @Override
     public void setMinLocalDateTime(LocalDateTime minLocalDateTime) {
         this.minLocalDateTime = minLocalDateTime;
     }
 
+    @Override
     public LocalDateTime getMaxLocalDateTime() {
         return maxLocalDateTime;
     }
 
+    @Override
     public void setMaxLocalDateTime(LocalDateTime maxLocalDateTime) {
         this.maxLocalDateTime = maxLocalDateTime;
     }
 
+    @Override
     public List<CalendarEntry> getCalendarEntries() {
         return calendarEntries;
     }
 
+    @Override
     public void setCalendarEntries(final List<CalendarEntry> calendarEntries) {
         this.calendarEntries = calendarEntries;
     }

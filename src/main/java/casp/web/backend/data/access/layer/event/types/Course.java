@@ -1,33 +1,24 @@
 package casp.web.backend.data.access.layer.event.types;
 
+import casp.web.backend.business.logic.layer.event.types.CourseRequiredFields;
 import casp.web.backend.common.enums.BaseEventType;
-import casp.web.backend.common.validation.CourseSpacesConstraint;
-import casp.web.backend.common.validation.CourseValidation;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
 import com.querydsl.core.annotations.QueryEntity;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CourseSpacesConstraint
 @QueryEntity
 @Document
-public class Course extends BaseEvent implements CourseValidation {
-    @PositiveOrZero
+public class Course extends BaseEvent implements CourseRequiredFields {
+
     private int spaceLimit;
 
-    @Valid
-    @NotNull
     private Set<CoTrainer> coTrainers = new HashSet<>();
 
-    @Valid
-    @NotNull
     private Set<Space> spaces = new HashSet<>();
 
     public Course() {
@@ -39,10 +30,12 @@ public class Course extends BaseEvent implements CourseValidation {
         return spaceLimit;
     }
 
+    @Override
     public void setSpaceLimit(int spaceLimit) {
         this.spaceLimit = spaceLimit;
     }
 
+    @Override
     public Set<CoTrainer> getCoTrainers() {
         return coTrainers
                 .stream()
@@ -50,10 +43,12 @@ public class Course extends BaseEvent implements CourseValidation {
                 .collect(Collectors.toSet());
     }
 
+    @Override
     public void setCoTrainers(Set<CoTrainer> coTrainers) {
         this.coTrainers = coTrainers;
     }
 
+    @Override
     public Set<Space> getSpaces() {
         return spaces
                 .stream()
@@ -61,6 +56,7 @@ public class Course extends BaseEvent implements CourseValidation {
                 .collect(Collectors.toSet());
     }
 
+    @Override
     public void setSpaces(Set<Space> spaces) {
         this.spaces = spaces;
     }

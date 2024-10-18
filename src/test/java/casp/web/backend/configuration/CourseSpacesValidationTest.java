@@ -1,7 +1,7 @@
 package casp.web.backend.configuration;
 
+import casp.web.backend.business.logic.layer.event.types.CourseRequiredFields;
 import casp.web.backend.common.validation.CourseSpacesValidation;
-import casp.web.backend.common.validation.CourseValidation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,7 +16,7 @@ class CourseSpacesValidationTest {
     private static final CourseSpacesValidation VALIDATION = new CourseSpacesValidation();
 
     @Mock
-    private CourseValidation courseValidation;
+    private CourseRequiredFields courseValidation;
 
     @Test
     void isValid() {
