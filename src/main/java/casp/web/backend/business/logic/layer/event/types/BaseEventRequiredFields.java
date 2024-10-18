@@ -35,7 +35,7 @@ public interface BaseEventRequiredFields {
     @Valid
     BaseEventOption getBaseEventOption();
 
-    void setBaseEventOption(@Valid BaseEventOption option);
+    void setBaseEventOption(@Valid BaseEventOption baseEventOption);
 
     @NotNull
     BaseEventType getEventType();

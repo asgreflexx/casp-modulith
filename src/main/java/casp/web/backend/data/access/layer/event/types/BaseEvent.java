@@ -93,8 +93,8 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
     }
 
     @Override
-    public void setBaseEventOption(BaseEventOption option) {
-        this.baseEventOption = option;
+    public void setBaseEventOption(BaseEventOption baseEventOption) {
+        this.baseEventOption = baseEventOption;
     }
 
     @Override
