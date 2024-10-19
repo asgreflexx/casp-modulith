@@ -4,7 +4,7 @@ import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
-import casp.web.backend.data.access.layer.event.options.BaseEventOption;
+import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
 
@@ -13,8 +13,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-
-class CourseDto extends BaseDto implements CourseRequiredFields, CourseDtoRequiredFields {
+@CoTrainersDtoConstraint
+@SpacesDtoConstraint
+@MemberReferenceDtoConstraint
+@CalendarDtoConstraint
+public class CourseDto extends BaseDto implements CourseRequiredFields, CourseDtoRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers;
     private Set<UUID> newCoTrainers;
@@ -26,7 +29,7 @@ class CourseDto extends BaseDto implements CourseRequiredFields, CourseDtoRequir
     private String location;
     private MemberReference member;
     private UUID newMemberId;
-    private BaseEventOption baseEventOption;
+    private RecurrenceOption recurrenceOption;
     private BaseEventType eventType;
     private LocalDateTime minLocalDateTime;
     private LocalDateTime maxLocalDateTime;
@@ -145,13 +148,13 @@ class CourseDto extends BaseDto implements CourseRequiredFields, CourseDtoRequir
     }
 
     @Override
-    public BaseEventOption getBaseEventOption() {
-        return baseEventOption;
+    public RecurrenceOption getRecurrenceOption() {
+        return recurrenceOption;
     }
 
     @Override
-    public void setBaseEventOption(final BaseEventOption baseEventOption) {
-        this.baseEventOption = baseEventOption;
+    public void setRecurrenceOption(final RecurrenceOption recurrenceOption) {
+        this.recurrenceOption = recurrenceOption;
     }
 
     @Override
@@ -165,23 +168,23 @@ class CourseDto extends BaseDto implements CourseRequiredFields, CourseDtoRequir
     }
 
     @Override
-    public LocalDateTime getMinLocalDateTime() {
+    public LocalDateTime getMinTime() {
         return minLocalDateTime;
     }
 
     @Override
-    public void setMinLocalDateTime(final LocalDateTime minLocalDateTime) {
-        this.minLocalDateTime = minLocalDateTime;
+    public void setMinTime(final LocalDateTime minTime) {
+        this.minLocalDateTime = minTime;
     }
 
     @Override
-    public LocalDateTime getMaxLocalDateTime() {
+    public LocalDateTime getMaxTime() {
         return maxLocalDateTime;
     }
 
     @Override
-    public void setMaxLocalDateTime(final LocalDateTime maxLocalDateTime) {
-        this.maxLocalDateTime = maxLocalDateTime;
+    public void setMaxTime(final LocalDateTime maxTime) {
+        this.maxLocalDateTime = maxTime;
     }
 
     @Override
