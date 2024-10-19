@@ -18,7 +18,7 @@ public class DogReference {
     private UUID id;
 
     @NotNull
-    private EntityStatus entityStatus;
+    private EntityStatus entityStatus = EntityStatus.ACTIVE;
 
     @NotBlank
     private String name;

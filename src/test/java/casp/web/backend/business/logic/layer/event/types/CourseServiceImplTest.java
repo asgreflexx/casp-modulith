@@ -1,31 +1,22 @@
 package casp.web.backend.business.logic.layer.event.types;
 
 
-import casp.web.backend.TestFixture;
-import casp.web.backend.business.logic.layer.event.calendar.CalendarService;
-import casp.web.backend.business.logic.layer.event.participants.CoTrainerService;
-import casp.web.backend.business.logic.layer.event.participants.SpaceService;
-import casp.web.backend.common.enums.BaseEventOptionType;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
+import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
+import casp.web.backend.data.access.layer.event.participants.CoTrainer;
+import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.data.access.layer.event.types.CourseRepository;
-import casp.web.backend.data.access.layer.member.MemberRepository;
-import casp.web.backend.deprecated.event.calendar.Calendar;
-import casp.web.backend.deprecated.event.calendar.CalendarRepository;
-import casp.web.backend.deprecated.event.participants.BaseParticipantRepository;
-import casp.web.backend.deprecated.event.participants.CoTrainer;
-import casp.web.backend.deprecated.event.participants.Space;
-import casp.web.backend.deprecated.event.types.BaseEvent;
-import casp.web.backend.deprecated.event.types.BaseEventRepository;
-import casp.web.backend.deprecated.event.types.Course;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -33,9 +24,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -44,13 +36,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -59,294 +45,342 @@ import static org.mockito.Mockito.when;
 class CourseServiceImplTest {
 
     @Mock
-    private CalendarService calendarService;
-    @Mock
-    private SpaceService participantService;
-    @Mock
-    private CoTrainerService coTrainerService;
-    @Mock
-    private BaseEventRepository eventRepository;
-    @Mock
-    private MemberRepository memberRepository;
-    @Mock
-    private CalendarRepository calendarRepository;
-    @Mock
-    private BaseParticipantRepository participantRepository;
-    @Mock
-    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+    private CourseRepository courseRepository;
     @Mock
     private MemberReferenceRepository memberReferenceRepository;
     @Mock
-    private CourseRepository courseV2Repository;
+    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+    @Mock
+    private BaseEventMigrationService migrationService;
     @Captor
-    private ArgumentCaptor<casp.web.backend.data.access.layer.event.types.Course> courseV2Captor;
+    private ArgumentCaptor<Course> courseCaptor;
+
+    private Course course;
 
     @InjectMocks
     private CourseServiceImpl courseService;
 
-    private Course course;
-
     @BeforeEach
     void setUp() {
-        course = spy(TestFixture.createCourse());
+        course = new Course();
     }
 
     @Test
-    void saveBaseEvent() {
-        var member = course.getMember();
-        course.setMember(null);
-        when(eventRepository.save(course)).thenAnswer(invocation -> invocation.getArgument(0));
-        when(memberRepository.findByIdAndEntityStatus(course.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+    void getAllByYear() {
+        var coursePage = new PageImpl<>(List.of(course));
+        when(courseRepository.findAllByYear(2024, Pageable.unpaged())).thenReturn(coursePage);
 
-        verify(course).setMember(member);
-    }
+        var actualCoursePage = courseService.getAllByYear(2024, Pageable.unpaged());
 
-    @Test
-    void deleteById() {
-        when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-        courseService.deleteById(course.getId());
-
-        verify(participantService).deleteParticipantsByBaseEventId(course.getId());
-        verify(calendarService).deleteCalendarEntriesByBaseEventId(course.getId());
-        verify(coTrainerService).deleteParticipantsByBaseEventId(course.getId());
-        assertSame(EntityStatus.DELETED, course.getEntityStatus());
-    }
-
-    @Test
-    void getBaseEventsAsPage() {
-        var page = new PageImpl<BaseEvent>(List.of(course));
-        var year = LocalDate.now().getYear();
-        when(eventRepository.findAllByYearAndEventType(year, course.getEventType(), Pageable.unpaged())).thenReturn(page);
-
-        assertThat(courseService.getAllByYear(year, Pageable.unpaged()).getContent()).
-                singleElement()
-                .isEqualTo(course);
+        assertThat(actualCoursePage)
+                .singleElement()
+                .satisfies(c -> assertEquals(course.getId(), c.getId()));
     }
 
     @Test
     void deleteBaseEventsByMemberId() {
         var memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatusNotAndEventType(memberId, EntityStatus.DELETED, course.getEventType())).thenReturn(Set.of(course));
+        when(courseRepository.findAllByMemberIdAndNotDeleted(memberId)).thenReturn(Set.of(course));
 
         courseService.deleteBaseEventsByMemberId(memberId);
 
-        verify(participantService).deleteParticipantsByBaseEventId(course.getId());
-        verify(calendarService).deleteCalendarEntriesByBaseEventId(course.getId());
-        verify(coTrainerService).deleteParticipantsByBaseEventId(course.getId());
-        assertSame(EntityStatus.DELETED, course.getEntityStatus());
+        verify(courseRepository).save(courseCaptor.capture());
+        assertThat(courseCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
     }
 
     @Test
     void deactivateBaseEventsByMemberId() {
         var memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.ACTIVE, course.getEventType())).thenReturn(Set.of(course));
+        when(courseRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Set.of(course));
 
         courseService.deactivateBaseEventsByMemberId(memberId);
 
-        verify(participantService).deactivateParticipantsByBaseEventId(course.getId());
-        verify(calendarService).deactivateCalendarEntriesByBaseEventId(course.getId());
-        verify(coTrainerService).deactivateParticipantsByBaseEventId(course.getId());
-        assertSame(EntityStatus.INACTIVE, course.getEntityStatus());
+        verify(courseRepository).save(courseCaptor.capture());
+        assertThat(courseCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.INACTIVE);
     }
 
     @Test
     void activateBaseEventsByMemberId() {
         var memberId = UUID.randomUUID();
-        when(eventRepository.findAllByMemberIdAndEntityStatusAndEventType(memberId, EntityStatus.INACTIVE, course.getEventType())).thenReturn(Set.of(course));
+        when(courseRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.INACTIVE)).thenReturn(Set.of(course));
 
         courseService.activateBaseEventsByMemberId(memberId);
 
-        verify(participantService).activateParticipantsByBaseEventId(course.getId());
-        verify(calendarService).activateCalendarEntriesByBaseEventId(course.getId());
-        verify(coTrainerService).activateParticipantsByBaseEventId(course.getId());
-        assertSame(EntityStatus.ACTIVE, course.getEntityStatus());
+        verify(courseRepository).save(courseCaptor.capture());
+        assertThat(courseCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
+    }
+
+    @Test
+    void migrateDataToV2() {
+        var courseSet = Set.of(course);
+        when(migrationService.mapToCourseV2()).thenReturn(courseSet);
+
+        courseService.migrateDataToV2();
+
+        verify(courseRepository).deleteAll();
+        verify(courseRepository).saveAll(courseSet);
+
     }
 
     @Nested
-    class MigrateDataToV2 {
-        private static final Sort SORT = Sort.by("eventFrom").ascending().and(Sort.by("eventTo").ascending());
-        @Mock
-        private MemberReference courseMember;
+    class RemoveSpace {
+        @Test
+        void courseExist() {
+            var dogHasHandler = new DogHasHandlerReference();
+            dogHasHandler.setMember(new MemberReference());
+            dogHasHandler.setDog(new DogReference());
+            var space = new Space(dogHasHandler);
+            course.setSpaces(Set.of(space));
 
-        private casp.web.backend.data.access.layer.event.types.Course courseV2;
-        private Calendar calendar;
+            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
+            courseService.removeSpace(course.getId(), space.getId());
 
-        @BeforeEach
-        void setUp() {
-            when(eventRepository.findAllByEventType(Course.EVENT_TYPE)).thenReturn(Set.of(course));
+            verify(courseRepository).save(courseCaptor.capture());
+
+            assertThat(courseCaptor.getValue().getSpaces())
+                    .isEmpty();
         }
 
         @Test
-        void deleteAll() {
-            courseService.migrateDataToV2();
-
-            verify(courseV2Repository).deleteAll();
-        }
-
-        @Test
-        void courseMemberNotFound() {
-            when(memberReferenceRepository.findById(course.getMemberId())).thenReturn(Optional.empty());
-
-            courseService.migrateDataToV2();
-
-            verifyNoInteractions(calendarRepository, participantRepository, dogHasHandlerReferenceRepository);
-            verify(courseV2Repository).deleteAll();
-            verify(courseV2Repository, times(0)).save(any(casp.web.backend.data.access.layer.event.types.Course.class));
-        }
-
-        @Test
-        void spaces() {
-            findCourseMemberAndCalendar();
-            var spaceDogHasHandler = mock(DogHasHandlerReference.class, Answers.RETURNS_DEEP_STUBS);
-            when(spaceDogHasHandler.isActive()).thenReturn(true);
-            var space = TestFixture.createSpace();
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), Space.PARTICIPANT_TYPE)).thenReturn(Set.of(space));
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), CoTrainer.PARTICIPANT_TYPE)).thenReturn(Set.of());
-            when(dogHasHandlerReferenceRepository.findById(space.getMemberOrHandlerId())).thenReturn(Optional.of(spaceDogHasHandler));
-
-            courseService.migrateDataToV2();
-
-            assertCourseV2();
-            assertThat(courseV2.getSpaces()).singleElement().satisfies(s -> assertSame(spaceDogHasHandler, s.getDogHasHandler()));
-        }
-
-        @Test
-        void dogHasHandlerForSpaceNotFound() {
-            findCourseMemberAndCalendar();
-            var space = TestFixture.createSpace();
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), Space.PARTICIPANT_TYPE)).thenReturn(Set.of(space));
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), CoTrainer.PARTICIPANT_TYPE)).thenReturn(Set.of());
-            when(dogHasHandlerReferenceRepository.findById(space.getMemberOrHandlerId())).thenReturn(Optional.empty());
-
-            courseService.migrateDataToV2();
-
-            assertCourseV2();
-            assertThat(courseV2.getSpaces()).isEmpty();
-        }
-
-        @Test
-        void coTrainers() {
-            findCourseMemberAndCalendar();
-            var coTrainerMember = mock(MemberReference.class, Answers.RETURNS_DEEP_STUBS);
-            when(coTrainerMember.getEntityStatus()).thenReturn(EntityStatus.ACTIVE);
-            var coTrainer = TestFixture.createCoTrainer();
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), Space.PARTICIPANT_TYPE)).thenReturn(Set.of());
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), CoTrainer.PARTICIPANT_TYPE)).thenReturn(Set.of(coTrainer));
-            when(memberReferenceRepository.findById(coTrainer.getMemberOrHandlerId())).thenReturn(Optional.of(coTrainerMember));
-
-            courseService.migrateDataToV2();
-
-            assertCourseV2();
-            assertThat(courseV2.getCoTrainers()).singleElement().satisfies(ct -> assertSame(coTrainerMember, ct.getMember()));
-        }
-
-        @Test
-        void memberForCoTrainerNotFound() {
-            findCourseMemberAndCalendar();
-            var coTrainer = TestFixture.createCoTrainer();
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), Space.PARTICIPANT_TYPE)).thenReturn(Set.of());
-            when(participantRepository.findAllByBaseEventIdAndParticipantType(course.getId(), CoTrainer.PARTICIPANT_TYPE)).thenReturn(Set.of(coTrainer));
-            when(memberReferenceRepository.findById(coTrainer.getMemberOrHandlerId())).thenReturn(Optional.empty());
-
-            courseService.migrateDataToV2();
-
-            assertCourseV2();
-            assertThat(courseV2.getCoTrainers()).isEmpty();
-        }
-
-        @Test
-        void daily() {
-            findCourseMemberAndCalendar();
-            course.setDailyOption(TestFixture.createDailyEventOption());
-
-            courseService.migrateDataToV2();
-
-            assertCourseV2();
-            assertSame(BaseEventOptionType.DAILY, courseV2.getBaseEventOption().getOptionType());
-        }
-
-        @Test
-        void weekly() {
-            findCourseMemberAndCalendar();
-            course.setWeeklyOption(TestFixture.createWeeklyEventOption());
-
-            courseService.migrateDataToV2();
-
-            assertCourseV2();
-            assertSame(BaseEventOptionType.WEEKLY, courseV2.getBaseEventOption().getOptionType());
-        }
-
-        private void findCourseMemberAndCalendar() {
-            when(memberReferenceRepository.findById(course.getMemberId())).thenReturn(Optional.of(courseMember));
-            calendar = TestFixture.createCalendarEntry();
-            when(calendarRepository.findAllByBaseEventId(course.getId(), SORT)).thenReturn(List.of(calendar));
-        }
-
-        private void assertCourseV2() {
-            verify(courseV2Repository).save(courseV2Captor.capture());
-            courseV2 = courseV2Captor.getValue();
-            assertEquals(course.getId(), courseV2.getId());
-            assertSame(courseMember, courseV2.getMember());
-            assertThat(courseV2.getCalendarEntries()).singleElement().satisfies(ce -> assertEquals(calendar.getId(), ce.getId()));
-        }
-    }
-
-    @Nested
-    class GetBaseEventById {
-        @BeforeEach
-        void setUp() {
-            course.setMember(null);
-        }
-
-        @Test
-        void eventExist() {
-            when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertSame(course, courseService.getOneById(course.getId()));
-        }
-
-        @Test
-        void eventDoesNotExist() {
+        void courseDoesNotExist() {
             var id = UUID.randomUUID();
-            when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            var idSpace = UUID.randomUUID();
+            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(id, idSpace));
+        }
+    }
+
+    @Nested
+    class SaveSpace {
+        @Test
+        void courseExist() {
+            var member = new MemberReference();
+            member.setEmail("mail@mail");
+            var dogHasHandler = new DogHasHandlerReference();
+            dogHasHandler.setMember(member);
+            dogHasHandler.setDog(new DogReference());
+            var space = new Space(dogHasHandler);
+            course.setSpaces(Set.of(space));
+
+            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+
+            space.setNote("spaceChanged");
+            courseService.saveSpace(course.getId(), space);
+
+            verify(courseRepository).save(courseCaptor.capture());
+
+            assertThat(courseCaptor.getValue().getSpaces())
+                    .singleElement()
+                    .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
+        }
+
+        @Test
+        void courseDoesNotExist() {
+            var id = UUID.randomUUID();
+            var space = new Space();
+            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> courseService.saveSpace(id, space));
+        }
+    }
+
+    @Nested
+    class GetEmailsByCourseId {
+        @Test
+        void exist() {
+            var member = new MemberReference();
+            member.setEmail("mail@mail");
+            var dogHasHandler = new DogHasHandlerReference();
+            dogHasHandler.setMember(member);
+            dogHasHandler.setDog(new DogReference());
+            var space = new Space(dogHasHandler);
+            course.setSpaces(Set.of(space));
+            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+
+            var emailSet = courseService.getEmailsByCourseId(course.getId());
+
+            assertThat(emailSet)
+                    .singleElement()
+                    .isEqualTo(member.getEmail());
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> courseService.getEmailsByCourseId(id));
+        }
+    }
+
+    @Nested
+    class DeleteById {
+        @Test
+        void exist() {
+            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+
+            courseService.deleteById(course.getId());
+
+            verify(courseRepository).save(courseCaptor.capture());
+            assertThat(courseCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> courseService.deleteById(id));
+        }
+    }
+
+    @Nested
+    class Save {
+        private CourseDto courseDto;
+        private CalendarEntry calendarEntry;
+
+        @BeforeEach
+        void setUp() {
+            calendarEntry = new CalendarEntry();
+            calendarEntry.setEntryFrom(LocalDateTime.MIN);
+            calendarEntry.setEntryTo(LocalDateTime.MAX);
+            courseDto = new CourseDto();
+            courseDto.setNewCalendarEntry(calendarEntry);
+        }
+
+        @Test
+        void setCalendarEntry() {
+            courseService.save(courseDto);
+
+            var actualCourse = getCourseSaved();
+            assertThat(actualCourse.getCalendarEntries())
+                    .singleElement()
+                    .isEqualTo(calendarEntry);
+            assertEquals(calendarEntry.getEntryFrom(), actualCourse.getMinTime());
+            assertEquals(calendarEntry.getEntryTo(), actualCourse.getMaxTime());
+        }
+
+        @Test
+        void setRecurrenceOption() {
+            courseDto.setNewCalendarEntry(null);
+            var daily = new DailyRecurrenceOption();
+            daily.setStartTime(LocalTime.of(1, 0, 0));
+            daily.setEndTime(LocalTime.of(3, 0, 0));
+            daily.setStartRecurrence(LocalDate.of(2024, 10, 1));
+            daily.setEndRecurrence(LocalDate.of(2024, 10, 3));
+            courseDto.setRecurrenceOption(daily);
+            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime());
+            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime());
+
+            courseService.save(courseDto);
+
+            var actualCourse = getCourseSaved();
+            assertThat(actualCourse.getCalendarEntries())
+                    .hasSize(3);
+            assertEquals(minTime, actualCourse.getMinTime());
+            assertEquals(maxTime, actualCourse.getMaxTime());
+        }
+
+        @Test
+        void setNewMember() {
+            var memberReference = mockMember();
+            courseDto.setNewMemberId(memberReference.getId());
+
+            courseService.save(courseDto);
+
+            assertEquals(memberReference, getCourseSaved().getMember());
+        }
+
+        @Test
+        void keepSameMember() {
+            var memberReference = new MemberReference();
+            memberReference.setId(UUID.randomUUID());
+            courseDto.setMember(memberReference);
+
+            courseService.save(courseDto);
+
+            verifyNoInteractions(memberReferenceRepository);
+            assertEquals(memberReference, getCourseSaved().getMember());
+        }
+
+        @Test
+        void updateMember() {
+            var actualMember = new MemberReference();
+            actualMember.setId(UUID.randomUUID());
+            var newMember = mockMember();
+            courseDto.setMember(actualMember);
+            courseDto.setNewMemberId(newMember.getId());
+
+            courseService.save(courseDto);
+
+            assertEquals(newMember, getCourseSaved().getMember());
+        }
+
+        @Test
+        void addCoTrainer() {
+            var memberReference = mockMember();
+            var coTrainer = new CoTrainer(memberReference);
+            courseDto.getNewCoTrainers().add(coTrainer.getId());
+
+            courseService.save(courseDto);
+
+            var actualCourse = getCourseSaved();
+            assertThat(actualCourse.getCoTrainers())
+                    .singleElement()
+                    .isEqualTo(coTrainer);
+        }
+
+        @Test
+        void addSpace() {
+            var dogHasHandlerReference = new DogHasHandlerReference();
+            dogHasHandlerReference.setId(UUID.randomUUID());
+            dogHasHandlerReference.setDog(new DogReference());
+            dogHasHandlerReference.setMember(new MemberReference());
+            var space = new Space(dogHasHandlerReference);
+            courseDto.setNewSpaces(Set.of(space.getId()));
+            when(dogHasHandlerReferenceRepository.findByIdAndEntityStatus(space.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
+
+            courseService.save(courseDto);
+
+            var actualCourse = getCourseSaved();
+            assertThat(actualCourse.getSpaces())
+                    .singleElement()
+                    .isEqualTo(space);
+        }
+
+        private Course getCourseSaved() {
+            verify(courseRepository).setMetadataAndSave(courseCaptor.capture());
+            return courseCaptor.getValue();
+        }
+
+        private MemberReference mockMember() {
+            var memberReference = new MemberReference();
+            memberReference.setId(UUID.randomUUID());
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
+            return memberReference;
+        }
+    }
+
+    @Nested
+    class GetOneById {
+        @Test
+        void exist() {
+            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+
+            var courseDto = courseService.getOneById(course.getId());
+
+            assertEquals(course.getId(), courseDto.getId());
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.getOneById(id));
         }
-
-        @Test
-        void memberExist() {
-            var member = TestFixture.createMember();
-            course.setMemberId(member.getId());
-            when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-            when(memberRepository.findByIdAndEntityStatus(course.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
-
-            var actualCourse = courseService.getOneById(course.getId());
-
-            assertSame(course.getMemberId(), actualCourse.getMember().getId());
-        }
-
-        @Test
-        void memberDoesNotExist() {
-            when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-            when(memberRepository.findByIdAndEntityStatus(course.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            var actualCourse = courseService.getOneById(course.getId());
-
-            assertNull(actualCourse.getMember());
-        }
-
-        @Test
-        void memberWasAlreadySet() {
-            var member = TestFixture.createMember();
-            course.setMemberId(member.getId());
-            course.setMember(member);
-            when(eventRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            courseService.getOneById(course.getId());
-
-            verifyNoInteractions(memberRepository);
-        }
     }
+
 }

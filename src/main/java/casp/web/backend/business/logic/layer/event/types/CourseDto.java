@@ -9,6 +9,7 @@ import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -19,10 +20,10 @@ import java.util.UUID;
 @CalendarDtoConstraint
 public class CourseDto extends BaseDto implements CourseRequiredFields, CourseDtoRequiredFields {
     private int spaceLimit;
-    private Set<CoTrainer> coTrainers;
-    private Set<UUID> newCoTrainers;
-    private Set<Space> spaces;
-    private Set<UUID> newSpaces;
+    private Set<CoTrainer> coTrainers = new HashSet<>();
+    private Set<UUID> newCoTrainers = new HashSet<>();
+    private Set<Space> spaces = new HashSet<>();
+    private Set<UUID> newSpaces = new HashSet<>();
     private int spaceListSize;
     private String name;
     private String description;

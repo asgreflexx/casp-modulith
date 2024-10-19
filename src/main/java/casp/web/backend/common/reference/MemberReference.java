@@ -16,10 +16,10 @@ import java.util.UUID;
 public class MemberReference {
     @Id
     @NotNull
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @NotNull
-    private EntityStatus entityStatus;
+    private EntityStatus entityStatus = EntityStatus.ACTIVE;
 
     @NotBlank
     private String firstName;

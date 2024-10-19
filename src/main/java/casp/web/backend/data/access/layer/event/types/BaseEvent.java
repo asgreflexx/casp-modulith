@@ -136,6 +136,19 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
 
     @Override
     public void setCalendarEntries(final List<CalendarEntry> calendarEntries) {
+        calendarEntries.sort(CalendarEntry::compareTo);
         this.calendarEntries = calendarEntries;
+        this.minTime = calendarEntries.getFirst().getEntryFrom();
+        this.maxTime = calendarEntries.getLast().getEntryTo();
+    }
+
+    @Override
+    public boolean equals(final Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
     }
 }
