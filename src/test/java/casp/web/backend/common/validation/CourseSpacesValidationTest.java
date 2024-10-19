@@ -1,7 +1,6 @@
-package casp.web.backend.configuration;
+package casp.web.backend.common.validation;
 
 import casp.web.backend.business.logic.layer.event.types.CourseRequiredFields;
-import casp.web.backend.common.validation.CourseSpacesValidation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

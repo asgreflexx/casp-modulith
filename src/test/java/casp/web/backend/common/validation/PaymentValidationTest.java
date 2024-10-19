@@ -1,7 +1,5 @@
-package casp.web.backend.configuration;
+package casp.web.backend.common.validation;
 
-import casp.web.backend.common.validation.Payment;
-import casp.web.backend.common.validation.PaymentValidation;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

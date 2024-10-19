@@ -1,7 +1,5 @@
-package casp.web.backend.configuration;
+package casp.web.backend.common.validation;
 
-import casp.web.backend.common.validation.CalendarFromToValidation;
-import casp.web.backend.common.validation.CalendarValidation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
