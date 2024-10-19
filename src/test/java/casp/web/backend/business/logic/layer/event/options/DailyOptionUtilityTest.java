@@ -1,9 +1,8 @@
 package casp.web.backend.business.logic.layer.event.options;
 
 
-import casp.web.backend.TestFixture;
-import casp.web.backend.deprecated.event.calendar.Calendar;
-import casp.web.backend.deprecated.event.types.Event;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,27 +15,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DailyOptionUtilityTest {
 
-    private static final String LOCATION = "Wien";
     private static final LocalTime START_TIME = LocalTime.of(1, 0, 0);
     private static final LocalTime END_TIME = LocalTime.of(2, 0, 0);
     private static final LocalDate START_RECURRENCE = LocalDate.of(2024, 1, 1);
     private static final LocalDate END_RECURRENCE = START_RECURRENCE.plusDays(9);
-    private static final Event EVENT = TestFixture.createEvent();
-    private Calendar expectedCalendarEntry;
+    private static final CalendarEntry EXPECTED_CALENDAR_ENTRY = new CalendarEntry();
 
     @BeforeEach
     void setUp() {
-        expectedCalendarEntry = TestFixture.createCalendarEntry(EVENT);
-        expectedCalendarEntry.setEventFrom(LocalDateTime.of(START_RECURRENCE, START_TIME));
-        expectedCalendarEntry.setEventTo(LocalDateTime.of(START_RECURRENCE, END_TIME));
+        EXPECTED_CALENDAR_ENTRY.setEntryFrom(LocalDateTime.of(START_RECURRENCE, START_TIME));
+        EXPECTED_CALENDAR_ENTRY.setEntryTo(LocalDateTime.of(START_RECURRENCE, END_TIME));
     }
 
     @Test
     void create10CalendarEntriesEveryDay() {
         var repeatEvery = 1;
-        createDailyOption(repeatEvery);
 
-        var calendarEntries = DailyOptionUtility.createCalendarEntries(LOCATION, EVENT);
+        var calendarEntries = DailyOptionUtility.createCalendarEntries(createDailyOption(repeatEvery));
 
         assertThat(calendarEntries)
                 .hasSize(10)
@@ -48,30 +43,28 @@ class DailyOptionUtilityTest {
         var repeatEvery = 2;
         createDailyOption(repeatEvery);
 
-        var calendarEntries = DailyOptionUtility.createCalendarEntries(LOCATION, EVENT);
+        var calendarEntries = DailyOptionUtility.createCalendarEntries(createDailyOption(repeatEvery));
 
         assertThat(calendarEntries)
                 .hasSize(5)
                 .allSatisfy(calendarEntry -> assertCalendarEntry(calendarEntry, repeatEvery));
     }
 
-    private void createDailyOption(final int repeatEvery) {
-        var dailyEventOption = TestFixture.createDailyEventOption();
-        dailyEventOption.setStartRecurrence(START_RECURRENCE);
-        dailyEventOption.setEndRecurrence(END_RECURRENCE);
-        dailyEventOption.setStartTime(START_TIME);
-        dailyEventOption.setEndTime(END_TIME);
-        dailyEventOption.setRepeatEvery(repeatEvery);
-
-        EVENT.setDailyOption(dailyEventOption);
+    private DailyRecurrenceOption createDailyOption(final int repeatEvery) {
+        var daily = new DailyRecurrenceOption();
+        daily.setStartRecurrence(START_RECURRENCE);
+        daily.setEndRecurrence(END_RECURRENCE);
+        daily.setStartTime(START_TIME);
+        daily.setEndTime(END_TIME);
+        daily.setRepeatEvery(repeatEvery);
+        return daily;
     }
 
-    private void assertCalendarEntry(final Calendar calendarEntry, final int repeat) {
-        assertEquals(LOCATION, calendarEntry.getLocation());
-        assertEquals(expectedCalendarEntry.getEventFrom(), calendarEntry.getEventFrom());
-        assertEquals(expectedCalendarEntry.getEventTo(), calendarEntry.getEventTo());
+    private void assertCalendarEntry(final CalendarEntry calendarEntry, final int repeat) {
+        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryFrom(), calendarEntry.getEntryFrom());
+        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryTo(), calendarEntry.getEntryTo());
 
-        expectedCalendarEntry.setEventFrom(expectedCalendarEntry.getEventFrom().plusDays(repeat));
-        expectedCalendarEntry.setEventTo(expectedCalendarEntry.getEventTo().plusDays(repeat));
+        EXPECTED_CALENDAR_ENTRY.setEntryFrom(EXPECTED_CALENDAR_ENTRY.getEntryFrom().plusDays(repeat));
+        EXPECTED_CALENDAR_ENTRY.setEntryTo(EXPECTED_CALENDAR_ENTRY.getEntryTo().plusDays(repeat));
     }
 }

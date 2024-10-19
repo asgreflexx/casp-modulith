@@ -20,6 +20,14 @@ public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidat
     @NotNull
     private LocalDateTime entryTo;
 
+    public CalendarEntry() {
+    }
+
+    public CalendarEntry(final LocalDateTime entryFrom, final LocalDateTime entryTo) {
+        this.entryFrom = entryFrom;
+        this.entryTo = entryTo;
+    }
+
     public UUID getId() {
         return id;
     }

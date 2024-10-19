@@ -1,10 +1,9 @@
 package casp.web.backend.business.logic.layer.event.options;
 
-import casp.web.backend.deprecated.event.calendar.Calendar;
-import casp.web.backend.deprecated.event.types.BaseEvent;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
 
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,21 +12,20 @@ final class DailyOptionUtility {
     private DailyOptionUtility() {
     }
 
-    static List<Calendar> createCalendarEntries(String location, BaseEvent baseEvent) {
-        List<Calendar> calendarList = new ArrayList<>();
-        var dailyEventOption = baseEvent.getDailyOption();
+    static List<CalendarEntry> createCalendarEntries(final DailyRecurrenceOption option) {
+        List<CalendarEntry> calendarList = new ArrayList<>();
         var eventFrom =
-                LocalDateTime.of(dailyEventOption.getStartRecurrence(), dailyEventOption.getStartTime());
+                LocalDateTime.of(option.getStartRecurrence(), option.getStartTime());
         var eventTo =
-                LocalDateTime.of(eventFrom.toLocalDate(), dailyEventOption.getEndTime());
+                LocalDateTime.of(eventFrom.toLocalDate(), option.getEndTime());
         var end =
-                LocalDateTime.of(dailyEventOption.getEndRecurrence(), dailyEventOption.getEndTime());
+                LocalDateTime.of(option.getEndRecurrence(), option.getEndTime());
 
         do {
-            calendarList.add(new Calendar(eventFrom, eventTo, location, baseEvent));
-            eventFrom = eventFrom.plusDays(dailyEventOption.getRepeatEvery());
-            eventTo = eventTo.plusDays(dailyEventOption.getRepeatEvery());
-        } while (end.toEpochSecond(ZoneOffset.UTC) >= eventTo.toEpochSecond(ZoneOffset.UTC));
+            calendarList.add(new CalendarEntry(eventFrom, eventTo));
+            eventFrom = eventFrom.plusDays(option.getRepeatEvery());
+            eventTo = eventTo.plusDays(option.getRepeatEvery());
+        } while (!eventTo.isAfter(end));
 
         return calendarList;
     }

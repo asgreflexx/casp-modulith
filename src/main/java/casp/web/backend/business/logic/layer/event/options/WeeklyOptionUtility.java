@@ -1,12 +1,11 @@
 package casp.web.backend.business.logic.layer.event.options;
 
-import casp.web.backend.deprecated.event.calendar.Calendar;
-import casp.web.backend.deprecated.event.options.WeeklyEventOptionRecurrence;
-import casp.web.backend.deprecated.event.types.BaseEvent;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.options.WeeklyOption;
+import casp.web.backend.data.access.layer.event.options.WeeklyRecurrenceOption;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,18 +14,17 @@ final class WeeklyOptionUtility {
     private WeeklyOptionUtility() {
     }
 
-    static List<Calendar> createCalendarEntries(String location, BaseEvent baseEvent) {
-        List<Calendar> calendarList = new ArrayList<>();
-        var weeklyEventOption = baseEvent.getWeeklyOption();
-        var occurrences = weeklyEventOption.getOccurrences();
+    static List<CalendarEntry> createCalendarEntries(final WeeklyRecurrenceOption option) {
+        List<CalendarEntry> calendarList = new ArrayList<>();
+        var occurrences = option.getOccurrences();
         var dayOfWeekSet = occurrences
                 .stream()
-                .map(WeeklyEventOptionRecurrence::getDayOfWeek)
+                .map(WeeklyOption::getDayOfWeek)
                 .collect(Collectors.toSet());
 
-        var localDatePointer = weeklyEventOption.getStartRecurrence();
+        var localDatePointer = option.getStartRecurrence();
         var endTime = occurrences.getLast().getEndTime();
-        var end = LocalDateTime.of(weeklyEventOption.getEndRecurrence(), endTime);
+        var end = LocalDateTime.of(option.getEndRecurrence(), endTime);
 
         do {
             if (dayOfWeekSet.contains(localDatePointer.getDayOfWeek())) {
@@ -40,19 +38,18 @@ final class WeeklyOptionUtility {
                                 LocalDateTime.of(localDatePointer,
                                         recurrence.getEndTime());
 
-                        calendarList.add(new Calendar(eventFrom, eventTo, location, baseEvent));
+                        calendarList.add(new CalendarEntry(eventFrom, eventTo));
                         skipList = true;
                     } else if (skipList) {
                         break;
                     }
                 }
             }
-            if (weeklyEventOption.getRepeatEvery() > 1 && localDatePointer.getDayOfWeek() == DayOfWeek.SUNDAY) {
-                localDatePointer = localDatePointer.plusWeeks(weeklyEventOption.getRepeatEvery() - 1L);
+            if (option.getRepeatEvery() > 1 && localDatePointer.getDayOfWeek() == DayOfWeek.SUNDAY) {
+                localDatePointer = localDatePointer.plusWeeks(option.getRepeatEvery() - 1L);
             }
             localDatePointer = localDatePointer.plusDays(1);
-        } while (end.toEpochSecond(ZoneOffset.UTC) >=
-                LocalDateTime.of(localDatePointer, endTime).toEpochSecond(ZoneOffset.UTC));
+        } while (!LocalDateTime.of(localDatePointer, endTime).isAfter(end));
 
         return calendarList;
     }
