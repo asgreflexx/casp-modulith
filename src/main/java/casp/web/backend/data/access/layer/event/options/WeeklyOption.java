@@ -11,7 +11,7 @@ import java.util.Objects;
 
 // It contains too many interfaces to be a well implemented record.
 @EventOptionTimesConstraint
-public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOptionRecurrence>, EventOptionTimes {
+public class WeeklyOption implements Comparable<WeeklyOption>, EventOptionTimes {
     @NotNull
     private DayOfWeek dayOfWeek;
 
@@ -59,7 +59,7 @@ public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOption
     }
 
     @Override
-    public int compareTo(WeeklyEventOptionRecurrence o) {
+    public int compareTo(WeeklyOption o) {
         var compareValue = getDayOfWeek().getValue() - o.getDayOfWeek().getValue();
         if (compareValue == 0) {
             compareValue = getCompareValue(getStartTime(), o.getStartTime());
@@ -73,7 +73,7 @@ public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOption
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
-        if (!(o instanceof WeeklyEventOptionRecurrence that)) return false;
+        if (!(o instanceof WeeklyOption that)) return false;
         return dayOfWeek == that.dayOfWeek && Objects.equals(startTime, that.startTime) && Objects.equals(endTime, that.endTime);
     }
 

@@ -1,6 +1,6 @@
 package casp.web.backend.common.enums;
 
-public enum BaseEventOptionType {
+public enum BaseRecurrenceOptionType {
     DAILY,
     WEEKLY
 }

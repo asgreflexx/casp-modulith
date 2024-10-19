@@ -10,7 +10,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class BaseEventOptionRecurrencesValidationTest {
+class RecurrenceOptionRecurrencesValidationTest {
 
     public static final BaseEventOptionRecurrencesValidation VALIDATION = new BaseEventOptionRecurrencesValidation();
     private DailyEventOption dailyEventOption;

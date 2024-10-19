@@ -3,7 +3,7 @@ package casp.web.backend.business.logic.layer.event.types;
 import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
-import casp.web.backend.data.access.layer.event.options.BaseEventOption;
+import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -33,9 +33,9 @@ public interface BaseEventRequiredFields {
     void setMember(@Valid @NotNull MemberReference member);
 
     @Valid
-    BaseEventOption getBaseEventOption();
+    RecurrenceOption getRecurrenceOption();
 
-    void setBaseEventOption(@Valid BaseEventOption baseEventOption);
+    void setRecurrenceOption(@Valid RecurrenceOption recurrenceOption);
 
     @NotNull
     BaseEventType getEventType();
@@ -43,14 +43,14 @@ public interface BaseEventRequiredFields {
     void setEventType(@NotNull BaseEventType eventType);
 
     @NotNull
-    LocalDateTime getMinLocalDateTime();
+    LocalDateTime getMinTime();
 
-    void setMinLocalDateTime(@NotNull LocalDateTime minLocalDateTime);
+    void setMinTime(@NotNull LocalDateTime minTime);
 
     @NotNull
-    LocalDateTime getMaxLocalDateTime();
+    LocalDateTime getMaxTime();
 
-    void setMaxLocalDateTime(@NotNull LocalDateTime maxLocalDateTime);
+    void setMaxTime(@NotNull LocalDateTime maxTime);
 
     @Valid
     @NotEmpty

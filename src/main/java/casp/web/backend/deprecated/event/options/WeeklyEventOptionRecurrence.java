@@ -1,6 +1,7 @@
 package casp.web.backend.deprecated.event.options;
 
 
+import casp.web.backend.data.access.layer.event.options.WeeklyOption;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 
@@ -11,7 +12,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.event.options.WeeklyEventOptionRecurrence} instead. It will be removed in #3.
+ * @deprecated use {@link WeeklyOption} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @EventOptionTimesConstraint

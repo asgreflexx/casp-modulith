@@ -1,13 +1,14 @@
 package casp.web.backend.deprecated.event.options;
 
 
+import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalTime;
 import java.util.StringJoiner;
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.event.options.DailyEventOption} instead. It will be removed in #3.
+ * @deprecated use {@link DailyRecurrenceOption} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @EventOptionTimesConstraint

@@ -1,7 +1,7 @@
 package casp.web.backend.data.access.layer.event.options;
 
 
-import casp.web.backend.common.enums.BaseEventOptionType;
+import casp.web.backend.common.enums.BaseRecurrenceOptionType;
 import casp.web.backend.common.validation.EventOptionTimes;
 import casp.web.backend.common.validation.EventOptionTimesConstraint;
 import jakarta.validation.constraints.NotNull;
@@ -9,15 +9,15 @@ import jakarta.validation.constraints.NotNull;
 import java.time.LocalTime;
 
 @EventOptionTimesConstraint
-public class DailyEventOption extends BaseEventOption implements EventOptionTimes {
+public class DailyRecurrenceOption extends RecurrenceOption implements EventOptionTimes {
     @NotNull
     private LocalTime startTime;
 
     @NotNull
     private LocalTime endTime;
 
-    public DailyEventOption() {
-        super(BaseEventOptionType.DAILY);
+    public DailyRecurrenceOption() {
+        super(BaseRecurrenceOptionType.DAILY);
     }
 
     @Override

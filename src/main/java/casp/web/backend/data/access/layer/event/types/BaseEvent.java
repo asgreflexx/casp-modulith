@@ -8,7 +8,7 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
-import casp.web.backend.data.access.layer.event.options.BaseEventOption;
+import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDateTime;
@@ -27,11 +27,11 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
     @DBRef
     MemberReference member;
 
-    BaseEventOption baseEventOption;
+    RecurrenceOption recurrenceOption;
 
-    LocalDateTime minLocalDateTime;
+    LocalDateTime minTime;
 
-    LocalDateTime maxLocalDateTime;
+    LocalDateTime maxTime;
 
     List<CalendarEntry> calendarEntries = new ArrayList<>();
 
@@ -88,13 +88,13 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
     }
 
     @Override
-    public BaseEventOption getBaseEventOption() {
-        return baseEventOption;
+    public RecurrenceOption getRecurrenceOption() {
+        return recurrenceOption;
     }
 
     @Override
-    public void setBaseEventOption(BaseEventOption baseEventOption) {
-        this.baseEventOption = baseEventOption;
+    public void setRecurrenceOption(RecurrenceOption recurrenceOption) {
+        this.recurrenceOption = recurrenceOption;
     }
 
     @Override
@@ -108,23 +108,23 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
     }
 
     @Override
-    public LocalDateTime getMinLocalDateTime() {
-        return minLocalDateTime;
+    public LocalDateTime getMinTime() {
+        return minTime;
     }
 
     @Override
-    public void setMinLocalDateTime(LocalDateTime minLocalDateTime) {
-        this.minLocalDateTime = minLocalDateTime;
+    public void setMinTime(LocalDateTime minTime) {
+        this.minTime = minTime;
     }
 
     @Override
-    public LocalDateTime getMaxLocalDateTime() {
-        return maxLocalDateTime;
+    public LocalDateTime getMaxTime() {
+        return maxTime;
     }
 
     @Override
-    public void setMaxLocalDateTime(LocalDateTime maxLocalDateTime) {
-        this.maxLocalDateTime = maxLocalDateTime;
+    public void setMaxTime(LocalDateTime maxTime) {
+        this.maxTime = maxTime;
     }
 
     @Override

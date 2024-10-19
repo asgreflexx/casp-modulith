@@ -1,8 +1,8 @@
 package casp.web.backend.deprecated.event.options;
 
-import casp.web.backend.data.access.layer.event.options.DailyEventOption;
-import casp.web.backend.data.access.layer.event.options.WeeklyEventOption;
-import casp.web.backend.data.access.layer.event.options.WeeklyEventOptionRecurrence;
+import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
+import casp.web.backend.data.access.layer.event.options.WeeklyOption;
+import casp.web.backend.data.access.layer.event.options.WeeklyRecurrenceOption;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -17,13 +17,13 @@ import java.util.List;
 public interface BaseEventOptionV2Mapper {
     BaseEventOptionV2Mapper BASE_EVENT_OPTION_V2_MAPPER = Mappers.getMapper(BaseEventOptionV2Mapper.class);
 
-    WeeklyEventOptionRecurrence toWeeklyEventOptionRecurrence(casp.web.backend.deprecated.event.options.WeeklyEventOptionRecurrence weeklyEventOptionRecurrence);
+    WeeklyOption toWeeklyEventOptionRecurrence(casp.web.backend.deprecated.event.options.WeeklyEventOptionRecurrence weeklyEventOptionRecurrence);
 
-    List<WeeklyEventOptionRecurrence> toWeeklyEventOptionRecurrenceList(List<casp.web.backend.deprecated.event.options.WeeklyEventOptionRecurrence> weeklyEventOptionRecurrenceList);
-
-    @Mapping(target = "optionType", ignore = true)
-    WeeklyEventOption toWeeklyEventOption(casp.web.backend.deprecated.event.options.WeeklyEventOption weeklyEventOption);
+    List<WeeklyOption> toWeeklyEventOptionRecurrenceList(List<casp.web.backend.deprecated.event.options.WeeklyEventOptionRecurrence> weeklyEventOptionRecurrenceList);
 
     @Mapping(target = "optionType", ignore = true)
-    DailyEventOption toDailyEventOption(casp.web.backend.deprecated.event.options.DailyEventOption dailyEventOption);
+    WeeklyRecurrenceOption toWeeklyEventOption(casp.web.backend.deprecated.event.options.WeeklyEventOption weeklyEventOption);
+
+    @Mapping(target = "optionType", ignore = true)
+    DailyRecurrenceOption toDailyEventOption(casp.web.backend.deprecated.event.options.DailyEventOption dailyEventOption);
 }

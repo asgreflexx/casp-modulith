@@ -1,6 +1,7 @@
 package casp.web.backend.deprecated.event.options;
 
 
+import casp.web.backend.data.access.layer.event.options.WeeklyRecurrenceOption;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.StringJoiner;
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.event.options.WeeklyEventOption} instead. It will be removed in #3.
+ * @deprecated use {@link WeeklyRecurrenceOption} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 public class WeeklyEventOption extends BaseEventOption {

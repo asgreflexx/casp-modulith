@@ -1,5 +1,6 @@
 package casp.web.backend.deprecated.event.options;
 
+import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
@@ -8,7 +9,7 @@ import java.time.LocalDate;
 
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.event.options.BaseEventOption} instead. It will be removed in #3.
+ * @deprecated use {@link RecurrenceOption} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @BaseEventOptionRecurrencesConstraint
