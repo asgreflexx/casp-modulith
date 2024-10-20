@@ -5,9 +5,9 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.ObjectUtils;
 
-public class CalendarDtoValidation implements ConstraintValidator<CalendarDtoConstraint, CourseDto> {
+public class CalendarDtoValidation implements ConstraintValidator<CalendarDtoConstraint, BaseEventDto> {
     @Override
-    public boolean isValid(CourseDto value, ConstraintValidatorContext context) {
+    public boolean isValid(BaseEventDto value, ConstraintValidatorContext context) {
         var areNewCalendarEntryAndRecurrenceOptionEmpty = ObjectUtils.allNull(value.getNewCalendarEntry(), value.getRecurrenceOption());
         var areNewCalendarEntryAndRecurrenceOptionNotEmpty = ObjectUtils.allNotNull(value.getNewCalendarEntry(), value.getRecurrenceOption());
         return !areNewCalendarEntryAndRecurrenceOptionEmpty && !areNewCalendarEntryAndRecurrenceOptionNotEmpty;

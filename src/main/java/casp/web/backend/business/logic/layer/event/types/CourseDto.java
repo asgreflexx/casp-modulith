@@ -1,41 +1,26 @@
 package casp.web.backend.business.logic.layer.event.types;
 
-import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.enums.BaseEventType;
-import casp.web.backend.common.reference.MemberReference;
-import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
-import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 @CoTrainersDtoConstraint
 @SpacesDtoConstraint
-@MemberReferenceDtoConstraint
-@CalendarDtoConstraint
-public class CourseDto extends BaseDto implements CourseRequiredFields, CourseDtoRequiredFields {
+public class CourseDto extends BaseEventDto implements CourseRequiredFields, CourseDtoRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers = new HashSet<>();
     private Set<UUID> newCoTrainers = new HashSet<>();
     private Set<Space> spaces = new HashSet<>();
     private Set<UUID> newSpaces = new HashSet<>();
     private int spaceListSize;
-    private String name;
-    private String description;
-    private String location;
-    private MemberReference member;
-    private UUID newMemberId;
-    private RecurrenceOption recurrenceOption;
-    private BaseEventType eventType;
-    private LocalDateTime minLocalDateTime;
-    private LocalDateTime maxLocalDateTime;
-    private List<CalendarEntry> calendarEntries;
-    private CalendarEntry newCalendarEntry;
+
+    public CourseDto() {
+        super(BaseEventType.COURSE);
+    }
 
     @Override
     public int getSpaceLimit() {
@@ -95,117 +80,6 @@ public class CourseDto extends BaseDto implements CourseRequiredFields, CourseDt
     @Override
     public void setSpaceListSize(final int spaceListSize) {
         this.spaceListSize = spaceListSize;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(final String name) {
-        this.name = name;
-
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public String getLocation() {
-        return location;
-    }
-
-    @Override
-    public void setLocation(final String location) {
-        this.location = location;
-    }
-
-    @Override
-    public MemberReference getMember() {
-        return member;
-    }
-
-    @Override
-    public void setMember(final MemberReference member) {
-        this.member = member;
-    }
-
-    @Override
-    public UUID getNewMemberId() {
-        return newMemberId;
-    }
-
-    @Override
-    public void setNewMemberId(final UUID newMemberId) {
-        this.newMemberId = newMemberId;
-    }
-
-    @Override
-    public RecurrenceOption getRecurrenceOption() {
-        return recurrenceOption;
-    }
-
-    @Override
-    public void setRecurrenceOption(final RecurrenceOption recurrenceOption) {
-        this.recurrenceOption = recurrenceOption;
-    }
-
-    @Override
-    public BaseEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public void setEventType(final BaseEventType eventType) {
-        this.eventType = eventType;
-    }
-
-    @Override
-    public LocalDateTime getMinTime() {
-        return minLocalDateTime;
-    }
-
-    @Override
-    public void setMinTime(final LocalDateTime minTime) {
-        this.minLocalDateTime = minTime;
-    }
-
-    @Override
-    public LocalDateTime getMaxTime() {
-        return maxLocalDateTime;
-    }
-
-    @Override
-    public void setMaxTime(final LocalDateTime maxTime) {
-        this.maxLocalDateTime = maxTime;
-    }
-
-    @Override
-    public List<CalendarEntry> getCalendarEntries() {
-        return calendarEntries;
-    }
-
-    @Override
-    public void setCalendarEntries(final List<CalendarEntry> calendarEntries) {
-        this.calendarEntries = calendarEntries;
-    }
-
-    @Override
-    public CalendarEntry getNewCalendarEntry() {
-        return newCalendarEntry;
-    }
-
-    @Override
-    public void setNewCalendarEntry(final CalendarEntry newCalendarEntry) {
-        this.newCalendarEntry = newCalendarEntry;
     }
 
     @Override
