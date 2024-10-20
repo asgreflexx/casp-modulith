@@ -39,12 +39,14 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
         this.eventType = eventType;
     }
 
-    static boolean isMemberActive(final MemberReference member) {
-        return EntityStatus.ACTIVE == member.getEntityStatus();
+    static boolean isMemberNotDeleted(final MemberReference member) {
+        return EntityStatus.DELETED != member.getEntityStatus();
     }
 
-    static boolean isDogHasHandlerActive(final DogHasHandlerReference dogHasHandler) {
-        return dogHasHandler.isActive();
+    static boolean isDogHasHandlerNotDeleted(final DogHasHandlerReference dogHasHandler) {
+        return EntityStatus.DELETED != dogHasHandler.getEntityStatus()
+                && isMemberNotDeleted(dogHasHandler.getMember())
+                && EntityStatus.DELETED != dogHasHandler.getDog().getEntityStatus();
     }
 
     @Override

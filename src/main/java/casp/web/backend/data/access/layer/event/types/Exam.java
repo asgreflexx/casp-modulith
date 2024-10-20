@@ -38,7 +38,7 @@ public class Exam extends BaseEvent {
     public Set<ExamParticipant> getParticipants() {
         return participants
                 .stream()
-                .filter(p -> isDogHasHandlerActive(p.getDogHasHandler()))
+                .filter(p -> isDogHasHandlerNotDeleted(p.getDogHasHandler()))
                 .collect(Collectors.toSet());
     }
 

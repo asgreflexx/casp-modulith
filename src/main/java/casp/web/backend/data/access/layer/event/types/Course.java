@@ -39,7 +39,7 @@ public class Course extends BaseEvent implements CourseRequiredFields {
     public Set<CoTrainer> getCoTrainers() {
         return coTrainers
                 .stream()
-                .filter(ct -> isMemberActive(ct.getMember()))
+                .filter(ct -> isMemberNotDeleted(ct.getMember()))
                 .collect(Collectors.toSet());
     }
 
@@ -52,7 +52,7 @@ public class Course extends BaseEvent implements CourseRequiredFields {
     public Set<Space> getSpaces() {
         return spaces
                 .stream()
-                .filter(s -> isDogHasHandlerActive(s.getDogHasHandler()))
+                .filter(s -> isDogHasHandlerNotDeleted(s.getDogHasHandler()))
                 .collect(Collectors.toSet());
     }
 

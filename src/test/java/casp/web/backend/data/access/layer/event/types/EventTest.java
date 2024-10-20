@@ -31,11 +31,10 @@ class EventTest {
     }
 
     @Test
-    void getParticipants() {
+    void getNotDeletedParticipants() {
         var active = mockParticipant(EntityStatus.ACTIVE);
-        var inactive = mockParticipant(EntityStatus.INACTIVE);
         var deleted = mockParticipant(EntityStatus.DELETED);
-        event.setParticipants(Set.of(active, inactive, deleted));
+        event.setParticipants(Set.of(active, deleted));
 
         assertThat(event.getParticipants())
                 .singleElement()

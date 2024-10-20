@@ -26,7 +26,7 @@ public class Event extends BaseEvent {
     public Set<EventParticipant> getParticipants() {
         return participants
                 .stream()
-                .filter(p -> isMemberActive(p.getMember()))
+                .filter(p -> isMemberNotDeleted(p.getMember()))
                 .collect(Collectors.toSet());
     }
 
