@@ -8,7 +8,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-class EventDto extends BaseEventDto implements EventRequiredFields, EventDtoRequiredFields {
+@EventParticipantsDtoConstraint
+public class EventDto extends BaseEventDto implements EventRequiredFields, EventDtoRequiredFields {
     private Set<EventParticipant> participants = new HashSet<>();
     private Set<UUID> newParticipants = new HashSet<>();
 
