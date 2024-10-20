@@ -3,7 +3,6 @@ package casp.web.backend.data.access.layer.event.participants;
 import casp.web.backend.common.enums.BaseParticipantType;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.validation.Payment;
-import casp.web.backend.common.validation.PaymentConstraint;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-@PaymentConstraint
 public class Space extends BaseParticipant implements Payment {
     private String note;
 

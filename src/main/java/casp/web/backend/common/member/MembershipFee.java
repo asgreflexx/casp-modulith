@@ -1,13 +1,11 @@
 package casp.web.backend.common.member;
 
 import casp.web.backend.common.validation.Payment;
-import casp.web.backend.common.validation.PaymentConstraint;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.LocalDate;
 
-@PaymentConstraint
 public class MembershipFee implements Payment {
     private String comment;
     @PositiveOrZero
