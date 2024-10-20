@@ -1,0 +1,231 @@
+package casp.web.backend.business.logic.layer.event.types;
+
+import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.MemberReference;
+import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
+import casp.web.backend.data.access.layer.event.participants.EventParticipant;
+import casp.web.backend.data.access.layer.event.types.Event;
+import casp.web.backend.data.access.layer.event.types.EventRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class EventServiceImplTest {
+    @Mock
+    private EventRepository eventRepository;
+    @Mock
+    private MemberReferenceRepository memberReferenceRepository;
+    @Mock
+    private BaseEventMigrationService migrationService;
+    @Captor
+    private ArgumentCaptor<Event> eventCaptor;
+
+    private Event event;
+
+    @InjectMocks
+    private EventServiceImpl eventService;
+
+    @BeforeEach
+    void setUp() {
+        event = new Event();
+    }
+
+    @Test
+    void deleteBaseEventsByMemberId() {
+        var memberId = UUID.randomUUID();
+        when(eventRepository.findAllByMemberIdAndNotDeleted(memberId)).thenReturn(Set.of(event));
+
+        eventService.deleteBaseEventsByMemberId(memberId);
+
+        verify(eventRepository).save(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
+    }
+
+    @Test
+    void deactivateBaseEventsByMemberId() {
+        var memberId = UUID.randomUUID();
+        when(eventRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Set.of(event));
+
+        eventService.deactivateBaseEventsByMemberId(memberId);
+
+        verify(eventRepository).save(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.INACTIVE);
+    }
+
+    @Test
+    void activateBaseEventsByMemberId() {
+        var memberId = UUID.randomUUID();
+        when(eventRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.INACTIVE)).thenReturn(Set.of(event));
+
+        eventService.activateBaseEventsByMemberId(memberId);
+
+        verify(eventRepository).save(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
+    }
+
+    @Test
+    void migrateDataToV2() {
+        var eventSet = Set.of(event);
+        when(migrationService.mapToEventV2()).thenReturn(eventSet);
+
+        eventService.migrateDataToV2();
+
+        verify(eventRepository).deleteAll();
+        verify(eventRepository).saveAll(eventSet);
+
+    }
+
+    @Nested
+    class DeleteById {
+        @Test
+        void exist() {
+            when(eventRepository.findByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
+
+            eventService.deleteById(event.getId());
+
+            verify(eventRepository).save(eventCaptor.capture());
+            assertThat(eventCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> eventService.deleteById(id));
+        }
+    }
+
+    @Nested
+    class Save {
+        private EventDto eventDto;
+        private CalendarEntry calendarEntry;
+
+        @BeforeEach
+        void setUp() {
+            calendarEntry = new CalendarEntry();
+            calendarEntry.setEntryFrom(LocalDateTime.MIN);
+            calendarEntry.setEntryTo(LocalDateTime.MAX);
+            eventDto = new EventDto();
+            eventDto.setNewCalendarEntry(calendarEntry);
+        }
+
+        @Test
+        void setCalendarEntry() {
+            eventService.save(eventDto);
+
+            var actualCourse = getEventSaved();
+            assertThat(actualCourse.getCalendarEntries())
+                    .singleElement()
+                    .isEqualTo(calendarEntry);
+            assertEquals(calendarEntry.getEntryFrom(), actualCourse.getMinTime());
+            assertEquals(calendarEntry.getEntryTo(), actualCourse.getMaxTime());
+        }
+
+        @Test
+        void setRecurrenceOption() {
+            eventDto.setNewCalendarEntry(null);
+            var daily = new DailyRecurrenceOption();
+            daily.setStartTime(LocalTime.of(1, 0, 0));
+            daily.setEndTime(LocalTime.of(3, 0, 0));
+            daily.setStartRecurrence(LocalDate.of(2024, 10, 1));
+            daily.setEndRecurrence(LocalDate.of(2024, 10, 3));
+            eventDto.setRecurrenceOption(daily);
+            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime());
+            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime());
+
+            eventService.save(eventDto);
+
+            var actualCourse = getEventSaved();
+            assertThat(actualCourse.getCalendarEntries())
+                    .hasSize(3);
+            assertEquals(minTime, actualCourse.getMinTime());
+            assertEquals(maxTime, actualCourse.getMaxTime());
+        }
+
+        @Test
+        void setNewMember() {
+            var memberReference = mockMember();
+            eventDto.setNewMemberId(memberReference.getId());
+
+            eventService.save(eventDto);
+
+            assertEquals(memberReference, getEventSaved().getMember());
+        }
+
+        @Test
+        void keepSameMember() {
+            var memberReference = new MemberReference();
+            memberReference.setId(UUID.randomUUID());
+            eventDto.setMember(memberReference);
+
+            eventService.save(eventDto);
+
+            verifyNoInteractions(memberReferenceRepository);
+            assertEquals(memberReference, getEventSaved().getMember());
+        }
+
+        @Test
+        void updateMember() {
+            var actualMember = new MemberReference();
+            actualMember.setId(UUID.randomUUID());
+            var newMember = mockMember();
+            eventDto.setMember(actualMember);
+            eventDto.setNewMemberId(newMember.getId());
+
+            eventService.save(eventDto);
+
+            assertEquals(newMember, getEventSaved().getMember());
+        }
+
+        @Test
+        void addParticipant() {
+            var memberReference = mockMember();
+            var participant = new EventParticipant(memberReference);
+            eventDto.getNewParticipants().add(participant.getId());
+
+            eventService.save(eventDto);
+
+            var actualEvent = getEventSaved();
+            assertThat(actualEvent.getParticipants())
+                    .singleElement()
+                    .isEqualTo(participant);
+        }
+
+        private Event getEventSaved() {
+            verify(eventRepository).setMetadataAndSave(eventCaptor.capture());
+            return eventCaptor.getValue();
+        }
+
+        private MemberReference mockMember() {
+            var memberReference = new MemberReference();
+            memberReference.setId(UUID.randomUUID());
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
+            return memberReference;
+        }
+    }
+}

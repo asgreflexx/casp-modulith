@@ -382,5 +382,4 @@ class CourseServiceImplTest {
             assertThrows(NoSuchElementException.class, () -> courseService.getOneById(id));
         }
     }
-
 }

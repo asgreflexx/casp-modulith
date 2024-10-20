@@ -3,9 +3,21 @@ package casp.web.backend.common.base;
 import casp.web.backend.common.enums.EntityStatus;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public interface BaseRepository<T extends BaseDocument> extends MongoRepository<T, UUID> {
+    private static <T extends BaseDocument> void setCreatedAndCreatedBy(final T source, final T target) {
+        if (EntityStatus.ACTIVE != source.getEntityStatus()) {
+            throw new IllegalStateException("The %s with id %s is not active".formatted(target.getClass().getSimpleName(),
+                    target.getId()));
+        }
+        target.setCreated(source.getCreated());
+        target.setCreatedBy(source.getCreatedBy());
+    }
+
+    Optional<T> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
+
     /**
      * Set the created and created by values if:
      * <ul>
@@ -24,14 +36,5 @@ public interface BaseRepository<T extends BaseDocument> extends MongoRepository<
         this.findById(document.getId())
                 .ifPresent(t -> setCreatedAndCreatedBy(t, document));
         return this.save(document);
-    }
-
-    private static <T extends BaseDocument> void setCreatedAndCreatedBy(final T source, final T target) {
-        if (EntityStatus.ACTIVE != source.getEntityStatus()) {
-            throw new IllegalStateException("The %s with id %s is not active".formatted(target.getClass().getSimpleName(),
-                    target.getId()));
-        }
-        target.setCreated(source.getCreated());
-        target.setCreatedBy(source.getCreatedBy());
     }
 }
