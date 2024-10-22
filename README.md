@@ -49,6 +49,13 @@ These URLs are obsolete:
 
 ## Findings
 
+### DBRef
+
+In a Spring Data MongoDB context, the @DBRef annotation denotes a reference to another document stored in a different
+collection. When you change the field decorated with @DBRef in your application and subsequently save the parent
+document, the changes to the referenced document (field) are not automatically persisted to the MongoDB database. This
+means that altering the reference itself does not inherently propagate changes to the actual referenced document.
+
 ### @Transactional
 
 * Cannot be used, it throws the following error:
