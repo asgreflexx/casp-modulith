@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * IDogRepository
@@ -16,9 +15,7 @@ import java.util.UUID;
 
 public interface DogRepository extends BaseRepository<Dog>, DogCustomRepository {
 
-    Optional<Dog> findDogByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
-
-    Optional<Dog> findDogByChipNumberAndEntityStatus(String chipNumber, EntityStatus entityStatus);
+    Optional<Dog> findOneByChipNumberAndEntityStatus(String chipNumber, EntityStatus entityStatus);
 
     Page<Dog> findAllByEntityStatus(EntityStatus entityStatus, Pageable pageable);
 }

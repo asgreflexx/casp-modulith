@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DogHasHandlerReferenceRepository extends MongoRepository<DogHasHandlerReference, UUID>, DogHasHandlerReferenceCustomRepository {
-    Optional<DogHasHandlerReference> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
+    Optional<DogHasHandlerReference> findOneByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 }

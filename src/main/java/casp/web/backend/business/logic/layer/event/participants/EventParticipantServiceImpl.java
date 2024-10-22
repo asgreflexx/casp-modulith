@@ -53,6 +53,6 @@ class EventParticipantServiceImpl extends BaseParticipantServiceImpl<EventPartic
     }
 
     private Optional<Member> findMember(final UUID memberId) {
-        return memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
+        return memberRepository.findOneByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 }

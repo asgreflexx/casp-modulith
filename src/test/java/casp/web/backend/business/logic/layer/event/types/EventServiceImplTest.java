@@ -103,7 +103,7 @@ class EventServiceImplTest {
     class DeleteById {
         @Test
         void exist() {
-            when(eventRepository.findByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
+            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
 
             eventService.deleteById(event.getId());
 
@@ -114,7 +114,7 @@ class EventServiceImplTest {
         @Test
         void doesNotExist() {
             var id = UUID.randomUUID();
-            when(eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(eventRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> eventService.deleteById(id));
         }

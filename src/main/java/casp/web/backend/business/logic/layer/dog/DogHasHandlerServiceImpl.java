@@ -78,7 +78,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public DogHasHandlerDto getDogHasHandlerById(final UUID id) {
-        var dogHasHandler = dogHasHandlerRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+        var dogHasHandler = dogHasHandlerRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> throwNoSuchElementException(DogHasHandler.class.getSimpleName(), id));
         return DOG_HAS_HANDLER_MAPPER.toTarget(dogHasHandler);
     }
@@ -97,7 +97,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public void deleteDogHasHandlerById(final UUID id) {
-        var dogHasHandler = dogHasHandlerRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+        var dogHasHandler = dogHasHandlerRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> throwNoSuchElementException(DogHasHandler.class.getSimpleName(), id));
 
         saveItWithNewStatus(dogHasHandler, EntityStatus.DELETED);

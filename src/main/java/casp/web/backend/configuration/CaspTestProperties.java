@@ -25,7 +25,7 @@ class CaspTestProperties {
     }
 
     private void createTestMemberIfDoesNotExist(final MemberProperty m) {
-        var doesMemberExist = memberRepository.findMemberByEmail(m.email()).isPresent();
+        var doesMemberExist = memberRepository.findOneByEmail(m.email()).isPresent();
         if (!doesMemberExist) {
             final var member = new Member();
             member.setEmail(m.email());

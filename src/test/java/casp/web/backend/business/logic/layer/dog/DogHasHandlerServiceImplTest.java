@@ -189,7 +189,7 @@ class DogHasHandlerServiceImplTest {
     class DeleteDogHasHandlerById {
         @Test
         void handlerExist() {
-            when(dogHasHandlerRepository.findByIdAndEntityStatus(dogHasHandler.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(dogHasHandlerRepository.findOneByIdAndEntityStatus(dogHasHandler.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
 
             dogHasHandlerService.deleteDogHasHandlerById(dogHasHandler.getId());
 
@@ -271,7 +271,7 @@ class DogHasHandlerServiceImplTest {
     class GetDogHasHandlerById {
         @Test
         void handlerExist() {
-            when(dogHasHandlerRepository.findByIdAndEntityStatus(dogHasHandler.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(dogHasHandlerRepository.findOneByIdAndEntityStatus(dogHasHandler.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
 
             var actualDogHasHandlerDto = dogHasHandlerService.getDogHasHandlerById(dogHasHandler.getId());
 

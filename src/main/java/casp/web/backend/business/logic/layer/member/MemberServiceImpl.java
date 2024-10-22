@@ -72,7 +72,7 @@ class MemberServiceImpl implements MemberService {
     public MemberDto saveMember(final MemberDto memberDto) {
         var member = MEMBER_MAPPER.toSource(memberDto);
 
-        memberRepository.findMemberByEmail(memberDto.getEmail())
+        memberRepository.findOneByEmail(memberDto.getEmail())
                 .ifPresent(m -> {
                     if (!member.equals(m)) {
                         var msg = "Member with email %s already exists.".formatted(member.getEmail());
@@ -132,7 +132,7 @@ class MemberServiceImpl implements MemberService {
     @Override
     public void setActiveMemberToBaseEvent(final BaseEvent baseEvent) {
         if (baseEvent.getMember() == null) {
-            memberRepository.findByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
+            memberRepository.findOneByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
                     .ifPresentOrElse(baseEvent::setMember,
                             () -> LOG.warn("No active member found with id: {}", baseEvent.getMemberId()));
         }

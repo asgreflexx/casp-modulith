@@ -13,9 +13,7 @@ public interface MemberRepository extends BaseRepository<Member>, MemberCustomRe
 
     Page<Member> findAllByEntityStatus(EntityStatus entityStatus, Pageable pageable);
 
-    Optional<Member> findMemberByEmail(String email);
+    Optional<Member> findOneByEmail(String email);
 
     Set<Member> findAllByIdInAndEntityStatus(Set<UUID> membersId, EntityStatus entityStatus);
-
-    Optional<Member> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 }

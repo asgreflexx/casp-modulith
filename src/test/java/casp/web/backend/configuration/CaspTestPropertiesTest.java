@@ -48,7 +48,7 @@ class CaspTestPropertiesTest {
             when(memberProperty.firstName()).thenReturn("John");
             when(memberProperty.lastName()).thenReturn("Doe");
             when(memberProperty.roles()).thenReturn(Set.of(Role.ADMIN));
-            when(memberRepository.findMemberByEmail(memberProperty.email())).thenReturn(Optional.empty());
+            when(memberRepository.findOneByEmail(memberProperty.email())).thenReturn(Optional.empty());
 
             caspTestProperties.setMembers(Set.of(memberProperty));
 
@@ -63,7 +63,7 @@ class CaspTestPropertiesTest {
 
         @Test
         void testMemberExist() {
-            when(memberRepository.findMemberByEmail(memberProperty.email())).thenReturn(Optional.of(mock(Member.class)));
+            when(memberRepository.findOneByEmail(memberProperty.email())).thenReturn(Optional.of(mock(Member.class)));
 
             caspTestProperties.setMembers(Set.of(memberProperty));
 

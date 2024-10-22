@@ -169,7 +169,7 @@ class CourseServiceImpl implements CourseService {
         var actualSpaces = courseDto.getSpaces();
         var newSpaces = courseDto.getNewSpaces()
                 .stream()
-                .flatMap(id -> dogHasHandlerReferenceRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+                .flatMap(id -> dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                         .map(Space::new)
                         .stream())
                 .collect(Collectors.toSet());
@@ -178,7 +178,7 @@ class CourseServiceImpl implements CourseService {
     }
 
     private Course getCourse(final UUID id) {
-        return courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+        return courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> {
                     var msg = "Course with id %s does not exist or it is not active.".formatted(id);
                     LOG.error(msg);

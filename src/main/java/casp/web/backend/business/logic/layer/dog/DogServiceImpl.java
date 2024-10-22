@@ -55,7 +55,7 @@ class DogServiceImpl implements DogService {
 
     @Override
     public Optional<DogDto> getDogByChipNumber(final String chipNumber) {
-        return dogRepository.findDogByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)
+        return dogRepository.findOneByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)
                 .map(this::mapToDogDto);
     }
 
@@ -76,7 +76,7 @@ class DogServiceImpl implements DogService {
     }
 
     private Dog getActiveDog(final UUID id) {
-        return dogRepository.findDogByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
+        return dogRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "Dog with id %s not found or it isn't active.".formatted(id);
             LOG.error(msg);
             return new NoSuchElementException(msg);

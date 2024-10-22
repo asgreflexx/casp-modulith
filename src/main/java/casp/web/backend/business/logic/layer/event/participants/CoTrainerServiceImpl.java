@@ -53,6 +53,6 @@ class CoTrainerServiceImpl extends BaseParticipantServiceImpl<CoTrainer, Course>
     }
 
     private Optional<Member> findMember(final UUID memberId) {
-        return memberRepository.findByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
+        return memberRepository.findOneByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 }

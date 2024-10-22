@@ -209,7 +209,7 @@ class MemberServiceImplTest {
         void memberIsActive() {
             event.setMember(null);
             event.setMemberId(member.getId());
-            when(memberRepository.findByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
+            when(memberRepository.findOneByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
 
             memberService.setActiveMemberToBaseEvent(event);
 
@@ -220,7 +220,7 @@ class MemberServiceImplTest {
         @Test
         void memberIsInactive() {
             event.setMember(null);
-            when(memberRepository.findByIdAndEntityStatus(event.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(memberRepository.findOneByIdAndEntityStatus(event.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             memberService.setActiveMemberToBaseEvent(event);
 
@@ -253,7 +253,7 @@ class MemberServiceImplTest {
 
         @Test
         void emailExistsButBelongsToOtherMember() {
-            when(memberRepository.findMemberByEmail(member.getEmail())).thenReturn(Optional.of(new Member()));
+            when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(new Member()));
             var memberDto = MEMBER_MAPPER.toTarget(member);
 
             assertThrows(IllegalStateException.class, () -> memberService.saveMember(memberDto));
@@ -261,7 +261,7 @@ class MemberServiceImplTest {
 
         @Test
         void updateMember() {
-            when(memberRepository.findMemberByEmail(member.getEmail())).thenReturn(Optional.of(member));
+            when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(member));
             when(memberRepository.setMetadataAndSave(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));

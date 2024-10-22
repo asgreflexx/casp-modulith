@@ -16,7 +16,7 @@ public interface BaseRepository<T extends BaseDocument> extends MongoRepository<
         target.setCreatedBy(source.getCreatedBy());
     }
 
-    Optional<T> findByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
+    Optional<T> findOneByIdAndEntityStatus(UUID id, EntityStatus entityStatus);
 
     /**
      * Set the created and created by values if:

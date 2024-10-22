@@ -132,7 +132,7 @@ class CourseServiceImplTest {
             var space = new Space(dogHasHandler);
             course.setSpaces(Set.of(space));
 
-            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             courseService.removeSpace(course.getId(), space.getId());
 
@@ -146,7 +146,7 @@ class CourseServiceImplTest {
         void courseDoesNotExist() {
             var id = UUID.randomUUID();
             var idSpace = UUID.randomUUID();
-            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(id, idSpace));
         }
@@ -164,7 +164,7 @@ class CourseServiceImplTest {
             var space = new Space(dogHasHandler);
             course.setSpaces(Set.of(space));
 
-            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             space.setNote("spaceChanged");
             courseService.saveSpace(course.getId(), space);
@@ -180,7 +180,7 @@ class CourseServiceImplTest {
         void courseDoesNotExist() {
             var id = UUID.randomUUID();
             var space = new Space();
-            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.saveSpace(id, space));
         }
@@ -197,7 +197,7 @@ class CourseServiceImplTest {
             dogHasHandler.setDog(new DogReference());
             var space = new Space(dogHasHandler);
             course.setSpaces(Set.of(space));
-            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             var emailSet = courseService.getEmailsByCourseId(course.getId());
 
@@ -209,7 +209,7 @@ class CourseServiceImplTest {
         @Test
         void doesNotExist() {
             var id = UUID.randomUUID();
-            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.getEmailsByCourseId(id));
         }
@@ -219,7 +219,7 @@ class CourseServiceImplTest {
     class DeleteById {
         @Test
         void exist() {
-            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             courseService.deleteById(course.getId());
 
@@ -230,7 +230,7 @@ class CourseServiceImplTest {
         @Test
         void doesNotExist() {
             var id = UUID.randomUUID();
-            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.deleteById(id));
         }
@@ -340,7 +340,7 @@ class CourseServiceImplTest {
             dogHasHandlerReference.setMember(new MemberReference());
             var space = new Space(dogHasHandlerReference);
             courseDto.setNewSpaces(Set.of(space.getId()));
-            when(dogHasHandlerReferenceRepository.findByIdAndEntityStatus(space.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(space.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
 
             courseService.save(courseDto);
 
@@ -367,7 +367,7 @@ class CourseServiceImplTest {
     class GetOneById {
         @Test
         void exist() {
-            when(courseRepository.findByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             var courseDto = courseService.getOneById(course.getId());
 
@@ -377,7 +377,7 @@ class CourseServiceImplTest {
         @Test
         void doesNotExist() {
             var id = UUID.randomUUID();
-            when(courseRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.getOneById(id));
         }

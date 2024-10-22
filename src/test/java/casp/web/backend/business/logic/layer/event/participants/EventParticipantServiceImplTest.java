@@ -119,7 +119,7 @@ class EventParticipantServiceImplTest {
     }
 
     private Optional<Member> findMember(final UUID id) {
-        return memberRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE);
+        return memberRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE);
     }
 
     @Nested

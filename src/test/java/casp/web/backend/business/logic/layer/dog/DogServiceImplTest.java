@@ -70,7 +70,7 @@ class DogServiceImplTest {
     @Test
     void getDogByChipNumber() {
         var chipNumber = UUID.randomUUID().toString();
-        when(dogRepository.findDogByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+        when(dogRepository.findOneByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
 
         assertThat(dogService.getDogByChipNumber(chipNumber)).usingRecursiveComparison().isEqualTo(Optional.of(dogDto));
     }
@@ -143,7 +143,7 @@ class DogServiceImplTest {
 
         @Test
         void dogWasFound() {
-            when(dogRepository.findDogByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+            when(dogRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
 
             dogService.deleteDogById(id);
 
@@ -153,7 +153,7 @@ class DogServiceImplTest {
 
         @Test
         void dogWasNotFound() {
-            when(dogRepository.findDogByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(dogRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> dogService.deleteDogById(id));
         }
@@ -164,7 +164,7 @@ class DogServiceImplTest {
 
         @Test
         void dogWasFound() {
-            when(dogRepository.findDogByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+            when(dogRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
 
             var result = dogService.getDogById(dog.getId());
 
@@ -174,7 +174,7 @@ class DogServiceImplTest {
         @Test
         void dogWasNotFound() {
             var dogId = dog.getId();
-            when(dogRepository.findDogByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            when(dogRepository.findOneByIdAndEntityStatus(dogId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> dogService.getDogById(dogId));
         }
@@ -187,7 +187,7 @@ class DogServiceImplTest {
             when(dogHasHandlerReference.getMember().getFirstName()).thenReturn("Bonsai");
             when(dogHasHandlerReference.getMember().getLastName()).thenReturn("Yasmin");
             when(dogHasHandlerReferenceRepository.findAllByDogId(dog.getId())).thenReturn(Set.of(dogHasHandlerReference));
-            when(dogRepository.findDogByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+            when(dogRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
 
             var result = dogService.getDogById(dog.getId());
 

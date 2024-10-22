@@ -58,7 +58,7 @@ class EventServiceImpl implements EventService {
 
     @Override
     public void deleteById(final UUID id) {
-        var event = eventRepository.findByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+        var event = eventRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> {
                     var msg = "Event with id %s does not exist or it is not active.".formatted(id);
                     LOG.error(msg);
