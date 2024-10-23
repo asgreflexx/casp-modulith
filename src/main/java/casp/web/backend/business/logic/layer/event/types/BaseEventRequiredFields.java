@@ -2,15 +2,12 @@ package casp.web.backend.business.logic.layer.event.types;
 
 import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.reference.MemberReference;
-import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 public interface BaseEventRequiredFields {
     @NotBlank
@@ -52,9 +49,4 @@ public interface BaseEventRequiredFields {
 
     void setMaxTime(@NotNull LocalDateTime maxTime);
 
-    @Valid
-    @NotEmpty
-    List<CalendarEntry> getCalendarEntries();
-
-    void setCalendarEntries(@Valid @NotEmpty List<CalendarEntry> calendarEntries);
 }

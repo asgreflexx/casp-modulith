@@ -8,8 +8,6 @@ import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @MemberReferenceDtoConstraint
@@ -24,7 +22,6 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoRequir
     RecurrenceOption recurrenceOption;
     LocalDateTime minTime;
     LocalDateTime maxTime;
-    List<CalendarEntry> calendarEntries = new ArrayList<>();
     CalendarEntry newCalendarEntry;
 
     BaseEventDto(BaseEventType eventType) {
@@ -119,16 +116,6 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoRequir
     @Override
     public void setMaxTime(LocalDateTime maxTime) {
         this.maxTime = maxTime;
-    }
-
-    @Override
-    public List<CalendarEntry> getCalendarEntries() {
-        return calendarEntries;
-    }
-
-    @Override
-    public void setCalendarEntries(final List<CalendarEntry> calendarEntries) {
-        this.calendarEntries = calendarEntries;
     }
 
     @Override

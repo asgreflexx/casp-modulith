@@ -7,6 +7,7 @@ import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.MemberReference;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntriesRequiredFields;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -15,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseEvent extends BaseDocument implements BaseEventRequiredFields {
+public abstract class BaseEvent extends BaseDocument implements BaseEventRequiredFields, CalendarEntriesRequiredFields {
     BaseEventType eventType;
 
     String name;
