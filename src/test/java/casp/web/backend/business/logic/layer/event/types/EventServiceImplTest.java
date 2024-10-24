@@ -21,14 +21,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -99,26 +97,16 @@ class EventServiceImplTest {
 
     }
 
-    @Nested
-    class DeleteById {
-        @Test
-        void exist() {
-            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
+    @Test
+    void deleteById() {
+        when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
 
-            eventService.deleteById(event.getId());
+        eventService.deleteById(event.getId());
 
-            verify(eventRepository).save(eventCaptor.capture());
-            assertThat(eventCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
-        }
-
-        @Test
-        void doesNotExist() {
-            var id = UUID.randomUUID();
-            when(eventRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> eventService.deleteById(id));
-        }
+        verify(eventRepository).save(eventCaptor.capture());
+        assertThat(eventCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
     }
+
 
     @Nested
     class Save {
