@@ -1,24 +1,19 @@
-package casp.web.backend.data.access.layer.event.types;
+package casp.web.backend.business.logic.layer.event.types;
 
-import casp.web.backend.business.logic.layer.event.types.ExamRequiredFields;
 import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.data.access.layer.event.participants.ExamParticipant;
-import com.querydsl.core.annotations.QueryEntity;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
-
-@QueryEntity
-@Document
-public class Exam extends BaseEvent implements ExamRequiredFields {
+@ExamParticipantsDtoConstraint
+public class ExamDto extends BaseEventDto implements ExamRequiredFields, ExamDtoRequiredFields {
     private String judgeName;
-
     private Set<ExamParticipant> participants = new HashSet<>();
+    private Set<UUID> newParticipants = new HashSet<>();
 
-    public Exam() {
+    ExamDto() {
         super(BaseEventType.EXAM);
     }
 
@@ -28,21 +23,28 @@ public class Exam extends BaseEvent implements ExamRequiredFields {
     }
 
     @Override
-    public void setJudgeName(String judgeName) {
+    public void setJudgeName(final String judgeName) {
         this.judgeName = judgeName;
     }
 
     @Override
     public Set<ExamParticipant> getParticipants() {
-        return participants
-                .stream()
-                .filter(p -> isDogHasHandlerNotDeleted(p.getDogHasHandler()))
-                .collect(Collectors.toSet());
+        return participants;
     }
 
     @Override
-    public void setParticipants(Set<ExamParticipant> participants) {
+    public void setParticipants(final Set<ExamParticipant> participants) {
         this.participants = participants;
+    }
+
+    @Override
+    public Set<UUID> getNewParticipants() {
+        return newParticipants;
+    }
+
+    @Override
+    public void setNewParticipants(final Set<UUID> newParticipants) {
+        this.newParticipants = newParticipants;
     }
 
     @Override
