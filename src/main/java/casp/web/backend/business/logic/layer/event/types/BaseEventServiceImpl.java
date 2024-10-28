@@ -8,6 +8,7 @@ import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.BaseEventCustomRepository;
 import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.data.access.layer.event.types.Exam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,6 +105,8 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         Set<D> documents;
         if (documentClass.equals(Course.class)) {
             documents = (Set<D>) migrationService.mapToCourseV2();
+        } else if (documentClass.equals(Exam.class)) {
+            documents = (Set<D>) migrationService.mapToExamV2();
         } else {
             documents = (Set<D>) migrationService.mapToEventV2();
         }

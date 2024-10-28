@@ -1,0 +1,236 @@
+package casp.web.backend.business.logic.layer.event.types;
+
+
+import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.DogHasHandlerReference;
+import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
+import casp.web.backend.common.reference.DogReference;
+import casp.web.backend.common.reference.MemberReference;
+import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
+import casp.web.backend.data.access.layer.event.participants.ExamParticipant;
+import casp.web.backend.data.access.layer.event.types.Exam;
+import casp.web.backend.data.access.layer.event.types.ExamRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class ExamServiceImplTest {
+    @Mock
+    private ExamRepository examRepository;
+    @Mock
+    private MemberReferenceRepository memberReferenceRepository;
+    @Mock
+    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+    @Mock
+    private BaseEventMigrationService migrationService;
+
+    @Captor
+    private ArgumentCaptor<Exam> examCaptor;
+
+    private Exam exam;
+
+    @InjectMocks
+    private ExamServiceImpl examService;
+
+    @BeforeEach
+    void setUp() {
+        exam = new Exam();
+    }
+
+    @Test
+    void deleteBaseEventsByMemberId() {
+        var memberId = UUID.randomUUID();
+        when(examRepository.findAllByMemberIdAndNotDeleted(memberId)).thenReturn(Set.of(exam));
+
+        examService.deleteBaseEventsByMemberId(memberId);
+
+        verify(examRepository).save(examCaptor.capture());
+        assertThat(examCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
+    }
+
+    @Test
+    void deactivateBaseEventsByMemberId() {
+        var memberId = UUID.randomUUID();
+        when(examRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.ACTIVE)).thenReturn(Set.of(exam));
+
+        examService.deactivateBaseEventsByMemberId(memberId);
+
+        verify(examRepository).save(examCaptor.capture());
+        assertThat(examCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.INACTIVE);
+    }
+
+    @Test
+    void activateBaseEventsByMemberId() {
+        var memberId = UUID.randomUUID();
+        when(examRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.INACTIVE)).thenReturn(Set.of(exam));
+
+        examService.activateBaseEventsByMemberId(memberId);
+
+        verify(examRepository).save(examCaptor.capture());
+        assertThat(examCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
+    }
+
+    @Test
+    void migrateDataToV2() {
+        var examSet = Set.of(exam);
+        when(migrationService.mapToExamV2()).thenReturn(examSet);
+
+        examService.migrateDataToV2();
+
+        verify(examRepository).deleteAll();
+        verify(examRepository).saveAll(examSet);
+    }
+
+    @Nested
+    class Save {
+        private ExamDto examDto;
+        private CalendarEntry calendarEntry;
+
+        @BeforeEach
+        void setUp() {
+            calendarEntry = new CalendarEntry();
+            calendarEntry.setEntryFrom(LocalDateTime.MIN);
+            calendarEntry.setEntryTo(LocalDateTime.MAX);
+            examDto = new ExamDto();
+            examDto.setNewCalendarEntry(calendarEntry);
+        }
+
+        @Test
+        void setCalendarEntry() {
+            examService.save(examDto);
+
+            var actualCourse = getExamSaved();
+            assertThat(actualCourse.getCalendarEntries()).singleElement().isEqualTo(calendarEntry);
+            assertEquals(calendarEntry.getEntryFrom(), actualCourse.getMinTime());
+            assertEquals(calendarEntry.getEntryTo(), actualCourse.getMaxTime());
+        }
+
+        @Test
+        void setRecurrenceOption() {
+            examDto.setNewCalendarEntry(null);
+            var daily = new DailyRecurrenceOption();
+            daily.setStartTime(LocalTime.of(1, 0, 0));
+            daily.setEndTime(LocalTime.of(3, 0, 0));
+            daily.setStartRecurrence(LocalDate.of(2024, 10, 1));
+            daily.setEndRecurrence(LocalDate.of(2024, 10, 3));
+            examDto.setRecurrenceOption(daily);
+            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime());
+            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime());
+
+            examService.save(examDto);
+
+            var actualCourse = getExamSaved();
+            assertThat(actualCourse.getCalendarEntries()).hasSize(3);
+            assertEquals(minTime, actualCourse.getMinTime());
+            assertEquals(maxTime, actualCourse.getMaxTime());
+        }
+
+        @Test
+        void setNewMember() {
+            var memberReference = mockMember();
+            examDto.setNewMemberId(memberReference.getId());
+
+            examService.save(examDto);
+
+            assertEquals(memberReference, getExamSaved().getMember());
+        }
+
+        @Test
+        void keepSameMember() {
+            var memberReference = new MemberReference();
+            memberReference.setId(UUID.randomUUID());
+            examDto.setMember(memberReference);
+
+            examService.save(examDto);
+
+            verifyNoInteractions(memberReferenceRepository);
+            assertEquals(memberReference, getExamSaved().getMember());
+        }
+
+        @Test
+        void updateMember() {
+            var actualMember = new MemberReference();
+            actualMember.setId(UUID.randomUUID());
+            var newMember = mockMember();
+            examDto.setMember(actualMember);
+            examDto.setNewMemberId(newMember.getId());
+
+            examService.save(examDto);
+
+            assertEquals(newMember, getExamSaved().getMember());
+        }
+
+        @Test
+        void addParticipant() {
+            var dogHasHandlerReference = new DogHasHandlerReference();
+            dogHasHandlerReference.setId(UUID.randomUUID());
+            dogHasHandlerReference.setDog(new DogReference());
+            dogHasHandlerReference.setMember(new MemberReference());
+            var participant = new ExamParticipant(dogHasHandlerReference);
+            examDto.setNewParticipants(Set.of(participant.getId()));
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(participant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
+
+            examService.save(examDto);
+
+            var actualCourse = getExamSaved();
+            assertThat(actualCourse.getParticipants()).singleElement().isEqualTo(participant);
+        }
+
+        private Exam getExamSaved() {
+            verify(examRepository).setMetadataAndSave(examCaptor.capture());
+            return examCaptor.getValue();
+        }
+
+        private MemberReference mockMember() {
+            var memberReference = new MemberReference();
+            memberReference.setId(UUID.randomUUID());
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
+            return memberReference;
+        }
+    }
+
+    @Nested
+    class DeleteById {
+        @Test
+        void exist() {
+            when(examRepository.findOneByIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(exam));
+
+            examService.deleteById(exam.getId());
+
+            verify(examRepository).save(examCaptor.capture());
+            assertThat(examCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.DELETED);
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(examRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> examService.deleteById(id));
+        }
+    }
+}
