@@ -11,8 +11,7 @@ import java.util.StringJoiner;
  * @deprecated use {@link DailyRecurrenceOption} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
-@EventOptionTimesConstraint
-public class DailyEventOption extends BaseEventOption implements EventOptionTimes {
+public class DailyEventOption extends BaseEventOption {
     private static final String OPTION_TYPE = "DAILY";
 
     @NotNull
@@ -25,7 +24,6 @@ public class DailyEventOption extends BaseEventOption implements EventOptionTime
         super(OPTION_TYPE);
     }
 
-    @Override
     public LocalTime getStartTime() {
         return startTime;
     }
@@ -34,7 +32,6 @@ public class DailyEventOption extends BaseEventOption implements EventOptionTime
         this.startTime = startTime;
     }
 
-    @Override
     public LocalTime getEndTime() {
         return endTime;
     }

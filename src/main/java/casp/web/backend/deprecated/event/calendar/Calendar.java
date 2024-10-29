@@ -17,8 +17,7 @@ import java.util.StringJoiner;
 @Deprecated(forRemoval = true, since = "0.0.0")
 @QueryEntity
 @Document
-@CalendarFromToConstraint
-public class Calendar extends BaseDocument implements Comparable<Calendar>, CalendarValidation {
+public class Calendar extends BaseDocument implements Comparable<Calendar> {
 
     @NotNull
     private LocalDateTime eventFrom;
@@ -47,7 +46,6 @@ public class Calendar extends BaseDocument implements Comparable<Calendar>, Cale
         this(calendar.eventFrom, calendar.eventTo, calendar.location, baseEvent);
     }
 
-    @Override
     public LocalDateTime getEventFrom() {
         return eventFrom;
     }
@@ -56,7 +54,6 @@ public class Calendar extends BaseDocument implements Comparable<Calendar>, Cale
         this.eventFrom = eventFrom;
     }
 
-    @Override
     public LocalDateTime getEventTo() {
         return eventTo;
     }

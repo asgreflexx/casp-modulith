@@ -15,8 +15,7 @@ import java.util.UUID;
  * @deprecated use {@link WeeklyOption} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
-@EventOptionTimesConstraint
-public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOptionRecurrence>, EventOptionTimes {
+public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOptionRecurrence> {
 
     @Id
     protected UUID id = UUID.randomUUID();
@@ -46,7 +45,6 @@ public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOption
         this.dayOfWeek = dayOfWeek;
     }
 
-    @Override
     public LocalTime getStartTime() {
         return startTime;
     }
@@ -55,7 +53,6 @@ public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOption
         this.startTime = startTime;
     }
 
-    @Override
     public LocalTime getEndTime() {
         return endTime;
     }

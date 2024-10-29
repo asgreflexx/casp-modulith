@@ -1,8 +1,6 @@
 package casp.web.backend.deprecated.dtos.event.calendar;
 
 
-import casp.web.backend.deprecated.event.calendar.CalendarFromToConstraint;
-import casp.web.backend.deprecated.event.calendar.CalendarValidation;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
@@ -13,8 +11,7 @@ import java.util.UUID;
  * @deprecated It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
-@CalendarFromToConstraint
-public class CalendarDto implements Comparable<CalendarDto>, CalendarValidation {
+public class CalendarDto implements Comparable<CalendarDto> {
     private UUID id = UUID.randomUUID();
     @NotNull
     private LocalDateTime eventFrom;
@@ -31,7 +28,6 @@ public class CalendarDto implements Comparable<CalendarDto>, CalendarValidation 
         this.id = id;
     }
 
-    @Override
     public LocalDateTime getEventFrom() {
         return eventFrom;
     }
@@ -40,7 +36,6 @@ public class CalendarDto implements Comparable<CalendarDto>, CalendarValidation 
         this.eventFrom = eventFrom;
     }
 
-    @Override
     public LocalDateTime getEventTo() {
         return eventTo;
     }

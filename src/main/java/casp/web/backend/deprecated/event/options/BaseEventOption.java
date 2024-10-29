@@ -12,7 +12,6 @@ import java.time.LocalDate;
  * @deprecated use {@link RecurrenceOption} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
-@BaseEventOptionRecurrencesConstraint
 public abstract class BaseEventOption {
     @NotBlank
     protected String optionType;
