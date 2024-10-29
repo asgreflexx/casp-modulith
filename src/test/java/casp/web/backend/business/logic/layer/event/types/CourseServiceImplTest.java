@@ -60,6 +60,15 @@ class CourseServiceImplTest {
     @InjectMocks
     private CourseServiceImpl courseService;
 
+    private static Space createSpace() {
+        var member = new MemberReference();
+        member.setEmail("mail@mail");
+        var dogHasHandler = new DogHasHandlerReference();
+        dogHasHandler.setMember(member);
+        dogHasHandler.setDog(new DogReference());
+        return new Space(dogHasHandler);
+    }
+
     @BeforeEach
     void setUp() {
         course = new Course();
@@ -125,12 +134,9 @@ class CourseServiceImplTest {
     @Nested
     class RemoveSpace {
         @Test
-        void courseExist() {
-            var dogHasHandler = new DogHasHandlerReference();
-            dogHasHandler.setMember(new MemberReference());
-            dogHasHandler.setDog(new DogReference());
-            var space = new Space(dogHasHandler);
-            course.setSpaces(Set.of(space));
+        void spaceExist() {
+            var space = createSpace();
+            course.getSpaces().add(createSpace());
 
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
@@ -155,25 +161,36 @@ class CourseServiceImplTest {
     @Nested
     class SaveSpace {
         @Test
-        void courseExist() {
-            var member = new MemberReference();
-            member.setEmail("mail@mail");
-            var dogHasHandler = new DogHasHandlerReference();
-            dogHasHandler.setMember(member);
-            dogHasHandler.setDog(new DogReference());
-            var space = new Space(dogHasHandler);
-            course.setSpaces(Set.of(space));
-
+        void addNewSpace() {
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
-            space.setNote("spaceChanged");
-            courseService.saveSpace(course.getId(), space);
+            var newSpace = createSpace();
+            newSpace.setNote("newSpace");
+            courseService.saveSpace(course.getId(), newSpace);
 
             verify(courseRepository).save(courseCaptor.capture());
 
             assertThat(courseCaptor.getValue().getSpaces())
                     .singleElement()
-                    .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
+                    .satisfies(s -> assertEquals(newSpace.getNote(), s.getNote()));
+        }
+
+        @Test
+        void updateSpace() {
+            var space = createSpace();
+            course.getSpaces().add(space);
+
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+
+            var changedSpace = createSpace();
+            changedSpace.setNote("spaceChanged");
+            courseService.saveSpace(course.getId(), changedSpace);
+
+            verify(courseRepository).save(courseCaptor.capture());
+
+            assertThat(courseCaptor.getValue().getSpaces())
+                    .singleElement()
+                    .satisfies(s -> assertEquals(changedSpace.getNote(), s.getNote()));
         }
 
         @Test

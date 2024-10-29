@@ -33,11 +33,8 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
-    private static Set<Space> getSpaces(final Course course, final UUID id) {
-        return course.getSpaces()
-                .stream()
-                .filter(s -> !id.equals(s.getId()))
-                .collect(Collectors.toSet());
+    private static void removeSpace(final Set<Space> spaces, final UUID spaceId) {
+        spaces.removeIf(s -> spaceId.equals(s.getId()));
     }
 
     @Override
@@ -75,16 +72,17 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     @Override
     public void saveSpace(final UUID courseId, final Space space) {
         var course = getOneByIdOrThrowException(courseId);
-        var spaceSet = getSpaces(course, space.getId());
-        spaceSet.add(space);
-        course.setSpaces(spaceSet);
+        var spaces = course.getSpaces();
+        removeSpace(spaces, space.getId());
+        spaces.add(space);
+        course.setSpaces(spaces);
         courseRepository.save(course);
     }
 
     @Override
     public void removeSpace(final UUID courseId, final UUID spaceId) {
         var course = getOneByIdOrThrowException(courseId);
-        course.setSpaces(getSpaces(course, spaceId));
+        removeSpace(course.getSpaces(), spaceId);
         courseRepository.save(course);
     }
 
