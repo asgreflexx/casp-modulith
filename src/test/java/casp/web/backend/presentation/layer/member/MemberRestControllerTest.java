@@ -6,12 +6,16 @@ import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Role;
 import casp.web.backend.common.member.Card;
+import casp.web.backend.common.reference.DogReferenceRepository;
+import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.data.access.layer.dog.DogHasHandler;
+import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.dog.DogRepository;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.types.Event;
+import casp.web.backend.data.access.layer.event.types.EventRepository;
 import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.data.access.layer.member.MemberRepository;
-import casp.web.backend.deprecated.dog.DogHasHandlerOldRepository;
-import casp.web.backend.deprecated.event.participants.BaseParticipantRepository;
-import casp.web.backend.deprecated.event.types.BaseEventRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -28,6 +32,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -59,13 +65,15 @@ class MemberRestControllerTest {
     @Autowired
     private MemberRepository memberRepository;
     @Autowired
-    private DogHasHandlerOldRepository dogHasHandlerOldRepository;
-    @Autowired
-    private BaseParticipantRepository baseParticipantRepository;
-    @Autowired
-    private BaseEventRepository baseEventRepository;
+    private DogHasHandlerRepository dogHasHandlerRepository;
     @Autowired
     private DogRepository dogRepository;
+    @Autowired
+    private EventRepository eventRepository;
+    @Autowired
+    private MemberReferenceRepository memberReferenceRepository;
+    @Autowired
+    private DogReferenceRepository dogReferenceRepository;
 
     @SpyBean
     private MemberService memberService;
@@ -77,9 +85,8 @@ class MemberRestControllerTest {
 
     @BeforeEach
     void setUp() {
-        baseParticipantRepository.deleteAll();
-        baseEventRepository.deleteAll();
-        dogHasHandlerOldRepository.deleteAll();
+        eventRepository.deleteAll();
+        dogHasHandlerRepository.deleteAll();
         memberRepository.deleteAll();
         dogRepository.deleteAll();
 
@@ -89,20 +96,23 @@ class MemberRestControllerTest {
         inactive = TestFixture.createMember("INACTIVE", "INACTIVE");
         inactive.setEntityStatus(EntityStatus.INACTIVE);
         memberRepository.save(inactive);
-        var bonsaiDocument = TestFixture.createDog();
-        dogRepository.save(bonsaiDocument);
-        var eventParticipant = TestFixture.createEventParticipant();
-        eventParticipant.setMemberOrHandlerId(johnDocument.getId());
-        var event = eventParticipant.getBaseEvent();
-        event.setMember(johnDocument);
-        event.setMemberId(johnDocument.getId());
-        var coTrainer = TestFixture.createCoTrainer();
-        coTrainer.setMemberOrHandlerId(johnDocument.getId());
-        var course = coTrainer.getBaseEvent();
-        course.setMember(johnDocument);
-        course.setMemberId(johnDocument.getId());
-        baseEventRepository.saveAll(Set.of(event, course));
-        baseParticipantRepository.saveAll(Set.of(eventParticipant, coTrainer));
+
+        var bonsaiDocument = dogRepository.save(TestFixture.createDog());
+
+        var event = new Event();
+        var dogHasHandler = new DogHasHandler();
+        memberReferenceRepository.findById(john.getId()).ifPresent(m -> {
+            dogHasHandler.setMember(m);
+            event.setMember(m);
+        });
+        dogReferenceRepository.findById(bonsaiDocument.getId()).ifPresent(dogHasHandler::setDog);
+        dogHasHandlerRepository.save(dogHasHandler);
+
+        var calendarEntry = new CalendarEntry(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
+        event.setName("Test");
+        event.setCalendarEntries(new ArrayList<>(List.of(calendarEntry)));
+        eventRepository.save(event);
+
         expectedActiveMembers = READ_MAPPER.toTargetSet(Set.of(john, zephyr));
     }
 
@@ -256,9 +266,8 @@ class MemberRestControllerTest {
             assertThat(MvcMapper.toObject(mvcResult, MemberRead.class))
                     .usingRecursiveAssertion()
                     .isEqualTo(READ_MAPPER.toTarget(john));
-            assertThat(dogHasHandlerOldRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.ACTIVE, dh.getEntityStatus()));
-            assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.ACTIVE, p.getEntityStatus()));
-            assertThat(baseEventRepository.findAll()).allSatisfy(e -> assertSame(EntityStatus.ACTIVE, e.getEntityStatus()));
+            assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.ACTIVE, dh.getEntityStatus()));
+            assertThat(eventRepository.findAll()).allSatisfy(e -> assertSame(EntityStatus.ACTIVE, e.getEntityStatus()));
         }
 
         @Test
@@ -287,9 +296,8 @@ class MemberRestControllerTest {
             assertThat(MvcMapper.toObject(mvcResult, MemberRead.class)).satisfies(dto -> {
                 assertSame(EntityStatus.INACTIVE, dto.getEntityStatus());
             });
-            assertThat(dogHasHandlerOldRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.INACTIVE, dh.getEntityStatus()));
-            assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.INACTIVE, p.getEntityStatus()));
-            assertThat(baseEventRepository.findAll()).allSatisfy(e -> assertSame(EntityStatus.INACTIVE, e.getEntityStatus()));
+            assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.INACTIVE, dh.getEntityStatus()));
+            assertThat(eventRepository.findAll()).allSatisfy(e -> assertSame(EntityStatus.INACTIVE, e.getEntityStatus()));
         }
 
         @Test
@@ -311,9 +319,8 @@ class MemberRestControllerTest {
                     .andExpect(status().isNoContent());
 
             getMemberById(john.getId()).andExpect(status().isBadRequest());
-            assertThat(dogHasHandlerOldRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.DELETED, dh.getEntityStatus()));
-            assertThat(baseParticipantRepository.findAll()).allSatisfy(p -> assertSame(EntityStatus.DELETED, p.getEntityStatus()));
-            assertThat(baseEventRepository.findAll()).allSatisfy(e -> assertSame(EntityStatus.DELETED, e.getEntityStatus()));
+            assertThat(dogHasHandlerRepository.findAll()).allSatisfy(dh -> assertSame(EntityStatus.DELETED, dh.getEntityStatus()));
+            assertThat(eventRepository.findAll()).allSatisfy(e -> assertSame(EntityStatus.DELETED, e.getEntityStatus()));
         }
 
         @Test
@@ -355,7 +362,7 @@ class MemberRestControllerTest {
 
             performPost(WRITE_MAPPER.toTarget(member))
                     .andExpect(status().isBadRequest())
-                    .andExpect(jsonPath("$.message").value("Member with email %s already exists." .formatted(john.getEmail())));
+                    .andExpect(jsonPath("$.message").value("Member with email %s already exists.".formatted(john.getEmail())));
 
             verify(memberService).saveMember(memberCaptor.capture());
             assertEquals(member.getId(), memberCaptor.getValue().getId());
