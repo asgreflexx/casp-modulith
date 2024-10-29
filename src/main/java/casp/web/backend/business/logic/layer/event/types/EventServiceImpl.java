@@ -24,8 +24,7 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements 
     @Override
     public void save(final EventDto dto) {
         var event = EVENT_MAPPER.toSource(dto);
-        setCalendarEntries(dto, event);
-        setMember(dto, event);
+        setCalendarEntriesAndMember(dto, event);
         setParticipants(dto, event);
 
         baseRepository.setMetadataAndSave(event);

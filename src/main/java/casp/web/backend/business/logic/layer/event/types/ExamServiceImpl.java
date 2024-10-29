@@ -27,8 +27,7 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
     @Override
     public void save(final ExamDto dto) {
         var exam = EXAM_MAPPER.toSource(dto);
-        setCalendarEntries(dto, exam);
-        setMember(dto, exam);
+        setCalendarEntriesAndMember(dto, exam);
         setParticipants(dto, exam);
 
         baseRepository.setMetadataAndSave(exam);

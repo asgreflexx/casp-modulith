@@ -65,23 +65,28 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
                 .forEach(d -> saveItNewEntityStatus(d, EntityStatus.ACTIVE));
     }
 
-    protected void setCalendarEntries(final T dto, final D document) {
-        if (null == dto.getRecurrenceOption()) {
-            document.setCalendarEntries(new ArrayList<>(List.of(dto.getNewCalendarEntry())));
+    @SuppressWarnings("unchecked")
+    @Override
+    public void migrateDataToV2() {
+        baseRepository.deleteAll();
+        Set<D> documents;
+        if (documentClass.equals(Course.class)) {
+            documents = (Set<D>) migrationService.mapToCourseV2();
+        } else if (documentClass.equals(Exam.class)) {
+            documents = (Set<D>) migrationService.mapToExamV2();
         } else {
-            document.setCalendarEntries(RecurrenceOptionUtility.createCalendarEntries(dto.getRecurrenceOption()));
+            documents = (Set<D>) migrationService.mapToEventV2();
         }
+        baseRepository.saveAll(documents);
+    }
+
+    protected void setCalendarEntriesAndMember(final T dto, final D document) {
+        setCalendarEntries(dto, document);
+        setMember(dto, document);
     }
 
     protected Optional<MemberReference> findMemberReferenceById(final UUID memberId) {
         return memberReferenceRepository.findOneByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
-    }
-
-    protected void setMember(final T dto, final D document) {
-        if (dto.getNewMemberId() != null) {
-            findMemberReferenceById(dto.getNewMemberId())
-                    .ifPresent(document::setMember);
-        }
     }
 
     protected D getOneByIdOrThrowException(final UUID id) {
@@ -98,18 +103,18 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         baseRepository.save(document);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void migrateDataToV2() {
-        baseRepository.deleteAll();
-        Set<D> documents;
-        if (documentClass.equals(Course.class)) {
-            documents = (Set<D>) migrationService.mapToCourseV2();
-        } else if (documentClass.equals(Exam.class)) {
-            documents = (Set<D>) migrationService.mapToExamV2();
+    private void setCalendarEntries(final T dto, final D document) {
+        if (null == dto.getRecurrenceOption()) {
+            document.setCalendarEntries(new ArrayList<>(List.of(dto.getNewCalendarEntry())));
         } else {
-            documents = (Set<D>) migrationService.mapToEventV2();
+            document.setCalendarEntries(RecurrenceOptionUtility.createCalendarEntries(dto.getRecurrenceOption()));
         }
-        baseRepository.saveAll(documents);
+    }
+
+    private void setMember(final T dto, final D document) {
+        if (dto.getNewMemberId() != null) {
+            findMemberReferenceById(dto.getNewMemberId())
+                    .ifPresent(document::setMember);
+        }
     }
 }

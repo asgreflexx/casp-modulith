@@ -41,8 +41,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     public void save(final CourseDto dto) {
         var course = COURSE_MAPPER.toSource(dto);
 
-        setCalendarEntries(dto, course);
-        setMember(dto, course);
+        setCalendarEntriesAndMember(dto, course);
         setCoTrainers(dto, course);
         setSpaces(dto, course);
 
