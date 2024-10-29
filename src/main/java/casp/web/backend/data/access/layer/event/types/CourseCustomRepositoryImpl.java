@@ -17,7 +17,7 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
 
     @Autowired
     CourseCustomRepositoryImpl(final MongoOperations mongoOperations) {
-        super(Course.class, mongoOperations);
+        super(mongoOperations);
     }
 
     @Override

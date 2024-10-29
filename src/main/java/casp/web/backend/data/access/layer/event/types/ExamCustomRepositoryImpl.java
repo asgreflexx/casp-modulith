@@ -9,6 +9,6 @@ class ExamCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Exam> imple
 
     @Autowired
     ExamCustomRepositoryImpl(final MongoOperations mongoOperations) {
-        super(Exam.class, mongoOperations);
+        super(mongoOperations);
     }
 }

@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -14,8 +15,10 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent> implements Bas
     final MongoOperations mongoOperations;
     private final Class<T> baseEventClass;
 
-    BaseEventCustomRepositoryImpl(final Class<T> baseEventClass, final MongoOperations mongoOperations) {
-        this.baseEventClass = baseEventClass;
+    // no need to check, all classes are of type BaseEvent
+    @SuppressWarnings("unchecked")
+    BaseEventCustomRepositoryImpl(final MongoOperations mongoOperations) {
+        this.baseEventClass = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
         this.mongoOperations = mongoOperations;
     }
 

@@ -9,7 +9,7 @@ class EventCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Event> imp
 
     @Autowired
     EventCustomRepositoryImpl(final MongoOperations mongoOperations) {
-        super(Event.class, mongoOperations);
+        super(mongoOperations);
     }
 
 }
