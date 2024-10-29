@@ -3,6 +3,8 @@ package casp.web.backend.business.logic.layer.event.types;
 import casp.web.backend.business.logic.layer.event.options.RecurrenceOptionUtility;
 import casp.web.backend.common.base.BaseRepository;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.DogHasHandlerReference;
+import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
@@ -25,6 +27,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
 
     protected final BaseRepository<D> baseRepository;
     private final MemberReferenceRepository memberReferenceRepository;
+    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     private final BaseEventCustomRepository<D> baseEventCustomRepository;
     private final Class<D> documentClass;
     private final BaseEventMigrationService migrationService;
@@ -32,10 +35,12 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
     @SuppressWarnings("unchecked")
     BaseEventServiceImpl(final MemberReferenceRepository memberReferenceRepository,
                          final BaseRepository<D> baseRepository,
+                         final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
                          final BaseEventMigrationService migrationService) {
         this.memberReferenceRepository = memberReferenceRepository;
         this.baseRepository = baseRepository;
         this.baseEventCustomRepository = (BaseEventCustomRepository<D>) baseRepository;
+        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
         this.migrationService = migrationService;
         var types = (ParameterizedType) getClass().getGenericSuperclass();
         this.documentClass = (Class<D>) types.getActualTypeArguments()[0];
@@ -101,6 +106,10 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
     protected void saveItNewEntityStatus(final D document, final EntityStatus entityStatus) {
         document.setEntityStatus(entityStatus);
         baseRepository.save(document);
+    }
+
+    protected Optional<DogHasHandlerReference> findDogHandlerReferenceById(final UUID dogHasHandlerId) {
+        return dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE);
     }
 
     private void setCalendarEntries(final T dto, final D document) {

@@ -1,6 +1,5 @@
 package casp.web.backend.business.logic.layer.event.types;
 
-import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.participants.ExamParticipant;
@@ -14,14 +13,12 @@ import static casp.web.backend.business.logic.layer.event.types.ExamMapper.EXAM_
 
 @Service
 class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements ExamService {
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     ExamServiceImpl(final MemberReferenceRepository memberReferenceRepository,
                     final ExamRepository examRepository,
                     final BaseEventMigrationService migrationService,
                     final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
-        super(memberReferenceRepository, examRepository, migrationService);
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
+        super(memberReferenceRepository, examRepository, dogHasHandlerReferenceRepository, migrationService);
     }
 
     @Override
@@ -37,7 +34,7 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
         var actualParticipants = dto.getParticipants();
         var newParticipants = dto.getNewParticipants()
                 .stream()
-                .flatMap(id -> dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+                .flatMap(id -> findDogHandlerReferenceById(id)
                         .map(ExamParticipant::new)
                         .stream())
                 .collect(Collectors.toSet());

@@ -18,7 +18,7 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements 
     EventServiceImpl(final EventRepository eventRepository,
                      final MemberReferenceRepository memberReferenceRepository,
                      final BaseEventMigrationService migrationService) {
-        super(memberReferenceRepository, eventRepository, migrationService);
+        super(memberReferenceRepository, eventRepository, null, migrationService);
     }
 
     @Override

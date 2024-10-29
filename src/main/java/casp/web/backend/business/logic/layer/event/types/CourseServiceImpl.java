@@ -1,6 +1,5 @@
 package casp.web.backend.business.logic.layer.event.types;
 
-import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
@@ -21,16 +20,14 @@ import static casp.web.backend.business.logic.layer.event.types.CourseMapper.COU
 @Service
 class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implements CourseService {
     private final CourseRepository courseRepository;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
     CourseServiceImpl(final CourseRepository courseRepository,
                       final MemberReferenceRepository memberReferenceRepository,
                       final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
                       final BaseEventMigrationService migrationService) {
-        super(memberReferenceRepository, courseRepository, migrationService);
+        super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
         this.courseRepository = courseRepository;
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     private static void removeSpace(final Set<Space> spaces, final UUID spaceId) {
@@ -101,7 +98,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         var actualSpaces = courseDto.getSpaces();
         var newSpaces = courseDto.getNewSpaces()
                 .stream()
-                .flatMap(id -> dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+                .flatMap(id -> findDogHandlerReferenceById(id)
                         .map(Space::new)
                         .stream())
                 .collect(Collectors.toSet());
