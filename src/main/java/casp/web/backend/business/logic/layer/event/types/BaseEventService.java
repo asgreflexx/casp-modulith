@@ -1,5 +1,7 @@
 package casp.web.backend.business.logic.layer.event.types;
 
+import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 interface BaseEventService<T extends BaseEventDto> {
@@ -12,6 +14,8 @@ interface BaseEventService<T extends BaseEventDto> {
     void deactivateBaseEventsByMemberId(UUID memberId);
 
     void activateBaseEventsByMemberId(UUID memberId);
+
+    Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
 
     /**
      * @deprecated It will be removed in #3.

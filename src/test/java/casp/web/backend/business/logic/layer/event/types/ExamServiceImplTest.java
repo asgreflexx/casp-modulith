@@ -25,6 +25,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +34,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -103,6 +106,27 @@ class ExamServiceImplTest {
 
         verify(examRepository).deleteAll();
         verify(examRepository).saveAll(examSet);
+    }
+
+    @Test
+    void getCalendarEntries() {
+        var from = LocalDateTime.now().minusDays(1);
+        var to = from.plusDays(1);
+        var calendarEntry1 = new CalendarEntry(from.minusHours(1), from);
+        var calendarEntry2 = new CalendarEntry(from, to);
+        var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
+        exam.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
+        when(examRepository.findAllBetweenFromAndTo(from, to)).thenReturn(Set.of(exam));
+
+        var calendarEntryDtoSet = examService.getCalendarEntriesBetweenFromAndTo(from, to);
+
+        assertThat(calendarEntryDtoSet)
+                .singleElement()
+                .satisfies(ce -> {
+                    assertEquals(calendarEntry2.getEntryFrom(), ce.getMinTime());
+                    assertEquals(calendarEntry2.getEntryTo(), ce.getMaxTime());
+                    assertSame(exam.getEventType(), ce.getEventType());
+                });
     }
 
     @Nested

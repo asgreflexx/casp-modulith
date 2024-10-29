@@ -7,6 +7,7 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
 import casp.web.backend.data.access.layer.event.types.BaseEventCustomRepository;
 import casp.web.backend.data.access.layer.event.types.Course;
@@ -15,12 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static casp.web.backend.business.logic.layer.event.types.CalendarEntryMapper.CALENDAR_MAPPER;
 
 abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto> implements BaseEventService<T> {
     private static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
@@ -46,6 +51,18 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         this.documentClass = (Class<D>) types.getActualTypeArguments()[0];
     }
 
+    private static <D extends BaseEvent> CalendarEntryDto mapToCalendarEntryDto(final D d, final CalendarEntry ce) {
+        var calendarEntryDto = CALENDAR_MAPPER.fromBaseEvent(d);
+        calendarEntryDto.setMinTime(ce.getEntryFrom());
+        calendarEntryDto.setMaxTime(ce.getEntryTo());
+        calendarEntryDto.setCalendarEntryId(ce.getId());
+        return calendarEntryDto;
+    }
+
+    private static boolean isWithinRange(final CalendarEntry calendarEntry, final LocalDateTime from, final LocalDateTime to) {
+        return !calendarEntry.getEntryFrom().isBefore(from) && !calendarEntry.getEntryTo().isAfter(to);
+    }
+
     @Override
     public void deleteById(final UUID id) {
         var document = getOneByIdOrThrowException(id);
@@ -68,6 +85,17 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
     public void activateBaseEventsByMemberId(final UUID memberId) {
         baseEventCustomRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.INACTIVE)
                 .forEach(d -> saveItNewEntityStatus(d, EntityStatus.ACTIVE));
+    }
+
+    @Override
+    public Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(final LocalDateTime from, final LocalDateTime to) {
+        return baseEventCustomRepository.findAllBetweenFromAndTo(from, to)
+                .stream()
+                .flatMap(d -> d.getCalendarEntries()
+                        .stream()
+                        .filter(ce -> isWithinRange(ce, from, to))
+                        .map(ce -> mapToCalendarEntryDto(d, ce)))
+                .collect(Collectors.toSet());
     }
 
     @SuppressWarnings("unchecked")
