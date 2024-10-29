@@ -188,10 +188,10 @@
                         <exclude>**/*Grade.class</exclude>
                         <exclude>**/*Calendar.class</exclude>
                         <exclude>**/*CalendarEntry.class</exclude>
-                        <exclude>**/*BaseEventOption.class</exclude>
-                        <exclude>**/*DailyEventOption.class</exclude>
-                        <exclude>**/*WeeklyEventOption.class</exclude>
-                        <exclude>**/*WeeklyEventOptionRecurrence.class</exclude>
+                        <exclude>**/*RecurrenceOption.class</exclude>
+                        <exclude>**/*DailyRecurrenceOption.class</exclude>
+                        <exclude>**/*WeeklyOption.class</exclude>
+                        <exclude>**/*WeeklyRecurrenceOption.class</exclude>
                         <exclude>**/*BaseParticipant.class</exclude>
                         <exclude>**/*CoTrainer.class</exclude>
                         <exclude>**/*EventParticipant.class</exclude>
