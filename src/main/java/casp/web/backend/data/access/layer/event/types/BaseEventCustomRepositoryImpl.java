@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 
 import java.lang.reflect.ParameterizedType;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,6 +34,14 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent> implements Bas
     public Set<T> findAllByMemberIdAndStatus(final UUID memberId, final EntityStatus status) {
         var criteria = BASE_EVENT.entityStatus.eq(status)
                 .and(BASE_EVENT.member.id.eq(memberId));
+        return findAllByCriteria(criteria);
+    }
+
+    @Override
+    public Set<T> findAllBetweenFromAndTo(final LocalDateTime from, final LocalDateTime to) {
+        var criteria = BASE_EVENT.entityStatus.eq(EntityStatus.ACTIVE)
+                .and(BASE_EVENT.minTime.loe(to))
+                .and(BASE_EVENT.maxTime.goe(from));
         return findAllByCriteria(criteria);
     }
 
