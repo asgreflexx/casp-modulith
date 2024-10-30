@@ -17,6 +17,8 @@ interface BaseEventService<T extends BaseEventDto> {
 
     Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
 
+    T getOneByIdAndCalendarEntryId(UUID id, UUID calendarEntryId);
+
     /**
      * @deprecated It will be removed in #3.
      */

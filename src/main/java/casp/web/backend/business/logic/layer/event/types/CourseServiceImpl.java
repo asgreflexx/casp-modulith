@@ -11,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -43,6 +45,21 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         setSpaces(dto, course);
 
         courseRepository.setMetadataAndSave(course);
+    }
+
+    @Override
+    public CourseDto getOneByIdAndCalendarEntryId(final UUID id, final UUID calendarEntryId) {
+        var courseDto = getOneById(id);
+        var calendarEntry = courseDto.getCalendarEntries()
+                .stream()
+                .filter(ce -> calendarEntryId.equals(ce.getId()))
+                .findAny()
+                .orElseThrow(() -> {
+                    var msg = "The Calendar entry with Id %s not found in course with Id %s".formatted(calendarEntryId, id);
+                    return new NoSuchElementException(msg);
+                });
+        courseDto.setCalendarEntries(List.of(calendarEntry));
+        return courseDto;
     }
 
     @Override

@@ -17,8 +17,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -144,7 +142,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         if (null == dto.getRecurrenceOption()) {
             var newCalendarEntry = dto.getNewCalendarEntry();
             var calendarEntry = new CalendarEntry(newCalendarEntry.getEntryFrom(), newCalendarEntry.getEntryTo());
-            document.setCalendarEntries(new ArrayList<>(List.of(calendarEntry)));
+            document.addCalendarEntry(calendarEntry);
         } else {
             document.setCalendarEntries(RecurrenceOptionUtility.createCalendarEntries(dto.getRecurrenceOption()));
         }

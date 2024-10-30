@@ -146,6 +146,11 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
         this.maxTime = calendarEntries.getLast().getEntryTo();
     }
 
+    public void addCalendarEntry(final CalendarEntry calendarEntry) {
+        calendarEntries.add(calendarEntry);
+        setCalendarEntries(calendarEntries);
+    }
+
     @Override
     public boolean equals(final Object o) {
         return super.equals(o);
