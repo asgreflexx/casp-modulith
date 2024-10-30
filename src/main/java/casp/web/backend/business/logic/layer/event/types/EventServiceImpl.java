@@ -7,6 +7,7 @@ import casp.web.backend.data.access.layer.event.types.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static casp.web.backend.business.logic.layer.event.types.EventMapper.EVENT_MAPPER;
@@ -28,6 +29,11 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements 
         setParticipants(dto, event);
 
         baseRepository.setMetadataAndSave(event);
+    }
+
+    @Override
+    public EventDto getOneById(final UUID id) {
+        return EVENT_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
     private void setParticipants(final EventDto eventDto, final Event event) {

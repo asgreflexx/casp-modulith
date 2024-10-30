@@ -19,6 +19,8 @@ interface BaseEventService<T extends BaseEventDto> {
 
     T getOneByIdAndCalendarEntryId(UUID id, UUID calendarEntryId);
 
+    T getOneById(UUID id);
+
     /**
      * @deprecated It will be removed in #3.
      */

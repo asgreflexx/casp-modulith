@@ -10,8 +10,6 @@ import java.util.UUID;
 
 public interface CourseService extends BaseEventService<CourseDto> {
 
-    CourseDto getOneById(UUID id);
-
     Page<CourseDto> getAllByYear(int year, Pageable pageable);
 
     Set<String> getEmailsByCourseId(UUID id);

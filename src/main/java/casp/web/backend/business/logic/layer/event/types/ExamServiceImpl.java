@@ -7,6 +7,7 @@ import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.data.access.layer.event.types.ExamRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static casp.web.backend.business.logic.layer.event.types.ExamMapper.EXAM_MAPPER;
@@ -28,6 +29,11 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
         setParticipants(dto, exam);
 
         baseRepository.setMetadataAndSave(exam);
+    }
+
+    @Override
+    public ExamDto getOneById(final UUID id) {
+        return EXAM_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
     private void setParticipants(final ExamDto dto, final Exam exam) {

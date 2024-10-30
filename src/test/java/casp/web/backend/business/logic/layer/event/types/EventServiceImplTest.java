@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
@@ -128,6 +130,49 @@ class EventServiceImplTest {
                     assertEquals(calendarEntry2.getEntryTo(), ce.getEntryTo());
                     assertSame(event.getEventType(), ce.getEventType());
                 });
+    }
+
+    @Nested
+    class GetOneByIdAndCalendarEntryId {
+
+        private CalendarEntry calendarEntry;
+
+        @BeforeEach
+        void setUp() {
+            calendarEntry = new CalendarEntry(LocalDateTime.MIN, LocalDateTime.MAX);
+            event.addCalendarEntry(calendarEntry);
+            event.addCalendarEntry(new CalendarEntry(LocalDateTime.now(), LocalDateTime.now().plusHours(1)));
+        }
+
+        @Test
+        void eventExist() {
+            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
+
+            var courseDto = eventService.getOneByIdAndCalendarEntryId(event.getId(), calendarEntry.getId());
+
+            assertEquals(event.getId(), courseDto.getId());
+            assertThat(courseDto.getCalendarEntries())
+                    .singleElement()
+                    .satisfies(ce -> {
+                        assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
+                        assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
+                    });
+        }
+
+        @Test
+        void eventDoesNotExist() {
+            var id = UUID.randomUUID();
+            when(eventRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> eventService.getOneByIdAndCalendarEntryId(id, calendarEntry.getId()));
+        }
+
+        @Test
+        void calendarEntryDoesNotExist() {
+            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
+
+            assertThrows(NoSuchElementException.class, () -> eventService.getOneByIdAndCalendarEntryId(event.getId(), UUID.randomUUID()));
+        }
     }
 
     @Nested
