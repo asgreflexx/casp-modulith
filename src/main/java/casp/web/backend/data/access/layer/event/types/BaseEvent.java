@@ -7,16 +7,17 @@ import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.MemberReference;
-import casp.web.backend.data.access.layer.event.calendar.CalendarEntriesRequiredFields;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseEvent extends BaseDocument implements BaseEventRequiredFields, CalendarEntriesRequiredFields {
+public abstract class BaseEvent extends BaseDocument implements BaseEventRequiredFields {
     BaseEventType eventType;
 
     String name;
@@ -34,6 +35,8 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
 
     LocalDateTime maxTime;
 
+    @Valid
+    @NotEmpty
     List<CalendarEntry> calendarEntries = new ArrayList<>();
 
     BaseEvent(BaseEventType eventType) {

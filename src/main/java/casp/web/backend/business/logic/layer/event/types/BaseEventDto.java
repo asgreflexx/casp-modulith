@@ -6,8 +6,11 @@ import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @MemberReferenceDtoConstraint
@@ -22,7 +25,8 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoRequir
     RecurrenceOption recurrenceOption;
     LocalDateTime minTime;
     LocalDateTime maxTime;
-    CalendarEntry newCalendarEntry;
+    NewCalendarEntryDto newCalendarEntry;
+    List<CalendarEntry> calendarEntries = new ArrayList<>();
 
     BaseEventDto(BaseEventType eventType) {
         this.eventType = eventType;
@@ -119,13 +123,23 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoRequir
     }
 
     @Override
-    public CalendarEntry getNewCalendarEntry() {
+    public @Valid NewCalendarEntryDto getNewCalendarEntry() {
         return newCalendarEntry;
     }
 
     @Override
-    public void setNewCalendarEntry(CalendarEntry newCalendarEntry) {
+    public void setNewCalendarEntry(@Valid NewCalendarEntryDto newCalendarEntry) {
         this.newCalendarEntry = newCalendarEntry;
+    }
+
+    @Override
+    public List<CalendarEntry> getCalendarEntries() {
+        return calendarEntries;
+    }
+
+    @Override
+    public void setCalendarEntries(final List<CalendarEntry> calendarEntries) {
+        this.calendarEntries = calendarEntries;
     }
 
     @Override

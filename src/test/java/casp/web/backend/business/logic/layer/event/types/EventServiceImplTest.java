@@ -133,15 +133,15 @@ class EventServiceImplTest {
     @Nested
     class Save {
         private EventDto eventDto;
-        private CalendarEntry calendarEntry;
+        private NewCalendarEntryDto newCalendarEntryDto;
 
         @BeforeEach
         void setUp() {
-            calendarEntry = new CalendarEntry();
-            calendarEntry.setEntryFrom(LocalDateTime.MIN);
-            calendarEntry.setEntryTo(LocalDateTime.MAX);
+            newCalendarEntryDto = new NewCalendarEntryDto();
+            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
+            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
             eventDto = new EventDto();
-            eventDto.setNewCalendarEntry(calendarEntry);
+            eventDto.setNewCalendarEntry(newCalendarEntryDto);
         }
 
         @Test
@@ -151,9 +151,12 @@ class EventServiceImplTest {
             var actualCourse = getEventSaved();
             assertThat(actualCourse.getCalendarEntries())
                     .singleElement()
-                    .isEqualTo(calendarEntry);
-            assertEquals(calendarEntry.getEntryFrom(), actualCourse.getMinTime());
-            assertEquals(calendarEntry.getEntryTo(), actualCourse.getMaxTime());
+                    .satisfies(ce -> {
+                        assertEquals(newCalendarEntryDto.getEntryFrom(), ce.getEntryFrom());
+                        assertEquals(newCalendarEntryDto.getEntryTo(), ce.getEntryTo());
+                    });
+            assertEquals(newCalendarEntryDto.getEntryFrom(), actualCourse.getMinTime());
+            assertEquals(newCalendarEntryDto.getEntryTo(), actualCourse.getMaxTime());
         }
 
         @Test

@@ -1,6 +1,5 @@
 package casp.web.backend.business.logic.layer.event.types;
 
-import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,14 +32,14 @@ class CalendarDtoValidationTest {
 
     @Test
     void recurrenceOptionIsEmpty() {
-        when(courseDto.getNewCalendarEntry()).thenReturn(mock(CalendarEntry.class));
+        when(courseDto.getNewCalendarEntry()).thenReturn(mock(NewCalendarEntryDto.class));
 
         assertTrue(VALIDATION.isValid(courseDto, null));
     }
 
     @Test
     void newCalendarEntryAndRecurrenceOptionAreNotEmpty() {
-        when(courseDto.getNewCalendarEntry()).thenReturn(mock(CalendarEntry.class));
+        when(courseDto.getNewCalendarEntry()).thenReturn(mock(NewCalendarEntryDto.class));
         when(courseDto.getRecurrenceOption()).thenReturn(mock(DailyRecurrenceOption.class));
 
         assertFalse(VALIDATION.isValid(courseDto, null));

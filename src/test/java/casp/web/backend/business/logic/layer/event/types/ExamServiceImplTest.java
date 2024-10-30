@@ -132,15 +132,15 @@ class ExamServiceImplTest {
     @Nested
     class Save {
         private ExamDto examDto;
-        private CalendarEntry calendarEntry;
+        private NewCalendarEntryDto newCalendarEntryDto;
 
         @BeforeEach
         void setUp() {
-            calendarEntry = new CalendarEntry();
-            calendarEntry.setEntryFrom(LocalDateTime.MIN);
-            calendarEntry.setEntryTo(LocalDateTime.MAX);
+            newCalendarEntryDto = new NewCalendarEntryDto();
+            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
+            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
             examDto = new ExamDto();
-            examDto.setNewCalendarEntry(calendarEntry);
+            examDto.setNewCalendarEntry(newCalendarEntryDto);
         }
 
         @Test
@@ -148,9 +148,14 @@ class ExamServiceImplTest {
             examService.save(examDto);
 
             var actualCourse = getExamSaved();
-            assertThat(actualCourse.getCalendarEntries()).singleElement().isEqualTo(calendarEntry);
-            assertEquals(calendarEntry.getEntryFrom(), actualCourse.getMinTime());
-            assertEquals(calendarEntry.getEntryTo(), actualCourse.getMaxTime());
+            assertThat(actualCourse.getCalendarEntries())
+                    .singleElement()
+                    .satisfies(ce -> {
+                        assertEquals(newCalendarEntryDto.getEntryFrom(), ce.getEntryFrom());
+                        assertEquals(newCalendarEntryDto.getEntryTo(), ce.getEntryTo());
+                    });
+            assertEquals(newCalendarEntryDto.getEntryFrom(), actualCourse.getMinTime());
+            assertEquals(newCalendarEntryDto.getEntryTo(), actualCourse.getMaxTime());
         }
 
         @Test

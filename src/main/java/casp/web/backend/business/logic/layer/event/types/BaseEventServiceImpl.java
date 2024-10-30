@@ -142,7 +142,9 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
 
     private void setCalendarEntries(final T dto, final D document) {
         if (null == dto.getRecurrenceOption()) {
-            document.setCalendarEntries(new ArrayList<>(List.of(dto.getNewCalendarEntry())));
+            var newCalendarEntry = dto.getNewCalendarEntry();
+            var calendarEntry = new CalendarEntry(newCalendarEntry.getEntryFrom(), newCalendarEntry.getEntryTo());
+            document.setCalendarEntries(new ArrayList<>(List.of(calendarEntry)));
         } else {
             document.setCalendarEntries(RecurrenceOptionUtility.createCalendarEntries(dto.getRecurrenceOption()));
         }
