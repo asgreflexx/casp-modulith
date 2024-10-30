@@ -1,6 +1,5 @@
 package casp.web.backend.data.access.layer.event.calendar;
 
-import casp.web.backend.common.validation.CalendarFromToConstraint;
 import casp.web.backend.common.validation.CalendarValidation;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
@@ -9,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@CalendarFromToConstraint
+
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
     @Id
     private UUID id = UUID.randomUUID();
@@ -36,18 +35,22 @@ public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidat
         this.id = id;
     }
 
+    @Override
     public LocalDateTime getEntryFrom() {
         return entryFrom;
     }
 
+    @Override
     public void setEntryFrom(LocalDateTime entryFrom) {
         this.entryFrom = entryFrom;
     }
 
+    @Override
     public LocalDateTime getEntryTo() {
         return entryTo;
     }
 
+    @Override
     public void setEntryTo(LocalDateTime entryTo) {
         this.entryTo = entryTo;
     }
