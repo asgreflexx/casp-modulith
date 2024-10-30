@@ -123,8 +123,8 @@ class ExamServiceImplTest {
         assertThat(calendarEntryDtoSet)
                 .singleElement()
                 .satisfies(ce -> {
-                    assertEquals(calendarEntry2.getEntryFrom(), ce.getMinTime());
-                    assertEquals(calendarEntry2.getEntryTo(), ce.getMaxTime());
+                    assertEquals(calendarEntry2.getEntryFrom(), ce.getEntryFrom());
+                    assertEquals(calendarEntry2.getEntryTo(), ce.getEntryTo());
                     assertSame(exam.getEventType(), ce.getEventType());
                 });
     }

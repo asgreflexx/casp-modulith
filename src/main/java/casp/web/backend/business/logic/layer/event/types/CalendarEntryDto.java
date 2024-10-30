@@ -1,28 +1,18 @@
 package casp.web.backend.business.logic.layer.event.types;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import casp.web.backend.common.validation.CalendarValidation;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-public class CalendarEntryDto extends BaseEventDto implements Comparable<CalendarEntryDto> {
+public class CalendarEntryDto extends BaseEventDto implements Comparable<CalendarEntryDto>, CalendarValidation {
     private UUID calendarEntryId;
+    private LocalDateTime entryFrom;
+    private LocalDateTime entryTo;
 
     public CalendarEntryDto() {
         super(null);
-    }
-
-    @JsonProperty("from")
-    @Override
-    public LocalDateTime getMinTime() {
-        return super.getMinTime();
-    }
-
-    @JsonProperty("to")
-    @Override
-    public LocalDateTime getMaxTime() {
-        return super.getMaxTime();
     }
 
     public UUID getCalendarEntryId() {
@@ -31,6 +21,26 @@ public class CalendarEntryDto extends BaseEventDto implements Comparable<Calenda
 
     public void setCalendarEntryId(UUID calendarEntryId) {
         this.calendarEntryId = calendarEntryId;
+    }
+
+    @Override
+    public LocalDateTime getEntryFrom() {
+        return entryFrom;
+    }
+
+    @Override
+    public void setEntryFrom(final LocalDateTime entryFrom) {
+        this.entryFrom = entryFrom;
+    }
+
+    @Override
+    public LocalDateTime getEntryTo() {
+        return entryTo;
+    }
+
+    @Override
+    public void setEntryTo(final LocalDateTime entryTo) {
+        this.entryTo = entryTo;
     }
 
     @Override

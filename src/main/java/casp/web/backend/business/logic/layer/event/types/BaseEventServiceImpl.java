@@ -53,8 +53,8 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
 
     private static <D extends BaseEvent> CalendarEntryDto mapToCalendarEntryDto(final D d, final CalendarEntry ce) {
         var calendarEntryDto = CALENDAR_MAPPER.fromBaseEvent(d);
-        calendarEntryDto.setMinTime(ce.getEntryFrom());
-        calendarEntryDto.setMaxTime(ce.getEntryTo());
+        calendarEntryDto.setEntryFrom(ce.getEntryFrom());
+        calendarEntryDto.setEntryTo(ce.getEntryTo());
         calendarEntryDto.setCalendarEntryId(ce.getId());
         return calendarEntryDto;
     }
