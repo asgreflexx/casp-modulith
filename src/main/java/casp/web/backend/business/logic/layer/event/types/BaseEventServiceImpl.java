@@ -37,20 +37,20 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
     private final BaseEventMigrationService migrationService;
 
     @SuppressWarnings("unchecked")
-    BaseEventServiceImpl(final MemberReferenceRepository memberReferenceRepository,
-                         final BaseRepository<D> baseRepository,
-                         final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
-                         final BaseEventMigrationService migrationService) {
+    BaseEventServiceImpl(MemberReferenceRepository memberReferenceRepository,
+                         BaseRepository<D> baseRepository,
+                         DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
+                         BaseEventMigrationService migrationService) {
         this.memberReferenceRepository = memberReferenceRepository;
         this.baseRepository = baseRepository;
-        this.baseEventCustomRepository = (BaseEventCustomRepository<D>) baseRepository;
+        baseEventCustomRepository = (BaseEventCustomRepository<D>) baseRepository;
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
         this.migrationService = migrationService;
         var types = (ParameterizedType) getClass().getGenericSuperclass();
-        this.documentClass = (Class<D>) types.getActualTypeArguments()[0];
+        documentClass = (Class<D>) types.getActualTypeArguments()[0];
     }
 
-    private static <D extends BaseEvent> CalendarEntryDto mapToCalendarEntryDto(final D d, final CalendarEntry ce) {
+    private static <D extends BaseEvent> CalendarEntryDto mapToCalendarEntryDto(D d, CalendarEntry ce) {
         var calendarEntryDto = CALENDAR_MAPPER.fromBaseEvent(d);
         calendarEntryDto.setEntryFrom(ce.getEntryFrom());
         calendarEntryDto.setEntryTo(ce.getEntryTo());
@@ -58,36 +58,36 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         return calendarEntryDto;
     }
 
-    private static boolean isWithinRange(final CalendarEntry calendarEntry, final LocalDateTime from, final LocalDateTime to) {
+    private static boolean isWithinRange(CalendarEntry calendarEntry, LocalDateTime from, LocalDateTime to) {
         return !calendarEntry.getEntryFrom().isBefore(from) && !calendarEntry.getEntryTo().isAfter(to);
     }
 
     @Override
-    public void deleteById(final UUID id) {
+    public void deleteById(UUID id) {
         var document = getOneByIdOrThrowException(id);
         saveItNewEntityStatus(document, EntityStatus.DELETED);
     }
 
     @Override
-    public void deleteBaseEventsByMemberId(final UUID memberId) {
+    public void deleteBaseEventsByMemberId(UUID memberId) {
         baseEventCustomRepository.findAllByMemberIdAndNotDeleted(memberId)
                 .forEach(d -> saveItNewEntityStatus(d, EntityStatus.DELETED));
     }
 
     @Override
-    public void deactivateBaseEventsByMemberId(final UUID memberId) {
+    public void deactivateBaseEventsByMemberId(UUID memberId) {
         baseEventCustomRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.ACTIVE)
                 .forEach(d -> saveItNewEntityStatus(d, EntityStatus.INACTIVE));
     }
 
     @Override
-    public void activateBaseEventsByMemberId(final UUID memberId) {
+    public void activateBaseEventsByMemberId(UUID memberId) {
         baseEventCustomRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.INACTIVE)
                 .forEach(d -> saveItNewEntityStatus(d, EntityStatus.ACTIVE));
     }
 
     @Override
-    public Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(final LocalDateTime from, final LocalDateTime to) {
+    public Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to) {
         return baseEventCustomRepository.findAllBetweenFromAndTo(from, to)
                 .stream()
                 .flatMap(d -> d.getCalendarEntries()
@@ -95,6 +95,23 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
                         .filter(ce -> isWithinRange(ce, from, to))
                         .map(ce -> mapToCalendarEntryDto(d, ce)))
                 .collect(Collectors.toSet());
+    }
+
+    @Override
+    public T getOneByIdAndCalendarEntryId(UUID id, UUID calendarEntryId) {
+        var dto = getOneById(id);
+        var calendarEntry = dto.getCalendarEntries()
+                .stream()
+                .filter(ce -> calendarEntryId.equals(ce.getId()))
+                .findAny()
+                .orElseThrow(() -> {
+                    var msg = "The Calendar entry with Id %s not found in %s with Id %s"
+                            .formatted(calendarEntryId, documentClass.getSimpleName(), id);
+                    LOG.error(msg);
+                    return new NoSuchElementException(msg);
+                });
+        dto.setCalendarEntries(List.of(calendarEntry));
+        return dto;
     }
 
     @SuppressWarnings("unchecked")
@@ -112,16 +129,16 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         baseRepository.saveAll(documents);
     }
 
-    protected void setCalendarEntriesAndMember(final T dto, final D document) {
+    protected void setCalendarEntriesAndMember(T dto, D document) {
         setCalendarEntries(dto, document);
         setMember(dto, document);
     }
 
-    protected Optional<MemberReference> findMemberReferenceById(final UUID memberId) {
+    protected Optional<MemberReference> findMemberReferenceById(UUID memberId) {
         return memberReferenceRepository.findOneByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 
-    protected D getOneByIdOrThrowException(final UUID id) {
+    protected D getOneByIdOrThrowException(UUID id) {
         return baseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> {
                     var msg = "%s with id %s does not exist or it is not active.".formatted(documentClass.getSimpleName(), id);
@@ -130,16 +147,16 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
                 });
     }
 
-    protected void saveItNewEntityStatus(final D document, final EntityStatus entityStatus) {
+    protected void saveItNewEntityStatus(D document, EntityStatus entityStatus) {
         document.setEntityStatus(entityStatus);
         baseRepository.save(document);
     }
 
-    protected Optional<DogHasHandlerReference> findDogHandlerReferenceById(final UUID dogHasHandlerId) {
+    protected Optional<DogHasHandlerReference> findDogHandlerReferenceById(UUID dogHasHandlerId) {
         return dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE);
     }
 
-    private void setCalendarEntries(final T dto, final D document) {
+    private void setCalendarEntries(T dto, D document) {
         if (null == dto.getRecurrenceOption()) {
             var newCalendarEntry = dto.getNewCalendarEntry();
             var calendarEntry = new CalendarEntry(newCalendarEntry.getEntryFrom(), newCalendarEntry.getEntryTo());
@@ -149,27 +166,10 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         }
     }
 
-    private void setMember(final T dto, final D document) {
+    private void setMember(T dto, D document) {
         if (dto.getNewMemberId() != null) {
             findMemberReferenceById(dto.getNewMemberId())
                     .ifPresent(document::setMember);
         }
-    }
-
-    @Override
-    public T getOneByIdAndCalendarEntryId(final UUID id, final UUID calendarEntryId) {
-        var dto = getOneById(id);
-        var calendarEntry = dto.getCalendarEntries()
-                .stream()
-                .filter(ce -> calendarEntryId.equals(ce.getId()))
-                .findAny()
-                .orElseThrow(() -> {
-                    var msg = "The Calendar entry with Id %s not found in %s with Id %s"
-                            .formatted(calendarEntryId, documentClass.getSimpleName(), id);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
-        dto.setCalendarEntries(List.of(calendarEntry));
-        return dto;
     }
 }
