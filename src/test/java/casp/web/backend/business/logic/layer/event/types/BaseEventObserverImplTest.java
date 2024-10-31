@@ -7,9 +7,14 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BaseEventObserverImplTest {
@@ -23,7 +28,6 @@ class BaseEventObserverImplTest {
     private UUID memberId;
     @InjectMocks
     private BaseEventObserverImpl observer;
-
 
     @BeforeEach
     void setUp() {
@@ -55,5 +59,22 @@ class BaseEventObserverImplTest {
         verify(courseService).activateBaseEventsByMemberId(memberId);
         verify(eventService).activateBaseEventsByMemberId(memberId);
         verify(examService).activateBaseEventsByMemberId(memberId);
+    }
+
+    @Test
+    void getCalendarEntriesBetweenFromAndTo() {
+        var from = LocalDateTime.now();
+        var to = from.plusHours(1);
+        var courseCalendarEntryDto = mock(CalendarEntryDto.class);
+        var eventCalendarEntryDto = mock(CalendarEntryDto.class);
+        var examCalendarEntryDto = mock(CalendarEntryDto.class);
+        when(courseService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Set.of(courseCalendarEntryDto));
+        when(eventService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Set.of(eventCalendarEntryDto));
+        when(examService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Set.of(examCalendarEntryDto));
+
+        var calendarEntryDtoSet = observer.getCalendarEntriesBetweenFromAndTo(from, to);
+
+        assertThat(calendarEntryDtoSet)
+                .containsExactlyInAnyOrder(courseCalendarEntryDto, eventCalendarEntryDto, examCalendarEntryDto);
     }
 }
