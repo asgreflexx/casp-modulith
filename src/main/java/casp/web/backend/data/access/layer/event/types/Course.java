@@ -66,8 +66,16 @@ public class Course extends BaseEvent implements CourseRequiredFields {
         return getSpaces().size();
     }
 
+    public void addSpace(Space space) {
+        spaces.add(space);
+    }
+
+    public void removeSpace(Space space) {
+        spaces.remove(space);
+    }
+
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

@@ -6,11 +6,14 @@ import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
 import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.data.access.layer.event.types.CourseRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,23 +22,37 @@ import static casp.web.backend.business.logic.layer.event.types.CourseMapper.COU
 
 @Service
 class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implements CourseService {
+    private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
     private final CourseRepository courseRepository;
 
     @Autowired
-    CourseServiceImpl(final CourseRepository courseRepository,
-                      final MemberReferenceRepository memberReferenceRepository,
-                      final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
-                      final BaseEventMigrationService migrationService) {
+    CourseServiceImpl(CourseRepository courseRepository,
+                      MemberReferenceRepository memberReferenceRepository,
+                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
+                      BaseEventMigrationService migrationService) {
         super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
         this.courseRepository = courseRepository;
     }
 
-    private static void removeSpace(final Set<Space> spaces, final UUID spaceId) {
-        spaces.removeIf(s -> spaceId.equals(s.getId()));
+    private static void removeSpace(Course course, UUID spaceId) {
+        course.removeSpace(findSpaceById(course, spaceId));
+    }
+
+    private static Space findSpaceById(Course course, UUID spaceId) {
+        return course
+                .getSpaces()
+                .stream()
+                .filter(s -> s.getId().equals(spaceId))
+                .findAny()
+                .orElseThrow(() -> {
+                    var msg = "Space with id %s not found in course with id %s.".formatted(spaceId, course.getId());
+                    LOG.error(msg);
+                    return new NoSuchElementException(msg);
+                });
     }
 
     @Override
-    public void save(final CourseDto dto) {
+    public void save(CourseDto dto) {
         var course = COURSE_MAPPER.toSource(dto);
 
         setCalendarEntriesAndMember(dto, course);
@@ -46,18 +63,18 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     }
 
     @Override
-    public CourseDto getOneById(final UUID id) {
+    public CourseDto getOneById(UUID id) {
         return COURSE_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
     @Override
-    public Page<CourseDto> getAllByYear(final int year, final Pageable pageable) {
+    public Page<CourseDto> getAllByYear(int year, Pageable pageable) {
         var coursePage = courseRepository.findAllByYear(year, pageable);
         return COURSE_MAPPER.toTargetPage(coursePage);
     }
 
     @Override
-    public Set<String> getEmailsByCourseId(final UUID id) {
+    public Set<String> getEmailsByCourseId(UUID id) {
         return getOneByIdOrThrowException(id)
                 .getSpaces()
                 .stream()
@@ -66,23 +83,21 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     }
 
     @Override
-    public void saveSpace(final UUID courseId, final Space space) {
+    public void saveSpace(UUID courseId, Space space) {
         var course = getOneByIdOrThrowException(courseId);
-        var spaces = course.getSpaces();
-        removeSpace(spaces, space.getId());
-        spaces.add(space);
-        course.setSpaces(spaces);
+        removeSpace(course, space.getId());
+        course.addSpace(space);
         courseRepository.save(course);
     }
 
     @Override
-    public void removeSpace(final UUID courseId, final UUID spaceId) {
+    public void removeSpace(UUID courseId, UUID spaceId) {
         var course = getOneByIdOrThrowException(courseId);
-        removeSpace(course.getSpaces(), spaceId);
+        removeSpace(course, spaceId);
         courseRepository.save(course);
     }
 
-    private void setCoTrainers(final CourseDto courseDto, final Course course) {
+    private void setCoTrainers(CourseDto courseDto, Course course) {
         var actualCoTrainers = course.getCoTrainers();
         var newCoTrainers = courseDto.getNewCoTrainers()
                 .stream()
@@ -94,7 +109,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         course.setCoTrainers(actualCoTrainers);
     }
 
-    private void setSpaces(final CourseDto courseDto, final Course course) {
+    private void setSpaces(CourseDto courseDto, Course course) {
         var actualSpaces = courseDto.getSpaces();
         var newSpaces = courseDto.getNewSpaces()
                 .stream()
