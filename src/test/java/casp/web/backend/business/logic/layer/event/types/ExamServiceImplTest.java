@@ -31,6 +31,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -116,11 +117,11 @@ class ExamServiceImplTest {
         var calendarEntry2 = new CalendarEntry(from, to);
         var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
         exam.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
-        when(examRepository.findAllBetweenFromAndTo(from, to)).thenReturn(Set.of(exam));
+        when(examRepository.findAllBetweenFromAndTo(from, to)).thenReturn(Stream.of(exam));
 
-        var calendarEntryDtoSet = examService.getCalendarEntriesBetweenFromAndTo(from, to);
+        var calendarEntryDtoStream = examService.getCalendarEntriesBetweenFromAndTo(from, to);
 
-        assertThat(calendarEntryDtoSet)
+        assertThat(calendarEntryDtoStream)
                 .singleElement()
                 .satisfies(ce -> {
                     assertEquals(calendarEntry2.getEntryFrom(), ce.getEntryFrom());

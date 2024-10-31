@@ -5,11 +5,12 @@ import casp.web.backend.common.enums.EntityStatus;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public interface BaseEventCustomRepository<T extends BaseEvent> {
     Set<T> findAllByMemberIdAndNotDeleted(UUID memberId);
 
     Set<T> findAllByMemberIdAndStatus(UUID memberId, EntityStatus status);
 
-    Set<T> findAllBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
+    Stream<T> findAllBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
 }

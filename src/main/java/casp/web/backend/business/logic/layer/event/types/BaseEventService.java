@@ -1,8 +1,8 @@
 package casp.web.backend.business.logic.layer.event.types;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 interface BaseEventService<T extends BaseEventDto> {
     void save(T dto);
@@ -15,7 +15,7 @@ interface BaseEventService<T extends BaseEventDto> {
 
     void activateBaseEventsByMemberId(UUID memberId);
 
-    Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
+    Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
 
     T getOneByIdAndCalendarEntryId(UUID id, UUID calendarEntryId);
 

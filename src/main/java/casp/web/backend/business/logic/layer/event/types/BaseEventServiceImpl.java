@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static casp.web.backend.business.logic.layer.event.types.CalendarEntryMapper.CALENDAR_MAPPER;
 
@@ -87,14 +87,12 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
     }
 
     @Override
-    public Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to) {
+    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to) {
         return baseEventCustomRepository.findAllBetweenFromAndTo(from, to)
-                .stream()
                 .flatMap(d -> d.getCalendarEntries()
                         .stream()
                         .filter(ce -> isWithinRange(ce, from, to))
-                        .map(ce -> mapToCalendarEntryDto(d, ce)))
-                .collect(Collectors.toSet());
+                        .map(ce -> mapToCalendarEntryDto(d, ce)));
     }
 
     @Override

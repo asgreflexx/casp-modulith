@@ -8,8 +8,8 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -68,9 +68,9 @@ class BaseEventObserverImplTest {
         var courseCalendarEntryDto = mock(CalendarEntryDto.class);
         var eventCalendarEntryDto = mock(CalendarEntryDto.class);
         var examCalendarEntryDto = mock(CalendarEntryDto.class);
-        when(courseService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Set.of(courseCalendarEntryDto));
-        when(eventService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Set.of(eventCalendarEntryDto));
-        when(examService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Set.of(examCalendarEntryDto));
+        when(courseService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Stream.of(courseCalendarEntryDto));
+        when(eventService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Stream.of(eventCalendarEntryDto));
+        when(examService.getCalendarEntriesBetweenFromAndTo(from, to)).thenReturn(Stream.of(examCalendarEntryDto));
 
         var calendarEntryDtoSet = observer.getCalendarEntriesBetweenFromAndTo(from, to);
 

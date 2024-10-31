@@ -7,37 +7,36 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 class BaseEventObserverImpl implements BaseEventObserver {
     private final Set<BaseEventService<?>> observers = new HashSet<>();
 
     @Autowired
-    BaseEventObserverImpl(final CourseService courseService, final EventService eventService, final ExamService examService) {
+    BaseEventObserverImpl(CourseService courseService, EventService eventService, ExamService examService) {
         observers.addAll(Set.of(courseService, eventService, examService));
     }
 
     @Override
-    public void deleteBaseEventsByMemberId(final UUID memberId) {
+    public void deleteBaseEventsByMemberId(UUID memberId) {
         observers.forEach(observer -> observer.deleteBaseEventsByMemberId(memberId));
     }
 
     @Override
-    public void deactivateBaseEventsByMemberId(final UUID memberId) {
+    public void deactivateBaseEventsByMemberId(UUID memberId) {
         observers.forEach(observer -> observer.deactivateBaseEventsByMemberId(memberId));
     }
 
     @Override
-    public void activateBaseEventsByMemberId(final UUID memberId) {
+    public void activateBaseEventsByMemberId(UUID memberId) {
         observers.forEach(observer -> observer.activateBaseEventsByMemberId(memberId));
     }
 
     @Override
-    public Set<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(final LocalDateTime from, final LocalDateTime to) {
+    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to) {
         return observers
-                .stream()
-                .flatMap(observer -> observer.getCalendarEntriesBetweenFromAndTo(from, to).stream())
-                .collect(Collectors.toSet());
+                .parallelStream()
+                .flatMap(observer -> observer.getCalendarEntriesBetweenFromAndTo(from, to));
     }
 }
