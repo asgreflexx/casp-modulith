@@ -2,7 +2,6 @@ package casp.web.backend.business.logic.layer.member;
 
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
-import casp.web.backend.business.logic.layer.event.participants.BaseParticipantObserver;
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
@@ -31,45 +30,42 @@ class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final DogHasHandlerService dogHasHandlerService;
-    private final BaseParticipantObserver baseParticipantObserver;
     private final BaseEventObserver baseEventObserver;
     private final CardRepository cardRepository;
     private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
-    MemberServiceImpl(final MemberRepository memberRepository,
-                      final DogHasHandlerService dogHasHandlerService,
-                      final BaseParticipantObserver baseParticipantObserver,
-                      final BaseEventObserver baseEventObserver,
-                      final CardRepository cardRepository,
-                      final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+    MemberServiceImpl(MemberRepository memberRepository,
+                      DogHasHandlerService dogHasHandlerService,
+                      BaseEventObserver baseEventObserver,
+                      CardRepository cardRepository,
+                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         this.memberRepository = memberRepository;
         this.dogHasHandlerService = dogHasHandlerService;
-        this.baseParticipantObserver = baseParticipantObserver;
         this.baseEventObserver = baseEventObserver;
         this.cardRepository = cardRepository;
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     @Override
-    public Page<MemberDto> getMembersByFirstNameAndLastName(final String firstName, final String lastName, final Pageable pageable) {
+    public Page<MemberDto> getMembersByFirstNameAndLastName(String firstName, String lastName, Pageable pageable) {
         var memberPage = memberRepository.findAllByFirstNameAndLastName(firstName, lastName, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
     @Override
-    public Page<MemberDto> getMembersByEntityStatus(final EntityStatus entityStatus, final Pageable pageable) {
+    public Page<MemberDto> getMembersByEntityStatus(EntityStatus entityStatus, Pageable pageable) {
         var memberPage = memberRepository.findAllByEntityStatus(entityStatus, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
     @Override
-    public MemberDto getMemberById(final UUID id) {
+    public MemberDto getMemberById(UUID id) {
         return mapToMemberDto(memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE));
     }
 
     @Override
-    public MemberDto saveMember(final MemberDto memberDto) {
+    public MemberDto saveMember(MemberDto memberDto) {
         var member = MEMBER_MAPPER.toSource(memberDto);
 
         memberRepository.findOneByEmail(memberDto.getEmail())
@@ -85,10 +81,9 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void deleteMemberById(final UUID id) {
+    public void deleteMemberById(UUID id) {
         var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE);
         dogHasHandlerService.deleteDogHasHandlersByMemberId(id);
-        baseParticipantObserver.deleteParticipantsByMemberOrHandlerId(id);
         baseEventObserver.deleteBaseEventsByMemberId(id);
         member.setEmail(EMAIL_FORMAT_IF_DELETED.formatted(member.getEmail(), id));
         member.setEntityStatus(EntityStatus.DELETED);
@@ -96,33 +91,31 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberDto deactivateMember(final UUID id) {
+    public MemberDto deactivateMember(UUID id) {
         var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE);
         dogHasHandlerService.deactivateDogHasHandlersByMemberId(id);
-        baseParticipantObserver.deactivateParticipantsByMemberOrHandlerId(id);
         baseEventObserver.deactivateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.INACTIVE);
         return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
 
     @Override
-    public MemberDto activateMember(final UUID id) {
+    public MemberDto activateMember(UUID id) {
         var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.INACTIVE);
         dogHasHandlerService.activateDogHasHandlersByMemberId(id);
-        baseParticipantObserver.activateParticipantsByMemberOrHandlerId(id);
         baseEventObserver.activateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.ACTIVE);
         return mapToMemberDto(memberRepository.save(member));
     }
 
     @Override
-    public Page<MemberDto> getMembersByName(final String name, final Pageable pageable) {
+    public Page<MemberDto> getMembersByName(String name, Pageable pageable) {
         var memberPage = memberRepository.findAllByValue(name, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
     @Override
-    public Set<String> getMembersEmailByIds(final Set<UUID> membersId) {
+    public Set<String> getMembersEmailByIds(Set<UUID> membersId) {
         return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE)
                 .stream()
                 .map(Member::getEmail)
@@ -130,7 +123,7 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void setActiveMemberToBaseEvent(final BaseEvent baseEvent) {
+    public void setActiveMemberToBaseEvent(BaseEvent baseEvent) {
         if (baseEvent.getMember() == null) {
             memberRepository.findOneByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
                     .ifPresentOrElse(baseEvent::setMember,
@@ -147,7 +140,7 @@ class MemberServiceImpl implements MemberService {
         });
     }
 
-    private MemberDto mapToMemberDto(final Member member) {
+    private MemberDto mapToMemberDto(Member member) {
         var memberDto = MEMBER_MAPPER.toTarget(member);
         var dogHasHandlerSet = dogHasHandlerReferenceRepository.findAllByMemberId(member.getId());
         memberDto.setDogHasHandlerSet(MEMBER_MAPPER.toDogHasHandlerDtoSet(dogHasHandlerSet));
