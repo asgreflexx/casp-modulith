@@ -6,6 +6,7 @@ import casp.web.backend.business.logic.layer.dog.DogService;
 import casp.web.backend.common.dog.DogHasHandler;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
+import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.dog.Dog;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
@@ -30,7 +31,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import static casp.web.backend.business.logic.layer.dog.DogMapper.DOG_MAPPER;
-import static casp.web.backend.deprecated.dog.DogHasHandlerV2Mapper.DOG_HAS_HANDLER_V2_MAPPER;
 import static casp.web.backend.presentation.layer.dog.DogReadMapper.READ_MAPPER;
 import static casp.web.backend.presentation.layer.dog.DogWriteMapper.WRITE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -120,7 +120,7 @@ class DogRestControllerTest {
                 .isEqualTo(DOG_MAPPER.toSource(charlie));
     }
 
-    private DogDto createDog(final String name, final EntityStatus entityStatus) {
+    private DogDto createDog(String name, EntityStatus entityStatus) {
         var dog = TestFixture.createDog();
         dog.setEntityStatus(entityStatus);
         dog.setName(name);
@@ -132,7 +132,11 @@ class DogRestControllerTest {
 
         var dogHasHandler = new casp.web.backend.data.access.layer.dog.DogHasHandler();
         memberReferenceRepository.findById(member.getId()).ifPresent(dogHasHandler::setMember);
-        dogHasHandler.setDog(DOG_HAS_HANDLER_V2_MAPPER.toDogReference(dog));
+        var dogReference = new DogReference();
+        dogReference.setId(dog.getId());
+        dogReference.setEntityStatus(entityStatus);
+        dogReference.setName(dog.getName());
+        dogHasHandler.setDog(dogReference);
         dogHasHandler.setEntityStatus(entityStatus);
         dogHasHandlerRepository.save(dogHasHandler);
         var space = TestFixture.createSpace();
@@ -149,11 +153,11 @@ class DogRestControllerTest {
         return dto;
     }
 
-    private ResultActions getDogById(final UUID dogId) throws Exception {
+    private ResultActions getDogById(UUID dogId) throws Exception {
         return mockMvc.perform(get(DOG_URL_PREFIX + "/{id}", dogId));
     }
 
-    private void assertDogHasHandler(final DogRead actual) {
+    private void assertDogHasHandler(DogRead actual) {
         assertThat(actual.getDogHasHandlerSet())
                 .singleElement()
                 .satisfies(dh -> {
@@ -198,7 +202,7 @@ class DogRestControllerTest {
             verify(dogService).deleteDogById(inactive.getId());
         }
 
-        private ResultActions deleteDog(final UUID dogId) throws Exception {
+        private ResultActions deleteDog(UUID dogId) throws Exception {
             return mockMvc.perform(delete(DOG_URL_PREFIX + "/{id}", dogId));
         }
     }
@@ -227,7 +231,7 @@ class DogRestControllerTest {
             assertThat(dogRead).isEqualTo(READ_MAPPER.toTarget(charlie));
         }
 
-        private ResultActions performPost(final DogWrite dog) throws Exception {
+        private ResultActions performPost(DogWrite dog) throws Exception {
             return mockMvc.perform(post(DOG_URL_PREFIX)
                     .content(MvcMapper.toString(dog))
                     .contentType(MediaType.APPLICATION_JSON)
@@ -284,7 +288,7 @@ class DogRestControllerTest {
 
         @Test
         void dogNotFound() throws Exception {
-            getDogById(DogRestControllerTest.this.inactive.getId())
+            getDogById(inactive.getId())
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value(DOG_NOT_FOUND_MSG.formatted(inactive.getId())));
         }

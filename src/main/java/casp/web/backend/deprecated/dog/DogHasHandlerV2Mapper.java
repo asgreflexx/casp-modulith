@@ -1,7 +1,5 @@
 package casp.web.backend.deprecated.dog;
 
-import casp.web.backend.common.reference.DogReference;
-import casp.web.backend.data.access.layer.dog.Dog;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -19,6 +17,4 @@ public interface DogHasHandlerV2Mapper {
     @Mapping(target = "dog", ignore = true)
     @Mapping(target = "member", ignore = true)
     DogHasHandler toDogHasHandler(casp.web.backend.deprecated.dog.DogHasHandler dogHasHandler);
-
-    DogReference toDogReference(Dog dog);
 }
