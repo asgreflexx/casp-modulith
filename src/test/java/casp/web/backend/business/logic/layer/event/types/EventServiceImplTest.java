@@ -262,6 +262,15 @@ class EventServiceImplTest {
         }
 
         @Test
+        void memberDoesNotExist() {
+            var newMemberId = UUID.randomUUID();
+            eventDto.setNewMemberId(newMemberId);
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> eventService.save(eventDto));
+        }
+
+        @Test
         void addParticipant() {
             var memberReference = mockMember();
             var participant = new EventParticipant(memberReference);

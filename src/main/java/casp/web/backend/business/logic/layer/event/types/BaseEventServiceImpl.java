@@ -166,8 +166,14 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
 
     private void setMember(T dto, D document) {
         if (dto.getNewMemberId() != null) {
-            findMemberReferenceById(dto.getNewMemberId())
-                    .ifPresent(document::setMember);
+            var memberReference = findMemberReferenceById(dto.getNewMemberId())
+                    .orElseThrow(() -> {
+                        var msg = "Member with id %s does not exist or it is not active.".formatted(dto.getNewMemberId());
+                        LOG.error(msg);
+                        return new NoSuchElementException(msg);
+                    });
+
+            document.setMember(memberReference);
         }
     }
 }

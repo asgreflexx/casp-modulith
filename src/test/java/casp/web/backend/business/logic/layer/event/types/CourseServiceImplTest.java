@@ -403,6 +403,15 @@ class CourseServiceImplTest {
         }
 
         @Test
+        void memberDoesNotExist() {
+            var newMemberId = UUID.randomUUID();
+            courseDto.setNewMemberId(newMemberId);
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> courseService.save(courseDto));
+        }
+
+        @Test
         void addCoTrainer() {
             var memberReference = mockMember();
             var coTrainer = new CoTrainer(memberReference);

@@ -258,6 +258,15 @@ class ExamServiceImplTest {
         }
 
         @Test
+        void memberDoesNotExist() {
+            var newMemberId = UUID.randomUUID();
+            examDto.setNewMemberId(newMemberId);
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> examService.save(examDto));
+        }
+
+        @Test
         void addParticipant() {
             var dogHasHandlerReference = new DogHasHandlerReference();
             dogHasHandlerReference.setId(UUID.randomUUID());
