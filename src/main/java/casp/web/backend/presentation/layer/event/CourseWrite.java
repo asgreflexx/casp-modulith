@@ -1,33 +1,18 @@
-package casp.web.backend.business.logic.layer.event.types;
+package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.common.enums.BaseEventType;
+import casp.web.backend.business.logic.layer.event.types.CourseDtoRequiredFields;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class CourseDto extends BaseEventDto implements CourseDtoRequiredFields {
+class CourseWrite extends BaseEventWrite implements CourseDtoRequiredFields {
+    private Set<CoTrainer> coTrainers;
+    private Set<UUID> newCoTrainers;
+    private Set<Space> spaces;
+    private Set<UUID> newSpaces;
     private int spaceLimit;
-    private Set<CoTrainer> coTrainers = new HashSet<>();
-    private Set<UUID> newCoTrainers = new HashSet<>();
-    private Set<Space> spaces = new HashSet<>();
-    private Set<UUID> newSpaces = new HashSet<>();
-
-    public CourseDto() {
-        super(BaseEventType.COURSE);
-    }
-
-    @Override
-    public int getSpaceLimit() {
-        return spaceLimit;
-    }
-
-    @Override
-    public void setSpaceLimit(int spaceLimit) {
-        this.spaceLimit = spaceLimit;
-    }
 
     @Override
     public Set<CoTrainer> getCoTrainers() {
@@ -67,6 +52,16 @@ public class CourseDto extends BaseEventDto implements CourseDtoRequiredFields {
     @Override
     public void setNewSpaces(Set<UUID> newSpaces) {
         this.newSpaces = newSpaces;
+    }
+
+    @Override
+    public int getSpaceLimit() {
+        return spaceLimit;
+    }
+
+    @Override
+    public void setSpaceLimit(int spaceLimit) {
+        this.spaceLimit = spaceLimit;
     }
 
     @Override

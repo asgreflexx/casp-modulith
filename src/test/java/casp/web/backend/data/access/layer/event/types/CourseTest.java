@@ -27,7 +27,7 @@ class CourseTest {
 
     private Course course;
 
-    private static CoTrainer mockCotrainer(final EntityStatus entityStatus) {
+    private static CoTrainer mockCotrainer(EntityStatus entityStatus) {
         var coTrainer = mock(CoTrainer.class, Answers.RETURNS_DEEP_STUBS);
         when(coTrainer.getMember().getEntityStatus()).thenReturn(entityStatus);
         return coTrainer;
@@ -72,10 +72,10 @@ class CourseTest {
         var spaceSet = mockSpaceSet(deletedSpace);
         course.setSpaces(spaceSet);
 
-        assertEquals(1, course.getSpaceListSize());
+        assertEquals(1, course.getSpaces().size());
     }
 
-    private Set<Space> mockSpaceSet(final DeletedSpace deletedSpace) {
+    private Set<Space> mockSpaceSet(DeletedSpace deletedSpace) {
         when(activeSpace.getDogHasHandler().getEntityStatus()).thenReturn(EntityStatus.ACTIVE);
         when(activeSpace.getDogHasHandler().getMember().getEntityStatus()).thenReturn(EntityStatus.ACTIVE);
         when(activeSpace.getDogHasHandler().getDog().getEntityStatus()).thenReturn(EntityStatus.ACTIVE);

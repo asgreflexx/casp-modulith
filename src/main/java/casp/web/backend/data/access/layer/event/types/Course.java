@@ -1,5 +1,6 @@
 package casp.web.backend.data.access.layer.event.types;
 
+import casp.web.backend.business.logic.layer.event.types.BaseEventRequiredFields;
 import casp.web.backend.business.logic.layer.event.types.CourseRequiredFields;
 import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 @QueryEntity
 @Document
-public class Course extends BaseEvent implements CourseRequiredFields {
+public class Course extends BaseEvent implements BaseEventRequiredFields, CourseRequiredFields {
 
     private int spaceLimit;
 
@@ -59,11 +60,6 @@ public class Course extends BaseEvent implements CourseRequiredFields {
     @Override
     public void setSpaces(Set<Space> spaces) {
         this.spaces = spaces;
-    }
-
-    @Override
-    public int getSpaceListSize() {
-        return getSpaces().size();
     }
 
     public void addSpace(Space space) {
