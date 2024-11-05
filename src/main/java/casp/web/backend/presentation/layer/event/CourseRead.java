@@ -6,7 +6,7 @@ import casp.web.backend.data.access.layer.event.participants.Space;
 
 import java.util.Set;
 
-class CourseRead extends BaseEventRead implements CourseRequiredFields {
+public class CourseRead extends BaseEventRead implements CourseRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers;
     private Set<Space> spaces;

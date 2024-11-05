@@ -7,7 +7,7 @@ import casp.web.backend.data.access.layer.event.participants.Space;
 import java.util.Set;
 import java.util.UUID;
 
-class CourseWrite extends BaseEventWrite implements CourseDtoRequiredFields {
+public class CourseWrite extends BaseEventWrite implements CourseDtoRequiredFields {
     private Set<CoTrainer> coTrainers;
     private Set<UUID> newCoTrainers;
     private Set<Space> spaces;
