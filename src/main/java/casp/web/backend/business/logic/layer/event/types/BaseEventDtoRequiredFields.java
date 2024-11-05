@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 
 import java.util.UUID;
 
-public interface BaseEventDtoRequiredFields extends BaseEventRequiredFields {
+public interface BaseEventDtoRequiredFields {
     UUID getNewMemberId();
 
     void setNewMemberId(UUID newMemberId);

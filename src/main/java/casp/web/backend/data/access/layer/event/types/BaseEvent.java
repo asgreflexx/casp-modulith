@@ -9,15 +9,15 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
+import casp.web.backend.presentation.layer.event.BaseEventWriteRequiredFields;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseEvent extends BaseDocument implements BaseEventRequiredFields {
+public abstract class BaseEvent extends BaseDocument implements BaseEventWriteRequiredFields, BaseEventRequiredFields {
     BaseEventType eventType;
 
     String name;
@@ -26,6 +26,7 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
 
     String location;
 
+    @NotNull
     @DBRef
     MemberReference member;
 
@@ -35,19 +36,17 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
 
     LocalDateTime maxTime;
 
-    @Valid
-    @NotEmpty
     List<CalendarEntry> calendarEntries = new ArrayList<>();
 
     BaseEvent(BaseEventType eventType) {
         this.eventType = eventType;
     }
 
-    static boolean isMemberNotDeleted(final MemberReference member) {
+    static boolean isMemberNotDeleted(MemberReference member) {
         return EntityStatus.DELETED != member.getEntityStatus();
     }
 
-    static boolean isDogHasHandlerNotDeleted(final DogHasHandlerReference dogHasHandler) {
+    static boolean isDogHasHandlerNotDeleted(DogHasHandlerReference dogHasHandler) {
         return EntityStatus.DELETED != dogHasHandler.getEntityStatus()
                 && isMemberNotDeleted(dogHasHandler.getMember())
                 && EntityStatus.DELETED != dogHasHandler.getDog().getEntityStatus();
@@ -89,7 +88,7 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
     }
 
     @Override
-    public void setMember(final MemberReference member) {
+    public void setMember(MemberReference member) {
         this.member = member;
     }
 
@@ -139,20 +138,20 @@ public abstract class BaseEvent extends BaseDocument implements BaseEventRequire
     }
 
     @Override
-    public void setCalendarEntries(final List<CalendarEntry> calendarEntries) {
+    public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
         calendarEntries.sort(CalendarEntry::compareTo);
         this.calendarEntries = calendarEntries;
-        this.minTime = calendarEntries.getFirst().getEntryFrom();
-        this.maxTime = calendarEntries.getLast().getEntryTo();
+        minTime = calendarEntries.getFirst().getEntryFrom();
+        maxTime = calendarEntries.getLast().getEntryTo();
     }
 
-    public void addCalendarEntry(final CalendarEntry calendarEntry) {
+    public void addCalendarEntry(CalendarEntry calendarEntry) {
         calendarEntries.add(calendarEntry);
         setCalendarEntries(calendarEntries);
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

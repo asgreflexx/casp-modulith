@@ -13,9 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@MemberReferenceDtoConstraint
-@CalendarDtoConstraint
-public abstract class BaseEventDto extends BaseDto implements BaseEventDtoRequiredFields {
+public abstract class BaseEventDto extends BaseDto implements BaseEventDtoWriteRequiredFields, BaseEventRequiredFields {
     BaseEventType eventType;
     String name;
     String description;
@@ -68,7 +66,7 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoRequir
     }
 
     @Override
-    public void setMember(final MemberReference member) {
+    public void setMember(MemberReference member) {
         this.member = member;
     }
 
@@ -138,12 +136,12 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoRequir
     }
 
     @Override
-    public void setCalendarEntries(final List<CalendarEntry> calendarEntries) {
+    public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
         this.calendarEntries = calendarEntries;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 
