@@ -10,12 +10,12 @@ import java.util.UUID;
 
 abstract class BaseParticipant {
     @NotNull
-    BaseParticipantType participantType;
+    protected BaseParticipantType participantType;
 
     @NotNull
-    EventResponse response = EventResponse.ACCEPTED;
+    protected EventResponse response = EventResponse.ACCEPTED;
 
-    BaseParticipant(final BaseParticipantType participantType) {
+    protected BaseParticipant(BaseParticipantType participantType) {
         this.participantType = participantType;
     }
 
@@ -32,7 +32,7 @@ abstract class BaseParticipant {
     }
 
     public void setResponse(EventResponse status) {
-        this.response = status;
+        response = status;
     }
 
     @Id

@@ -18,27 +18,27 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class BaseEvent extends BaseDocument implements BaseEventWriteRequiredFields, BaseEventRequiredFields {
-    BaseEventType eventType;
+    protected BaseEventType eventType;
 
-    String name;
+    protected String name;
 
-    String description;
+    protected String description;
 
-    String location;
+    protected String location;
 
     @NotNull
     @DBRef
-    MemberReference member;
+    protected MemberReference member;
 
-    RecurrenceOption recurrenceOption;
+    protected RecurrenceOption recurrenceOption;
 
-    LocalDateTime minTime;
+    protected LocalDateTime minTime;
 
-    LocalDateTime maxTime;
+    protected LocalDateTime maxTime;
 
-    List<CalendarEntry> calendarEntries = new ArrayList<>();
+    protected List<CalendarEntry> calendarEntries = new ArrayList<>();
 
-    BaseEvent(BaseEventType eventType) {
+    protected BaseEvent(BaseEventType eventType) {
         this.eventType = eventType;
     }
 

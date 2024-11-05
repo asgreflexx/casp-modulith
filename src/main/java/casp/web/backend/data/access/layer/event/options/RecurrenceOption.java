@@ -11,18 +11,18 @@ import java.time.LocalDate;
 @BaseEventOptionRecurrencesConstraint
 public abstract class RecurrenceOption implements BaseEventOptionValidation {
     @NotNull
-    BaseRecurrenceOptionType optionType;
+    protected BaseRecurrenceOptionType optionType;
 
     @NotNull
-    LocalDate startRecurrence;
+    protected LocalDate startRecurrence;
 
     @NotNull
-    LocalDate endRecurrence;
+    protected LocalDate endRecurrence;
 
     @Positive
-    int repeatEvery = 1;
+    protected int repeatEvery = 1;
 
-    RecurrenceOption(final BaseRecurrenceOptionType optionType) {
+    protected RecurrenceOption(BaseRecurrenceOptionType optionType) {
         this.optionType = optionType;
     }
 
@@ -56,7 +56,7 @@ public abstract class RecurrenceOption implements BaseEventOptionValidation {
         return optionType;
     }
 
-    public void setOptionType(final BaseRecurrenceOptionType optionType) {
+    public void setOptionType(BaseRecurrenceOptionType optionType) {
         this.optionType = optionType;
     }
 }

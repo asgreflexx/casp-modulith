@@ -14,19 +14,19 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class BaseEventDto extends BaseDto implements BaseEventDtoWriteRequiredFields, BaseEventRequiredFields {
-    BaseEventType eventType;
-    String name;
-    String description;
-    String location;
-    MemberReference member;
-    UUID newMemberId;
-    RecurrenceOption recurrenceOption;
-    LocalDateTime minTime;
-    LocalDateTime maxTime;
-    NewCalendarEntryDto newCalendarEntry;
-    List<CalendarEntry> calendarEntries = new ArrayList<>();
+    protected BaseEventType eventType;
+    protected String name;
+    protected String description;
+    protected String location;
+    protected MemberReference member;
+    protected UUID newMemberId;
+    protected RecurrenceOption recurrenceOption;
+    protected LocalDateTime minTime;
+    protected LocalDateTime maxTime;
+    protected NewCalendarEntryDto newCalendarEntry;
+    protected List<CalendarEntry> calendarEntries = new ArrayList<>();
 
-    BaseEventDto(BaseEventType eventType) {
+    protected BaseEventDto(BaseEventType eventType) {
         this.eventType = eventType;
     }
 
