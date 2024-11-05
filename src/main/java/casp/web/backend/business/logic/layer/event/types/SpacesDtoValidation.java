@@ -4,9 +4,9 @@ package casp.web.backend.business.logic.layer.event.types;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class SpacesDtoValidation implements ConstraintValidator<SpacesDtoConstraint, CourseDto> {
+public class SpacesDtoValidation implements ConstraintValidator<SpacesDtoConstraint, CourseDtoRequiredFields> {
     @Override
-    public boolean isValid(CourseDto value, ConstraintValidatorContext context) {
+    public boolean isValid(CourseDtoRequiredFields value, ConstraintValidatorContext context) {
         return value.getNewSpaces()
                 .stream()
                 .noneMatch(newId -> value.getSpaces()

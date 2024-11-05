@@ -1,4 +1,4 @@
-package casp.web.backend.common.validation;
+package casp.web.backend.business.logic.layer.event.types;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;

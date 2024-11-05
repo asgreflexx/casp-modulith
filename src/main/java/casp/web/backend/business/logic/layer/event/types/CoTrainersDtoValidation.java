@@ -4,9 +4,9 @@ package casp.web.backend.business.logic.layer.event.types;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-public class CoTrainersDtoValidation implements ConstraintValidator<CoTrainersDtoConstraint, CourseDto> {
+public class CoTrainersDtoValidation implements ConstraintValidator<CoTrainersDtoConstraint, CourseDtoRequiredFields> {
     @Override
-    public boolean isValid(CourseDto value, ConstraintValidatorContext context) {
+    public boolean isValid(CourseDtoRequiredFields value, ConstraintValidatorContext context) {
         return value.getNewCoTrainers()
                 .stream()
                 .noneMatch(newId -> value.getCoTrainers()

@@ -3,7 +3,9 @@ package casp.web.backend.business.logic.layer.event.types;
 import java.util.Set;
 import java.util.UUID;
 
-public interface CourseDtoRequiredFields {
+@CoTrainersDtoConstraint
+@SpacesDtoConstraint
+public interface CourseDtoRequiredFields extends BaseEventDtoRequiredFields, CourseRequiredFields {
     Set<UUID> getNewCoTrainers();
 
     void setNewCoTrainers(Set<UUID> newCoTrainers);
@@ -11,6 +13,4 @@ public interface CourseDtoRequiredFields {
     Set<UUID> getNewSpaces();
 
     void setNewSpaces(Set<UUID> newSpaces);
-
-    void setSpaceListSize(int spaceListSize);
 }

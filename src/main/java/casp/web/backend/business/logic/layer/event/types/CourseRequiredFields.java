@@ -1,8 +1,8 @@
 package casp.web.backend.business.logic.layer.event.types;
 
-import casp.web.backend.common.validation.CourseSpacesConstraint;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.presentation.layer.event.BaseEventWriteRequiredFields;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -10,7 +10,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.util.Set;
 
 @CourseSpacesConstraint
-public interface CourseRequiredFields extends BaseEventRequiredFields {
+public interface CourseRequiredFields extends BaseEventWriteRequiredFields {
     @PositiveOrZero
     int getSpaceLimit();
 
@@ -27,6 +27,4 @@ public interface CourseRequiredFields extends BaseEventRequiredFields {
     Set<Space> getSpaces();
 
     void setSpaces(@Valid @NotNull Set<Space> spaces);
-
-    int getSpaceListSize();
 }
