@@ -16,21 +16,21 @@ class CourseSpacesValidationTest {
     private static final CourseSpacesValidation VALIDATION = new CourseSpacesValidation();
 
     @Mock(answer = RETURNS_DEEP_STUBS)
-    private Course courseValidation;
+    private Course course;
 
     @Test
     void isValid() {
-        when(courseValidation.getSpaceLimit()).thenReturn(1);
-        when(courseValidation.getSpaces().size()).thenReturn(1);
+        when(course.getSpaceLimit()).thenReturn(1);
+        when(course.getSpaces().size()).thenReturn(1);
 
-        assertTrue(VALIDATION.isValid(courseValidation, null));
+        assertTrue(VALIDATION.isValid(course, null));
     }
 
     @Test
     void isInvalid() {
-        when(courseValidation.getSpaceLimit()).thenReturn(1);
-        when(courseValidation.getSpaces().size()).thenReturn(2);
+        when(course.getSpaceLimit()).thenReturn(1);
+        when(course.getSpaces().size()).thenReturn(2);
 
-        assertFalse(VALIDATION.isValid(courseValidation, null));
+        assertFalse(VALIDATION.isValid(course, null));
     }
 }

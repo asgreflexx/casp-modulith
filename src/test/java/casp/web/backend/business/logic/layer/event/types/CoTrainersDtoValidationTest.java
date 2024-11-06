@@ -42,4 +42,9 @@ class CoTrainersDtoValidationTest {
 
         assertTrue(VALIDATION.isValid(courseDto, null));
     }
+
+    @Test
+    void newCoTrainersAndCoTrainersAreNull() {
+        assertTrue(VALIDATION.isValid(courseDto, null));
+    }
 }

@@ -4,14 +4,15 @@ import casp.web.backend.business.logic.layer.event.types.CourseDtoRequiredFields
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 public class CourseWrite extends BaseEventWrite implements CourseDtoRequiredFields {
-    private Set<CoTrainer> coTrainers;
-    private Set<UUID> newCoTrainers;
-    private Set<Space> spaces;
-    private Set<UUID> newSpaces;
+    private Set<CoTrainer> coTrainers = new HashSet<>();
+    private Set<UUID> newCoTrainers = new HashSet<>();
+    private Set<Space> spaces = new HashSet<>();
+    private Set<UUID> newSpaces = new HashSet<>();
     private int spaceLimit;
 
     @Override
