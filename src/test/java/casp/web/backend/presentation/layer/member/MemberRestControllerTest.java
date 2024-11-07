@@ -6,6 +6,7 @@ import casp.web.backend.business.logic.layer.member.MemberService;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Role;
 import casp.web.backend.common.member.Card;
+import casp.web.backend.common.member.MembershipFee;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
@@ -32,6 +33,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -159,18 +161,18 @@ class MemberRestControllerTest {
         verify(memberService).migrateDataToV2();
     }
 
-    private ResultActions performPost(final MemberWrite member) throws Exception {
+    private ResultActions performPost(MemberWrite member) throws Exception {
         return mockMvc.perform(post(MEMBER_URL_PREFIX)
                 .content(MvcMapper.toString(member))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON));
     }
 
-    private ResultActions getMemberById(final UUID id) throws Exception {
+    private ResultActions getMemberById(UUID id) throws Exception {
         return mockMvc.perform(get(MEMBER_URL_PREFIX + "/{id}", id));
     }
 
-    private ResultActions deactivateMember(final UUID memberId) throws Exception {
+    private ResultActions deactivateMember(UUID memberId) throws Exception {
         return mockMvc.perform(post(MEMBER_URL_PREFIX + "/{id}/deactivate", memberId));
     }
 
@@ -199,7 +201,7 @@ class MemberRestControllerTest {
 
         }
 
-        private ResultActions getMemberPage(final EntityStatus entityStatus) throws Exception {
+        private ResultActions getMemberPage(EntityStatus entityStatus) throws Exception {
             return mockMvc.perform(get(MEMBER_URL_PREFIX)
                     .param("entityStatusParam", entityStatus.name())
                     .param("page", "0")
@@ -245,7 +247,7 @@ class MemberRestControllerTest {
                     .satisfies(e -> assertThat(e.getMessage()).contains("firstName: must not be blank", "lastName: must not be blank"));
         }
 
-        private ResultActions performGet(final String firstName, final String lastName) throws Exception {
+        private ResultActions performGet(String firstName, String lastName) throws Exception {
             return mockMvc.perform(get(URL)
                     .param("firstName", firstName)
                     .param("lastName", lastName));
@@ -280,7 +282,7 @@ class MemberRestControllerTest {
             verify(memberService).activateMember(john.getId());
         }
 
-        private ResultActions activateMember(final UUID memberId) throws Exception {
+        private ResultActions activateMember(UUID memberId) throws Exception {
             return mockMvc.perform(post(MEMBER_URL_PREFIX + "/{id}/activate", memberId));
         }
     }
@@ -333,7 +335,7 @@ class MemberRestControllerTest {
             verify(memberService).deleteMemberById(inactive.getId());
         }
 
-        private ResultActions deleteMember(final UUID memberId) throws Exception {
+        private ResultActions deleteMember(UUID memberId) throws Exception {
             return mockMvc.perform(delete(MEMBER_URL_PREFIX + "/{id}", memberId));
         }
     }
@@ -379,6 +381,24 @@ class MemberRestControllerTest {
                     .isNotNull()
                     .satisfies(e -> assertThat(e.getMessage())
                             .contains("NotBlank.lastName", "NotBlank.firstName", "NotNull.email"));
+        }
+
+        @Test
+        void membershipFeeIsInvalid() throws Exception {
+            var membershipFee = new MembershipFee();
+            membershipFee.setPaidDate(LocalDate.now());
+            john.setMembershipFees(Set.of(membershipFee));
+            var memberWrite = WRITE_MAPPER.toTarget(john);
+
+            var exception = performPost(memberWrite)
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .contains("If paid, then value and date must be added; if not, both value and date must be empty");
         }
 
         @Test
@@ -434,14 +454,14 @@ class MemberRestControllerTest {
 
         private Member johnDomain;
 
-        private static Card createCard(final int balance) {
+        private static Card createCard(int balance) {
             var cardV2 = new Card();
             cardV2.setCode(UUID.randomUUID().toString());
             cardV2.setBalance(balance);
             return cardV2;
         }
 
-        private static void assertCard(final Card expectedCard, final Card actualCard) {
+        private static void assertCard(Card expectedCard, Card actualCard) {
             assertEquals(expectedCard.getCode(), actualCard.getCode());
             assertEquals(expectedCard.getBalance(), actualCard.getBalance());
         }
