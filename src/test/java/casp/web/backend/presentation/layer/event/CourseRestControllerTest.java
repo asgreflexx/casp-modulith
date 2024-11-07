@@ -122,7 +122,12 @@ class CourseRestControllerTest {
 
         @Test
         void badCourse() throws Exception {
-            var exception = performPost(new CourseWrite())
+            var badCourse = new CourseWrite();
+            badCourse.setSpaces(null);
+            badCourse.setNewSpaces(null);
+            badCourse.setCoTrainers(null);
+            badCourse.setNewCoTrainers(null);
+            var exception = performPost(badCourse)
                     .andExpect(status().isBadRequest())
                     .andReturn()
                     .getResolvedException();

@@ -3,15 +3,21 @@ package casp.web.backend.presentation.layer.event;
 import casp.web.backend.business.logic.layer.event.types.CourseDtoRequiredFields;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
 import casp.web.backend.data.access.layer.event.participants.Space;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
 public class CourseWrite extends BaseEventWrite implements CourseDtoRequiredFields {
+    @JsonSetter(nulls = Nulls.SKIP)
     private Set<CoTrainer> coTrainers = new HashSet<>();
+    @JsonSetter(nulls = Nulls.SKIP)
     private Set<UUID> newCoTrainers = new HashSet<>();
+    @JsonSetter(nulls = Nulls.SKIP)
     private Set<Space> spaces = new HashSet<>();
+    @JsonSetter(nulls = Nulls.SKIP)
     private Set<UUID> newSpaces = new HashSet<>();
     private int spaceLimit;
 
