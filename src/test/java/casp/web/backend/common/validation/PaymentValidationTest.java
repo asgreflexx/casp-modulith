@@ -22,17 +22,12 @@ class PaymentValidationTest {
     @Nested
     class IsValid {
         @Test
-        void isPaidIsFalse() {
-            when(payment.isPaid()).thenReturn(false);
-            when(payment.getPaidPrice()).thenReturn(0.0);
-            when(payment.getPaidDate()).thenReturn(null);
-
+        void isNotPaid() {
             assertTrue(VALIDATION.isValid(payment, null));
         }
 
         @Test
-        void isPaidIsTrue() {
-            when(payment.isPaid()).thenReturn(true);
+        void isPaid() {
             when(payment.getPaidPrice()).thenReturn(1.0);
             when(payment.getPaidDate()).thenReturn(LocalDate.now());
 
@@ -43,35 +38,15 @@ class PaymentValidationTest {
     @Nested
     class IsInValid {
         @Test
-        void isPaidIsFalseAndPaidPriceIsHigherThan0() {
-            when(payment.isPaid()).thenReturn(false);
+        void dateIsNull() {
             when(payment.getPaidPrice()).thenReturn(1.0);
 
             assertFalse(VALIDATION.isValid(payment, null));
         }
 
         @Test
-        void isPaidIsFalseAndPaidDateIsNotNull() {
-            when(payment.isPaid()).thenReturn(false);
-            when(payment.getPaidPrice()).thenReturn(0.0);
+        void priceIs0() {
             when(payment.getPaidDate()).thenReturn(LocalDate.now());
-
-            assertFalse(VALIDATION.isValid(payment, null));
-        }
-
-        @Test
-        void isPaidIsTrueAndPaidPriceIs0() {
-            when(payment.isPaid()).thenReturn(true);
-            when(payment.getPaidPrice()).thenReturn(0.0);
-
-            assertFalse(VALIDATION.isValid(payment, null));
-        }
-
-        @Test
-        void isPaidIsTrueAndPaidDateIsNull() {
-            when(payment.isPaid()).thenReturn(true);
-            when(payment.getPaidPrice()).thenReturn(1.0);
-            when(payment.getPaidDate()).thenReturn(null);
 
             assertFalse(VALIDATION.isValid(payment, null));
         }

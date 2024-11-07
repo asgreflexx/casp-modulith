@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDate;
@@ -19,9 +20,6 @@ public class Space extends BaseParticipant implements Payment {
     @PositiveOrZero
     @Digits(integer = 9, fraction = 2)
     private double paidPrice;
-
-    private boolean isPaid;
-
     private LocalDate paidDate;
 
     @Valid
@@ -33,11 +31,10 @@ public class Space extends BaseParticipant implements Payment {
         super(BaseParticipantType.SPACE);
     }
 
-    public Space(final DogHasHandlerReference dogHasHandler) {
+    public Space(DogHasHandlerReference dogHasHandler) {
         this();
         this.dogHasHandler = dogHasHandler;
     }
-
 
     public String getNote() {
         return note;
@@ -57,15 +54,6 @@ public class Space extends BaseParticipant implements Payment {
     }
 
     @Override
-    public boolean isPaid() {
-        return isPaid;
-    }
-
-    public void setIsPaid(boolean isPaid) {
-        this.isPaid = isPaid;
-    }
-
-    @Override
     public LocalDate getPaidDate() {
         return paidDate;
     }
@@ -74,11 +62,16 @@ public class Space extends BaseParticipant implements Payment {
         this.paidDate = paidDate;
     }
 
+    @Override
+    public boolean isPaid() {
+        return ObjectUtils.allNotNull(paidDate, paidPrice);
+    }
+
     public DogHasHandlerReference getDogHasHandler() {
         return dogHasHandler;
     }
 
-    public void setDogHasHandler(final DogHasHandlerReference dogHasHandler) {
+    public void setDogHasHandler(DogHasHandlerReference dogHasHandler) {
         this.dogHasHandler = dogHasHandler;
     }
 
@@ -88,7 +81,7 @@ public class Space extends BaseParticipant implements Payment {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Space space)) return false;
         return Objects.equals(dogHasHandler, space.dogHasHandler);

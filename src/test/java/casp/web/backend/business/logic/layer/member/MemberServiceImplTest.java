@@ -11,6 +11,8 @@ import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.deprecated.event.types.Event;
 import casp.web.backend.deprecated.member.Card;
 import casp.web.backend.deprecated.member.CardRepository;
+import casp.web.backend.deprecated.member.MemberOldRepository;
+import casp.web.backend.deprecated.member.MembershipFee;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,6 +26,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -51,6 +54,8 @@ class MemberServiceImplTest {
     private MemberRepository memberRepository;
     @Mock
     private CardRepository cardRepository;
+    @Mock
+    private MemberOldRepository memberOldRepository;
 
     @Mock
     private DogHasHandlerService dogHasHandlerService;
@@ -136,22 +141,33 @@ class MemberServiceImplTest {
 
     @Test
     void migrateDataToV2() {
-        var membershipFee = TestFixture.createMembershipFee();
+        var membershipFee = mock(MembershipFee.class);
+        when(membershipFee.getPaidPrice()).thenReturn(1.0);
+        when(membershipFee.getPaidDate()).thenReturn(LocalDate.now());
+        when(membershipFee.getComment()).thenReturn("comment");
+
         var card = mock(Card.class);
-        member.setMembershipFees(Set.of(membershipFee));
-        when(memberRepository.findAll()).thenReturn(List.of(member));
-        when(cardRepository.findAllByMemberId(member.getId())).thenReturn(Set.of(card));
         when(card.getCode()).thenReturn(UUID.randomUUID().toString());
+
+        var memberOld = mock(casp.web.backend.deprecated.member.Member.class);
+        when(memberOld.getId()).thenReturn(UUID.randomUUID());
+        when(memberOld.getMembershipFees()).thenReturn(Set.of(membershipFee));
+
+        when(memberOldRepository.findAll()).thenReturn(List.of(memberOld));
+        when(cardRepository.findAllByMemberId(memberOld.getId())).thenReturn(Set.of(card));
 
         memberService.migrateDataToV2();
 
         verify(memberRepository).save(memberCaptor.capture());
-
         var memberV2 = memberCaptor.getValue();
-        assertEquals(member.getId(), memberV2.getId());
+        assertEquals(memberOld.getId(), memberV2.getId());
         assertThat(memberV2.getMembershipFees())
                 .singleElement()
-                .satisfies(mfv2 -> assertEquals(membershipFee.getPaidDate(), mfv2.getPaidDate()));
+                .satisfies(mfv2 -> {
+                    assertEquals(membershipFee.getPaidDate(), mfv2.getPaidDate());
+                    assertEquals(membershipFee.getPaidPrice(), mfv2.getPaidPrice());
+                    assertEquals(membershipFee.getComment(), mfv2.getComment());
+                });
         assertThat(memberV2.getCards())
                 .singleElement()
                 .satisfies(cardV2 -> assertEquals(card.getCode(), cardV2.getCode()));

@@ -3,6 +3,7 @@ package casp.web.backend.common.member;
 import casp.web.backend.common.validation.Payment;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.PositiveOrZero;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.time.LocalDate;
 
@@ -11,14 +12,13 @@ public class MembershipFee implements Payment {
     @PositiveOrZero
     @Digits(integer = 9, fraction = 2)
     private double paidPrice;
-    private boolean isPaid;
     private LocalDate paidDate;
 
     public String getComment() {
         return comment;
     }
 
-    public void setComment(final String comment) {
+    public void setComment(String comment) {
         this.comment = comment;
     }
 
@@ -27,17 +27,8 @@ public class MembershipFee implements Payment {
         return paidPrice;
     }
 
-    public void setPaidPrice(final double paidPrice) {
+    public void setPaidPrice(double paidPrice) {
         this.paidPrice = paidPrice;
-    }
-
-    @Override
-    public boolean isPaid() {
-        return isPaid;
-    }
-
-    public void setPaid(final boolean paid) {
-        isPaid = paid;
     }
 
     @Override
@@ -45,7 +36,12 @@ public class MembershipFee implements Payment {
         return paidDate;
     }
 
-    public void setPaidDate(final LocalDate paidDate) {
+    public void setPaidDate(LocalDate paidDate) {
         this.paidDate = paidDate;
+    }
+
+    @Override
+    public boolean isPaid() {
+        return ObjectUtils.allNotNull(paidDate, paidPrice);
     }
 }
