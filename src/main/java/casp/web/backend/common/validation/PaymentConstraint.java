@@ -20,7 +20,7 @@ import java.lang.annotation.Target;
 @Constraint(validatedBy = {PaymentValidation.class})
 public @interface PaymentConstraint {
     String message() default
-            "If paid than a value and the date were added, if not booth value and date are empty";
+            "If paid, then value and date must be added; if not, both value and date must be empty";
 
     Class<?>[] groups() default {};
 

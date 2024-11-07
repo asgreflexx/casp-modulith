@@ -1,6 +1,7 @@
 package casp.web.backend.presentation.layer.event;
 
 import casp.web.backend.business.logic.layer.event.types.CourseService;
+import casp.web.backend.data.access.layer.event.participants.Space;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springdoc.core.annotations.ParameterObject;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,6 +64,18 @@ class CourseRestController {
     @GetMapping("emails/{id}")
     ResponseEntity<Set<String>> getSpacesEmail(@PathVariable UUID id) {
         return ResponseEntity.ok(courseService.getEmailsByCourseId(id));
+    }
+
+    @PatchMapping("{courseId}/space")
+    ResponseEntity<Void> updateSpace(@PathVariable UUID courseId, @RequestBody @Valid Space space) {
+        courseService.updateSpace(courseId, space);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("{courseId}/space/{spaceId}")
+    ResponseEntity<Void> removeSpace(@PathVariable UUID courseId, @PathVariable UUID spaceId) {
+        courseService.removeSpace(courseId, spaceId);
+        return ResponseEntity.noContent().build();
     }
 
     /**

@@ -241,7 +241,7 @@ class CourseServiceImplTest {
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             space.setNote("spaceChanged");
-            courseService.saveSpace(course.getId(), space);
+            courseService.updateSpace(course.getId(), space);
 
             verify(courseRepository).save(courseCaptor.capture());
 
@@ -256,14 +256,14 @@ class CourseServiceImplTest {
             var space = new Space();
             when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> courseService.saveSpace(id, space));
+            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(id, space));
         }
 
         @Test
         void spaceDoesNotExist() {
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
-            assertThrows(NoSuchElementException.class, () -> courseService.saveSpace(course.getId(), createSpace()));
+            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(course.getId(), createSpace()));
         }
     }
 

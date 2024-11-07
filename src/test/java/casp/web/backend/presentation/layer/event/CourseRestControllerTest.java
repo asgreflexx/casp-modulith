@@ -5,9 +5,11 @@ import casp.web.backend.business.logic.layer.event.types.CourseDto;
 import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.business.logic.layer.event.types.NewCalendarEntryDto;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.data.access.layer.dog.Dog;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.dog.DogRepository;
@@ -36,16 +38,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -54,6 +59,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CourseRestControllerTest {
     private static final String COURSE_URL_PREFIX = "/course";
     private static final String COURSE_DOES_NOT_EXIST_MSG = "Course with id %s does not exist or it is not active.";
+    private static final String SPACE_DOES_NOT_EXIST_MSG = "Space with id %s not found in course with id %s.";
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,10 +82,14 @@ class CourseRestControllerTest {
     @SpyBean
     private CourseService courseService;
 
+    @Captor
+    private ArgumentCaptor<Space> spaceCaptor;
+
     private Course course;
     private DogHasHandler dogHasHandler;
     private Member member;
     private LocalDateTime startDateTime;
+    private Dog dog;
 
 
     @BeforeEach
@@ -90,7 +100,7 @@ class CourseRestControllerTest {
         memberRepository.deleteAll();
 
         member = memberRepository.save(TestFixture.createMember());
-        var dog = dogRepository.save(TestFixture.createDog());
+        dog = dogRepository.save(TestFixture.createDog());
         dogHasHandler = new DogHasHandler();
         memberReferenceRepository.findById(member.getId()).ifPresent(dogHasHandler::setMember);
         dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandler::setDog);
@@ -109,6 +119,152 @@ class CourseRestControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(courseService).migrateDataToV2();
+    }
+
+    private Space saveNewSpaceToCourse() {
+        var space = createSpace();
+        course.setSpaceLimit(1);
+        course.addSpace(space);
+        courseRepository.save(course);
+        return space;
+    }
+
+    private Space createSpace() {
+        return dogHasHandlerReferenceRepository.findById(dogHasHandler.getId())
+                .map(Space::new)
+                .orElseThrow();
+    }
+
+    @Nested
+    class UpdateSpace {
+        private Space space;
+
+        private Space createNonExistingSpace() {
+            var dogHasHandlerReference = new DogHasHandlerReference();
+            memberReferenceRepository.findById(member.getId()).ifPresent(dogHasHandlerReference::setMember);
+            dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandlerReference::setDog);
+            return new Space(dogHasHandlerReference);
+        }
+
+        @BeforeEach
+        void setUp() {
+            space = saveNewSpaceToCourse();
+        }
+
+        @Test
+        void courseDoesNotExist() throws Exception {
+            var courseId = UUID.randomUUID();
+
+            var exception = performPatch(courseId, space)
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .isEqualTo(COURSE_DOES_NOT_EXIST_MSG.formatted(courseId));
+        }
+
+        @Test
+        void spaceDoesNotExist() throws Exception {
+            var nonExistingSpace = createNonExistingSpace();
+
+            var exception = performPatch(course.getId(), nonExistingSpace)
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .isEqualTo(SPACE_DOES_NOT_EXIST_MSG.formatted(nonExistingSpace.getId(), course.getId()));
+        }
+
+        @Test
+        void spaceIsNotValid() throws Exception {
+            space.setPaidDate(LocalDate.now());
+
+            var exception = performPatch(course.getId(), space)
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .contains("If paid, then value and date must be added; if not, both value and date must be empty");
+        }
+
+        @Test
+        void validSpace() throws Exception {
+            space.setNote("new note");
+
+            performPatch(course.getId(), space)
+                    .andExpect(status().isNoContent());
+
+            verify(courseService).updateSpace(eq(course.getId()), spaceCaptor.capture());
+            assertEquals(space.getNote(), spaceCaptor.getValue().getNote());
+        }
+
+        private ResultActions performPatch(UUID courseId, Space space) throws Exception {
+            return mockMvc.perform(patch(COURSE_URL_PREFIX + "/{courseId}/space", courseId)
+                    .content(MvcMapper.toString(space))
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON));
+        }
+    }
+
+    @Nested
+    class RemoveSpace {
+        private Space space;
+
+        @BeforeEach
+        void setUp() {
+            space = saveNewSpaceToCourse();
+        }
+
+        @Test
+        void courseDoesNotExist() throws Exception {
+            var courseId = UUID.randomUUID();
+
+            var exception = performDelete(courseId, space.getId())
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .isEqualTo(COURSE_DOES_NOT_EXIST_MSG.formatted(courseId));
+        }
+
+        @Test
+        void spaceDoesNotExist() throws Exception {
+            var spaceId = UUID.randomUUID();
+
+            var exception = performDelete(course.getId(), spaceId)
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .isEqualTo(SPACE_DOES_NOT_EXIST_MSG.formatted(spaceId, course.getId()));
+        }
+
+        @Test
+        void spaceAndCourseExist() throws Exception {
+            performDelete(course.getId(), space.getId())
+                    .andExpect(status().isNoContent());
+
+            verify(courseService).removeSpace(course.getId(), space.getId());
+        }
+
+        private ResultActions performDelete(UUID courseId, UUID spaceId) throws Exception {
+            return mockMvc.perform(delete(COURSE_URL_PREFIX + "/{courseId}/space/{spaceId}", courseId, spaceId));
+        }
     }
 
     @Nested
@@ -223,11 +379,7 @@ class CourseRestControllerTest {
     class GetSpacesEmail {
         @Test
         void isActive() throws Exception {
-            dogHasHandlerReferenceRepository.findById(dogHasHandler.getId()).ifPresent(dhh -> {
-                course.setSpaceLimit(1);
-                course.addSpace(new Space(dhh));
-                courseRepository.save(course);
-            });
+            saveNewSpaceToCourse();
             var mvcResult = performGet()
                     .andExpect(status().isOk())
                     .andReturn();

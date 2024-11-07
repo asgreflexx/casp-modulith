@@ -14,7 +14,7 @@ public interface CourseService extends BaseEventService<CourseDto> {
 
     Set<String> getEmailsByCourseId(UUID id);
 
-    void saveSpace(UUID courseId, Space space);
+    void updateSpace(UUID courseId, Space space);
 
     void removeSpace(UUID courseId, UUID spaceId);
 }
