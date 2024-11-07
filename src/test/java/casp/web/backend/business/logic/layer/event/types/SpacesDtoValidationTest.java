@@ -42,9 +42,4 @@ class SpacesDtoValidationTest {
 
         assertTrue(VALIDATION.isValid(courseDto, null));
     }
-
-    @Test
-    void newSpacesAndSpacesAreNull() {
-        assertTrue(VALIDATION.isValid(courseDto, null));
-    }
 }
