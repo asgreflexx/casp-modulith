@@ -8,8 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-@EventParticipantsDtoConstraint
-public class EventDto extends BaseEventDto implements EventRequiredFields, EventDtoRequiredFields {
+public class EventDto extends BaseEventDto implements EventDtoRequiredFields {
     private Set<EventParticipant> participants = new HashSet<>();
     private Set<UUID> newParticipants = new HashSet<>();
 
@@ -23,7 +22,7 @@ public class EventDto extends BaseEventDto implements EventRequiredFields, Event
     }
 
     @Override
-    public void setParticipants(final Set<EventParticipant> participants) {
+    public void setParticipants(Set<EventParticipant> participants) {
         this.participants = participants;
     }
 
@@ -33,12 +32,12 @@ public class EventDto extends BaseEventDto implements EventRequiredFields, Event
     }
 
     @Override
-    public void setNewParticipants(final Set<UUID> newParticipants) {
+    public void setNewParticipants(Set<UUID> newParticipants) {
         this.newParticipants = newParticipants;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 
