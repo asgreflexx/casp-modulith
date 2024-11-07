@@ -103,6 +103,14 @@ class CourseRestControllerTest {
         course = courseRepository.save(course);
     }
 
+    @Test
+    void migrateDataToV2() throws Exception {
+        mockMvc.perform(post(COURSE_URL_PREFIX + "/migrate-data"))
+                .andExpect(status().isNoContent());
+
+        verify(courseService).migrateDataToV2();
+    }
+
     @Nested
     class Save {
         @Captor
