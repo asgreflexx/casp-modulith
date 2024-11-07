@@ -69,7 +69,6 @@ class DogRestControllerTest {
     private DogService dogService;
 
     private DogDto charlie;
-    private DogDto bonsai;
     private DogDto inactive;
     private Set<DogRead> expectedActiveDogs;
 
@@ -81,7 +80,7 @@ class DogRestControllerTest {
         memberRepository.deleteAll();
 
         charlie = createDog("Charlie", EntityStatus.ACTIVE);
-        bonsai = createDog("Bonsai", EntityStatus.ACTIVE);
+        var bonsai = createDog("Bonsai", EntityStatus.ACTIVE);
         inactive = createDog("INACTIVE", EntityStatus.INACTIVE);
         expectedActiveDogs = READ_MAPPER.toTargetSet(Set.of(charlie, bonsai));
     }

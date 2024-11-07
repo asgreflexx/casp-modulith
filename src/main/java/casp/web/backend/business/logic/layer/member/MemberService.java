@@ -2,7 +2,6 @@ package casp.web.backend.business.logic.layer.member;
 
 
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.deprecated.event.types.BaseEvent;
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,11 +26,10 @@ public interface MemberService {
 
     MemberDto activateMember(UUID id);
 
-    Page<MemberDto> getMembersByName(@Nullable String name, final Pageable pageable);
+    Page<MemberDto> getMembersByName(@Nullable String name, Pageable pageable);
 
     Set<String> getMembersEmailByIds(Set<UUID> membersId);
 
-    void setActiveMemberToBaseEvent(BaseEvent baseEvent);
 
     /**
      * @deprecated It will be removed in #3.

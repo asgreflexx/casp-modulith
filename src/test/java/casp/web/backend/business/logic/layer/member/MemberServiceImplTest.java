@@ -1,6 +1,5 @@
 package casp.web.backend.business.logic.layer.member;
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
@@ -8,7 +7,6 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.data.access.layer.member.MemberRepository;
-import casp.web.backend.deprecated.event.types.Event;
 import casp.web.backend.deprecated.member.Card;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
@@ -37,8 +35,6 @@ import java.util.UUID;
 import static casp.web.backend.business.logic.layer.member.MemberMapper.MEMBER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -203,48 +199,6 @@ class MemberServiceImplTest {
                     .singleElement()
                     .usingRecursiveAssertion()
                     .isEqualTo(MEMBER_MAPPER.toDogHasHandlerDto(dogHasHandlerReference));
-        }
-    }
-
-    @Nested
-    class SetActiveMemberToBaseEvent {
-
-        private Event event;
-
-        @BeforeEach
-        void setUp() {
-            event = spy(TestFixture.createEvent());
-        }
-
-        @Test
-        void memberIsActive() {
-            event.setMember(null);
-            event.setMemberId(member.getId());
-            when(memberRepository.findOneByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
-
-            memberService.setActiveMemberToBaseEvent(event);
-
-            assertSame(member, event.getMember());
-
-        }
-
-        @Test
-        void memberIsInactive() {
-            event.setMember(null);
-            when(memberRepository.findOneByIdAndEntityStatus(event.getMemberId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            memberService.setActiveMemberToBaseEvent(event);
-
-            assertNull(event.getMember());
-        }
-
-        @Test
-        void noNeedToSetMember() {
-            memberService.setActiveMemberToBaseEvent(event);
-
-            verifyNoInteractions(memberRepository);
-
-            assertNotNull(event.getMember());
         }
     }
 

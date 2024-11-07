@@ -7,7 +7,6 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.data.access.layer.member.MemberRepository;
-import casp.web.backend.deprecated.event.types.BaseEvent;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
 import org.slf4j.Logger;
@@ -124,15 +123,6 @@ class MemberServiceImpl implements MemberService {
                 .stream()
                 .map(Member::getEmail)
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public void setActiveMemberToBaseEvent(BaseEvent baseEvent) {
-        if (baseEvent.getMember() == null) {
-            memberRepository.findOneByIdAndEntityStatus(baseEvent.getMemberId(), EntityStatus.ACTIVE)
-                    .ifPresentOrElse(baseEvent::setMember,
-                            () -> LOG.warn("No active member found with id: {}", baseEvent.getMemberId()));
-        }
     }
 
     @Override

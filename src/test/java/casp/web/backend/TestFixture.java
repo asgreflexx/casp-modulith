@@ -6,20 +6,10 @@ import casp.web.backend.deprecated.dog.DogHasHandler;
 import casp.web.backend.deprecated.event.participants.ExamParticipant;
 import casp.web.backend.deprecated.event.participants.Space;
 import casp.web.backend.deprecated.event.types.Course;
-import casp.web.backend.deprecated.event.types.Event;
 import casp.web.backend.deprecated.event.types.Exam;
 
 public enum TestFixture {
     ;
-
-    public static Event createEvent() {
-        var member = createMember();
-        var event = new Event();
-        event.setName("Test Event");
-        event.setMemberId(member.getId());
-        event.setMember(member);
-        return event;
-    }
 
     public static Member createMember() {
         return createMember("John", "Doe");
