@@ -1,19 +1,29 @@
-package casp.web.backend.business.logic.layer.event.types;
+package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.common.enums.BaseEventType;
+import casp.web.backend.business.logic.layer.event.types.ExamDtoRequiredFields;
 import casp.web.backend.data.access.layer.event.participants.ExamParticipant;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class ExamDto extends BaseEventDto implements ExamDtoRequiredFields {
+public class ExamWrite extends BaseEventWrite implements ExamDtoRequiredFields {
     private String judgeName;
+    @JsonSetter(nulls = Nulls.SKIP)
     private Set<ExamParticipant> participants = new HashSet<>();
+    @JsonSetter(nulls = Nulls.SKIP)
     private Set<UUID> newParticipants = new HashSet<>();
 
-    public ExamDto() {
-        super(BaseEventType.EXAM);
+    @Override
+    public Set<UUID> getNewParticipants() {
+        return newParticipants;
+    }
+
+    @Override
+    public void setNewParticipants(Set<UUID> newParticipants) {
+        this.newParticipants = newParticipants;
     }
 
     @Override
@@ -34,16 +44,6 @@ public class ExamDto extends BaseEventDto implements ExamDtoRequiredFields {
     @Override
     public void setParticipants(Set<ExamParticipant> participants) {
         this.participants = participants;
-    }
-
-    @Override
-    public Set<UUID> getNewParticipants() {
-        return newParticipants;
-    }
-
-    @Override
-    public void setNewParticipants(Set<UUID> newParticipants) {
-        this.newParticipants = newParticipants;
     }
 
     @Override
