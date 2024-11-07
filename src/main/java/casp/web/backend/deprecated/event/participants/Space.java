@@ -1,7 +1,5 @@
 package casp.web.backend.deprecated.event.participants;
 
-import casp.web.backend.common.validation.Payment;
-import casp.web.backend.common.validation.PaymentConstraint;
 import casp.web.backend.deprecated.dog.DogHasHandler;
 import casp.web.backend.deprecated.event.types.Course;
 import com.querydsl.core.annotations.QueryEntity;
@@ -19,11 +17,10 @@ import java.util.StringJoiner;
  * @deprecated use {@link casp.web.backend.data.access.layer.event.participants.Space} instead.It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
-@PaymentConstraint
 @QueryEntity
 @Document(BaseParticipant.COLLECTION)
 @TypeAlias(Space.PARTICIPANT_TYPE)
-public class Space extends BaseParticipant implements Payment {
+public class Space extends BaseParticipant {
     public static final String PARTICIPANT_TYPE = "SPACE";
 
     private String note;
@@ -44,7 +41,7 @@ public class Space extends BaseParticipant implements Payment {
         super(PARTICIPANT_TYPE);
     }
 
-    public Space(final Course course, final DogHasHandler dogHasHandler) {
+    public Space(Course course, DogHasHandler dogHasHandler) {
         super(PARTICIPANT_TYPE, dogHasHandler.getId(), course);
         this.dogHasHandler = dogHasHandler;
     }
@@ -58,7 +55,6 @@ public class Space extends BaseParticipant implements Payment {
         this.note = note;
     }
 
-    @Override
     public double getPaidPrice() {
         return paidPrice;
     }
@@ -67,7 +63,6 @@ public class Space extends BaseParticipant implements Payment {
         this.paidPrice = paidPrice;
     }
 
-    @Override
     public boolean isPaid() {
         return isPaid;
     }
@@ -76,7 +71,6 @@ public class Space extends BaseParticipant implements Payment {
         this.isPaid = isPaid;
     }
 
-    @Override
     public LocalDate getPaidDate() {
         return paidDate;
     }
@@ -89,7 +83,7 @@ public class Space extends BaseParticipant implements Payment {
         return dogHasHandler;
     }
 
-    public void setDogHasHandler(final DogHasHandler dogHasHandler) {
+    public void setDogHasHandler(DogHasHandler dogHasHandler) {
         this.dogHasHandler = dogHasHandler;
     }
 
