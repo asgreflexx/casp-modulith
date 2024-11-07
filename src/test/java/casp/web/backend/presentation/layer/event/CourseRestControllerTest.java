@@ -136,6 +136,60 @@ class CourseRestControllerTest {
     }
 
     @Nested
+    class GetCalendarEntry {
+        private UUID calendarEntryId;
+
+        @BeforeEach
+        void setUp() {
+            calendarEntryId = course.getCalendarEntries().getFirst().getId();
+        }
+
+        @Test
+        void courseDoesNotExist() throws Exception {
+            var courseId = UUID.randomUUID();
+            var exception = performGet(courseId, calendarEntryId)
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .isEqualTo(COURSE_DOES_NOT_EXIST_MSG.formatted(courseId));
+        }
+
+        @Test
+        void calendarEntryDoesNotExist() throws Exception {
+            var nonExistingCalendarEntry = UUID.randomUUID();
+            var exception = performGet(course.getId(), nonExistingCalendarEntry)
+                    .andExpect(status().isBadRequest())
+                    .andReturn()
+                    .getResolvedException();
+
+            assertThat(exception)
+                    .isNotNull()
+                    .message()
+                    .isEqualTo("The Calendar entry with Id %s not found in Course with Id %s".formatted(nonExistingCalendarEntry, course.getId()));
+        }
+
+        @Test
+        void calendarEntryExist() throws Exception {
+            var mvcResult = performGet(course.getId(), calendarEntryId)
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            var courseRead = MvcMapper.toObject(mvcResult, CourseRead.class);
+            assertThat(courseRead.getCalendarEntries())
+                    .singleElement()
+                    .satisfies(ce -> assertEquals(calendarEntryId, ce.getId()));
+        }
+
+        private ResultActions performGet(UUID courseId, Object calendarEntryId) throws Exception {
+            return mockMvc.perform(get(COURSE_URL_PREFIX + "/{courseId}/calendar-entry/{calendarEntryId}", courseId, calendarEntryId));
+        }
+    }
+
+    @Nested
     class UpdateSpace {
         private Space space;
 
