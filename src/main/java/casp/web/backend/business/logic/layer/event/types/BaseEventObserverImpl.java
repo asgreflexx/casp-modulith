@@ -1,42 +1,52 @@
 package casp.web.backend.business.logic.layer.event.types;
 
+import casp.web.backend.common.enums.BaseEventType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 @Service
 class BaseEventObserverImpl implements BaseEventObserver {
-    private final Set<BaseEventService<?>> observers = new HashSet<>();
+    private final Map<BaseEventType, BaseEventService<?>> observerMap = new EnumMap<>(BaseEventType.class);
 
     @Autowired
     BaseEventObserverImpl(CourseService courseService, EventService eventService, ExamService examService) {
-        observers.addAll(Set.of(courseService, eventService, examService));
+        observerMap.put(BaseEventType.COURSE, courseService);
+        observerMap.put(BaseEventType.EVENT, eventService);
+        observerMap.put(BaseEventType.EXAM, examService);
     }
 
     @Override
     public void deleteBaseEventsByMemberId(UUID memberId) {
-        observers.forEach(observer -> observer.deleteBaseEventsByMemberId(memberId));
+        executeOperation(service -> service.deleteBaseEventsByMemberId(memberId));
     }
 
     @Override
     public void deactivateBaseEventsByMemberId(UUID memberId) {
-        observers.forEach(observer -> observer.deactivateBaseEventsByMemberId(memberId));
+        executeOperation(service -> service.deactivateBaseEventsByMemberId(memberId));
     }
 
     @Override
     public void activateBaseEventsByMemberId(UUID memberId) {
-        observers.forEach(observer -> observer.activateBaseEventsByMemberId(memberId));
+        executeOperation(service -> service.activateBaseEventsByMemberId(memberId));
     }
 
     @Override
-    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to) {
-        return observers
+    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to, Set<BaseEventType> eventTypeSet) {
+        return observerMap.entrySet()
                 .parallelStream()
-                .flatMap(observer -> observer.getCalendarEntriesBetweenFromAndTo(from, to));
+                .filter(observer -> eventTypeSet.isEmpty() || eventTypeSet.contains(observer.getKey()))
+                .flatMap(observer -> observer.getValue().getCalendarEntriesBetweenFromAndTo(from, to));
+    }
+
+    private void executeOperation(Consumer<BaseEventService<?>> operation) {
+        observerMap.values().forEach(operation);
     }
 }
