@@ -29,7 +29,7 @@ public class CalendarEntryDto extends BaseEventDto implements Comparable<Calenda
     }
 
     @Override
-    public void setEntryFrom(final LocalDateTime entryFrom) {
+    public void setEntryFrom(LocalDateTime entryFrom) {
         this.entryFrom = entryFrom;
     }
 
@@ -39,17 +39,17 @@ public class CalendarEntryDto extends BaseEventDto implements Comparable<Calenda
     }
 
     @Override
-    public void setEntryTo(final LocalDateTime entryTo) {
+    public void setEntryTo(LocalDateTime entryTo) {
         this.entryTo = entryTo;
     }
 
     @Override
-    public int compareTo(final CalendarEntryDto calendarEntryDto) {
-        return this.minTime.compareTo(calendarEntryDto.getMinTime()) + this.maxTime.compareTo(calendarEntryDto.getMaxTime());
+    public int compareTo(CalendarEntryDto calendarEntryDto) {
+        return minTime.compareTo(calendarEntryDto.getMinTime()) + maxTime.compareTo(calendarEntryDto.getMaxTime());
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CalendarEntryDto that)) return false;
         if (!super.equals(o)) return false;
