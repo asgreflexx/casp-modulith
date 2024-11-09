@@ -1,6 +1,8 @@
 package casp.web.backend.business.logic.layer.dog;
 
 import casp.web.backend.TestFixture;
+import casp.web.backend.business.logic.layer.event.types.CourseService;
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
@@ -43,6 +45,8 @@ class DogServiceImplTest {
 
     @Mock
     private DogHasHandlerService dogHasHandlerService;
+    @Mock
+    private CourseService courseService;
 
     @Captor
     private ArgumentCaptor<Dog> dogCaptor;
@@ -92,6 +96,7 @@ class DogServiceImplTest {
 
             var actualDogDto = dogService.saveDog(dogDto);
 
+            verify(courseService).getSpacesByDogHasHandlers(Set.of());
             assertThat(actualDogDto).usingRecursiveAssertion().isEqualTo(dogDto);
         }
 
@@ -101,6 +106,7 @@ class DogServiceImplTest {
 
             dogService.saveDog(dogDto);
 
+            verify(courseService).getSpacesByDogHasHandlers(Set.of());
             verify(dogRepository).setMetadataAndSave(dogCaptor.capture());
             assertThat(dogCaptor.getValue()).usingRecursiveAssertion().isEqualTo(dog);
         }
@@ -181,17 +187,37 @@ class DogServiceImplTest {
 
         @Test
         void mapDogHasHandler() {
+            var dogHasHandlerReference = mockDogHasHandler();
+            when(dogRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+
+            var result = dogService.getDogById(dog.getId());
+
+            assertThat(result.getDogHasHandlerSet()).singleElement().usingRecursiveAssertion().isEqualTo(DOG_MAPPER.toDogHasHandler(dogHasHandlerReference));
+        }
+
+        @Test
+        void mapSpaces() {
+            var dogHasHandlerReference = mockDogHasHandler();
+            var spaceDto = mock(SpaceDto.class);
+            when(dogRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
+            when(courseService.getSpacesByDogHasHandlers(Set.of(dogHasHandlerReference))).thenReturn(Set.of(spaceDto));
+
+            var memberDto = dogService.getDogById(dog.getId());
+
+            assertThat(memberDto.getSpaces())
+                    .singleElement()
+                    .isEqualTo(spaceDto);
+
+        }
+
+        private DogHasHandlerReference mockDogHasHandler() {
             var dogHasHandlerReference = mock(DogHasHandlerReference.class, Answers.RETURNS_DEEP_STUBS);
             when(dogHasHandlerReference.getId()).thenReturn(UUID.randomUUID());
             when(dogHasHandlerReference.getMember().getId()).thenReturn(UUID.randomUUID());
             when(dogHasHandlerReference.getMember().getFirstName()).thenReturn("Bonsai");
             when(dogHasHandlerReference.getMember().getLastName()).thenReturn("Yasmin");
             when(dogHasHandlerReferenceRepository.findAllByDogId(dog.getId())).thenReturn(Set.of(dogHasHandlerReference));
-            when(dogRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
-
-            var result = dogService.getDogById(dog.getId());
-
-            assertThat(result.getDogHasHandlerSet()).singleElement().usingRecursiveAssertion().isEqualTo(DOG_MAPPER.toDogHasHandler(dogHasHandlerReference));
+            return dogHasHandlerReference;
         }
     }
 }

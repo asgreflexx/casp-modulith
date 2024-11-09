@@ -35,6 +35,7 @@ import static casp.web.backend.presentation.layer.dog.DogReadMapper.READ_MAPPER;
 import static casp.web.backend.presentation.layer.dog.DogWriteMapper.WRITE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -282,6 +283,7 @@ class DogRestControllerTest {
 
             var dogRead = MvcMapper.toObject(mvcResult, DogRead.class);
             assertThat(dogRead).isEqualTo(READ_MAPPER.toTarget(charlie));
+            assertNotNull(dogRead.getSpaces());
             assertDogHasHandler(dogRead);
         }
 

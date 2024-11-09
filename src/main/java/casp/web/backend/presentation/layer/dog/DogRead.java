@@ -1,5 +1,6 @@
 package casp.web.backend.presentation.layer.dog;
 
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.dog.DogDtoRequiredFields;
 import casp.web.backend.common.dog.DogHasHandler;
@@ -24,6 +25,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     private String ownerAddress;
     private EuropeNetState europeNetState = EuropeNetState.NOT_CHECKED;
     private Set<DogHasHandler> dogHasHandlerSet = new HashSet<>();
+    private Set<SpaceDto> spaces;
 
     @Override
     public Set<DogHasHandler> getDogHasHandlerSet() {
@@ -31,7 +33,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setDogHasHandlerSet(final Set<DogHasHandler> dogHasHandlerSet) {
+    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
         this.dogHasHandlerSet = dogHasHandlerSet;
     }
 
@@ -41,7 +43,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -51,7 +53,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setBreederName(final String breederName) {
+    public void setBreederName(String breederName) {
         this.breederName = breederName;
     }
 
@@ -61,7 +63,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setBreedName(final String breedName) {
+    public void setBreedName(String breedName) {
         this.breedName = breedName;
     }
 
@@ -71,7 +73,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setBirthDate(final LocalDate birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -81,7 +83,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setPedigree(final String pedigree) {
+    public void setPedigree(String pedigree) {
         this.pedigree = pedigree;
     }
 
@@ -91,7 +93,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setGender(final Gender gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
@@ -101,7 +103,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setChipNumber(final String chipNumber) {
+    public void setChipNumber(String chipNumber) {
         this.chipNumber = chipNumber;
     }
 
@@ -111,7 +113,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setRabiesDate(final LocalDate rabiesDate) {
+    public void setRabiesDate(LocalDate rabiesDate) {
         this.rabiesDate = rabiesDate;
     }
 
@@ -121,7 +123,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setHeight(final float height) {
+    public void setHeight(float height) {
         this.height = height;
     }
 
@@ -131,7 +133,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setOwnerName(final String ownerName) {
+    public void setOwnerName(String ownerName) {
         this.ownerName = ownerName;
     }
 
@@ -141,7 +143,7 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setOwnerAddress(final String ownerAddress) {
+    public void setOwnerAddress(String ownerAddress) {
         this.ownerAddress = ownerAddress;
     }
 
@@ -151,12 +153,22 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     }
 
     @Override
-    public void setEuropeNetState(final EuropeNetState europeNetState) {
+    public void setEuropeNetState(EuropeNetState europeNetState) {
         this.europeNetState = europeNetState;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public Set<SpaceDto> getSpaces() {
+        return spaces;
+    }
+
+    @Override
+    public void setSpaces(Set<SpaceDto> spaces) {
+        this.spaces = spaces;
+    }
+
+    @Override
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

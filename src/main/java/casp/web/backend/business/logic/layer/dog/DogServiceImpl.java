@@ -1,5 +1,6 @@
 package casp.web.backend.business.logic.layer.dog;
 
+import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.data.access.layer.dog.Dog;
@@ -21,32 +22,35 @@ import static casp.web.backend.business.logic.layer.dog.DogMapper.DOG_MAPPER;
 class DogServiceImpl implements DogService {
     private static final Logger LOG = LoggerFactory.getLogger(DogServiceImpl.class);
 
-    private final DogRepository dogRepository;
     private final DogHasHandlerService dogHasHandlerService;
+    private final CourseService courseService;
+    private final DogRepository dogRepository;
     private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
-    DogServiceImpl(final DogRepository dogRepository,
-                   final DogHasHandlerService dogHasHandlerService,
-                   final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+    DogServiceImpl(DogHasHandlerService dogHasHandlerService,
+                   CourseService courseService,
+                   DogRepository dogRepository,
+                   DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         this.dogRepository = dogRepository;
         this.dogHasHandlerService = dogHasHandlerService;
+        this.courseService = courseService;
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     @Override
-    public DogDto getDogById(final UUID id) {
+    public DogDto getDogById(UUID id) {
         return mapToDogDto(getActiveDog(id));
     }
 
     @Override
-    public DogDto saveDog(final DogDto dogDto) {
+    public DogDto saveDog(DogDto dogDto) {
         var dog = DOG_MAPPER.toSource(dogDto);
         return mapToDogDto(dogRepository.setMetadataAndSave(dog));
     }
 
     @Override
-    public void deleteDogById(final UUID id) {
+    public void deleteDogById(UUID id) {
         var dog = getActiveDog(id);
         dogHasHandlerService.deleteDogHasHandlersByDogId(id);
         dog.setEntityStatus(EntityStatus.DELETED);
@@ -54,28 +58,28 @@ class DogServiceImpl implements DogService {
     }
 
     @Override
-    public Optional<DogDto> getDogByChipNumber(final String chipNumber) {
+    public Optional<DogDto> getDogByChipNumber(String chipNumber) {
         return dogRepository.findOneByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)
                 .map(this::mapToDogDto);
     }
 
     @Override
-    public Page<DogDto> getDogsByNameOrOwnerName(final String name, final String ownerName, final Pageable pageable) {
+    public Page<DogDto> getDogsByNameOrOwnerName(String name, String ownerName, Pageable pageable) {
         return DOG_MAPPER.toTargetPage(dogRepository.findAllByNameOrOwnerName(name, ownerName, pageable));
     }
 
     @Override
-    public Page<DogDto> getDogs(final Pageable pageable) {
+    public Page<DogDto> getDogs(Pageable pageable) {
         return DOG_MAPPER.toTargetPage(dogRepository.findAllByEntityStatus(EntityStatus.ACTIVE, pageable));
     }
 
     @Override
-    public Page<DogDto> getDogsThatWereNotChecked(final Pageable pageable) {
+    public Page<DogDto> getDogsThatWereNotChecked(Pageable pageable) {
         var pageRequest = pageable != null ? pageable : Pageable.unpaged();
         return DOG_MAPPER.toTargetPage(dogRepository.findAllByEuropeNetStateNotChecked(pageRequest));
     }
 
-    private Dog getActiveDog(final UUID id) {
+    private Dog getActiveDog(UUID id) {
         return dogRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "Dog with id %s not found or it isn't active.".formatted(id);
             LOG.error(msg);
@@ -83,10 +87,11 @@ class DogServiceImpl implements DogService {
         });
     }
 
-    private DogDto mapToDogDto(final Dog dog) {
+    private DogDto mapToDogDto(Dog dog) {
         var dogDto = DOG_MAPPER.toTarget(dog);
         var dogHasHandlerSet = dogHasHandlerReferenceRepository.findAllByDogId(dog.getId());
         dogDto.setDogHasHandlerSet(DOG_MAPPER.toDogHasHandlerSet(dogHasHandlerSet));
+        dogDto.setSpaces(courseService.getSpacesByDogHasHandlers(dogHasHandlerSet));
         return dogDto;
     }
 }

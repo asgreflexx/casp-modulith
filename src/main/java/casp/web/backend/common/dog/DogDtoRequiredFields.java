@@ -1,5 +1,6 @@
 package casp.web.backend.common.dog;
 
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import jakarta.validation.Valid;
 
 import java.util.Set;
@@ -9,4 +10,8 @@ public interface DogDtoRequiredFields extends DogRequiredFields {
     Set<DogHasHandler> getDogHasHandlerSet();
 
     void setDogHasHandlerSet(@Valid Set<DogHasHandler> dogHasHandlerSet);
+
+    Set<SpaceDto> getSpaces();
+
+    void setSpaces(Set<SpaceDto> spaces);
 }
