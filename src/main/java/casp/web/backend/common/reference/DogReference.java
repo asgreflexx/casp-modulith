@@ -15,7 +15,7 @@ import java.util.UUID;
 public class DogReference {
     @Id
     @NotNull
-    private UUID id;
+    private UUID id = UUID.randomUUID();
 
     @NotNull
     private EntityStatus entityStatus = EntityStatus.ACTIVE;
@@ -27,7 +27,7 @@ public class DogReference {
         return id;
     }
 
-    public void setId(final UUID id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -35,7 +35,7 @@ public class DogReference {
         return entityStatus;
     }
 
-    public void setEntityStatus(final EntityStatus entityStatus) {
+    public void setEntityStatus(EntityStatus entityStatus) {
         this.entityStatus = entityStatus;
     }
 
@@ -48,7 +48,7 @@ public class DogReference {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogReference that)) return false;
         return Objects.equals(id, that.id);
