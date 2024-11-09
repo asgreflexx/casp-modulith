@@ -36,6 +36,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static casp.web.backend.business.logic.layer.event.types.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -268,7 +269,7 @@ class CourseServiceImplTest {
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             space.setNote("spaceChanged");
-            courseService.updateSpace(course.getId(), space);
+            courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(space));
 
             verify(courseRepository).save(courseCaptor.capture());
 
@@ -283,14 +284,14 @@ class CourseServiceImplTest {
             var space = new Space();
             when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(id, space));
+            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(id, COURSE_MAPPER.toSpaceDto(space)));
         }
 
         @Test
         void spaceDoesNotExist() {
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(course.getId(), createSpace()));
+            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(createSpace())));
         }
     }
 

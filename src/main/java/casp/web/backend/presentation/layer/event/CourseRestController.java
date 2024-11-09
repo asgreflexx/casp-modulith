@@ -1,7 +1,6 @@
 package casp.web.backend.presentation.layer.event;
 
 import casp.web.backend.business.logic.layer.event.types.CourseService;
-import casp.web.backend.data.access.layer.event.participants.Space;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springdoc.core.annotations.ParameterObject;
@@ -67,8 +66,8 @@ class CourseRestController {
     }
 
     @PatchMapping("{courseId}/space")
-    ResponseEntity<Void> updateSpace(@PathVariable UUID courseId, @RequestBody @Valid Space space) {
-        courseService.updateSpace(courseId, space);
+    ResponseEntity<Void> updateSpace(@PathVariable UUID courseId, @RequestBody @Valid SpaceWrite space) {
+        courseService.updateSpace(courseId, COURSE_WRITE_MAPPER.toSpaceDto(space));
         return ResponseEntity.noContent().build();
     }
 

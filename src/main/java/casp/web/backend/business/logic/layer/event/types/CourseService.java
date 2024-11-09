@@ -2,7 +2,6 @@ package casp.web.backend.business.logic.layer.event.types;
 
 
 import casp.web.backend.common.reference.DogHasHandlerReference;
-import casp.web.backend.data.access.layer.event.participants.Space;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +14,7 @@ public interface CourseService extends BaseEventService<CourseDto> {
 
     Set<String> getEmailsByCourseId(UUID id);
 
-    void updateSpace(UUID courseId, Space space);
+    void updateSpace(UUID courseId, SpaceDto spaceDto);
 
     void removeSpace(UUID courseId, UUID spaceId);
 

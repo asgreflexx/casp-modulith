@@ -4,6 +4,7 @@ import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.types.CourseDto;
 import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.business.logic.layer.event.types.NewCalendarEntryDto;
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
@@ -83,7 +84,7 @@ class CourseRestControllerTest {
     private CourseService courseService;
 
     @Captor
-    private ArgumentCaptor<Space> spaceCaptor;
+    private ArgumentCaptor<SpaceDto> spaceCaptor;
 
     private Course course;
     private DogHasHandler dogHasHandler;

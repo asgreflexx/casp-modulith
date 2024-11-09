@@ -2,12 +2,13 @@ package casp.web.backend.business.logic.layer.event.types;
 
 import casp.web.backend.common.enums.EventResponse;
 import casp.web.backend.common.reference.DogHasHandlerReference;
+import casp.web.backend.presentation.layer.event.SpaceWriteRequiredFields;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
-public class SpaceDto {
+public class SpaceDto implements SpaceWriteRequiredFields {
     private UUID courseId;
     private String courseName;
     private DogHasHandlerReference dogHasHandler;
@@ -36,42 +37,52 @@ public class SpaceDto {
         return dogHasHandler.getId();
     }
 
+    @Override
     public DogHasHandlerReference getDogHasHandler() {
         return dogHasHandler;
     }
 
+    @Override
     public void setDogHasHandler(DogHasHandlerReference dogHasHandler) {
         this.dogHasHandler = dogHasHandler;
     }
 
+    @Override
     public String getNote() {
         return note;
     }
 
+    @Override
     public void setNote(String note) {
         this.note = note;
     }
 
+    @Override
     public double getPaidPrice() {
         return paidPrice;
     }
 
+    @Override
     public void setPaidPrice(double paidPrice) {
         this.paidPrice = paidPrice;
     }
 
+    @Override
     public LocalDate getPaidDate() {
         return paidDate;
     }
 
+    @Override
     public void setPaidDate(LocalDate paidDate) {
         this.paidDate = paidDate;
     }
 
+    @Override
     public EventResponse getResponse() {
         return response;
     }
 
+    @Override
     public void setResponse(EventResponse response) {
         this.response = response;
     }

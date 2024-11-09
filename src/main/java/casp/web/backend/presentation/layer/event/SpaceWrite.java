@@ -1,28 +1,25 @@
-package casp.web.backend.data.access.layer.event.participants;
+package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.common.enums.BaseParticipantType;
+import casp.web.backend.common.enums.EventResponse;
 import casp.web.backend.common.reference.DogHasHandlerReference;
-import casp.web.backend.presentation.layer.event.SpaceWriteRequiredFields;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDate;
-import java.util.UUID;
+import java.util.Objects;
 
-public class Space extends BaseParticipant implements SpaceWriteRequiredFields {
+public class SpaceWrite implements SpaceWriteRequiredFields {
+    private DogHasHandlerReference dogHasHandler;
     private String note;
-
     private double paidPrice;
     private LocalDate paidDate;
+    private EventResponse response;
 
-    @DBRef
-    private DogHasHandlerReference dogHasHandler;
-
-    public Space() {
-        super(BaseParticipantType.SPACE);
+    @Override
+    public DogHasHandlerReference getDogHasHandler() {
+        return dogHasHandler;
     }
 
-    public Space(DogHasHandlerReference dogHasHandler) {
-        this();
+    @Override
+    public void setDogHasHandler(DogHasHandlerReference dogHasHandler) {
         this.dogHasHandler = dogHasHandler;
     }
 
@@ -57,27 +54,24 @@ public class Space extends BaseParticipant implements SpaceWriteRequiredFields {
     }
 
     @Override
-    public DogHasHandlerReference getDogHasHandler() {
-        return dogHasHandler;
+    public EventResponse getResponse() {
+        return response;
     }
 
     @Override
-    public void setDogHasHandler(DogHasHandlerReference dogHasHandler) {
-        this.dogHasHandler = dogHasHandler;
-    }
-
-    @Override
-    public UUID getId() {
-        return dogHasHandler.getId();
+    public void setResponse(EventResponse response) {
+        this.response = response;
     }
 
     @Override
     public boolean equals(Object o) {
-        return super.equals(o);
+        if (this == o) return true;
+        if (!(o instanceof SpaceWrite that)) return false;
+        return Objects.equals(getDogHasHandler().getId(), that.getDogHasHandler().getId());
     }
 
     @Override
     public int hashCode() {
-        return super.hashCode();
+        return Objects.hashCode(getDogHasHandler().getId());
     }
 }
