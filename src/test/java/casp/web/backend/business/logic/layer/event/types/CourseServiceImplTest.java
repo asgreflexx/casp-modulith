@@ -75,6 +75,7 @@ class CourseServiceImplTest {
     @BeforeEach
     void setUp() {
         course = new Course();
+        course.setName("course");
     }
 
     @Test
@@ -151,6 +152,32 @@ class CourseServiceImplTest {
                     assertEquals(calendarEntry2.getEntryFrom(), ce.getEntryFrom());
                     assertEquals(calendarEntry2.getEntryTo(), ce.getEntryTo());
                     assertSame(course.getEventType(), ce.getEventType());
+                });
+    }
+
+    @Test
+    void getSpacesByDogHasHandlers() {
+        var space = createSpace();
+        space.setPaidPrice(100);
+        space.setPaidDate(LocalDate.now());
+        course.addSpace(space);
+        course.addSpace(createSpace());
+        var dogHasHandlerSet = Set.of(space.getDogHasHandler());
+        when(courseRepository.findAllByDogHasHandlers(dogHasHandlerSet)).thenReturn(Stream.of(course));
+
+        var spaces = courseService.getSpacesByDogHasHandlers(dogHasHandlerSet);
+
+        assertThat(spaces)
+                .singleElement()
+                .satisfies(spaceDto -> {
+                    assertEquals(course.getId(), spaceDto.getCourseId());
+                    assertEquals(course.getName(), spaceDto.getCourseName());
+                    assertEquals(space.getId(), spaceDto.getId());
+                    assertEquals(space.getDogHasHandler(), spaceDto.getDogHasHandler());
+                    assertEquals(space.getNote(), spaceDto.getNote());
+                    assertEquals(space.getPaidPrice(), spaceDto.getPaidPrice());
+                    assertEquals(space.getPaidDate(), spaceDto.getPaidDate());
+                    assertSame(space.getResponse(), spaceDto.getResponse());
                 });
     }
 

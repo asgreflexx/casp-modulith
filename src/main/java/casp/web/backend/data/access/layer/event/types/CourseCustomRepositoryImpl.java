@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> implements CourseCustomRepository {
@@ -56,7 +56,7 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     }
 
     @Override
-    public Set<Course> findAllByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlers) {
+    public Stream<Course> findAllByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlers) {
         if (ObjectUtils.isEmpty(dogHasHandlers)) {
             var msg = "The set of DogHasHandlerReference should not be empty.";
             LOG.error(msg);
@@ -64,7 +64,6 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         }
         return query()
                 .where(mapToSpaceConstraint(dogHasHandlers), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
-                .stream()
-                .collect(Collectors.toSet());
+                .stream();
     }
 }

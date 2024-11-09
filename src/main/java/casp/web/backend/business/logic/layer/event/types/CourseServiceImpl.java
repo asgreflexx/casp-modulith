@@ -1,5 +1,6 @@
 package casp.web.backend.business.logic.layer.event.types;
 
+import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.participants.CoTrainer;
@@ -17,6 +18,7 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static casp.web.backend.business.logic.layer.event.types.CourseMapper.COURSE_MAPPER;
 
@@ -49,6 +51,13 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
                     LOG.error(msg);
                     return new NoSuchElementException(msg);
                 });
+    }
+
+    private static Stream<SpaceDto> filterAndMapToSpaceDto(Course course, Set<Space> expectedSpaces) {
+        return course.getSpaces()
+                .stream()
+                .filter(expectedSpaces::contains)
+                .map(s -> COURSE_MAPPER.toSpaceDto(s, course));
     }
 
     @Override
@@ -95,6 +104,14 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         var course = getOneByIdOrThrowException(courseId);
         removeSpace(course, spaceId);
         courseRepository.save(course);
+    }
+
+    @Override
+    public Set<SpaceDto> getSpacesByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlerSet) {
+        var expectedSpaces = dogHasHandlerSet.stream().map(Space::new).collect(Collectors.toSet());
+        return courseRepository.findAllByDogHasHandlers(dogHasHandlerSet)
+                .flatMap(c -> filterAndMapToSpaceDto(c, expectedSpaces))
+                .collect(Collectors.toSet());
     }
 
     private void setCoTrainers(CourseDto courseDto, Course course) {
