@@ -11,7 +11,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.UUID;
 
 public class Space extends BaseParticipant implements Payment {
@@ -82,13 +81,11 @@ public class Space extends BaseParticipant implements Payment {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof Space space)) return false;
-        return Objects.equals(dogHasHandler, space.dogHasHandler);
+        return super.equals(o);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(dogHasHandler);
+        return super.hashCode();
     }
 }

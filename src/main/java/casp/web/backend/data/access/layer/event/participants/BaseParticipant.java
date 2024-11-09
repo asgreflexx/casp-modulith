@@ -6,6 +6,7 @@ import casp.web.backend.common.enums.EventResponse;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 
+import java.util.Objects;
 import java.util.UUID;
 
 abstract class BaseParticipant {
@@ -38,4 +39,16 @@ abstract class BaseParticipant {
     @Id
     @NotNull
     public abstract UUID getId();
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof BaseParticipant that)) return false;
+        return Objects.equals(getId(), that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getId());
+    }
 }
