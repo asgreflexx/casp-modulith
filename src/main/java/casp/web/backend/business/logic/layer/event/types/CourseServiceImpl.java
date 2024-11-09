@@ -14,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
@@ -108,6 +109,9 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
 
     @Override
     public Set<SpaceDto> getSpacesByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlerSet) {
+        if (dogHasHandlerSet.isEmpty()) {
+            return Collections.emptySet();
+        }
         var expectedSpaces = dogHasHandlerSet.stream().map(Space::new).collect(Collectors.toSet());
         return courseRepository.findAllByDogHasHandlers(dogHasHandlerSet)
                 .flatMap(c -> filterAndMapToSpaceDto(c, expectedSpaces))
