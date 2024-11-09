@@ -3,6 +3,7 @@ package casp.web.backend.business.logic.layer.member;
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
+import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.data.access.layer.member.Member;
@@ -29,22 +30,24 @@ class MemberServiceImpl implements MemberService {
     private static final String EMAIL_FORMAT_IF_DELETED = "%s---%s";
 
     private final MemberRepository memberRepository;
+    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     private final DogHasHandlerService dogHasHandlerService;
     private final BaseEventObserver baseEventObserver;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+    private final CourseService courseService;
     private final CardRepository cardRepository;
     private final MemberOldRepository memberOldRepository;
 
     @Autowired
     MemberServiceImpl(MemberRepository memberRepository,
-                      DogHasHandlerService dogHasHandlerService,
+                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository, DogHasHandlerService dogHasHandlerService,
                       BaseEventObserver baseEventObserver,
+                      CourseService courseService,
                       CardRepository cardRepository,
-                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
                       MemberOldRepository memberOldRepository) {
         this.memberRepository = memberRepository;
         this.dogHasHandlerService = dogHasHandlerService;
         this.baseEventObserver = baseEventObserver;
+        this.courseService = courseService;
         this.cardRepository = cardRepository;
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
         this.memberOldRepository = memberOldRepository;
@@ -139,6 +142,7 @@ class MemberServiceImpl implements MemberService {
         var memberDto = MEMBER_MAPPER.toTarget(member);
         var dogHasHandlerSet = dogHasHandlerReferenceRepository.findAllByMemberId(member.getId());
         memberDto.setDogHasHandlerSet(MEMBER_MAPPER.toDogHasHandlerDtoSet(dogHasHandlerSet));
+        memberDto.setSpaces(courseService.getSpacesByDogHasHandlers(dogHasHandlerSet));
         return memberDto;
     }
 }

@@ -7,12 +7,16 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Role;
 import casp.web.backend.common.member.Card;
 import casp.web.backend.common.member.MembershipFee;
+import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
 import casp.web.backend.data.access.layer.dog.DogRepository;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.data.access.layer.event.types.Course;
+import casp.web.backend.data.access.layer.event.types.CourseRepository;
 import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.data.access.layer.event.types.EventRepository;
 import casp.web.backend.data.access.layer.member.Member;
@@ -73,9 +77,13 @@ class MemberRestControllerTest {
     @Autowired
     private EventRepository eventRepository;
     @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
     private MemberReferenceRepository memberReferenceRepository;
     @Autowired
     private DogReferenceRepository dogReferenceRepository;
+    @Autowired
+    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @SpyBean
     private MemberService memberService;
@@ -84,9 +92,11 @@ class MemberRestControllerTest {
     private MemberDto zephyr;
     private Member inactive;
     private Set<MemberRead> expectedActiveMembers;
+    private UUID dogHasHandlerId;
 
     @BeforeEach
     void setUp() {
+        courseRepository.deleteAll();
         eventRepository.deleteAll();
         dogHasHandlerRepository.deleteAll();
         memberRepository.deleteAll();
@@ -109,6 +119,7 @@ class MemberRestControllerTest {
         });
         dogReferenceRepository.findById(bonsaiDocument.getId()).ifPresent(dogHasHandler::setDog);
         dogHasHandlerRepository.save(dogHasHandler);
+        dogHasHandlerId = dogHasHandler.getId();
 
         var calendarEntry = new CalendarEntry(LocalDateTime.now(), LocalDateTime.now().plusDays(1));
         event.setName("Test");
@@ -446,6 +457,30 @@ class MemberRestControllerTest {
                             .value(MEMBER_NOT_FOUND_MESSAGE.formatted(inactive.getId(), EntityStatus.ACTIVE)));
 
             verify(memberService).getMemberById(inactive.getId());
+        }
+
+        @Test
+        void containsSpaces() throws Exception {
+            var course = new Course();
+            course.setName("course");
+            course.addCalendarEntry(new CalendarEntry(LocalDateTime.now(), LocalDateTime.now().plusDays(1)));
+            memberReferenceRepository.findById(john.getId()).ifPresent(course::setMember);
+            var space = dogHasHandlerReferenceRepository.findById(dogHasHandlerId)
+                    .map(Space::new)
+                    .orElseThrow();
+            course.addSpace(space);
+            course.setSpaceLimit(1);
+            courseRepository.save(course);
+
+            var mvcResult = getMemberById(john.getId())
+                    .andExpect(status().isOk())
+                    .andReturn();
+
+            var memberDto = MvcMapper.toObject(mvcResult, MemberRead.class);
+            assertThat(memberDto.getSpaces())
+                    .singleElement()
+                    .satisfies(spaceDto -> assertEquals(space.getId(), spaceDto.getId()));
+
         }
     }
 

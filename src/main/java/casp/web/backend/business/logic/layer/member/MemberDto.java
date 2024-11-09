@@ -1,5 +1,6 @@
 package casp.web.backend.business.logic.layer.member;
 
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Gender;
@@ -41,6 +42,7 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
     private Set<Card> cards = new HashSet<>();
 
     private Set<DogHasHandler> dogHasHandlerSet = new HashSet<>();
+    private Set<SpaceDto> spaces = new HashSet<>();
 
     @Override
     public EntityStatus getEntityStatus() {
@@ -178,12 +180,22 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setDogHasHandlerSet(final Set<DogHasHandler> dogHasHandlerSet) {
+    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
         this.dogHasHandlerSet = dogHasHandlerSet;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public Set<SpaceDto> getSpaces() {
+        return spaces;
+    }
+
+    @Override
+    public void setSpaces(Set<SpaceDto> spaces) {
+        this.spaces = spaces;
+    }
+
+    @Override
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

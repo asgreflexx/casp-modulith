@@ -1,5 +1,6 @@
 package casp.web.backend.presentation.layer.member;
 
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Gender;
@@ -28,6 +29,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     private Set<Role> roles;
     private Set<MembershipFee> membershipFees;
     private Set<Card> cards;
+    private Set<SpaceDto> spaces;
 
     @Override
     public EntityStatus getEntityStatus() {
@@ -35,7 +37,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setEntityStatus(final EntityStatus entityStatus) {
+    public void setEntityStatus(EntityStatus entityStatus) {
         this.entityStatus = entityStatus;
 
     }
@@ -46,7 +48,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setDogHasHandlerSet(final Set<DogHasHandler> dogHasHandlerSet) {
+    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
         this.dogHasHandlerSet = dogHasHandlerSet;
     }
 
@@ -56,7 +58,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setFirstName(final String firstName) {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
@@ -66,7 +68,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setLastName(final String lastName) {
+    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
@@ -76,7 +78,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setBirthDate(final LocalDate birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -86,7 +88,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setGender(final Gender gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
@@ -96,7 +98,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setTelephoneNumber(final String telephoneNumber) {
+    public void setTelephoneNumber(String telephoneNumber) {
         this.telephoneNumber = telephoneNumber;
     }
 
@@ -106,7 +108,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setEmail(final String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -116,7 +118,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setAddress(final String address) {
+    public void setAddress(String address) {
         this.address = address;
     }
 
@@ -126,7 +128,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setPostcode(final String postcode) {
+    public void setPostcode(String postcode) {
         this.postcode = postcode;
     }
 
@@ -136,7 +138,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setCity(final String city) {
+    public void setCity(String city) {
         this.city = city;
     }
 
@@ -146,7 +148,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setRoles(final Set<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
@@ -156,7 +158,7 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setMembershipFees(final Set<MembershipFee> membershipFees) {
+    public void setMembershipFees(Set<MembershipFee> membershipFees) {
         this.membershipFees = membershipFees;
     }
 
@@ -166,12 +168,22 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public void setCards(final Set<Card> cards) {
+    public void setCards(Set<Card> cards) {
         this.cards = cards;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public Set<SpaceDto> getSpaces() {
+        return spaces;
+    }
+
+    @Override
+    public void setSpaces(Set<SpaceDto> spaces) {
+        this.spaces = spaces;
+    }
+
+    @Override
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

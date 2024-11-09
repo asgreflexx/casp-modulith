@@ -2,6 +2,8 @@ package casp.web.backend.business.logic.layer.member;
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
+import casp.web.backend.business.logic.layer.event.types.CourseService;
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
@@ -49,6 +51,8 @@ class MemberServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
     @Mock
+    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+    @Mock
     private CardRepository cardRepository;
     @Mock
     private MemberOldRepository memberOldRepository;
@@ -58,7 +62,7 @@ class MemberServiceImplTest {
     @Mock
     private BaseEventObserver baseEventObserver;
     @Mock
-    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+    private CourseService courseService;
 
     @Captor
     private ArgumentCaptor<Member> memberCaptor;
@@ -187,11 +191,7 @@ class MemberServiceImplTest {
 
         @Test
         void dogHasHandlerIsCorrectlyMapped() {
-            var dogHasHandlerReference = mock(DogHasHandlerReference.class, Answers.RETURNS_DEEP_STUBS);
-            when(dogHasHandlerReference.getId()).thenReturn(UUID.randomUUID());
-            when(dogHasHandlerReference.getDog().getId()).thenReturn(UUID.randomUUID());
-            when(dogHasHandlerReference.getDog().getName()).thenReturn("Bonsai");
-            when(dogHasHandlerReferenceRepository.findAllByMemberId(member.getId())).thenReturn(Set.of(dogHasHandlerReference));
+            var dogHasHandlerReference = mockDogHasHandler();
 
             var memberDto = memberService.getMemberById(member.getId());
 
@@ -199,6 +199,29 @@ class MemberServiceImplTest {
                     .singleElement()
                     .usingRecursiveAssertion()
                     .isEqualTo(MEMBER_MAPPER.toDogHasHandlerDto(dogHasHandlerReference));
+        }
+
+        @Test
+        void spacesWereAddedToMemberDto() {
+            var dogHasHandlerReference = mockDogHasHandler();
+            var spaceDto = mock(SpaceDto.class);
+            when(courseService.getSpacesByDogHasHandlers(Set.of(dogHasHandlerReference))).thenReturn(Set.of(spaceDto));
+
+            var memberDto = memberService.getMemberById(member.getId());
+
+            assertThat(memberDto.getSpaces())
+                    .singleElement()
+                    .isEqualTo(spaceDto);
+
+        }
+
+        private DogHasHandlerReference mockDogHasHandler() {
+            var dogHasHandlerReference = mock(DogHasHandlerReference.class, Answers.RETURNS_DEEP_STUBS);
+            when(dogHasHandlerReference.getId()).thenReturn(UUID.randomUUID());
+            when(dogHasHandlerReference.getDog().getId()).thenReturn(UUID.randomUUID());
+            when(dogHasHandlerReference.getDog().getName()).thenReturn("Bonsai");
+            when(dogHasHandlerReferenceRepository.findAllByMemberId(member.getId())).thenReturn(Set.of(dogHasHandlerReference));
+            return dogHasHandlerReference;
         }
     }
 
@@ -211,6 +234,7 @@ class MemberServiceImplTest {
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));
 
             verify(memberRepository).setMetadataAndSave(memberCaptor.capture());
+            verify(courseService).getSpacesByDogHasHandlers(Set.of());
             assertThat(memberCaptor.getValue())
                     .usingRecursiveComparison()
                     .isEqualTo(member);
@@ -232,6 +256,7 @@ class MemberServiceImplTest {
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));
 
             verify(memberRepository).setMetadataAndSave(memberCaptor.capture());
+            verify(courseService).getSpacesByDogHasHandlers(Set.of());
             assertThat(memberCaptor.getValue())
                     .usingRecursiveComparison()
                     .isEqualTo(member);
