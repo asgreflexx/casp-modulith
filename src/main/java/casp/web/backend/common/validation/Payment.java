@@ -12,9 +12,4 @@ public interface Payment {
     double getPaidPrice();
 
     LocalDate getPaidDate();
-
-    default boolean isPaid() {
-        return getPaidPrice() > 0 && getPaidDate() != null;
-    }
-
 }
