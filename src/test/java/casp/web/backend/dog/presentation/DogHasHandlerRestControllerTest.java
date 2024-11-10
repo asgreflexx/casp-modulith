@@ -10,7 +10,6 @@ import casp.web.backend.dog.DogHasHandlerDto;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
-import casp.web.backend.dog.data.DogRepository;
 import casp.web.backend.dog.data.Grade;
 import casp.web.backend.dog.data.GradeType;
 import casp.web.backend.presentation.layer.MvcMapper;
@@ -57,8 +56,6 @@ class DogHasHandlerRestControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private DogRepository dogRepository;
-    @Autowired
     private DogHasHandlerOldRepository dogHasHandlerOldRepository;
     @Autowired
     private DogReferenceRepository dogReferenceRepository;
@@ -81,13 +78,13 @@ class DogHasHandlerRestControllerTest {
         dogHasHandlerOldRepository.deleteAll();
         dogHasHandlerRepository.deleteAll();
         memberReferenceRepository.deleteAll();
-        dogRepository.deleteAll();
+        dogReferenceRepository.deleteAll();
 
 
         var member = memberReferenceRepository.save(TestFixture.createMemberReference());
-        var dog = dogRepository.save(TestFixture.createDog());
+        var dog = dogReferenceRepository.save(TestFixture.createDogReference());
         var dogHasHandler = new DogHasHandler();
-        dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandler::setDog);
+        dogHasHandler.setDog(dog);
         dogHasHandler.setMember(member);
         dogHasHandler = dogHasHandlerRepository.save(dogHasHandler);
         dogHasHandlerDto = DOG_HAS_HANDLER_MAPPER.toTarget(dogHasHandler);

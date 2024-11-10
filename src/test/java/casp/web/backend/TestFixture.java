@@ -28,8 +28,12 @@ public enum TestFixture {
     }
 
     public static DogReference createDogReference() {
+        return createDogReference("Riley");
+    }
+
+    public static DogReference createDogReference(String name) {
         var dogReference = new DogReference();
-        dogReference.setName("Riley");
+        dogReference.setName(name);
         return dogReference;
     }
 }
