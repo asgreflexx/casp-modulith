@@ -37,11 +37,7 @@ class DogHasHandlerReferenceCustomRepositoryImplTest {
         memberReferenceRepository.deleteAll();
         dogRepository.deleteAll();
 
-        member = new MemberReference();
-        member.setFirstName("John");
-        member.setLastName("Doe");
-        member.setEmail("%s@mail.com".formatted(member.getId()));
-        member = memberReferenceRepository.save(member);
+        member = memberReferenceRepository.save(TestFixture.createMemberReference());
         dog = dogRepository.save(TestFixture.createDog());
         dogHasHandler = new DogHasHandler();
         dogHasHandler.setDog(DOG_HAS_HANDLER_REFERENCE_MAPPER.toDogReference(dog));

@@ -1,5 +1,6 @@
 package casp.web.backend.presentation.layer.event;
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.types.ExamDto;
 import casp.web.backend.business.logic.layer.event.types.ExamService;
 import casp.web.backend.business.logic.layer.event.types.NewCalendarEntryDto;
@@ -60,11 +61,7 @@ class ExamRestControllerTest {
         examRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
-        member = new MemberReference();
-        member.setFirstName("Joe");
-        member.setLastName("Doe");
-        member.setEmail("%s@mail.com");
-        member = memberReferenceRepository.save(member);
+        member = memberReferenceRepository.save(TestFixture.createMemberReference());
         exam = new Exam();
         exam.setName("exam");
         exam.setJudgeName("Judge");

@@ -4,7 +4,6 @@ import casp.web.backend.TestFixture;
 import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReferenceRepository;
-import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.dog.DogHasHandlerOldRepository;
 import casp.web.backend.dog.DogHasHandlerDto;
@@ -85,11 +84,7 @@ class DogHasHandlerRestControllerTest {
         dogRepository.deleteAll();
 
 
-        var member = new MemberReference();
-        member.setFirstName("John");
-        member.setLastName("Doe");
-        member.setEmail("%s@mail.com".formatted(member.getId()));
-        member = memberReferenceRepository.save(member);
+        var member = memberReferenceRepository.save(TestFixture.createMemberReference());
         var dog = dogRepository.save(TestFixture.createDog());
         var dogHasHandler = new DogHasHandler();
         dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandler::setDog);

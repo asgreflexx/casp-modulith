@@ -1,5 +1,6 @@
 package casp.web.backend;
 
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.member.data.Member;
 
@@ -27,4 +28,15 @@ public enum TestFixture {
         return dog;
     }
 
+    public static MemberReference createMemberReference() {
+        return createMemberReference("John", "Doe");
+    }
+
+    public static MemberReference createMemberReference(String firstName, String lastName) {
+        var member = new MemberReference();
+        member.setFirstName(firstName);
+        member.setLastName(lastName);
+        member.setEmail("%s@mail.com".formatted(member.getId()));
+        return member;
+    }
 }

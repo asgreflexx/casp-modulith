@@ -1,6 +1,7 @@
 package casp.web.backend.business.logic.layer.event.types;
 
 
+import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
@@ -65,8 +66,7 @@ class CourseServiceImplTest {
     private CourseServiceImpl courseService;
 
     private static Space createSpace() {
-        var member = new MemberReference();
-        member.setEmail("mail@mail");
+        var member = TestFixture.createMemberReference();
         var dogHasHandler = new DogHasHandlerReference();
         dogHasHandler.setMember(member);
         dogHasHandler.setDog(new DogReference());
@@ -310,8 +310,7 @@ class CourseServiceImplTest {
     class GetEmailsByCourseId {
         @Test
         void exist() {
-            var member = new MemberReference();
-            member.setEmail("mail@mail");
+            var member = TestFixture.createMemberReference();
             var dogHasHandler = new DogHasHandlerReference();
             dogHasHandler.setMember(member);
             dogHasHandler.setDog(new DogReference());
@@ -418,8 +417,7 @@ class CourseServiceImplTest {
 
         @Test
         void keepSameMember() {
-            var memberReference = new MemberReference();
-            memberReference.setId(UUID.randomUUID());
+            var memberReference = TestFixture.createMemberReference();
             courseDto.setMember(memberReference);
 
             courseService.save(courseDto);
@@ -430,8 +428,7 @@ class CourseServiceImplTest {
 
         @Test
         void updateMember() {
-            var actualMember = new MemberReference();
-            actualMember.setId(UUID.randomUUID());
+            var actualMember = TestFixture.createMemberReference();
             var newMember = mockMember();
             courseDto.setMember(actualMember);
             courseDto.setNewMemberId(newMember.getId());
@@ -469,7 +466,7 @@ class CourseServiceImplTest {
             var dogHasHandlerReference = new DogHasHandlerReference();
             dogHasHandlerReference.setId(UUID.randomUUID());
             dogHasHandlerReference.setDog(new DogReference());
-            dogHasHandlerReference.setMember(new MemberReference());
+            dogHasHandlerReference.setMember(TestFixture.createMemberReference());
             var space = new Space(dogHasHandlerReference);
             courseDto.setNewSpaces(Set.of(space.getId()));
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(space.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
@@ -488,8 +485,7 @@ class CourseServiceImplTest {
         }
 
         private MemberReference mockMember() {
-            var memberReference = new MemberReference();
-            memberReference.setId(UUID.randomUUID());
+            var memberReference = TestFixture.createMemberReference();
             when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
             return memberReference;
         }

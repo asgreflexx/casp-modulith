@@ -97,11 +97,7 @@ class CourseRestControllerTest {
         dogRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
-        member = new MemberReference();
-        member.setFirstName("Joe");
-        member.setLastName("Doe");
-        member.setEmail("%s@mail.com");
-        member = memberReferenceRepository.save(member);
+        member = memberReferenceRepository.save(TestFixture.createMemberReference());
         dog = dogRepository.save(TestFixture.createDog());
         dogHasHandler = new DogHasHandler();
         dogHasHandler.setMember(member);
@@ -111,7 +107,7 @@ class CourseRestControllerTest {
         course.setName("course");
         startDateTime = LocalDateTime.now();
         course.addCalendarEntry(new CalendarEntry(startDateTime, startDateTime.plusHours(1)));
-        memberReferenceRepository.findById(member.getId()).ifPresent(course::setMember);
+        course.setMember(member);
         course = courseRepository.save(course);
     }
 
@@ -197,7 +193,7 @@ class CourseRestControllerTest {
 
         private Space createNonExistingSpace() {
             var dogHasHandlerReference = new DogHasHandlerReference();
-            memberReferenceRepository.findById(member.getId()).ifPresent(dogHasHandlerReference::setMember);
+            dogHasHandlerReference.setMember(member);
             dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandlerReference::setDog);
             return new Space(dogHasHandlerReference);
         }

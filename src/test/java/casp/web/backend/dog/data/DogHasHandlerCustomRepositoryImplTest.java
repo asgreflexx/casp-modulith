@@ -44,7 +44,7 @@ class DogHasHandlerCustomRepositoryImplTest {
         memberRepository.deleteAll();
 
         createDogAndReturnItsId();
-        var member = createMember("John", "Doe");
+        var member = memberRepository.save(TestFixture.createMemberReference());
         memberId = member.getId();
 
         activeDogHasHandler = createDogHasHandler(EntityStatus.ACTIVE, member);
@@ -80,14 +80,6 @@ class DogHasHandlerCustomRepositoryImplTest {
         return dogHasHandlerRepository.save(dogHasHandler);
     }
 
-    private MemberReference createMember(String firstName, String lastName) {
-        var member = new MemberReference();
-        member.setFirstName(firstName);
-        member.setLastName(lastName);
-        member.setEmail("%s@mail.com".formatted(member.getId()));
-        return memberRepository.save(member);
-    }
-
     private void createDogAndReturnItsId() {
         var dog = TestFixture.createDog();
         dog.setName("Bonsai");
@@ -118,7 +110,7 @@ class DogHasHandlerCustomRepositoryImplTest {
 
             activeDogHasHandler2 = new DogHasHandler();
             dogReferenceRepository.findById(dog.getId()).ifPresent(activeDogHasHandler2::setDog);
-            activeDogHasHandler2.setMember(createMember("Maximilian", "Mustermann"));
+            activeDogHasHandler2.setMember(memberRepository.save(TestFixture.createMemberReference("Maximilian", "Mustermann")));
             dogHasHandlerRepository.save(activeDogHasHandler2);
         }
 
