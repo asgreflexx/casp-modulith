@@ -30,7 +30,7 @@ public class NewCalendarEntryDto implements CalendarValidation {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof NewCalendarEntryDto that)) return false;
         return Objects.equals(entryFrom, that.entryFrom) && Objects.equals(entryTo, that.entryTo);

@@ -7,12 +7,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-final class DailyOptionUtility {
+enum DailyOptionUtility {
+    ;
 
-    private DailyOptionUtility() {
-    }
-
-    static List<CalendarEntry> createCalendarEntries(final DailyRecurrenceOption option) {
+    static List<CalendarEntry> createCalendarEntries(DailyRecurrenceOption option) {
         List<CalendarEntry> calendarList = new ArrayList<>();
         var eventFrom =
                 LocalDateTime.of(option.getStartRecurrence(), option.getStartTime());

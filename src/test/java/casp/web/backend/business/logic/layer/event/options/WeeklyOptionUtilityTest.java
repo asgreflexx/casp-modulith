@@ -65,7 +65,7 @@ class WeeklyOptionUtilityTest {
         });
     }
 
-    private WeeklyRecurrenceOption createWeeklyEventOption(final int repeatEvery, final LocalDate endRecurrence, final List<WeeklyOption> occurrences) {
+    private WeeklyRecurrenceOption createWeeklyEventOption(int repeatEvery, LocalDate endRecurrence, List<WeeklyOption> occurrences) {
         var weeklyEventOption = new WeeklyRecurrenceOption();
         weeklyEventOption.setStartRecurrence(START_RECURRENCE);
         weeklyEventOption.setEndRecurrence(endRecurrence);
@@ -75,7 +75,7 @@ class WeeklyOptionUtilityTest {
 
     }
 
-    private WeeklyOption createRecurrence(final DayOfWeek dayOfWeek, final int startHour, final int endHour) {
+    private WeeklyOption createRecurrence(DayOfWeek dayOfWeek, int startHour, int endHour) {
         var weeklyOption = new WeeklyOption();
         weeklyOption.setDayOfWeek(dayOfWeek);
         weeklyOption.setStartTime(LocalTime.of(startHour, 0, 0));
@@ -83,7 +83,7 @@ class WeeklyOptionUtilityTest {
         return weeklyOption;
     }
 
-    private void assertCalendarEntry(final CalendarEntry calendarEntry) {
+    private void assertCalendarEntry(CalendarEntry calendarEntry) {
         assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryFrom(), calendarEntry.getEntryFrom());
         assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryTo(), calendarEntry.getEntryTo());
     }

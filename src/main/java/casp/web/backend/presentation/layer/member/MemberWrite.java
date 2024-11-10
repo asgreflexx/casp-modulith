@@ -30,7 +30,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setFirstName(final String firstName) {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
@@ -40,7 +40,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setLastName(final String lastName) {
+    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
@@ -50,7 +50,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setBirthDate(final LocalDate birthDate) {
+    public void setBirthDate(LocalDate birthDate) {
         this.birthDate = birthDate;
     }
 
@@ -60,7 +60,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setGender(final Gender gender) {
+    public void setGender(Gender gender) {
         this.gender = gender;
     }
 
@@ -70,7 +70,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setTelephoneNumber(final String telephoneNumber) {
+    public void setTelephoneNumber(String telephoneNumber) {
         this.telephoneNumber = telephoneNumber;
     }
 
@@ -80,7 +80,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setEmail(final String email) {
+    public void setEmail(String email) {
         this.email = email;
     }
 
@@ -90,7 +90,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setAddress(final String address) {
+    public void setAddress(String address) {
         this.address = address;
     }
 
@@ -100,7 +100,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setPostcode(final String postcode) {
+    public void setPostcode(String postcode) {
         this.postcode = postcode;
     }
 
@@ -110,7 +110,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setCity(final String city) {
+    public void setCity(String city) {
         this.city = city;
     }
 
@@ -120,7 +120,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setRoles(final Set<Role> roles) {
+    public void setRoles(Set<Role> roles) {
         this.roles = roles;
     }
 
@@ -130,7 +130,7 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setMembershipFees(final Set<MembershipFee> membershipFees) {
+    public void setMembershipFees(Set<MembershipFee> membershipFees) {
         this.membershipFees = membershipFees;
     }
 
@@ -140,12 +140,12 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     }
 
     @Override
-    public void setCards(final Set<Card> cards) {
+    public void setCards(Set<Card> cards) {
         this.cards = cards;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

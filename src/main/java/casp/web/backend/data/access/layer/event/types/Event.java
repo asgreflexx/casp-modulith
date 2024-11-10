@@ -34,7 +34,7 @@ public class Event extends BaseEvent implements EventRequiredFields {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.UUID;
 
 public interface MemberCustomRepository {
-    Page<Member> findAllByFirstNameAndLastName(@Nullable String firstName, @Nullable String lastName, final Pageable pageable);
+    Page<Member> findAllByFirstNameAndLastName(@Nullable String firstName, @Nullable String lastName, Pageable pageable);
 
     Page<Member> findAllByValue(@Nullable String value, Pageable pageable);
 

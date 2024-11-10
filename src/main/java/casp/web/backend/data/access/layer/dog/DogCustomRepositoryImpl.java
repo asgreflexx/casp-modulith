@@ -16,13 +16,13 @@ class DogCustomRepositoryImpl implements DogCustomRepository {
     private final MongoOperations mongoOperations;
 
     @Autowired
-    DogCustomRepositoryImpl(final MongoOperations mongoOperations) {
+    DogCustomRepositoryImpl(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
         dog = QDog.dog;
     }
 
     @Override
-    public Page<Dog> findAllByNameOrOwnerName(final String dogName, final String ownerName, final Pageable pageable) {
+    public Page<Dog> findAllByNameOrOwnerName(String dogName, String ownerName, Pageable pageable) {
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE);
         if (StringUtils.isNotBlank(dogName)) {
             expression = expression.and(dog.name.equalsIgnoreCase(dogName));
@@ -35,7 +35,7 @@ class DogCustomRepositoryImpl implements DogCustomRepository {
     }
 
     @Override
-    public Page<Dog> findAllByEuropeNetStateNotChecked(final Pageable pageable) {
+    public Page<Dog> findAllByEuropeNetStateNotChecked(Pageable pageable) {
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE)
                 .and(dog.chipNumber.isNotNull().and(dog.chipNumber.isNotEmpty()))
                 .and(dog.europeNetState.notIn(EuropeNetState.DOG_NOT_REGISTERED, EuropeNetState.DOG_IS_REGISTERED));

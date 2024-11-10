@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 class ExamCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Exam> implements ExamCustomRepository {
 
     @Autowired
-    ExamCustomRepositoryImpl(final MongoOperations mongoOperations) {
+    ExamCustomRepositoryImpl(MongoOperations mongoOperations) {
         super(mongoOperations);
     }
 }

@@ -73,7 +73,7 @@ class DogHasHandlerCustomRepositoryImplTest {
         assertThat(dogHasHandlers).containsExactly(activeDogHasHandler);
     }
 
-    private DogHasHandler createDogHasHandler(final EntityStatus entityStatus) {
+    private DogHasHandler createDogHasHandler(EntityStatus entityStatus) {
         var dogHasHandler = new DogHasHandler();
         dogHasHandler.setEntityStatus(entityStatus);
         dogReferenceRepository.findById(dogId).ifPresent(dogHasHandler::setDog);
@@ -130,7 +130,7 @@ class DogHasHandlerCustomRepositoryImplTest {
         @ParameterizedTest
         @NullAndEmptySource
         @ValueSource(strings = {" "})
-        void nameIsEmptyOrNull(final String name) {
+        void nameIsEmptyOrNull(String name) {
             var dogHasHandlerPage = dogHasHandlerRepository.findAllByName(name, Pageable.unpaged());
 
             assertThat(dogHasHandlerPage).containsExactlyInAnyOrder(activeDogHasHandler, activeDogHasHandler2);
@@ -138,7 +138,7 @@ class DogHasHandlerCustomRepositoryImplTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"Rob", "Max", "Must"})
-        void findByShortDogName(final String name) {
+        void findByShortDogName(String name) {
             var dogHasHandlerPage = dogHasHandlerRepository.findAllByName(name, Pageable.unpaged());
 
             assertThat(dogHasHandlerPage).containsExactly(activeDogHasHandler2);

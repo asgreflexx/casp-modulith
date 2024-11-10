@@ -37,7 +37,7 @@ class MemberCustomRepositoryImplTest {
         createMember("deleted", "deleted", EntityStatus.DELETED, null);
     }
 
-    private Member createMember(final String firstName, final String lastName, final EntityStatus entityStatus, @Nullable final Role role) {
+    private Member createMember(String firstName, String lastName, EntityStatus entityStatus, @Nullable Role role) {
         var member = new Member();
         member.setFirstName(firstName);
         member.setLastName(lastName);

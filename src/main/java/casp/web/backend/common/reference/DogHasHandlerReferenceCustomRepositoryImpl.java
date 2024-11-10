@@ -18,18 +18,18 @@ class DogHasHandlerReferenceCustomRepositoryImpl implements DogHasHandlerReferen
     private final MongoOperations mongoOperations;
 
     @Autowired
-    DogHasHandlerReferenceCustomRepositoryImpl(final MongoOperations mongoOperations) {
+    DogHasHandlerReferenceCustomRepositoryImpl(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
     }
 
     @Override
-    public Set<DogHasHandlerReference> findAllByMemberId(final UUID memberId) {
+    public Set<DogHasHandlerReference> findAllByMemberId(UUID memberId) {
         var memberCriteria = DOG_HAS_HANDLER_REFERENCE.member.id.eq(memberId);
         return findAllByCriteria(memberCriteria);
     }
 
     @Override
-    public Set<DogHasHandlerReference> findAllByDogId(final UUID dogId) {
+    public Set<DogHasHandlerReference> findAllByDogId(UUID dogId) {
         var dogCriteria = DOG_HAS_HANDLER_REFERENCE.dog.id.eq(dogId);
         return findAllByCriteria(dogCriteria);
     }
@@ -38,7 +38,7 @@ class DogHasHandlerReferenceCustomRepositoryImpl implements DogHasHandlerReferen
         return new SpringDataMongodbQuery<>(mongoOperations, DogHasHandlerReference.class);
     }
 
-    private Set<DogHasHandlerReference> findAllByCriteria(final BooleanExpression criteria) {
+    private Set<DogHasHandlerReference> findAllByCriteria(BooleanExpression criteria) {
         return query()
                 .where(criteria.and(DOG_HAS_HANDLER_IS_ACTIVE))
                 .stream()

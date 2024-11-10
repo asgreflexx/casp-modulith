@@ -16,7 +16,7 @@ class CaspTestProperties {
     private final MemberRepository memberRepository;
 
     @Autowired
-    CaspTestProperties(final MemberRepository memberRepository) {
+    CaspTestProperties(MemberRepository memberRepository) {
         this.memberRepository = memberRepository;
     }
 
@@ -24,10 +24,10 @@ class CaspTestProperties {
         members.forEach(this::createTestMemberIfDoesNotExist);
     }
 
-    private void createTestMemberIfDoesNotExist(final MemberProperty m) {
+    private void createTestMemberIfDoesNotExist(MemberProperty m) {
         var doesMemberExist = memberRepository.findOneByEmail(m.email()).isPresent();
         if (!doesMemberExist) {
-            final var member = new Member();
+            var member = new Member();
             member.setEmail(m.email());
             member.setFirstName(m.firstName());
             member.setLastName(m.lastName());

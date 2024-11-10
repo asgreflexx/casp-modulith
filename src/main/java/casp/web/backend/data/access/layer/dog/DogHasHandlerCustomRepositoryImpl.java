@@ -27,30 +27,30 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
     private final MongoOperations mongoOperations;
 
     @Autowired
-    DogHasHandlerCustomRepositoryImpl(final MongoOperations mongoOperations) {
+    DogHasHandlerCustomRepositoryImpl(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
     }
 
     @Override
-    public Set<DogHasHandler> findAllByDogIdAndNotDeleted(final UUID dogId) {
+    public Set<DogHasHandler> findAllByDogIdAndNotDeleted(UUID dogId) {
         var expression = DOG_HAS_HANDLER.dog.id.eq(dogId).and(DOG_HAS_HANDLER.entityStatus.ne(EntityStatus.DELETED));
         return executeQuery(expression);
     }
 
     @Override
-    public Set<DogHasHandler> findAllByMemberIdAndNotDeleted(final UUID memberId) {
+    public Set<DogHasHandler> findAllByMemberIdAndNotDeleted(UUID memberId) {
         var expression = DOG_HAS_HANDLER.member.id.eq(memberId).and(DOG_HAS_HANDLER.entityStatus.ne(EntityStatus.DELETED));
         return executeQuery(expression);
     }
 
     @Override
-    public Set<DogHasHandler> findAllByMemberIdAndEntityStatus(final UUID memberId, final EntityStatus entityStatus) {
+    public Set<DogHasHandler> findAllByMemberIdAndEntityStatus(UUID memberId, EntityStatus entityStatus) {
         var expression = DOG_HAS_HANDLER.member.id.eq(memberId).and(DOG_HAS_HANDLER.entityStatus.eq(entityStatus));
         return executeQuery(expression);
     }
 
     @Override
-    public Page<DogHasHandler> findAllByName(@Nullable final String name, final Pageable pageable) {
+    public Page<DogHasHandler> findAllByName(@Nullable String name, Pageable pageable) {
         var expression = DOG_HAS_HANDLER.entityStatus.eq(EntityStatus.ACTIVE);
         if (StringUtils.isNotBlank(name)) {
             expression = expression.and(DOG_HAS_HANDLER.dog.id.in(findAllByDogName(name, pageable))
@@ -62,7 +62,7 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
     }
 
     @Override
-    public Optional<DogHasHandler> findByDogIdAndMemberId(final UUID dogId, final UUID memberId) {
+    public Optional<DogHasHandler> findByDogIdAndMemberId(UUID dogId, UUID memberId) {
         var expression = DOG_HAS_HANDLER.entityStatus.eq(EntityStatus.ACTIVE)
                 .and(DOG_HAS_HANDLER.dog.id.eq(dogId))
                 .and(DOG_HAS_HANDLER.member.id.eq(memberId));
@@ -72,7 +72,7 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
                 .findAny();
     }
 
-    private Set<UUID> findAllByDogName(final String name, final Pageable pageable) {
+    private Set<UUID> findAllByDogName(String name, Pageable pageable) {
         var query = new SpringDataMongodbQuery<>(mongoOperations, DogReference.class);
         var dog = QDogReference.dogReference;
         var expression = dog.name.containsIgnoreCase(name).and(dog.entityStatus.eq(EntityStatus.ACTIVE));
@@ -84,7 +84,7 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
                 .collect(Collectors.toSet());
     }
 
-    private Set<UUID> findAllByMemberName(final String name, final Pageable pageable) {
+    private Set<UUID> findAllByMemberName(String name, Pageable pageable) {
         var query = new SpringDataMongodbQuery<>(mongoOperations, MemberReference.class);
         var member = QMemberReference.memberReference;
         var expression = member.entityStatus.eq(EntityStatus.ACTIVE)
@@ -98,7 +98,7 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
                 .collect(Collectors.toSet());
     }
 
-    private Set<DogHasHandler> executeQuery(final BooleanExpression expression) {
+    private Set<DogHasHandler> executeQuery(BooleanExpression expression) {
         return query()
                 .where(expression)
                 .stream()

@@ -50,7 +50,7 @@ class DailyOptionUtilityTest {
                 .allSatisfy(calendarEntry -> assertCalendarEntry(calendarEntry, repeatEvery));
     }
 
-    private DailyRecurrenceOption createDailyOption(final int repeatEvery) {
+    private DailyRecurrenceOption createDailyOption(int repeatEvery) {
         var daily = new DailyRecurrenceOption();
         daily.setStartRecurrence(START_RECURRENCE);
         daily.setEndRecurrence(END_RECURRENCE);
@@ -60,7 +60,7 @@ class DailyOptionUtilityTest {
         return daily;
     }
 
-    private void assertCalendarEntry(final CalendarEntry calendarEntry, final int repeat) {
+    private void assertCalendarEntry(CalendarEntry calendarEntry, int repeat) {
         assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryFrom(), calendarEntry.getEntryFrom());
         assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryTo(), calendarEntry.getEntryTo());
 

@@ -22,7 +22,7 @@ public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidat
     public CalendarEntry() {
     }
 
-    public CalendarEntry(final LocalDateTime entryFrom, final LocalDateTime entryTo) {
+    public CalendarEntry(LocalDateTime entryFrom, LocalDateTime entryTo) {
         this.entryFrom = entryFrom;
         this.entryTo = entryTo;
     }
@@ -61,7 +61,7 @@ public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidat
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof CalendarEntry calendar)) return false;
         return Objects.equals(id, calendar.id);

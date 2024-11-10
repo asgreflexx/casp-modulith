@@ -10,7 +10,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 
-public final class MvcMapper {
+public enum MvcMapper {
+    ;
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     static {
@@ -18,9 +19,6 @@ public final class MvcMapper {
         MAPPER.setDateFormat(sf);
         MAPPER.registerModule(new JavaTimeModule());
         MAPPER.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    }
-
-    private MvcMapper() {
     }
 
     public static <T> T toObject(MvcResult mvcResult, Class<T> clazz) throws JsonProcessingException, UnsupportedEncodingException {
@@ -33,7 +31,7 @@ public final class MvcMapper {
         return MAPPER.readValue(value, typeReference);
     }
 
-    public static String toString(final Object object) throws JsonProcessingException {
+    public static String toString(Object object) throws JsonProcessingException {
         return MAPPER.writeValueAsString(object);
     }
 }

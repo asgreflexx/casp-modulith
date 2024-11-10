@@ -24,7 +24,7 @@ public abstract class BaseDto {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BaseDto baseDto)) return false;
         return Objects.equals(id, baseDto.id);

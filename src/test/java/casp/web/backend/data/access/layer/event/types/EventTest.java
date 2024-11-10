@@ -19,7 +19,7 @@ class EventTest {
 
     private Event event;
 
-    private static EventParticipant mockParticipant(final EntityStatus entityStatus) {
+    private static EventParticipant mockParticipant(EntityStatus entityStatus) {
         var participant = mock(EventParticipant.class, Answers.RETURNS_DEEP_STUBS);
         when(participant.getMember().getEntityStatus()).thenReturn(entityStatus);
         return participant;

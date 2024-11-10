@@ -52,7 +52,7 @@ public class Card extends BaseDocument {
         return member;
     }
 
-    public void setMember(final Member member) {
+    public void setMember(Member member) {
         this.member = member;
     }
 
@@ -65,7 +65,7 @@ public class Card extends BaseDocument {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

@@ -34,7 +34,7 @@ class DogCustomRepositoryImplTest {
 
     }
 
-    private Dog createDog(final String name, final EntityStatus entityStatus, final EuropeNetState europeNetState, final String chipNumber) {
+    private Dog createDog(String name, EntityStatus entityStatus, EuropeNetState europeNetState, String chipNumber) {
         var dog = new Dog();
         dog.setEntityStatus(entityStatus);
         dog.setEuropeNetState(europeNetState);

@@ -19,7 +19,7 @@ public class DogHasHandlerWrite extends BaseView implements DogHasHandlerDtoRequ
     }
 
     @Override
-    public void setGrades(final Set<Grade> grades) {
+    public void setGrades(Set<Grade> grades) {
         this.grades = grades;
     }
 
@@ -29,7 +29,7 @@ public class DogHasHandlerWrite extends BaseView implements DogHasHandlerDtoRequ
     }
 
     @Override
-    public void setMemberId(final UUID memberId) {
+    public void setMemberId(UUID memberId) {
         this.memberId = memberId;
     }
 
@@ -39,12 +39,12 @@ public class DogHasHandlerWrite extends BaseView implements DogHasHandlerDtoRequ
     }
 
     @Override
-    public void setDogId(final UUID dogId) {
+    public void setDogId(UUID dogId) {
         this.dogId = dogId;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogHasHandlerWrite that)) return false;
         if (!super.equals(o)) return false;

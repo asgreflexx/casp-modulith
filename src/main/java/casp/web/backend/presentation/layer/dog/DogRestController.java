@@ -33,51 +33,51 @@ class DogRestController {
     private final EuropeNetTasks europeNetTasks;
 
     @Autowired
-    DogRestController(final DogService dogService, final EuropeNetTasks europeNetTasks) {
+    DogRestController(DogService dogService, EuropeNetTasks europeNetTasks) {
         this.dogService = dogService;
         this.europeNetTasks = europeNetTasks;
     }
 
     @GetMapping("{id}")
-    ResponseEntity<DogRead> getDogById(final @PathVariable UUID id) {
+    ResponseEntity<DogRead> getDogById(@PathVariable UUID id) {
         var dogDto = dogService.getDogById(id);
         return ResponseEntity.ok(READ_MAPPER.toTarget(dogDto));
     }
 
     @GetMapping
-    ResponseEntity<Page<DogRead>> getDogs(final @ParameterObject Pageable pageable) {
+    ResponseEntity<Page<DogRead>> getDogs(@ParameterObject Pageable pageable) {
         var dogDtoPage = dogService.getDogs(pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogDtoPage));
     }
 
     @PostMapping
-    ResponseEntity<DogRead> saveDog(final @RequestBody @Valid DogWrite dogWrite) {
+    ResponseEntity<DogRead> saveDog(@RequestBody @Valid DogWrite dogWrite) {
         var dogDto = dogService.saveDog(WRITE_MAPPER.toSource(dogWrite));
         return ResponseEntity.ok(READ_MAPPER.toTarget(dogDto));
     }
 
     @DeleteMapping("{id}")
-    ResponseEntity<Void> deleteDogById(final @PathVariable UUID id) {
+    ResponseEntity<Void> deleteDogById(@PathVariable UUID id) {
         dogService.deleteDogById(id);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("register")
-    ResponseEntity<Page<DogRead>> register(final @ParameterObject @Nullable Pageable pageable) {
+    ResponseEntity<Page<DogRead>> register(@ParameterObject @Nullable Pageable pageable) {
         var dogDtoPage = europeNetTasks.registerDogsManually(pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogDtoPage));
     }
 
     @GetMapping("by-chip-number/{chipNumber}")
-    ResponseEntity<DogRead> getDogByChipNumber(final @PathVariable String chipNumber) {
+    ResponseEntity<DogRead> getDogByChipNumber(@PathVariable String chipNumber) {
         return ResponseEntity.of(dogService.getDogByChipNumber(chipNumber)
                 .map(READ_MAPPER::toTarget));
     }
 
     @GetMapping("by-dog-name-or-owner-name")
-    ResponseEntity<Page<DogRead>> getDogsByNameOrOwnerName(final @RequestParam(required = false) String name,
-                                                           final @RequestParam(required = false) String ownerName,
-                                                           final @ParameterObject Pageable pageable) {
+    ResponseEntity<Page<DogRead>> getDogsByNameOrOwnerName(@RequestParam(required = false) String name,
+                                                           @RequestParam(required = false) String ownerName,
+                                                           @ParameterObject Pageable pageable) {
         var dogDtoPage = dogService.getDogsByNameOrOwnerName(name, ownerName, pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogDtoPage));
     }

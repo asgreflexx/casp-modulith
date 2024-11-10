@@ -71,7 +71,7 @@ public class WeeklyOption implements Comparable<WeeklyOption>, EventOptionTimes 
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof WeeklyOption that)) return false;
         return dayOfWeek == that.dayOfWeek && Objects.equals(startTime, that.startTime) && Objects.equals(endTime, that.endTime);

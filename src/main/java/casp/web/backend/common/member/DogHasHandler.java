@@ -38,7 +38,7 @@ public class DogHasHandler {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogHasHandler that)) return false;
         return Objects.equals(id, that.id);

@@ -52,7 +52,7 @@ public class BaseEvent extends BaseDocument {
     // These fields aren't set by the user
     protected LocalDateTime minLocalDateTime;
     protected LocalDateTime maxLocalDateTime;
-    protected int participantsSize = 0;
+    protected int participantsSize;
 
     // needed for deserialization
     public BaseEvent() {
@@ -83,14 +83,14 @@ public class BaseEvent extends BaseDocument {
     }
 
     public void setMemberId(UUID member) {
-        this.memberId = member;
+        memberId = member;
     }
 
     public Member getMember() {
         return member;
     }
 
-    public void setMember(final Member member) {
+    public void setMember(Member member) {
         this.member = member;
     }
 
@@ -99,7 +99,7 @@ public class BaseEvent extends BaseDocument {
     }
 
     public void setDailyOption(DailyEventOption option) {
-        this.dailyOption = option;
+        dailyOption = option;
     }
 
     public WeeklyEventOption getWeeklyOption() {
@@ -143,7 +143,7 @@ public class BaseEvent extends BaseDocument {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

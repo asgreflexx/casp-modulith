@@ -44,11 +44,11 @@ class BaseEventMigrationService {
     private final MemberReferenceRepository memberReferenceRepository;
     private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
-    BaseEventMigrationService(final BaseEventRepository baseEventRepository,
-                              final BaseParticipantRepository baseParticipantRepository,
-                              final CalendarRepository calendarRepository,
-                              final MemberReferenceRepository memberReferenceRepository,
-                              final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+    BaseEventMigrationService(BaseEventRepository baseEventRepository,
+                              BaseParticipantRepository baseParticipantRepository,
+                              CalendarRepository calendarRepository,
+                              MemberReferenceRepository memberReferenceRepository,
+                              DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         this.baseEventRepository = baseEventRepository;
         this.baseParticipantRepository = baseParticipantRepository;
         this.calendarRepository = calendarRepository;
@@ -56,7 +56,7 @@ class BaseEventMigrationService {
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
-    static Optional<RecurrenceOption> mapToBaseEventOptionV2(final BaseEvent baseEvent) {
+    static Optional<RecurrenceOption> mapToBaseEventOptionV2(BaseEvent baseEvent) {
         if (null != baseEvent.getDailyOption()) {
             return Optional.of(BASE_EVENT_OPTION_V2_MAPPER.toDailyEventOption(baseEvent.getDailyOption()));
         } else if (null != baseEvent.getWeeklyOption()) {
@@ -90,7 +90,7 @@ class BaseEventMigrationService {
                 ).collect(Collectors.toSet());
     }
 
-    private Course mapCourseV1ToCourseV2(final BaseEvent cv1, final MemberReference m) {
+    private Course mapCourseV1ToCourseV2(BaseEvent cv1, MemberReference m) {
         var courseV2 = BASE_EVENT_V2_MAPPER.toCourse((casp.web.backend.deprecated.event.types.Course) cv1);
         courseV2.setMember(m);
         var calendarEntries = mapCalendarEntries(cv1.getId());
@@ -102,7 +102,7 @@ class BaseEventMigrationService {
         return courseV2;
     }
 
-    private Event mapEventV1ToEventV2(final BaseEvent ev1, final MemberReference m) {
+    private Event mapEventV1ToEventV2(BaseEvent ev1, MemberReference m) {
         var eventV2 = BASE_EVENT_V2_MAPPER.toEvent((casp.web.backend.deprecated.event.types.Event) ev1);
         eventV2.setMember(m);
         var calendarEntries = mapCalendarEntries(ev1.getId());
@@ -113,7 +113,7 @@ class BaseEventMigrationService {
         return eventV2;
     }
 
-    private Exam mapExamV1ToExamV2(final BaseEvent ev1, final MemberReference m) {
+    private Exam mapExamV1ToExamV2(BaseEvent ev1, MemberReference m) {
         var examV2 = BASE_EVENT_V2_MAPPER.toExam((casp.web.backend.deprecated.event.types.Exam) ev1);
         examV2.setMember(m);
         var calendarEntries = mapCalendarEntries(ev1.getId());
@@ -124,7 +124,7 @@ class BaseEventMigrationService {
         return examV2;
     }
 
-    private Set<casp.web.backend.data.access.layer.event.participants.Space> mapToSpaceV2(final UUID id) {
+    private Set<casp.web.backend.data.access.layer.event.participants.Space> mapToSpaceV2(UUID id) {
         return baseParticipantRepository.findAllByBaseEventIdAndParticipantType(id, Space.PARTICIPANT_TYPE)
                 .stream()
                 .flatMap(sv1 ->
@@ -138,7 +138,7 @@ class BaseEventMigrationService {
                 .collect(Collectors.toSet());
     }
 
-    private Set<casp.web.backend.data.access.layer.event.participants.CoTrainer> mapToCoTrainerV2(final UUID id) {
+    private Set<casp.web.backend.data.access.layer.event.participants.CoTrainer> mapToCoTrainerV2(UUID id) {
         return baseParticipantRepository.findAllByBaseEventIdAndParticipantType(id, CoTrainer.PARTICIPANT_TYPE)
                 .stream()
                 .flatMap(ctv1 ->
@@ -152,7 +152,7 @@ class BaseEventMigrationService {
                 .collect(Collectors.toSet());
     }
 
-    private Set<ExamParticipant> mapToExamParticipantV2(final UUID id) {
+    private Set<ExamParticipant> mapToExamParticipantV2(UUID id) {
         return baseParticipantRepository.findAllByBaseEventIdAndParticipantType(id, casp.web.backend.deprecated.event.participants.ExamParticipant.PARTICIPANT_TYPE)
                 .stream()
                 .flatMap(pv1 ->
@@ -166,7 +166,7 @@ class BaseEventMigrationService {
                 .collect(Collectors.toSet());
     }
 
-    private Set<EventParticipant> mapToEventParticipantV2(final UUID id) {
+    private Set<EventParticipant> mapToEventParticipantV2(UUID id) {
         return baseParticipantRepository.findAllByBaseEventIdAndParticipantType(id, casp.web.backend.deprecated.event.participants.EventParticipant.PARTICIPANT_TYPE)
                 .stream()
                 .flatMap(epv1 ->
@@ -180,7 +180,7 @@ class BaseEventMigrationService {
                 .collect(Collectors.toSet());
     }
 
-    private CalendarEntries mapCalendarEntries(final UUID id) {
+    private CalendarEntries mapCalendarEntries(UUID id) {
         var calendarList = calendarRepository.findAllByBaseEventId(id, SORT);
         var calendarEntryList = CALENDAR_V2_MAPPER.toCalendarEntryList(calendarList);
         return new CalendarEntries(calendarList.getFirst().getLocation(), calendarEntryList);

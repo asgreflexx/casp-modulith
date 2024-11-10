@@ -39,7 +39,7 @@ public class Calendar extends BaseDocument implements Comparable<Calendar> {
         this.eventTo = eventTo;
         this.location = location;
         this.baseEvent = baseEvent;
-        this.entityStatus = baseEvent.getEntityStatus();
+        entityStatus = baseEvent.getEntityStatus();
     }
 
     public Calendar(Calendar calendar, BaseEvent baseEvent) {
@@ -84,7 +84,7 @@ public class Calendar extends BaseDocument implements Comparable<Calendar> {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

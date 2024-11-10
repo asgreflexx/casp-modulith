@@ -26,7 +26,7 @@ public class ExamParticipant extends BaseParticipant {
         super(PARTICIPANT_TYPE);
     }
 
-    public ExamParticipant(final Exam exam, final DogHasHandler dogHasHandler) {
+    public ExamParticipant(Exam exam, DogHasHandler dogHasHandler) {
         super(PARTICIPANT_TYPE, dogHasHandler.getId(), exam);
         this.dogHasHandler = dogHasHandler;
     }
@@ -35,7 +35,7 @@ public class ExamParticipant extends BaseParticipant {
         return dogHasHandler;
     }
 
-    public void setDogHasHandler(final DogHasHandler dogHasHandler) {
+    public void setDogHasHandler(DogHasHandler dogHasHandler) {
         this.dogHasHandler = dogHasHandler;
     }
 }

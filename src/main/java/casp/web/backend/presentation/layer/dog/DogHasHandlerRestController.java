@@ -33,50 +33,50 @@ class DogHasHandlerRestController {
     private final DogHasHandlerService dogHasHandlerService;
 
     @Autowired
-    DogHasHandlerRestController(final DogHasHandlerService dogHasHandlerService) {
+    DogHasHandlerRestController(DogHasHandlerService dogHasHandlerService) {
         this.dogHasHandlerService = dogHasHandlerService;
     }
 
     @GetMapping("{id}")
-    ResponseEntity<DogHasHandlerRead> getDogHasHandlerById(final @PathVariable UUID id) {
+    ResponseEntity<DogHasHandlerRead> getDogHasHandlerById(@PathVariable UUID id) {
         var dogHasHandlerDto = dogHasHandlerService.getDogHasHandlerById(id);
         return ResponseEntity.ok(READ_MAPPER.toTarget(dogHasHandlerDto));
     }
 
 
     @PostMapping
-    ResponseEntity<DogHasHandlerRead> saveDogHasHandler(final @RequestBody @Valid DogHasHandlerWrite dogHasHandlerWrite) {
+    ResponseEntity<DogHasHandlerRead> saveDogHasHandler(@RequestBody @Valid DogHasHandlerWrite dogHasHandlerWrite) {
         var dogHasHandlerDto = WRITE_MAPPER.toSource(dogHasHandlerWrite);
         dogHasHandlerDto = dogHasHandlerService.saveDogHasHandler(dogHasHandlerDto);
         return ResponseEntity.ok(READ_MAPPER.toTarget(dogHasHandlerDto));
     }
 
     @DeleteMapping("{id}")
-    ResponseEntity<Void> deleteDogHasHandlerById(final @PathVariable UUID id) {
+    ResponseEntity<Void> deleteDogHasHandlerById(@PathVariable UUID id) {
         dogHasHandlerService.deleteDogHasHandlerById(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("search-by-name")
-    ResponseEntity<Page<DogHasHandlerRead>> searchByName(final @RequestParam(required = false, defaultValue = "") String name, final @ParameterObject Pageable pageable) {
+    ResponseEntity<Page<DogHasHandlerRead>> searchByName(@RequestParam(required = false, defaultValue = "") String name, @ParameterObject Pageable pageable) {
         var dogHasHandlerDtoPage = dogHasHandlerService.searchByName(name, pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogHasHandlerDtoPage));
     }
 
     @GetMapping
-    ResponseEntity<Page<DogHasHandlerRead>> getAllDogHasHandlers(final @ParameterObject Pageable pageable) {
+    ResponseEntity<Page<DogHasHandlerRead>> getAllDogHasHandlers(@ParameterObject Pageable pageable) {
         var dogHasHandlerDtoPage = dogHasHandlerService.getAllDogHasHandlers(pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogHasHandlerDtoPage));
     }
 
     @GetMapping("by-ids")
-    ResponseEntity<Set<DogHasHandlerRead>> getDogHasHandlersByHandlerIds(final @RequestParam @Size(min = 1) Set<UUID> ids) {
+    ResponseEntity<Set<DogHasHandlerRead>> getDogHasHandlersByHandlerIds(@RequestParam @Size(min = 1) Set<UUID> ids) {
         var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlersByIds(ids);
         return ResponseEntity.ok(READ_MAPPER.toTargetSet(dogHasHandlerDtoSet));
     }
 
     @GetMapping("emails-by-ids")
-    ResponseEntity<Set<String>> getMembersEmailByIds(final @RequestParam @Size(min = 1) Set<UUID> ids) {
+    ResponseEntity<Set<String>> getMembersEmailByIds(@RequestParam @Size(min = 1) Set<UUID> ids) {
         return ResponseEntity.ok(dogHasHandlerService.getEmailsByDogHasHandlersIds(ids));
     }
 

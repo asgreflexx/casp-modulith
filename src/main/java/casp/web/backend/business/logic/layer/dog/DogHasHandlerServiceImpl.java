@@ -36,24 +36,24 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     private final DogHasHandlerRepository dogHasHandlerRepository;
 
     @Autowired
-    DogHasHandlerServiceImpl(final DogHasHandlerOldRepository dogHasHandlerOldRepository,
-                             final MemberReferenceRepository memberReferenceRepository,
-                             final DogReferenceRepository dogReferenceRepository,
-                             final DogHasHandlerRepository dogHasHandlerRepository) {
+    DogHasHandlerServiceImpl(DogHasHandlerOldRepository dogHasHandlerOldRepository,
+                             MemberReferenceRepository memberReferenceRepository,
+                             DogReferenceRepository dogReferenceRepository,
+                             DogHasHandlerRepository dogHasHandlerRepository) {
         this.dogHasHandlerOldRepository = dogHasHandlerOldRepository;
         this.memberReferenceRepository = memberReferenceRepository;
         this.dogReferenceRepository = dogReferenceRepository;
         this.dogHasHandlerRepository = dogHasHandlerRepository;
     }
 
-    private static NoSuchElementException throwNoSuchElementException(final String clazzName, final UUID id) {
+    private static NoSuchElementException throwNoSuchElementException(String clazzName, UUID id) {
         var msg = "%s with id %s not found or it isn't active".formatted(clazzName, id);
         LOG.error(msg);
         return new NoSuchElementException(msg);
     }
 
     @Override
-    public DogHasHandlerDto saveDogHasHandler(final DogHasHandlerDto dogHasHandlerDto) {
+    public DogHasHandlerDto saveDogHasHandler(DogHasHandlerDto dogHasHandlerDto) {
         var dog = dogReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerDto.getDogId(), EntityStatus.ACTIVE).
                 orElseThrow(() -> throwNoSuchElementException(Dog.class.getSimpleName(), dogHasHandlerDto.getDogId()));
         var member = memberReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerDto.getMemberId(), EntityStatus.ACTIVE).
@@ -77,26 +77,26 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     }
 
     @Override
-    public DogHasHandlerDto getDogHasHandlerById(final UUID id) {
+    public DogHasHandlerDto getDogHasHandlerById(UUID id) {
         var dogHasHandler = dogHasHandlerRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> throwNoSuchElementException(DogHasHandler.class.getSimpleName(), id));
         return DOG_HAS_HANDLER_MAPPER.toTarget(dogHasHandler);
     }
 
     @Override
-    public void deleteDogHasHandlersByMemberId(final UUID memberId) {
+    public void deleteDogHasHandlersByMemberId(UUID memberId) {
         dogHasHandlerRepository.findAllByMemberIdAndNotDeleted(memberId)
                 .forEach(dhh -> saveItWithNewStatus(dhh, EntityStatus.DELETED));
     }
 
     @Override
-    public void deleteDogHasHandlersByDogId(final UUID dogId) {
+    public void deleteDogHasHandlersByDogId(UUID dogId) {
         dogHasHandlerRepository.findAllByDogIdAndNotDeleted(dogId)
                 .forEach(dhh -> saveItWithNewStatus(dhh, EntityStatus.DELETED));
     }
 
     @Override
-    public void deleteDogHasHandlerById(final UUID id) {
+    public void deleteDogHasHandlerById(UUID id) {
         var dogHasHandler = dogHasHandlerRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> throwNoSuchElementException(DogHasHandler.class.getSimpleName(), id));
 
@@ -104,24 +104,24 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     }
 
     @Override
-    public Page<DogHasHandlerDto> searchByName(@Nullable final String name, final Pageable pageable) {
+    public Page<DogHasHandlerDto> searchByName(@Nullable String name, Pageable pageable) {
         var dogHasHandlerPage = dogHasHandlerRepository.findAllByName(name, pageable);
         return DOG_HAS_HANDLER_MAPPER.toTargetPage(dogHasHandlerPage);
     }
 
     @Override
-    public Page<DogHasHandlerDto> getAllDogHasHandlers(final Pageable pageable) {
+    public Page<DogHasHandlerDto> getAllDogHasHandlers(Pageable pageable) {
         var dogHasHandlerPage = dogHasHandlerRepository.findAllByEntityStatus(EntityStatus.ACTIVE, pageable);
         return DOG_HAS_HANDLER_MAPPER.toTargetPage(dogHasHandlerPage);
     }
 
     @Override
-    public Set<DogHasHandlerDto> getDogHasHandlersByIds(final Set<UUID> ids) {
+    public Set<DogHasHandlerDto> getDogHasHandlersByIds(Set<UUID> ids) {
         return DOG_HAS_HANDLER_MAPPER.toTargetSet(getActiveDogHasHandlerSet(ids));
     }
 
     @Override
-    public Set<String> getEmailsByDogHasHandlersIds(final Set<UUID> ids) {
+    public Set<String> getEmailsByDogHasHandlersIds(Set<UUID> ids) {
         return getActiveDogHasHandlerSet(ids)
                 .stream()
                 .map(dhh -> dhh.getMember().getEmail())
@@ -129,13 +129,13 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     }
 
     @Override
-    public void deactivateDogHasHandlersByMemberId(final UUID memberId) {
+    public void deactivateDogHasHandlersByMemberId(UUID memberId) {
         dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.ACTIVE)
                 .forEach(dhh -> saveItWithNewStatus(dhh, EntityStatus.INACTIVE));
     }
 
     @Override
-    public void activateDogHasHandlersByMemberId(final UUID memberId) {
+    public void activateDogHasHandlersByMemberId(UUID memberId) {
         dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(memberId, EntityStatus.INACTIVE)
                 .forEach(dhh -> saveItWithNewStatus(dhh, EntityStatus.ACTIVE));
     }
@@ -151,16 +151,16 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         dogHasHandlerRepository.saveAll(dogHasHandlerSet);
     }
 
-    private void saveItWithNewStatus(final DogHasHandler dogHasHandler, final EntityStatus entityStatus) {
+    private void saveItWithNewStatus(DogHasHandler dogHasHandler, EntityStatus entityStatus) {
         dogHasHandler.setEntityStatus(entityStatus);
         dogHasHandlerRepository.save(dogHasHandler);
     }
 
-    private Set<DogHasHandler> getActiveDogHasHandlerSet(final Set<UUID> ids) {
+    private Set<DogHasHandler> getActiveDogHasHandlerSet(Set<UUID> ids) {
         return dogHasHandlerRepository.findAllByIdInAndEntityStatus(ids, EntityStatus.ACTIVE);
     }
 
-    private Optional<casp.web.backend.data.access.layer.dog.DogHasHandler> findMemberAndMapToDogHasHandlerV2(final casp.web.backend.deprecated.dog.DogHasHandler dh, final DogReference dog) {
+    private Optional<casp.web.backend.data.access.layer.dog.DogHasHandler> findMemberAndMapToDogHasHandlerV2(casp.web.backend.deprecated.dog.DogHasHandler dh, DogReference dog) {
         return memberReferenceRepository.findById(dh.getMemberId()).map(member -> {
             var dogHasHandler = DOG_HAS_HANDLER_V2_MAPPER.toDogHasHandler(dh);
             dogHasHandler.setDog(dog);

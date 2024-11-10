@@ -34,7 +34,7 @@ public class Exam extends BaseEvent {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         return super.equals(o);
     }
 

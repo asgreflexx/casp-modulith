@@ -7,12 +7,10 @@ import casp.web.backend.data.access.layer.event.options.WeeklyRecurrenceOption;
 
 import java.util.List;
 
-public final class RecurrenceOptionUtility {
+public enum RecurrenceOptionUtility {
+    ;
 
-    private RecurrenceOptionUtility() {
-    }
-
-    public static List<CalendarEntry> createCalendarEntries(final RecurrenceOption option) {
+    public static List<CalendarEntry> createCalendarEntries(RecurrenceOption option) {
         if (option instanceof DailyRecurrenceOption daily) {
             return DailyOptionUtility.createCalendarEntries(daily);
         } else {

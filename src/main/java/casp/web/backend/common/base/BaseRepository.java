@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface BaseRepository<T extends BaseDocument> extends MongoRepository<T, UUID> {
-    private static <T extends BaseDocument> void setCreatedAndCreatedBy(final T source, final T target) {
+    private static <T extends BaseDocument> void setCreatedAndCreatedBy(T source, T target) {
         if (EntityStatus.ACTIVE != source.getEntityStatus()) {
             throw new IllegalStateException("The %s with id %s is not active".formatted(target.getClass().getSimpleName(),
                     target.getId()));
@@ -33,8 +33,8 @@ public interface BaseRepository<T extends BaseDocument> extends MongoRepository<
      * @return the saved instance of type {@link T}
      */
     default T setMetadataAndSave(T document) {
-        this.findById(document.getId())
+        findById(document.getId())
                 .ifPresent(t -> setCreatedAndCreatedBy(t, document));
-        return this.save(document);
+        return save(document);
     }
 }

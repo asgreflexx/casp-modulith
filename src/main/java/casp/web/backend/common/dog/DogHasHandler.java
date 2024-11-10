@@ -19,7 +19,7 @@ public class DogHasHandler {
         return id;
     }
 
-    public void setId(final UUID id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -27,7 +27,7 @@ public class DogHasHandler {
         return memberId;
     }
 
-    public void setMemberId(final UUID memberId) {
+    public void setMemberId(UUID memberId) {
         this.memberId = memberId;
     }
 
@@ -35,7 +35,7 @@ public class DogHasHandler {
         return firstName;
     }
 
-    public void setFirstName(final String firstName) {
+    public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
@@ -43,12 +43,12 @@ public class DogHasHandler {
         return lastName;
     }
 
-    public void setLastName(final String lastName) {
+    public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogHasHandler that)) return false;
         return Objects.equals(id, that.id);

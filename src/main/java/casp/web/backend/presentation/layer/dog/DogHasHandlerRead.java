@@ -21,7 +21,7 @@ public class DogHasHandlerRead extends BaseView implements DogHasHandlerRequired
     }
 
     @Override
-    public void setMember(final MemberReference member) {
+    public void setMember(MemberReference member) {
         this.member = member;
     }
 
@@ -31,7 +31,7 @@ public class DogHasHandlerRead extends BaseView implements DogHasHandlerRequired
     }
 
     @Override
-    public void setDog(final DogReference dog) {
+    public void setDog(DogReference dog) {
         this.dog = dog;
     }
 
@@ -41,12 +41,12 @@ public class DogHasHandlerRead extends BaseView implements DogHasHandlerRequired
     }
 
     @Override
-    public void setGrades(final Set<Grade> grades) {
+    public void setGrades(Set<Grade> grades) {
         this.grades = grades;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogHasHandlerRead that)) return false;
         if (!super.equals(o)) return false;

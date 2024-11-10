@@ -25,7 +25,7 @@ public class Grade {
         return name;
     }
 
-    public void setName(final String name) {
+    public void setName(String name) {
         this.name = name;
     }
 
@@ -33,7 +33,7 @@ public class Grade {
         return type;
     }
 
-    public void setType(final GradeType type) {
+    public void setType(GradeType type) {
         this.type = type;
     }
 
@@ -41,7 +41,7 @@ public class Grade {
         return points;
     }
 
-    public void setPoints(final long points) {
+    public void setPoints(long points) {
         this.points = points;
     }
 
@@ -49,12 +49,12 @@ public class Grade {
         return examDate;
     }
 
-    public void setExamDate(final LocalDate examDate) {
+    public void setExamDate(LocalDate examDate) {
         this.examDate = examDate;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Grade grade)) return false;
         return points == grade.points && Objects.equals(name, grade.name) && type == grade.type && Objects.equals(examDate, grade.examDate);

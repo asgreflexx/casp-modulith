@@ -60,7 +60,7 @@ class RecurrenceOptionUtilityTest {
                 .satisfies(this::assertCalendarEntry);
     }
 
-    private void assertCalendarEntry(final CalendarEntry calendarEntry) {
+    private void assertCalendarEntry(CalendarEntry calendarEntry) {
         assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryFrom(), calendarEntry.getEntryFrom());
         assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryTo(), calendarEntry.getEntryTo());
     }

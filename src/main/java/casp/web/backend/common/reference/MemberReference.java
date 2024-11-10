@@ -35,7 +35,7 @@ public class MemberReference {
         return id;
     }
 
-    public void setId(final UUID id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -43,7 +43,7 @@ public class MemberReference {
         return entityStatus;
     }
 
-    public void setEntityStatus(final EntityStatus entityStatus) {
+    public void setEntityStatus(EntityStatus entityStatus) {
         this.entityStatus = entityStatus;
     }
 
@@ -72,7 +72,7 @@ public class MemberReference {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MemberReference that)) return false;
         return Objects.equals(id, that.id);

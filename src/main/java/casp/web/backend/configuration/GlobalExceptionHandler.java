@@ -26,7 +26,7 @@ class GlobalExceptionHandler {
     private final String internalExceptionResponse;
 
     @Autowired
-    GlobalExceptionHandler(final @Value("${casp.internal-exception-response}") String internalExceptionResponse) {
+    GlobalExceptionHandler(@Value("${casp.internal-exception-response}") String internalExceptionResponse) {
         this.internalExceptionResponse = internalExceptionResponse;
     }
 

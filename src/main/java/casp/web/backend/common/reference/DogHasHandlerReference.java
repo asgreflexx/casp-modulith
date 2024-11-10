@@ -35,7 +35,7 @@ public class DogHasHandlerReference {
         return id;
     }
 
-    public void setId(final UUID id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -43,7 +43,7 @@ public class DogHasHandlerReference {
         return entityStatus;
     }
 
-    public void setEntityStatus(final EntityStatus entityStatus) {
+    public void setEntityStatus(EntityStatus entityStatus) {
         this.entityStatus = entityStatus;
     }
 
@@ -70,7 +70,7 @@ public class DogHasHandlerReference {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogHasHandlerReference that)) return false;
         if (!super.equals(o)) return false;

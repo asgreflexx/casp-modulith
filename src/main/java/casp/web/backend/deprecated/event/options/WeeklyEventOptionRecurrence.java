@@ -33,7 +33,7 @@ public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOption
         return id;
     }
 
-    public void setId(final UUID id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
@@ -74,7 +74,7 @@ public class WeeklyEventOptionRecurrence implements Comparable<WeeklyEventOption
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof WeeklyEventOptionRecurrence that)) return false;
         return Objects.equals(id, that.id);

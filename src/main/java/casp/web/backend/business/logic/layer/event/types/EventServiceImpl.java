@@ -16,14 +16,14 @@ import static casp.web.backend.business.logic.layer.event.types.EventMapper.EVEN
 class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements EventService {
 
     @Autowired
-    EventServiceImpl(final EventRepository eventRepository,
-                     final MemberReferenceRepository memberReferenceRepository,
-                     final BaseEventMigrationService migrationService) {
+    EventServiceImpl(EventRepository eventRepository,
+                     MemberReferenceRepository memberReferenceRepository,
+                     BaseEventMigrationService migrationService) {
         super(memberReferenceRepository, eventRepository, null, migrationService);
     }
 
     @Override
-    public void save(final EventDto dto) {
+    public void save(EventDto dto) {
         var event = EVENT_MAPPER.toSource(dto);
         setCalendarEntriesAndMember(dto, event);
         setParticipants(dto, event);
@@ -32,11 +32,11 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements 
     }
 
     @Override
-    public EventDto getOneById(final UUID id) {
+    public EventDto getOneById(UUID id) {
         return EVENT_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
-    private void setParticipants(final EventDto eventDto, final Event event) {
+    private void setParticipants(EventDto eventDto, Event event) {
         var actualParticipants = event.getParticipants();
         var eventParticipantSet = eventDto.getNewParticipants()
                 .stream()

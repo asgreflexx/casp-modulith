@@ -14,7 +14,7 @@ public class GetByOwnerCustomValidator implements ConstraintValidator<GetByOwner
     private static final int PARAMETERS_COUNT = 3;
 
     @Override
-    public boolean isValid(final Object[] values, final ConstraintValidatorContext context) {
+    public boolean isValid(Object[] values, ConstraintValidatorContext context) {
         if (ArrayUtils.isEmpty(values) || values.length < PARAMETERS_COUNT) {
             return false;
         }
@@ -36,7 +36,7 @@ public class GetByOwnerCustomValidator implements ConstraintValidator<GetByOwner
         return !isChipNumberBlank || !isNameAndOwnerNameAreBlank;
     }
 
-    private static String convertObjectToString(final Object value) {
+    private static String convertObjectToString(Object value) {
         return value == null ? "" : String.valueOf(value);
     }
 }

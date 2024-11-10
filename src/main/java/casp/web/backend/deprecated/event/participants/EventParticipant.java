@@ -25,7 +25,7 @@ public class EventParticipant extends BaseParticipant {
         super(PARTICIPANT_TYPE);
     }
 
-    public EventParticipant(final BaseEvent baseEvent, final Member member) {
+    public EventParticipant(BaseEvent baseEvent, Member member) {
         super(PARTICIPANT_TYPE, member.getId(), baseEvent);
         this.member = member;
     }
@@ -34,7 +34,7 @@ public class EventParticipant extends BaseParticipant {
         return member;
     }
 
-    public void setMember(final Member member) {
+    public void setMember(Member member) {
         this.member = member;
     }
 }

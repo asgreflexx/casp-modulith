@@ -56,7 +56,7 @@ public class DogHasHandler extends BaseDocument implements DogHasHandlerRequired
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogHasHandler that)) return false;
         if (!super.equals(o)) return false;

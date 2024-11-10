@@ -25,7 +25,7 @@ public abstract class BaseEventOption {
     @Positive
     protected int repeatEvery = 1;
 
-    BaseEventOption(final String optionType) {
+    BaseEventOption(String optionType) {
         this.optionType = optionType;
     }
 
@@ -57,7 +57,7 @@ public abstract class BaseEventOption {
         return optionType;
     }
 
-    public void setOptionType(final String optionType) {
+    public void setOptionType(String optionType) {
         this.optionType = optionType;
     }
 }

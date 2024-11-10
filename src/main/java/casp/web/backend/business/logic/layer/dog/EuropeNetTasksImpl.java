@@ -28,21 +28,21 @@ class EuropeNetTasksImpl implements EuropeNetTasks {
     private final RestTemplate restTemplate;
 
     @Autowired
-    EuropeNetTasksImpl(final DogService dogService,
-                       final RestTemplateBuilder restTemplateBuilder,
-                       final @Value("${casp.europenet-api-endpoint}") String euroPetNetApi) {
+    EuropeNetTasksImpl(DogService dogService,
+                       RestTemplateBuilder restTemplateBuilder,
+                       @Value("${casp.europenet-api-endpoint}") String euroPetNetApi) {
         this.dogService = dogService;
         this.euroPetNetApi = euroPetNetApi;
         restTemplate = restTemplateBuilder.build();
     }
 
-    private static EuropeNetState getNotCheckStatusBecauseOfUnexpectedResponse(final String body) {
+    private static EuropeNetState getNotCheckStatusBecauseOfUnexpectedResponse(String body) {
         LOG.info("Unexpected response from EuroPetNet API: {}", body);
         return EuropeNetState.NOT_CHECKED;
     }
 
     @Override
-    public Page<DogDto> registerDogsManually(final Pageable pageRequest) {
+    public Page<DogDto> registerDogsManually(Pageable pageRequest) {
         var dogPage = dogService.getDogsThatWereNotChecked(pageRequest);
         registerDogs(dogPage);
         return dogPage;
@@ -54,7 +54,7 @@ class EuropeNetTasksImpl implements EuropeNetTasks {
         registerDogs(dogPage);
     }
 
-    private void registerDogs(final Page<DogDto> dogPage) {
+    private void registerDogs(Page<DogDto> dogPage) {
         if (dogPage.isEmpty()) {
             LOG.info("No dogs to check");
             return;

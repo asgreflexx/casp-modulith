@@ -24,7 +24,7 @@ public abstract class BaseView {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof BaseView baseView)) return false;
         return Objects.equals(id, baseView.id);

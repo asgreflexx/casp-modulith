@@ -10,11 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-final class WeeklyOptionUtility {
-    private WeeklyOptionUtility() {
-    }
+enum WeeklyOptionUtility {
+    ;
 
-    static List<CalendarEntry> createCalendarEntries(final WeeklyRecurrenceOption option) {
+    static List<CalendarEntry> createCalendarEntries(WeeklyRecurrenceOption option) {
         List<CalendarEntry> calendarList = new ArrayList<>();
         var occurrences = option.getOccurrences();
         var dayOfWeekSet = occurrences

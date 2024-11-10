@@ -25,7 +25,7 @@ public class DogHasHandlerDto extends BaseDto implements DogHasHandlerRequiredFi
     }
 
     @Override
-    public void setMember(final MemberReference member) {
+    public void setMember(MemberReference member) {
         this.member = member;
     }
 
@@ -35,7 +35,7 @@ public class DogHasHandlerDto extends BaseDto implements DogHasHandlerRequiredFi
     }
 
     @Override
-    public void setDog(final DogReference dog) {
+    public void setDog(DogReference dog) {
         this.dog = dog;
     }
 
@@ -45,7 +45,7 @@ public class DogHasHandlerDto extends BaseDto implements DogHasHandlerRequiredFi
     }
 
     @Override
-    public void setGrades(final Set<Grade> grades) {
+    public void setGrades(Set<Grade> grades) {
         this.grades = grades;
     }
 
@@ -55,7 +55,7 @@ public class DogHasHandlerDto extends BaseDto implements DogHasHandlerRequiredFi
     }
 
     @Override
-    public void setMemberId(final UUID memberId) {
+    public void setMemberId(UUID memberId) {
         this.memberId = memberId;
     }
 
@@ -65,12 +65,12 @@ public class DogHasHandlerDto extends BaseDto implements DogHasHandlerRequiredFi
     }
 
     @Override
-    public void setDogId(final UUID dogId) {
+    public void setDogId(UUID dogId) {
         this.dogId = dogId;
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof DogHasHandlerDto that)) return false;
         if (!super.equals(o)) return false;

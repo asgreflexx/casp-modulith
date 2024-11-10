@@ -43,7 +43,7 @@ public class BaseParticipant extends BaseDocument {
         this.participantType = participantType;
     }
 
-    protected BaseParticipant(final String participantType, final UUID memberOrHandlerId, final BaseEvent baseEvent) {
+    protected BaseParticipant(String participantType, UUID memberOrHandlerId, BaseEvent baseEvent) {
         this.participantType = participantType;
         this.memberOrHandlerId = memberOrHandlerId;
         this.baseEvent = baseEvent;
@@ -62,7 +62,7 @@ public class BaseParticipant extends BaseDocument {
     }
 
     public void setResponse(EventResponse status) {
-        this.response = status;
+        response = status;
     }
 
     public UUID getMemberOrHandlerId() {

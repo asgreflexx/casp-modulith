@@ -32,7 +32,7 @@ public class Card {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof Card card)) return false;
         return Objects.equals(code, card.code);

@@ -26,11 +26,11 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private final MongoOperations mongoOperations;
 
     @Autowired
-    MemberCustomRepositoryImpl(final MongoOperations mongoOperations) {
+    MemberCustomRepositoryImpl(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
     }
 
-    private static BooleanExpression[] splitIntoWords(final String name) {
+    private static BooleanExpression[] splitIntoWords(String name) {
         return Arrays.stream(name.trim().split(SPLIT_WORDS_WITH_SPACE))
                 .map(String::trim)
                 .filter(ObjectUtils::isNotEmpty)
@@ -38,12 +38,12 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .toArray(BooleanExpression[]::new);
     }
 
-    private static BooleanExpression createFullTextExpression(final String word) {
+    private static BooleanExpression createFullTextExpression(String word) {
         return MEMBER.firstName.containsIgnoreCase(word).or(MEMBER.lastName.containsIgnoreCase(word));
     }
 
     @Override
-    public Page<Member> findAllByFirstNameAndLastName(final String firstName, final String lastName, final Pageable pageable) {
+    public Page<Member> findAllByFirstNameAndLastName(String firstName, String lastName, Pageable pageable) {
         var expression = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
         if (ObjectUtils.isNotEmpty(firstName)) {
             expression = expression.and(MEMBER.firstName.equalsIgnoreCase(firstName));
@@ -56,7 +56,7 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Page<Member> findAllByValue(final String value, final Pageable pageable) {
+    public Page<Member> findAllByValue(String value, Pageable pageable) {
         var expression = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
         if (ObjectUtils.isNotEmpty(value)) {
             expression = expression.andAnyOf(splitIntoWords(value));
@@ -68,7 +68,7 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     // fetchOne can return a null
     @SuppressWarnings("OptionalOfNullableMisuse")
     @Override
-    public Member findByIdAndEntityStatusCustom(final UUID id, final EntityStatus entityStatus) {
+    public Member findByIdAndEntityStatusCustom(UUID id, EntityStatus entityStatus) {
         var expression = MEMBER.entityStatus.eq(entityStatus).and(MEMBER.id.eq(id));
         return Optional.ofNullable(createQuery().where(expression).fetchOne()).orElseThrow(() -> {
             var msg = "Member with id %s not found or it isn't %s.".formatted(id, entityStatus);

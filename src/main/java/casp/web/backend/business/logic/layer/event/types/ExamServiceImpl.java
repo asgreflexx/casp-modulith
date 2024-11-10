@@ -15,15 +15,15 @@ import static casp.web.backend.business.logic.layer.event.types.ExamMapper.EXAM_
 @Service
 class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements ExamService {
 
-    ExamServiceImpl(final MemberReferenceRepository memberReferenceRepository,
-                    final ExamRepository examRepository,
-                    final BaseEventMigrationService migrationService,
-                    final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+    ExamServiceImpl(MemberReferenceRepository memberReferenceRepository,
+                    ExamRepository examRepository,
+                    BaseEventMigrationService migrationService,
+                    DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         super(memberReferenceRepository, examRepository, dogHasHandlerReferenceRepository, migrationService);
     }
 
     @Override
-    public void save(final ExamDto dto) {
+    public void save(ExamDto dto) {
         var exam = EXAM_MAPPER.toSource(dto);
         setCalendarEntriesAndMember(dto, exam);
         setParticipants(dto, exam);
@@ -32,11 +32,11 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
     }
 
     @Override
-    public ExamDto getOneById(final UUID id) {
+    public ExamDto getOneById(UUID id) {
         return EXAM_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
-    private void setParticipants(final ExamDto dto, final Exam exam) {
+    private void setParticipants(ExamDto dto, Exam exam) {
         var actualParticipants = dto.getParticipants();
         var newParticipants = dto.getNewParticipants()
                 .stream()

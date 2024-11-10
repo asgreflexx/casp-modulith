@@ -12,7 +12,8 @@ import casp.web.backend.deprecated.event.types.Exam;
  * @deprecated It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
-public final class TypesRegex {
+public enum TypesRegex {
+    ;
     public static final String BASE_EVENT_TYPES_REGEX = "^" + Event.EVENT_TYPE
             + "|" + Course.EVENT_TYPE
             + "|" + Exam.EVENT_TYPE + "$";
@@ -21,6 +22,4 @@ public final class TypesRegex {
             + "|" + ExamParticipant.PARTICIPANT_TYPE
             + "|" + Space.PARTICIPANT_TYPE + "$";
 
-    private TypesRegex() {
-    }
 }

@@ -26,7 +26,7 @@ public class CoTrainer extends BaseParticipant {
         super(PARTICIPANT_TYPE);
     }
 
-    public CoTrainer(final Course course, final Member member) {
+    public CoTrainer(Course course, Member member) {
         super(PARTICIPANT_TYPE, member.getId(), course);
         this.member = member;
     }
@@ -35,7 +35,7 @@ public class CoTrainer extends BaseParticipant {
         return member;
     }
 
-    public void setMember(final Member member) {
+    public void setMember(Member member) {
         this.member = member;
     }
 }

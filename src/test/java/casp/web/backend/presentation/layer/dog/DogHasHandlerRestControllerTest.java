@@ -75,7 +75,7 @@ class DogHasHandlerRestControllerTest {
 
     private DogHasHandlerDto dogHasHandlerDto;
 
-    private static String createMessageDogHasHandlerDoesNotExist(final UUID id) {
+    private static String createMessageDogHasHandlerDoesNotExist(UUID id) {
         return "DogHasHandler with id %s not found or it isn't active".formatted(id);
     }
 
@@ -99,7 +99,7 @@ class DogHasHandlerRestControllerTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {DOG_NAME})
-    void searchByName(final String name) throws Exception {
+    void searchByName(String name) throws Exception {
         var mvcResult = mockMvc.perform(get(DOG_HAS_HANDLER_URL_PREFIX + "/search-by-name")
                         .param("name", name))
                 .andExpect(status().isOk())
@@ -135,7 +135,7 @@ class DogHasHandlerRestControllerTest {
         verify(dogHasHandlerService).migrateDataToV2();
     }
 
-    private void assertDogAndMemberFields(final DogHasHandlerRead dhh) {
+    private void assertDogAndMemberFields(DogHasHandlerRead dhh) {
         assertThat(dhh.getDog())
                 .usingRecursiveAssertion()
                 .isEqualTo(dogHasHandlerDto.getDog());
@@ -219,7 +219,7 @@ class DogHasHandlerRestControllerTest {
             verify(dogHasHandlerService).deleteDogHasHandlerById(id);
         }
 
-        private ResultActions deleteDogHasHandlerById(final UUID id) throws Exception {
+        private ResultActions deleteDogHasHandlerById(UUID id) throws Exception {
             return mockMvc.perform(delete(DOG_HAS_HANDLER_URL_PREFIX + "/{id}", id));
         }
     }
@@ -306,7 +306,7 @@ class DogHasHandlerRestControllerTest {
             return dogHasHandlerWrite;
         }
 
-        private ResultActions performPost(final DogHasHandlerWrite dogHasHandlerWrite) throws Exception {
+        private ResultActions performPost(DogHasHandlerWrite dogHasHandlerWrite) throws Exception {
             return mockMvc.perform(post(DOG_HAS_HANDLER_URL_PREFIX)
                     .content(MvcMapper.toString(dogHasHandlerWrite))
                     .contentType(MediaType.APPLICATION_JSON)
@@ -340,7 +340,7 @@ class DogHasHandlerRestControllerTest {
             verify(dogHasHandlerService).getDogHasHandlerById(id);
         }
 
-        private ResultActions getDogHasHandlerById(final UUID id) throws Exception {
+        private ResultActions getDogHasHandlerById(UUID id) throws Exception {
             return mockMvc.perform(get(DOG_HAS_HANDLER_URL_PREFIX + "/{id}", id));
         }
     }

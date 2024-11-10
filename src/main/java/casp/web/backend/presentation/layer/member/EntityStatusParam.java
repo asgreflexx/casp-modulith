@@ -7,7 +7,7 @@ enum EntityStatusParam {
     INACTIVE(EntityStatus.INACTIVE);
     private final EntityStatus entityStatus;
 
-    EntityStatusParam(final EntityStatus entityStatus) {
+    EntityStatusParam(EntityStatus entityStatus) {
         this.entityStatus = entityStatus;
     }
 
