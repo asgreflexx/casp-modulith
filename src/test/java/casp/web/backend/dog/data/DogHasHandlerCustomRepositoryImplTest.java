@@ -4,8 +4,8 @@ package casp.web.backend.dog.data;
 import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReferenceRepository;
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.member.data.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -30,9 +30,7 @@ class DogHasHandlerCustomRepositoryImplTest {
     @Autowired
     private DogReferenceRepository dogReferenceRepository;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private MemberReferenceRepository memberReferenceRepository;
+    private MemberReferenceRepository memberRepository;
 
     private DogHasHandler activeDogHasHandler;
     private DogHasHandler inactiveDogHasHandler;
@@ -46,10 +44,11 @@ class DogHasHandlerCustomRepositoryImplTest {
         memberRepository.deleteAll();
 
         createDogAndReturnItsId();
-        createMemberAndReturnItsId();
+        var member = createMember("John", "Doe");
+        memberId = member.getId();
 
-        activeDogHasHandler = createDogHasHandler(EntityStatus.ACTIVE);
-        inactiveDogHasHandler = createDogHasHandler(EntityStatus.INACTIVE);
+        activeDogHasHandler = createDogHasHandler(EntityStatus.ACTIVE, member);
+        inactiveDogHasHandler = createDogHasHandler(EntityStatus.INACTIVE, member);
     }
 
     @Test
@@ -73,20 +72,20 @@ class DogHasHandlerCustomRepositoryImplTest {
         assertThat(dogHasHandlers).containsExactly(activeDogHasHandler);
     }
 
-    private DogHasHandler createDogHasHandler(EntityStatus entityStatus) {
+    private DogHasHandler createDogHasHandler(EntityStatus entityStatus, MemberReference member) {
         var dogHasHandler = new DogHasHandler();
         dogHasHandler.setEntityStatus(entityStatus);
         dogReferenceRepository.findById(dogId).ifPresent(dogHasHandler::setDog);
-        memberReferenceRepository.findById(memberId).ifPresent(dogHasHandler::setMember);
+        dogHasHandler.setMember(member);
         return dogHasHandlerRepository.save(dogHasHandler);
     }
 
-    private void createMemberAndReturnItsId() {
-        var member = TestFixture.createMember();
-        member.setFirstName("John");
-        member.setLastName("Doe");
-        memberRepository.save(member);
-        memberId = member.getId();
+    private MemberReference createMember(String firstName, String lastName) {
+        var member = new MemberReference();
+        member.setFirstName(firstName);
+        member.setLastName(lastName);
+        member.setEmail("%s@mail.com".formatted(member.getId()));
+        return memberRepository.save(member);
     }
 
     private void createDogAndReturnItsId() {
@@ -112,10 +111,6 @@ class DogHasHandlerCustomRepositoryImplTest {
 
         @BeforeEach
         void setUp() {
-            var member = TestFixture.createMember();
-            member.setFirstName("Maximilian");
-            member.setLastName("Mustermann");
-            memberRepository.save(member);
 
             var dog = TestFixture.createDog();
             dog.setName("Robert");
@@ -123,7 +118,7 @@ class DogHasHandlerCustomRepositoryImplTest {
 
             activeDogHasHandler2 = new DogHasHandler();
             dogReferenceRepository.findById(dog.getId()).ifPresent(activeDogHasHandler2::setDog);
-            memberReferenceRepository.findById(member.getId()).ifPresent(activeDogHasHandler2::setMember);
+            activeDogHasHandler2.setMember(createMember("Maximilian", "Mustermann"));
             dogHasHandlerRepository.save(activeDogHasHandler2);
         }
 

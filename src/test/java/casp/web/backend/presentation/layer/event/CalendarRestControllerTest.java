@@ -1,8 +1,8 @@
 package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.types.CalendarEntryDto;
 import casp.web.backend.common.enums.BaseEventType;
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.types.BaseEvent;
@@ -12,7 +12,6 @@ import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.data.access.layer.event.types.EventRepository;
 import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.data.access.layer.event.types.ExamRepository;
-import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +28,6 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.within;
@@ -52,8 +50,6 @@ class CalendarRestControllerTest {
     private EventRepository eventRepository;
     @Autowired
     private ExamRepository examRepository;
-    @Autowired
-    private MemberRepository memberRepository;
     @Autowired
     private MemberReferenceRepository memberReferenceRepository;
     private Course course;
@@ -80,14 +76,18 @@ class CalendarRestControllerTest {
         courseRepository.deleteAll();
         eventRepository.deleteAll();
         examRepository.deleteAll();
-        memberRepository.deleteAll();
+        memberReferenceRepository.deleteAll();
 
-        var memberId = memberRepository.save(TestFixture.createMember()).getId();
+        var member = new MemberReference();
+        member.setFirstName("John");
+        member.setLastName("Doe");
+        member.setEmail("%s@mail.com");
+        member = memberReferenceRepository.save(member);
         from = LocalDate.now();
-        course = courseRepository.save(createBaseEvent(memberId, new Course(), from));
-        event = eventRepository.save(createBaseEvent(memberId, new Event(), from.plusDays(1)));
+        course = courseRepository.save(createBaseEvent(member, new Course(), from));
+        event = eventRepository.save(createBaseEvent(member, new Event(), from.plusDays(1)));
         to = from.plusDays(2);
-        exam = examRepository.save(createBaseEvent(memberId, new Exam(), to));
+        exam = examRepository.save(createBaseEvent(member, new Exam(), to));
     }
 
     @Test
@@ -111,10 +111,10 @@ class CalendarRestControllerTest {
                 .satisfies(actual -> assertCalendarEntry(actual, event));
     }
 
-    private <T extends BaseEvent> T createBaseEvent(UUID memberId, T baseEvent, LocalDate startTime) {
+    private <T extends BaseEvent> T createBaseEvent(MemberReference member, T baseEvent, LocalDate startTime) {
         baseEvent.setName(baseEvent.getEventType().name());
         baseEvent.addCalendarEntry(new CalendarEntry(startTime.atStartOfDay(), startTime.atTime(LocalTime.MAX)));
-        memberReferenceRepository.findById(memberId).ifPresent(baseEvent::setMember);
+        baseEvent.setMember(member);
         return baseEvent;
     }
 

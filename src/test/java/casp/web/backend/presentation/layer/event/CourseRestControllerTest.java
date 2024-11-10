@@ -9,6 +9,7 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReferenceRepository;
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.participants.Space;
@@ -18,8 +19,6 @@ import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import casp.web.backend.dog.data.DogRepository;
-import casp.web.backend.member.data.Member;
-import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -68,8 +67,6 @@ class CourseRestControllerTest {
     @Autowired
     private CourseRepository courseRepository;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private MemberReferenceRepository memberReferenceRepository;
     @Autowired
     private DogRepository dogRepository;
@@ -88,7 +85,7 @@ class CourseRestControllerTest {
 
     private Course course;
     private DogHasHandler dogHasHandler;
-    private Member member;
+    private MemberReference member;
     private LocalDateTime startDateTime;
     private Dog dog;
 
@@ -98,12 +95,16 @@ class CourseRestControllerTest {
         courseRepository.deleteAll();
         dogHasHandlerRepository.deleteAll();
         dogRepository.deleteAll();
-        memberRepository.deleteAll();
+        memberReferenceRepository.deleteAll();
 
-        member = memberRepository.save(TestFixture.createMember());
+        member = new MemberReference();
+        member.setFirstName("Joe");
+        member.setLastName("Doe");
+        member.setEmail("%s@mail.com");
+        member = memberReferenceRepository.save(member);
         dog = dogRepository.save(TestFixture.createDog());
         dogHasHandler = new DogHasHandler();
-        memberReferenceRepository.findById(member.getId()).ifPresent(dogHasHandler::setMember);
+        dogHasHandler.setMember(member);
         dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandler::setDog);
         dogHasHandler = dogHasHandlerRepository.save(dogHasHandler);
         course = new Course();

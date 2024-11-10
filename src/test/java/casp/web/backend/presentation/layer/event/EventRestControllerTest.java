@@ -1,16 +1,14 @@
 package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.types.EventDto;
 import casp.web.backend.business.logic.layer.event.types.EventService;
 import casp.web.backend.business.logic.layer.event.types.NewCalendarEntryDto;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.data.access.layer.event.types.EventRepository;
-import casp.web.backend.member.data.Member;
-import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -46,8 +44,6 @@ class EventRestControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private MemberReferenceRepository memberReferenceRepository;
     @Autowired
     private EventRepository eventRepository;
@@ -55,20 +51,24 @@ class EventRestControllerTest {
     @SpyBean
     private EventService eventService;
     private Event event;
-    private Member member;
+    private MemberReference member;
     private LocalDateTime startDateTime;
 
     @BeforeEach
     void setUp() {
         eventRepository.deleteAll();
-        memberRepository.deleteAll();
+        memberReferenceRepository.deleteAll();
 
-        member = memberRepository.save(TestFixture.createMember());
+        member = new MemberReference();
+        member.setFirstName("Joe");
+        member.setLastName("Doe");
+        member.setEmail("%s@mail.com");
+        member = memberReferenceRepository.save(member);
         event = new Event();
         event.setName("Test");
         startDateTime = LocalDateTime.now();
         event.addCalendarEntry(new CalendarEntry(startDateTime, startDateTime.plusHours(1)));
-        memberReferenceRepository.findById(member.getId()).ifPresent(event::setMember);
+        event.setMember(member);
         event = eventRepository.save(event);
     }
 

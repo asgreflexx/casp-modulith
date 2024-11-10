@@ -4,6 +4,7 @@ import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReferenceRepository;
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.dog.DogDto;
 import casp.web.backend.dog.DogHasHandler;
@@ -11,7 +12,6 @@ import casp.web.backend.dog.DogService;
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import casp.web.backend.dog.data.DogRepository;
-import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -57,8 +57,6 @@ class DogRestControllerTest {
     @Autowired
     private DogHasHandlerRepository dogHasHandlerRepository;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     @Autowired
     private MemberReferenceRepository memberReferenceRepository;
@@ -76,7 +74,7 @@ class DogRestControllerTest {
     void setUp() {
         dogHasHandlerRepository.deleteAll();
         dogRepository.deleteAll();
-        memberRepository.deleteAll();
+        memberReferenceRepository.deleteAll();
 
         charlie = createDog("Charlie", EntityStatus.ACTIVE);
         var bonsai = createDog("Bonsai", EntityStatus.ACTIVE);
@@ -125,12 +123,15 @@ class DogRestControllerTest {
         dog.setChipNumber(UUID.randomUUID().toString());
         dog = dogRepository.save(dog);
 
-        var member = TestFixture.createMember();
+        var member = new MemberReference();
         member.setEntityStatus(entityStatus);
-        memberRepository.save(member);
+        member.setFirstName("John");
+        member.setLastName("Doe");
+        member.setEmail("%s@mail.com".formatted(member.getId()));
+        memberReferenceRepository.save(member);
 
         var dogHasHandler = new casp.web.backend.dog.data.DogHasHandler();
-        memberReferenceRepository.findById(member.getId()).ifPresent(dogHasHandler::setMember);
+        dogHasHandler.setMember(member);
         dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandler::setDog);
         dogHasHandlerRepository.save(dogHasHandler);
 

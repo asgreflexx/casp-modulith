@@ -4,6 +4,7 @@ import casp.web.backend.TestFixture;
 import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReferenceRepository;
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.dog.DogHasHandlerOldRepository;
 import casp.web.backend.dog.DogHasHandlerDto;
@@ -13,7 +14,6 @@ import casp.web.backend.dog.data.DogHasHandlerRepository;
 import casp.web.backend.dog.data.DogRepository;
 import casp.web.backend.dog.data.Grade;
 import casp.web.backend.dog.data.GradeType;
-import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -58,8 +58,6 @@ class DogHasHandlerRestControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private DogRepository dogRepository;
     @Autowired
     private DogHasHandlerOldRepository dogHasHandlerOldRepository;
@@ -83,15 +81,19 @@ class DogHasHandlerRestControllerTest {
     void setUp() {
         dogHasHandlerOldRepository.deleteAll();
         dogHasHandlerRepository.deleteAll();
-        memberRepository.deleteAll();
+        memberReferenceRepository.deleteAll();
         dogRepository.deleteAll();
 
 
-        var member = memberRepository.save(TestFixture.createMember());
+        var member = new MemberReference();
+        member.setFirstName("John");
+        member.setLastName("Doe");
+        member.setEmail("%s@mail.com".formatted(member.getId()));
+        member = memberReferenceRepository.save(member);
         var dog = dogRepository.save(TestFixture.createDog());
         var dogHasHandler = new DogHasHandler();
         dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandler::setDog);
-        memberReferenceRepository.findById(member.getId()).ifPresent(dogHasHandler::setMember);
+        dogHasHandler.setMember(member);
         dogHasHandler = dogHasHandlerRepository.save(dogHasHandler);
         dogHasHandlerDto = DOG_HAS_HANDLER_MAPPER.toTarget(dogHasHandler);
     }

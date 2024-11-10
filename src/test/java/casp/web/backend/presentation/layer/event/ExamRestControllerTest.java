@@ -1,16 +1,14 @@
 package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.types.ExamDto;
 import casp.web.backend.business.logic.layer.event.types.ExamService;
 import casp.web.backend.business.logic.layer.event.types.NewCalendarEntryDto;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.data.access.layer.event.types.ExamRepository;
-import casp.web.backend.member.data.Member;
-import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -47,8 +45,6 @@ class ExamRestControllerTest {
     private MockMvc mockMvc;
 
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
     private MemberReferenceRepository memberReferenceRepository;
     @Autowired
     private ExamRepository examRepository;
@@ -57,20 +53,24 @@ class ExamRestControllerTest {
     private ExamService examService;
     private Exam exam;
     private LocalDateTime startDateTime;
-    private Member member;
+    private MemberReference member;
 
     @BeforeEach
     void setUp() {
         examRepository.deleteAll();
-        memberRepository.deleteAll();
+        memberReferenceRepository.deleteAll();
 
-        member = memberRepository.save(TestFixture.createMember());
+        member = new MemberReference();
+        member.setFirstName("Joe");
+        member.setLastName("Doe");
+        member.setEmail("%s@mail.com");
+        member = memberReferenceRepository.save(member);
         exam = new Exam();
         exam.setName("exam");
         exam.setJudgeName("Judge");
         startDateTime = LocalDateTime.now();
         exam.addCalendarEntry(new CalendarEntry(startDateTime, startDateTime.plusHours(1)));
-        memberReferenceRepository.findById(member.getId()).ifPresent(exam::setMember);
+        exam.setMember(member);
         exam = examRepository.save(exam);
     }
 
