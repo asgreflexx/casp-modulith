@@ -203,6 +203,7 @@
                         <exclude>**/*Exam.class</exclude>
                         <exclude>**/*Member.class</exclude>
                         <exclude>**/*MemberReference.class</exclude>
+                        <exclude>**/*MemberProperty.class</exclude>
                         <exclude>**/*MembershipFee.class</exclude>
                         <exclude>**/*Card.class</exclude>
                         <exclude>**/*Dto.class</exclude>
