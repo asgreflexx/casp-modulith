@@ -2,18 +2,9 @@ package casp.web.backend;
 
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
-import casp.web.backend.dog.data.Dog;
 
-public enum TestFixture {
+public enum ReferenceTestFixture {
     ;
-
-    public static Dog createDog() {
-        var dog = new Dog();
-        dog.setName("Riley");
-        dog.setOwnerName("John Doe");
-        dog.setOwnerAddress("123 Main St");
-        return dog;
-    }
 
     public static MemberReference createMemberReference() {
         return createMemberReference("John", "Doe");

@@ -1,6 +1,6 @@
 package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.business.logic.layer.event.types.CalendarEntryDto;
 import casp.web.backend.common.enums.BaseEventType;
 import casp.web.backend.common.reference.MemberReference;
@@ -79,7 +79,7 @@ class CalendarRestControllerTest {
         examRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
-        var member = memberReferenceRepository.save(TestFixture.createMemberReference());
+        var member = memberReferenceRepository.save(ReferenceTestFixture.createMemberReference());
         from = LocalDate.now();
         course = courseRepository.save(createBaseEvent(member, new Course(), from));
         event = eventRepository.save(createBaseEvent(member, new Event(), from.plusDays(1)));

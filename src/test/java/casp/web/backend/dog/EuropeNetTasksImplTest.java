@@ -1,7 +1,6 @@
 package casp.web.backend.dog;
 
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.EuropeNetState;
 import org.junit.jupiter.api.BeforeEach;

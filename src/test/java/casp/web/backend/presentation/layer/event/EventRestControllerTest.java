@@ -1,6 +1,6 @@
 package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.business.logic.layer.event.types.EventDto;
 import casp.web.backend.business.logic.layer.event.types.EventService;
 import casp.web.backend.business.logic.layer.event.types.NewCalendarEntryDto;
@@ -60,7 +60,7 @@ class EventRestControllerTest {
         eventRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
-        member = memberReferenceRepository.save(TestFixture.createMemberReference());
+        member = memberReferenceRepository.save(ReferenceTestFixture.createMemberReference());
         event = new Event();
         event.setName("Test");
         startDateTime = LocalDateTime.now();

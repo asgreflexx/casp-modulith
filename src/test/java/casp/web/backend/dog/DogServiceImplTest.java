@@ -1,6 +1,5 @@
 package casp.web.backend.dog;
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;

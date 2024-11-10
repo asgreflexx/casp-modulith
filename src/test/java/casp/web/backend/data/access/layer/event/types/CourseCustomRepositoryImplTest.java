@@ -1,6 +1,6 @@
 package casp.web.backend.data.access.layer.event.types;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
@@ -85,7 +85,7 @@ class CourseCustomRepositoryImplTest {
     }
 
     private MemberReference createMemberReference() {
-        var member = TestFixture.createMemberReference();
+        var member = ReferenceTestFixture.createMemberReference();
         return memberReferenceRepository.save(member);
     }
 

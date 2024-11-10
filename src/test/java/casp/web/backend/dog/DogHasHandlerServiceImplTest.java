@@ -1,6 +1,6 @@
 package casp.web.backend.dog;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
@@ -69,7 +69,7 @@ class DogHasHandlerServiceImplTest {
         dog.setEntityStatus(EntityStatus.ACTIVE);
         dog.setName("Bonsai");
 
-        member = TestFixture.createMemberReference();
+        member = ReferenceTestFixture.createMemberReference();
 
         dogHasHandler = new DogHasHandler();
         dogHasHandler.setDog(dog);

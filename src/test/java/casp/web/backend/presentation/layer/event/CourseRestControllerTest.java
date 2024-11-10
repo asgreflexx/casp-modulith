@@ -1,6 +1,6 @@
 package casp.web.backend.presentation.layer.event;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.business.logic.layer.event.types.CourseDto;
 import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.business.logic.layer.event.types.NewCalendarEntryDto;
@@ -94,8 +94,8 @@ class CourseRestControllerTest {
         dogReferenceRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
-        member = memberReferenceRepository.save(TestFixture.createMemberReference());
-        dog = dogReferenceRepository.save(TestFixture.createDogReference());
+        member = memberReferenceRepository.save(ReferenceTestFixture.createMemberReference());
+        dog = dogReferenceRepository.save(ReferenceTestFixture.createDogReference());
         dogHasHandler = new DogHasHandler();
         dogHasHandler.setMember(member);
         dogHasHandler.setDog(dog);

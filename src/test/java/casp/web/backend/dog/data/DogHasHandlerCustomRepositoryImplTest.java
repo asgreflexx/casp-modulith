@@ -1,7 +1,7 @@
 package casp.web.backend.dog.data;
 
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
@@ -41,9 +41,9 @@ class DogHasHandlerCustomRepositoryImplTest {
         dogHasHandlerRepository.deleteAll();
         dogReferenceRepository.deleteAll();
         memberRepository.deleteAll();
-        var dog = dogReferenceRepository.save(TestFixture.createDogReference());
+        var dog = dogReferenceRepository.save(ReferenceTestFixture.createDogReference());
         dogId = dog.getId();
-        var member = memberRepository.save(TestFixture.createMemberReference());
+        var member = memberRepository.save(ReferenceTestFixture.createMemberReference());
         memberId = member.getId();
 
         activeDogHasHandler = createDogHasHandler(EntityStatus.ACTIVE, member, dog);
@@ -96,8 +96,8 @@ class DogHasHandlerCustomRepositoryImplTest {
         @BeforeEach
         void setUp() {
             activeDogHasHandler2 = new DogHasHandler();
-            activeDogHasHandler2.setDog(dogReferenceRepository.save(TestFixture.createDogReference("Robert")));
-            activeDogHasHandler2.setMember(memberRepository.save(TestFixture.createMemberReference("Maximilian", "Mustermann")));
+            activeDogHasHandler2.setDog(dogReferenceRepository.save(ReferenceTestFixture.createDogReference("Robert")));
+            activeDogHasHandler2.setMember(memberRepository.save(ReferenceTestFixture.createMemberReference("Maximilian", "Mustermann")));
             dogHasHandlerRepository.save(activeDogHasHandler2);
         }
 

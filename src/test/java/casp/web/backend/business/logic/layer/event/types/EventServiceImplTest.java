@@ -1,6 +1,6 @@
 package casp.web.backend.business.logic.layer.event.types;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
@@ -239,7 +239,7 @@ class EventServiceImplTest {
 
         @Test
         void keepSameMember() {
-            var memberReference = TestFixture.createMemberReference();
+            var memberReference = ReferenceTestFixture.createMemberReference();
             eventDto.setMember(memberReference);
 
             eventService.save(eventDto);
@@ -250,7 +250,7 @@ class EventServiceImplTest {
 
         @Test
         void updateMember() {
-            var actualMember = TestFixture.createMemberReference();
+            var actualMember = ReferenceTestFixture.createMemberReference();
             var newMember = mockMember();
             eventDto.setMember(actualMember);
             eventDto.setNewMemberId(newMember.getId());
@@ -289,7 +289,7 @@ class EventServiceImplTest {
         }
 
         private MemberReference mockMember() {
-            var memberReference = TestFixture.createMemberReference();
+            var memberReference = ReferenceTestFixture.createMemberReference();
             when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
             return memberReference;
         }

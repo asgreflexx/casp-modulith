@@ -1,7 +1,7 @@
 package casp.web.backend.business.logic.layer.event.types;
 
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
@@ -235,7 +235,7 @@ class ExamServiceImplTest {
 
         @Test
         void keepSameMember() {
-            var memberReference = TestFixture.createMemberReference();
+            var memberReference = ReferenceTestFixture.createMemberReference();
             examDto.setMember(memberReference);
 
             examService.save(examDto);
@@ -246,7 +246,7 @@ class ExamServiceImplTest {
 
         @Test
         void updateMember() {
-            var actualMember = TestFixture.createMemberReference();
+            var actualMember = ReferenceTestFixture.createMemberReference();
             var newMember = mockMember();
             examDto.setMember(actualMember);
             examDto.setNewMemberId(newMember.getId());
@@ -270,7 +270,7 @@ class ExamServiceImplTest {
             var dogHasHandlerReference = new DogHasHandlerReference();
             dogHasHandlerReference.setId(UUID.randomUUID());
             dogHasHandlerReference.setDog(new DogReference());
-            dogHasHandlerReference.setMember(TestFixture.createMemberReference());
+            dogHasHandlerReference.setMember(ReferenceTestFixture.createMemberReference());
             var participant = new ExamParticipant(dogHasHandlerReference);
             examDto.setNewParticipants(Set.of(participant.getId()));
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(participant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
@@ -287,7 +287,7 @@ class ExamServiceImplTest {
         }
 
         private MemberReference mockMember() {
-            var memberReference = TestFixture.createMemberReference();
+            var memberReference = ReferenceTestFixture.createMemberReference();
             when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
             return memberReference;
         }

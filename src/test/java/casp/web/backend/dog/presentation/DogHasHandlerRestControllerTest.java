@@ -1,6 +1,6 @@
 package casp.web.backend.dog.presentation;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReferenceRepository;
@@ -81,8 +81,8 @@ class DogHasHandlerRestControllerTest {
         dogReferenceRepository.deleteAll();
 
 
-        var member = memberReferenceRepository.save(TestFixture.createMemberReference());
-        var dog = dogReferenceRepository.save(TestFixture.createDogReference());
+        var member = memberReferenceRepository.save(ReferenceTestFixture.createMemberReference());
+        var dog = dogReferenceRepository.save(ReferenceTestFixture.createDogReference());
         var dogHasHandler = new DogHasHandler();
         dogHasHandler.setDog(dog);
         dogHasHandler.setMember(member);

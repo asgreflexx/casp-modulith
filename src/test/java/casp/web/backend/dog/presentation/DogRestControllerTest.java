@@ -1,6 +1,6 @@
 package casp.web.backend.dog.presentation;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReferenceRepository;
@@ -8,6 +8,7 @@ import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.dog.DogDto;
 import casp.web.backend.dog.DogHasHandler;
 import casp.web.backend.dog.DogService;
+import casp.web.backend.dog.TestFixture;
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import casp.web.backend.dog.data.DogRepository;
@@ -122,7 +123,7 @@ class DogRestControllerTest {
         dog.setChipNumber(UUID.randomUUID().toString());
         dog = dogRepository.save(dog);
 
-        var member = memberReferenceRepository.save(TestFixture.createMemberReference());
+        var member = memberReferenceRepository.save(ReferenceTestFixture.createMemberReference());
 
         var dogHasHandler = new casp.web.backend.dog.data.DogHasHandler();
         dogHasHandler.setMember(member);

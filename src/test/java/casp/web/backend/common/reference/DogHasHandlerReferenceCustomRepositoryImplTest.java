@@ -1,6 +1,6 @@
 package casp.web.backend.common.reference;
 
-import casp.web.backend.TestFixture;
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
@@ -34,8 +34,8 @@ class DogHasHandlerReferenceCustomRepositoryImplTest {
         memberReferenceRepository.deleteAll();
         dogReferenceRepository.deleteAll();
 
-        member = memberReferenceRepository.save(TestFixture.createMemberReference());
-        dog = dogReferenceRepository.save(TestFixture.createDogReference());
+        member = memberReferenceRepository.save(ReferenceTestFixture.createMemberReference());
+        dog = dogReferenceRepository.save(ReferenceTestFixture.createDogReference());
         dogHasHandler = new DogHasHandler();
         dogHasHandler.setDog(dog);
         dogHasHandler.setMember(member);
