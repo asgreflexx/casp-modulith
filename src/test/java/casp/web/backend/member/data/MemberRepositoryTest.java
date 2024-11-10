@@ -1,7 +1,7 @@
 package casp.web.backend.member.data;
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.member.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

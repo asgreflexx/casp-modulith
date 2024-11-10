@@ -1,24 +1,11 @@
 package casp.web.backend;
 
+import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.dog.data.Dog;
-import casp.web.backend.member.data.Member;
 
 public enum TestFixture {
     ;
-
-    public static Member createMember() {
-        return createMember("John", "Doe");
-    }
-
-    public static Member createMember(String firstName, String lastName) {
-        var member = new Member();
-        member.setFirstName(firstName);
-        member.setLastName(lastName);
-        member.setEmail("%s@example.com".formatted(member.getId()));
-        return member;
-    }
-
 
     public static Dog createDog() {
         var dog = new Dog();
@@ -38,5 +25,11 @@ public enum TestFixture {
         member.setLastName(lastName);
         member.setEmail("%s@mail.com".formatted(member.getId()));
         return member;
+    }
+
+    public static DogReference createDogReference() {
+        var dogReference = new DogReference();
+        dogReference.setName("Riley");
+        return dogReference;
     }
 }

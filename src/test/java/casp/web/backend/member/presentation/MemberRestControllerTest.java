@@ -1,6 +1,5 @@
 package casp.web.backend.member.presentation;
 
-import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReferenceRepository;
@@ -13,9 +12,9 @@ import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.data.access.layer.event.types.EventRepository;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
-import casp.web.backend.dog.data.DogRepository;
 import casp.web.backend.member.MemberDto;
 import casp.web.backend.member.MemberService;
+import casp.web.backend.member.TestFixture;
 import casp.web.backend.member.data.Card;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
@@ -73,8 +72,6 @@ class MemberRestControllerTest {
     @Autowired
     private DogHasHandlerRepository dogHasHandlerRepository;
     @Autowired
-    private DogRepository dogRepository;
-    @Autowired
     private EventRepository eventRepository;
     @Autowired
     private CourseRepository courseRepository;
@@ -100,7 +97,7 @@ class MemberRestControllerTest {
         eventRepository.deleteAll();
         dogHasHandlerRepository.deleteAll();
         memberRepository.deleteAll();
-        dogRepository.deleteAll();
+        dogReferenceRepository.deleteAll();
 
         var johnDocument = memberRepository.save(TestFixture.createMember());
         john = MEMBER_MAPPER.toTarget(johnDocument);
@@ -109,7 +106,7 @@ class MemberRestControllerTest {
         inactive.setEntityStatus(EntityStatus.INACTIVE);
         memberRepository.save(inactive);
 
-        var bonsaiDocument = dogRepository.save(TestFixture.createDog());
+        var bonsaiDocument = dogReferenceRepository.save(casp.web.backend.TestFixture.createDogReference());
 
         var event = new Event();
         var dogHasHandler = new DogHasHandler();
