@@ -1,8 +1,7 @@
-package casp.web.backend.common;
+package casp.web.backend.common.reference;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.data.access.layer.dog.Dog;
 import casp.web.backend.data.access.layer.dog.DogHasHandler;
 import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
@@ -15,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 
-import static casp.web.backend.common.DogHasHandlerReferenceMapper.DOG_HAS_HANDLER_REFERENCE_MAPPER;
+import static casp.web.backend.common.reference.DogHasHandlerReferenceMapper.DOG_HAS_HANDLER_REFERENCE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
