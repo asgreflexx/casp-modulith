@@ -1,6 +1,5 @@
 package casp.web.backend.member;
 
-import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
 import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.business.logic.layer.event.types.SpaceDto;
@@ -11,6 +10,7 @@ import casp.web.backend.deprecated.member.Card;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
 import casp.web.backend.deprecated.member.MembershipFee;
+import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;

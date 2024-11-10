@@ -2,10 +2,10 @@ package casp.web.backend.common.reference;
 
 import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.data.access.layer.dog.Dog;
-import casp.web.backend.data.access.layer.dog.DogHasHandler;
-import casp.web.backend.data.access.layer.dog.DogHasHandlerRepository;
-import casp.web.backend.data.access.layer.dog.DogRepository;
+import casp.web.backend.dog.data.Dog;
+import casp.web.backend.dog.data.DogHasHandler;
+import casp.web.backend.dog.data.DogHasHandlerRepository;
+import casp.web.backend.dog.data.DogRepository;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;

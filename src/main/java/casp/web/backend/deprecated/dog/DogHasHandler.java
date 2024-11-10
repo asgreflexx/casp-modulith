@@ -1,8 +1,8 @@
 package casp.web.backend.deprecated.dog;
 
 import casp.web.backend.common.base.BaseDocument;
-import casp.web.backend.common.dog.Grade;
-import casp.web.backend.data.access.layer.dog.Dog;
+import casp.web.backend.dog.data.Dog;
+import casp.web.backend.dog.data.Grade;
 import casp.web.backend.member.data.Member;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
@@ -16,7 +16,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.dog.DogHasHandler} instead. It will be removed in #3.
+ * @deprecated use {@link casp.web.backend.dog.data.DogHasHandler} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @QueryEntity
