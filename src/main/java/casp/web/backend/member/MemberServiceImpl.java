@@ -1,4 +1,4 @@
-package casp.web.backend.business.logic.layer.member;
+package casp.web.backend.member;
 
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
@@ -6,10 +6,10 @@ import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
 import casp.web.backend.business.logic.layer.event.types.CourseService;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.data.access.layer.member.Member;
-import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
+import casp.web.backend.member.data.Member;
+import casp.web.backend.member.data.MemberRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +21,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static casp.web.backend.business.logic.layer.member.MemberMapper.MEMBER_MAPPER;
 import static casp.web.backend.deprecated.member.MemberV2Mapper.MEMBER_V2_MAPPER;
+import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 
 @Service
 class MemberServiceImpl implements MemberService {

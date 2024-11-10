@@ -1,28 +1,56 @@
-package casp.web.backend.presentation.layer.member;
+package casp.web.backend.member;
 
-import casp.web.backend.common.base.BaseView;
+import casp.web.backend.business.logic.layer.event.types.SpaceDto;
+import casp.web.backend.common.base.BaseDto;
+import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Gender;
-import casp.web.backend.common.enums.Role;
-import casp.web.backend.common.member.Card;
-import casp.web.backend.common.member.MemberRequiredFields;
-import casp.web.backend.common.member.MembershipFee;
+import casp.web.backend.member.data.Card;
+import casp.web.backend.member.data.MembershipFee;
+import casp.web.backend.member.data.Role;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
 
-class MemberWrite extends BaseView implements MemberRequiredFields {
+public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
+    private EntityStatus entityStatus;
+
     private String firstName;
+
     private String lastName;
+
     private LocalDate birthDate;
+
     private Gender gender;
+
     private String telephoneNumber;
+
     private String email;
+
     private String address;
+
     private String postcode;
+
     private String city;
-    private Set<Role> roles;
-    private Set<MembershipFee> membershipFees;
-    private Set<Card> cards;
+
+    private Set<Role> roles = new HashSet<>();
+
+    private Set<MembershipFee> membershipFees = new HashSet<>();
+
+    private Set<Card> cards = new HashSet<>();
+
+    private Set<DogHasHandlerDto> dogHasHandlerSet = new HashSet<>();
+    private Set<SpaceDto> spaces = new HashSet<>();
+
+    @Override
+    public EntityStatus getEntityStatus() {
+        return entityStatus;
+    }
+
+    @Override
+    public void setEntityStatus(EntityStatus entityStatus) {
+        this.entityStatus = entityStatus;
+    }
 
     @Override
     public String getFirstName() {
@@ -142,6 +170,26 @@ class MemberWrite extends BaseView implements MemberRequiredFields {
     @Override
     public void setCards(Set<Card> cards) {
         this.cards = cards;
+    }
+
+    @Override
+    public Set<DogHasHandlerDto> getDogHasHandlerSet() {
+        return dogHasHandlerSet;
+    }
+
+    @Override
+    public void setDogHasHandlerSet(Set<DogHasHandlerDto> dogHasHandlerSet) {
+        this.dogHasHandlerSet = dogHasHandlerSet;
+    }
+
+    @Override
+    public Set<SpaceDto> getSpaces() {
+        return spaces;
+    }
+
+    @Override
+    public void setSpaces(Set<SpaceDto> spaces) {
+        this.spaces = spaces;
     }
 
     @Override

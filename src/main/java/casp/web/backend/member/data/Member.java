@@ -1,22 +1,20 @@
-package casp.web.backend.business.logic.layer.member;
+package casp.web.backend.member.data;
 
-import casp.web.backend.business.logic.layer.event.types.SpaceDto;
-import casp.web.backend.common.base.BaseDto;
-import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.Gender;
-import casp.web.backend.common.enums.Role;
-import casp.web.backend.common.member.Card;
-import casp.web.backend.common.member.DogHasHandler;
-import casp.web.backend.common.member.MemberDtoRequiredFields;
-import casp.web.backend.common.member.MembershipFee;
+import casp.web.backend.member.MemberRequiredFields;
+import com.querydsl.core.annotations.QueryEntity;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
-    private EntityStatus entityStatus;
-
+@QueryEntity
+@Document
+public class Member extends BaseDocument implements MemberRequiredFields {
     private String firstName;
 
     private String lastName;
@@ -27,6 +25,7 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
 
     private String telephoneNumber;
 
+    @Indexed(unique = true)
     private String email;
 
     private String address;
@@ -35,24 +34,11 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
 
     private String city;
 
-    private Set<Role> roles = new HashSet<>();
+    private Set<Role> roles = new HashSet<>(List.of(Role.USER));
 
     private Set<MembershipFee> membershipFees = new HashSet<>();
 
     private Set<Card> cards = new HashSet<>();
-
-    private Set<DogHasHandler> dogHasHandlerSet = new HashSet<>();
-    private Set<SpaceDto> spaces = new HashSet<>();
-
-    @Override
-    public EntityStatus getEntityStatus() {
-        return entityStatus;
-    }
-
-    @Override
-    public void setEntityStatus(EntityStatus entityStatus) {
-        this.entityStatus = entityStatus;
-    }
 
     @Override
     public String getFirstName() {
@@ -172,26 +158,6 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
     @Override
     public void setCards(Set<Card> cards) {
         this.cards = cards;
-    }
-
-    @Override
-    public Set<DogHasHandler> getDogHasHandlerSet() {
-        return dogHasHandlerSet;
-    }
-
-    @Override
-    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
-        this.dogHasHandlerSet = dogHasHandlerSet;
-    }
-
-    @Override
-    public Set<SpaceDto> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<SpaceDto> spaces) {
-        this.spaces = spaces;
     }
 
     @Override

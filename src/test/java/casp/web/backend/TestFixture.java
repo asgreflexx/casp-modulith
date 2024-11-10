@@ -1,12 +1,12 @@
 package casp.web.backend;
 
 import casp.web.backend.data.access.layer.dog.Dog;
-import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.deprecated.dog.DogHasHandler;
 import casp.web.backend.deprecated.event.participants.ExamParticipant;
 import casp.web.backend.deprecated.event.participants.Space;
 import casp.web.backend.deprecated.event.types.Course;
 import casp.web.backend.deprecated.event.types.Exam;
+import casp.web.backend.member.data.Member;
 
 public enum TestFixture {
     ;

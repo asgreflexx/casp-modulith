@@ -1,7 +1,6 @@
-package casp.web.backend.data.access.layer.member;
+package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.enums.Role;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

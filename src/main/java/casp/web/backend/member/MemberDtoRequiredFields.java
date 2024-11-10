@@ -1,4 +1,4 @@
-package casp.web.backend.common.member;
+package casp.web.backend.member;
 
 import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;
@@ -12,9 +12,9 @@ public interface MemberDtoRequiredFields extends MemberRequiredFields {
     void setEntityStatus(EntityStatus entityStatus);
 
     @Valid
-    Set<DogHasHandler> getDogHasHandlerSet();
+    Set<DogHasHandlerDto> getDogHasHandlerSet();
 
-    void setDogHasHandlerSet(@Valid Set<DogHasHandler> dogHasHandlerSet);
+    void setDogHasHandlerSet(@Valid Set<DogHasHandlerDto> dogHasHandlerSet);
 
     Set<SpaceDto> getSpaces();
 

@@ -1,7 +1,7 @@
-package casp.web.backend.presentation.layer.member;
+package casp.web.backend.member.presentation;
 
-import casp.web.backend.business.logic.layer.member.MemberDto;
 import casp.web.backend.common.base.BaseViewMapper;
+import casp.web.backend.member.MemberDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

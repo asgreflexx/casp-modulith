@@ -1,14 +1,14 @@
-package casp.web.backend.presentation.layer.member;
+package casp.web.backend.member.presentation;
 
 import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Gender;
-import casp.web.backend.common.enums.Role;
-import casp.web.backend.common.member.Card;
-import casp.web.backend.common.member.DogHasHandler;
-import casp.web.backend.common.member.MemberDtoRequiredFields;
-import casp.web.backend.common.member.MembershipFee;
+import casp.web.backend.member.DogHasHandlerDto;
+import casp.web.backend.member.MemberDtoRequiredFields;
+import casp.web.backend.member.data.Card;
+import casp.web.backend.member.data.MembershipFee;
+import casp.web.backend.member.data.Role;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -16,7 +16,7 @@ import java.util.Set;
 
 class MemberRead extends BaseView implements MemberDtoRequiredFields {
     private EntityStatus entityStatus;
-    private Set<DogHasHandler> dogHasHandlerSet;
+    private Set<DogHasHandlerDto> dogHasHandlerSet;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
@@ -43,12 +43,12 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     }
 
     @Override
-    public Set<DogHasHandler> getDogHasHandlerSet() {
+    public Set<DogHasHandlerDto> getDogHasHandlerSet() {
         return dogHasHandlerSet;
     }
 
     @Override
-    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
+    public void setDogHasHandlerSet(Set<DogHasHandlerDto> dogHasHandlerSet) {
         this.dogHasHandlerSet = dogHasHandlerSet;
     }
 

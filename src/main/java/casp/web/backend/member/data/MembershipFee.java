@@ -1,4 +1,4 @@
-package casp.web.backend.common.member;
+package casp.web.backend.member.data;
 
 import casp.web.backend.common.validation.Payment;
 import jakarta.validation.constraints.Digits;

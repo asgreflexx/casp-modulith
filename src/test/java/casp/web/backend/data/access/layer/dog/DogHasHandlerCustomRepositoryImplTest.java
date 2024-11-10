@@ -5,7 +5,7 @@ import casp.web.backend.TestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.data.access.layer.member.MemberRepository;
+import casp.web.backend.member.data.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

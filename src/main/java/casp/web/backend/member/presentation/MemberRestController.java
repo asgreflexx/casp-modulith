@@ -1,7 +1,7 @@
-package casp.web.backend.presentation.layer.member;
+package casp.web.backend.member.presentation;
 
-import casp.web.backend.business.logic.layer.member.MemberService;
-import casp.web.backend.common.enums.Role;
+import casp.web.backend.member.MemberService;
+import casp.web.backend.member.data.Role;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static casp.web.backend.presentation.layer.member.MemberReadMapper.READ_MAPPER;
-import static casp.web.backend.presentation.layer.member.MemberWriteMapper.WRITE_MAPPER;
+import static casp.web.backend.member.presentation.MemberReadMapper.READ_MAPPER;
+import static casp.web.backend.member.presentation.MemberWriteMapper.WRITE_MAPPER;
 
 @RestController
 @RequestMapping("member")

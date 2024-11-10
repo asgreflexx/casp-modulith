@@ -1,4 +1,4 @@
-package casp.web.backend.business.logic.layer.member;
+package casp.web.backend.member;
 
 import casp.web.backend.business.logic.layer.dog.DogHasHandlerService;
 import casp.web.backend.business.logic.layer.event.types.BaseEventObserver;
@@ -7,12 +7,12 @@ import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.data.access.layer.member.Member;
-import casp.web.backend.data.access.layer.member.MemberRepository;
 import casp.web.backend.deprecated.member.Card;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
 import casp.web.backend.deprecated.member.MembershipFee;
+import casp.web.backend.member.data.Member;
+import casp.web.backend.member.data.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import static casp.web.backend.business.logic.layer.member.MemberMapper.MEMBER_MAPPER;
+import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;

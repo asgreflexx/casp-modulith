@@ -2,10 +2,10 @@ package casp.web.backend.deprecated.event.types;
 
 
 import casp.web.backend.common.base.BaseDocument;
-import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.deprecated.event.TypesRegex;
 import casp.web.backend.deprecated.event.options.DailyEventOption;
 import casp.web.backend.deprecated.event.options.WeeklyEventOption;
+import casp.web.backend.member.data.Member;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;

@@ -1,4 +1,4 @@
-package casp.web.backend.presentation.layer.member;
+package casp.web.backend.member.presentation;
 
 import casp.web.backend.common.enums.EntityStatus;
 

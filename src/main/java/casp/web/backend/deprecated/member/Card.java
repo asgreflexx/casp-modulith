@@ -1,7 +1,7 @@
 package casp.web.backend.deprecated.member;
 
 import casp.web.backend.common.base.BaseDocument;
-import casp.web.backend.data.access.layer.member.Member;
+import casp.web.backend.member.data.Member;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -13,7 +13,7 @@ import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
- * @deprecated use {@link casp.web.backend.common.member.Card} instead. It will be removed in #3.
+ * @deprecated use {@link casp.web.backend.member.data.Card} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @QueryEntity

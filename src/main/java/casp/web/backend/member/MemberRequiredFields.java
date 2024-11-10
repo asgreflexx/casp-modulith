@@ -1,7 +1,9 @@
-package casp.web.backend.common.member;
+package casp.web.backend.member;
 
 import casp.web.backend.common.enums.Gender;
-import casp.web.backend.common.enums.Role;
+import casp.web.backend.member.data.Card;
+import casp.web.backend.member.data.MembershipFee;
+import casp.web.backend.member.data.Role;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;

@@ -2,7 +2,7 @@ package casp.web.backend.deprecated.member;
 
 import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.Gender;
-import casp.web.backend.common.enums.Role;
+import casp.web.backend.member.data.Role;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 

@@ -1,7 +1,7 @@
 package casp.web.backend.deprecated.event.participants;
 
-import casp.web.backend.data.access.layer.member.Member;
 import casp.web.backend.deprecated.event.types.Course;
+import casp.web.backend.deprecated.member.Member;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import org.springframework.data.annotation.TypeAlias;

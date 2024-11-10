@@ -1,8 +1,8 @@
 package casp.web.backend.configuration;
 
-import casp.web.backend.common.enums.Role;
-import casp.web.backend.data.access.layer.member.Member;
-import casp.web.backend.data.access.layer.member.MemberRepository;
+import casp.web.backend.member.data.Member;
+import casp.web.backend.member.data.MemberRepository;
+import casp.web.backend.member.data.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

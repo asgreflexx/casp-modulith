@@ -12,7 +12,7 @@ import casp.web.backend.data.access.layer.event.types.Event;
 import casp.web.backend.data.access.layer.event.types.EventRepository;
 import casp.web.backend.data.access.layer.event.types.Exam;
 import casp.web.backend.data.access.layer.event.types.ExamRepository;
-import casp.web.backend.data.access.layer.member.MemberRepository;
+import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.junit.jupiter.api.BeforeEach;

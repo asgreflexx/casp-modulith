@@ -1,11 +1,11 @@
-package casp.web.backend.common.member;
+package casp.web.backend.member;
 
 import jakarta.validation.constraints.NotNull;
 
 import java.util.Objects;
 import java.util.UUID;
 
-public class DogHasHandler {
+public class DogHasHandlerDto {
     @NotNull
     private UUID id;
     @NotNull
@@ -40,7 +40,7 @@ public class DogHasHandler {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof DogHasHandler that)) return false;
+        if (!(o instanceof DogHasHandlerDto that)) return false;
         return Objects.equals(id, that.id);
     }
 

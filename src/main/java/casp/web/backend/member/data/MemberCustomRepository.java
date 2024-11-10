@@ -1,4 +1,4 @@
-package casp.web.backend.data.access.layer.member;
+package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
 import jakarta.annotation.Nullable;
