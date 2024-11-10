@@ -8,6 +8,7 @@ import casp.web.backend.business.logic.layer.event.types.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
+import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
@@ -15,10 +16,8 @@ import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.participants.Space;
 import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.data.access.layer.event.types.CourseRepository;
-import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
-import casp.web.backend.dog.data.DogRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -69,8 +68,6 @@ class CourseRestControllerTest {
     @Autowired
     private MemberReferenceRepository memberReferenceRepository;
     @Autowired
-    private DogRepository dogRepository;
-    @Autowired
     private DogReferenceRepository dogReferenceRepository;
     @Autowired
     private DogHasHandlerRepository dogHasHandlerRepository;
@@ -87,21 +84,21 @@ class CourseRestControllerTest {
     private DogHasHandler dogHasHandler;
     private MemberReference member;
     private LocalDateTime startDateTime;
-    private Dog dog;
+    private DogReference dog;
 
 
     @BeforeEach
     void setUp() {
         courseRepository.deleteAll();
         dogHasHandlerRepository.deleteAll();
-        dogRepository.deleteAll();
+        dogReferenceRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
         member = memberReferenceRepository.save(TestFixture.createMemberReference());
-        dog = dogRepository.save(TestFixture.createDog());
+        dog = dogReferenceRepository.save(TestFixture.createDogReference());
         dogHasHandler = new DogHasHandler();
         dogHasHandler.setMember(member);
-        dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandler::setDog);
+        dogHasHandler.setDog(dog);
         dogHasHandler = dogHasHandlerRepository.save(dogHasHandler);
         course = new Course();
         course.setName("course");
@@ -194,7 +191,7 @@ class CourseRestControllerTest {
         private Space createNonExistingSpace() {
             var dogHasHandlerReference = new DogHasHandlerReference();
             dogHasHandlerReference.setMember(member);
-            dogReferenceRepository.findById(dog.getId()).ifPresent(dogHasHandlerReference::setDog);
+            dogHasHandlerReference.setDog(dog);
             return new Space(dogHasHandlerReference);
         }
 
