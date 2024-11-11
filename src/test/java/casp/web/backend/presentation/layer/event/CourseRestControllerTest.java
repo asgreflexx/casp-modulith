@@ -16,8 +16,6 @@ import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
 import casp.web.backend.data.access.layer.event.participants.Space;
 import casp.web.backend.data.access.layer.event.types.Course;
 import casp.web.backend.data.access.layer.event.types.CourseRepository;
-import casp.web.backend.dog.data.DogHasHandler;
-import casp.web.backend.dog.data.DogHasHandlerRepository;
 import casp.web.backend.presentation.layer.MvcMapper;
 import casp.web.backend.presentation.layer.RestResponsePage;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -70,8 +68,6 @@ class CourseRestControllerTest {
     @Autowired
     private DogReferenceRepository dogReferenceRepository;
     @Autowired
-    private DogHasHandlerRepository dogHasHandlerRepository;
-    @Autowired
     private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @SpyBean
@@ -81,7 +77,7 @@ class CourseRestControllerTest {
     private ArgumentCaptor<SpaceDto> spaceCaptor;
 
     private Course course;
-    private DogHasHandler dogHasHandler;
+    private DogHasHandlerReference dogHasHandler;
     private MemberReference member;
     private LocalDateTime startDateTime;
     private DogReference dog;
@@ -90,16 +86,16 @@ class CourseRestControllerTest {
     @BeforeEach
     void setUp() {
         courseRepository.deleteAll();
-        dogHasHandlerRepository.deleteAll();
+        dogHasHandlerReferenceRepository.deleteAll();
         dogReferenceRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
         member = memberReferenceRepository.save(ReferenceTestFixture.createMemberReference());
         dog = dogReferenceRepository.save(ReferenceTestFixture.createDogReference());
-        dogHasHandler = new DogHasHandler();
+        dogHasHandler = new DogHasHandlerReference();
         dogHasHandler.setMember(member);
         dogHasHandler.setDog(dog);
-        dogHasHandler = dogHasHandlerRepository.save(dogHasHandler);
+        dogHasHandler = dogHasHandlerReferenceRepository.save(dogHasHandler);
         course = new Course();
         course.setName("course");
         startDateTime = LocalDateTime.now();
