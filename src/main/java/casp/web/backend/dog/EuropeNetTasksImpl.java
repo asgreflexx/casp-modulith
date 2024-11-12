@@ -50,7 +50,7 @@ class EuropeNetTasksImpl implements EuropeNetTasks {
 
     @Scheduled(cron = "${casp.cron}")
     void scheduleChipNumbersCheckTask() {
-        var dogPage = dogService.getDogsThatWereNotChecked(null);
+        var dogPage = dogService.getDogsThatWereNotChecked(Pageable.unpaged());
         registerDogs(dogPage);
     }
 

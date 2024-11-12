@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -58,7 +59,7 @@ class EuropeNetTasksImplTest {
 
     @Test
     void theAreNoDogsToRegister() {
-        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(new PageImpl<>(List.of()));
+        when(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of()));
 
         europeNetTasks.scheduleChipNumbersCheckTask();
 
@@ -68,9 +69,9 @@ class EuropeNetTasksImplTest {
     @Test
     void registerDogsManually() {
         var expectedPage = new PageImpl<DogDto>(List.of());
-        when(dogService.getDogsThatWereNotChecked(null)).thenReturn(new PageImpl<>(List.of()));
+        when(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of()));
 
-        var actualPage = europeNetTasks.registerDogsManually(null);
+        var actualPage = europeNetTasks.registerDogsManually(Pageable.unpaged());
 
         assertEquals(expectedPage, actualPage);
     }
@@ -81,7 +82,7 @@ class EuropeNetTasksImplTest {
         void setUp() {
             dog.setChipNumber("chipNumber");
             var dogPage = new PageImpl<>(List.of(DOG_MAPPER.toTarget(dog)));
-            when(dogService.getDogsThatWereNotChecked(null)).thenReturn(dogPage);
+            when(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).thenReturn(dogPage);
         }
 
         @Test

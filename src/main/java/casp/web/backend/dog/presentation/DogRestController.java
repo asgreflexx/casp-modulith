@@ -2,7 +2,6 @@ package casp.web.backend.dog.presentation;
 
 import casp.web.backend.dog.DogService;
 import casp.web.backend.dog.EuropeNetTasks;
-import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +62,7 @@ class DogRestController {
     }
 
     @PostMapping("register")
-    ResponseEntity<Page<DogRead>> register(@ParameterObject @Nullable Pageable pageable) {
+    ResponseEntity<Page<DogRead>> register(@ParameterObject Pageable pageable) {
         var dogDtoPage = europeNetTasks.registerDogsManually(pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogDtoPage));
     }

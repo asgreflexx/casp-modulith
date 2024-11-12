@@ -125,7 +125,7 @@ class DogServiceImplTest {
 
         @Test
         void pageableIsNull() {
-            assertThat(dogService.getDogsThatWereNotChecked(null)).containsExactly(DOG_MAPPER.toTarget(dog));
+            assertThat(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).containsExactly(DOG_MAPPER.toTarget(dog));
         }
 
         @Test

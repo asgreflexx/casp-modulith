@@ -75,8 +75,7 @@ class DogServiceImpl implements DogService {
 
     @Override
     public Page<DogDto> getDogsThatWereNotChecked(Pageable pageable) {
-        var pageRequest = pageable != null ? pageable : Pageable.unpaged();
-        return DOG_MAPPER.toTargetPage(dogRepository.findAllByEuropeNetStateNotChecked(pageRequest));
+        return DOG_MAPPER.toTargetPage(dogRepository.findAllByEuropeNetStateNotChecked(pageable));
     }
 
     private Dog getActiveDog(UUID id) {
