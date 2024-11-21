@@ -1,5 +1,6 @@
 package casp.web.backend.deprecated.event.calendar;
 
+import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.deprecated.event.types.BaseEvent;
 import com.querydsl.core.annotations.QueryEntity;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 import java.util.StringJoiner;
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.event.calendar.CalendarEntry} instead. It will be removed in #3.
+ * @deprecated use {@link CalendarEntry} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @QueryEntity

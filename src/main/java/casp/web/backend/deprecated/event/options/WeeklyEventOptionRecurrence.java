@@ -1,7 +1,7 @@
 package casp.web.backend.deprecated.event.options;
 
 
-import casp.web.backend.data.access.layer.event.options.WeeklyOption;
+import casp.web.backend.calendar.data.options.WeeklyOption;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 

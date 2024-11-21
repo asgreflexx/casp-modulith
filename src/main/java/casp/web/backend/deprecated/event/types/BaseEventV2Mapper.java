@@ -1,8 +1,8 @@
 package casp.web.backend.deprecated.event.types;
 
-import casp.web.backend.data.access.layer.event.types.Course;
-import casp.web.backend.data.access.layer.event.types.Event;
-import casp.web.backend.data.access.layer.event.types.Exam;
+import casp.web.backend.calendar.data.Course;
+import casp.web.backend.calendar.data.Event;
+import casp.web.backend.calendar.data.Exam;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

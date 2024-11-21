@@ -1,6 +1,6 @@
 package casp.web.backend.deprecated.event.calendar;
 
-import casp.web.backend.data.access.layer.event.calendar.CalendarEntry;
+import casp.web.backend.calendar.data.CalendarEntry;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

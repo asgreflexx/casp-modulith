@@ -1,7 +1,7 @@
 package casp.web.backend.deprecated.event.options;
 
 
-import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
+import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalTime;

@@ -1,6 +1,6 @@
 package casp.web.backend.member.presentation;
 
-import casp.web.backend.business.logic.layer.event.types.SpaceDto;
+import casp.web.backend.calendar.SpaceDto;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Gender;

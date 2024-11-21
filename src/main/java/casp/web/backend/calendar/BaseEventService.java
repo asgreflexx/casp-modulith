@@ -1,0 +1,29 @@
+package casp.web.backend.calendar;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+import java.util.stream.Stream;
+
+interface BaseEventService<T extends BaseEventDto> {
+    void save(T dto);
+
+    void deleteById(UUID id);
+
+    void deleteBaseEventsByMemberId(UUID memberId);
+
+    void deactivateBaseEventsByMemberId(UUID memberId);
+
+    void activateBaseEventsByMemberId(UUID memberId);
+
+    Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
+
+    T getOneByIdAndCalendarEntryId(UUID id, UUID calendarEntryId);
+
+    T getOneById(UUID id);
+
+    /**
+     * @deprecated It will be removed in #3.
+     */
+    @Deprecated(forRemoval = true, since = "0.0.0")
+    void migrateDataToV2();
+}

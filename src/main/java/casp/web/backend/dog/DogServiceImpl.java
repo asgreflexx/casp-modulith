@@ -1,6 +1,6 @@
 package casp.web.backend.dog;
 
-import casp.web.backend.business.logic.layer.event.types.CourseService;
+import casp.web.backend.calendar.CourseService;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.dog.data.Dog;

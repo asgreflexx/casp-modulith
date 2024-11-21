@@ -9,7 +9,7 @@ import java.util.StringJoiner;
 
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.event.types.Exam} instead. It will be removed in #3.
+ * @deprecated use {@link casp.web.backend.calendar.data.Exam} instead. It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @QueryEntity

@@ -1,9 +1,9 @@
 package casp.web.backend.deprecated.event.participants;
 
-import casp.web.backend.data.access.layer.event.participants.CoTrainer;
-import casp.web.backend.data.access.layer.event.participants.EventParticipant;
-import casp.web.backend.data.access.layer.event.participants.ExamParticipant;
-import casp.web.backend.data.access.layer.event.participants.Space;
+import casp.web.backend.calendar.data.participants.CoTrainer;
+import casp.web.backend.calendar.data.participants.EventParticipant;
+import casp.web.backend.calendar.data.participants.ExamParticipant;
+import casp.web.backend.calendar.data.participants.Space;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

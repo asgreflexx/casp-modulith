@@ -1,8 +1,8 @@
 package casp.web.backend.deprecated.event.options;
 
-import casp.web.backend.data.access.layer.event.options.DailyRecurrenceOption;
-import casp.web.backend.data.access.layer.event.options.WeeklyOption;
-import casp.web.backend.data.access.layer.event.options.WeeklyRecurrenceOption;
+import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
+import casp.web.backend.calendar.data.options.WeeklyOption;
+import casp.web.backend.calendar.data.options.WeeklyRecurrenceOption;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

@@ -1,6 +1,6 @@
 package casp.web.backend.deprecated.event.options;
 
-import casp.web.backend.data.access.layer.event.options.RecurrenceOption;
+import casp.web.backend.calendar.data.options.RecurrenceOption;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;

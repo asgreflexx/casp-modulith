@@ -1,6 +1,6 @@
 package casp.web.backend.dog;
 
-import casp.web.backend.business.logic.layer.event.types.SpaceDto;
+import casp.web.backend.calendar.SpaceDto;
 import jakarta.validation.Valid;
 
 import java.util.Set;

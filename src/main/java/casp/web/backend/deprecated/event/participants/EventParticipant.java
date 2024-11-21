@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
- * @deprecated use {@link casp.web.backend.data.access.layer.event.participants.EventParticipant} instead.It will be removed in #3.
+ * @deprecated use {@link casp.web.backend.calendar.data.participants.EventParticipant} instead.It will be removed in #3.
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @QueryEntity
