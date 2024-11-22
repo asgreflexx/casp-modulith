@@ -4,6 +4,7 @@ import casp.web.backend.calendar.data.Event;
 import casp.web.backend.calendar.data.EventRepository;
 import casp.web.backend.calendar.data.participants.EventParticipant;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

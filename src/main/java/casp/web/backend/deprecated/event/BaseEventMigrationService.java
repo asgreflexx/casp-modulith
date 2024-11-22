@@ -1,4 +1,4 @@
-package casp.web.backend.calendar;
+package casp.web.backend.deprecated.event;
 
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.Course;
@@ -35,7 +35,7 @@ import static casp.web.backend.deprecated.event.types.BaseEventV2Mapper.BASE_EVE
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @Service
-class BaseEventMigrationService {
+public class BaseEventMigrationService {
     private static final Sort SORT = Sort.by("eventFrom").ascending().and(Sort.by("eventTo").ascending());
 
     private final BaseEventRepository baseEventRepository;
@@ -56,7 +56,7 @@ class BaseEventMigrationService {
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
-    static Optional<RecurrenceOption> mapToBaseEventOptionV2(BaseEvent baseEvent) {
+    private static Optional<RecurrenceOption> mapToBaseEventOptionV2(BaseEvent baseEvent) {
         if (null != baseEvent.getDailyOption()) {
             return Optional.of(BASE_EVENT_OPTION_V2_MAPPER.toDailyEventOption(baseEvent.getDailyOption()));
         } else if (null != baseEvent.getWeeklyOption()) {
@@ -66,7 +66,7 @@ class BaseEventMigrationService {
         }
     }
 
-    Set<Course> mapToCourseV2() {
+    public Set<Course> mapToCourseV2() {
         return baseEventRepository.findAllByEventType(casp.web.backend.deprecated.event.types.Course.EVENT_TYPE)
                 .stream()
                 .flatMap(cv1 -> memberReferenceRepository.findById(cv1.getMemberId())
@@ -74,7 +74,7 @@ class BaseEventMigrationService {
                 ).collect(Collectors.toSet());
     }
 
-    Set<Event> mapToEventV2() {
+    public Set<Event> mapToEventV2() {
         return baseEventRepository.findAllByEventType(casp.web.backend.deprecated.event.types.Event.EVENT_TYPE)
                 .stream()
                 .flatMap(ev1 -> memberReferenceRepository.findById(ev1.getMemberId())
@@ -82,7 +82,7 @@ class BaseEventMigrationService {
                 ).collect(Collectors.toSet());
     }
 
-    Set<Exam> mapToExamV2() {
+    public Set<Exam> mapToExamV2() {
         return baseEventRepository.findAllByEventType(casp.web.backend.deprecated.event.types.Exam.EVENT_TYPE)
                 .stream()
                 .flatMap(ev1 -> memberReferenceRepository.findById(ev1.getMemberId())

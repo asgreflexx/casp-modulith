@@ -14,6 +14,7 @@ import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

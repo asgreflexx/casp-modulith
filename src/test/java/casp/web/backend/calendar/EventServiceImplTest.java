@@ -9,6 +9,7 @@ import casp.web.backend.calendar.data.participants.EventParticipant;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;

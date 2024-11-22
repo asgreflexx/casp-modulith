@@ -12,6 +12,7 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

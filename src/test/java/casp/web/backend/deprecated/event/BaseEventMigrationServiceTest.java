@@ -1,4 +1,4 @@
-package casp.web.backend.calendar;
+package casp.web.backend.deprecated.event;
 
 import casp.web.backend.calendar.data.BaseEvent;
 import casp.web.backend.calendar.options.BaseRecurrenceOptionType;

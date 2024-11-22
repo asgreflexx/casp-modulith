@@ -5,6 +5,7 @@ import casp.web.backend.calendar.data.ExamRepository;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
