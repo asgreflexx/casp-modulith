@@ -29,18 +29,7 @@ pipeline {
                 script {
                     sh 'mvn -B clean verify'
                 }
-                jacoco changeBuildStatus: true,
-                        exclusionPattern: createExclusionPattern(),
-                        maximumBranchCoverage: '80',
-                        maximumClassCoverage: '80',
-                        maximumComplexityCoverage: '80',
-                        maximumLineCoverage: '80',
-                        maximumMethodCoverage: '80',
-                        minimumBranchCoverage: '50',
-                        minimumClassCoverage: '50',
-                        minimumComplexityCoverage: '50',
-                        minimumLineCoverage: '50',
-                        minimumMethodCoverage: '50'
+                recordCoverage(tools: [[parser: 'JACOCO']])
             }
         }
 
@@ -90,20 +79,3 @@ pipeline {
         }
     }
 }
-
-def createExclusionPattern() {
-    def pom = readMavenPom file: 'pom.xml'
-
-    def exclusions = []
-    def plugin = pom.getBuild().getPlugins().find { p -> 'jacoco-maven-plugin' == p.getArtifactId() }
-    if (plugin) {
-        def lines = plugin.getConfiguration().toString().split('\n')
-        lines.each { line ->
-            if (line.contains('<exclude>')) {
-                exclusions.add(line.replace('<exclude>', '').replace('</exclude>', '').replace(' ', ''))
-            }
-        }
-    }
-    return exclusions.join(', ')
-}
-

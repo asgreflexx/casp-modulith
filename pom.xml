@@ -186,6 +186,7 @@
                         <exclude>**/*DogHasHandler.class</exclude>
                         <exclude>**/*DogHasHandlerReference.class</exclude>
                         <exclude>**/*Grade.class</exclude>
+                        <exclude>**/*GradeType.class</exclude>
                         <exclude>**/*Calendar.class</exclude>
                         <exclude>**/*CalendarEntry.class</exclude>
                         <exclude>**/*RecurrenceOption.class</exclude>
@@ -211,6 +212,43 @@
                         <exclude>**/*Write.class</exclude>
                         <exclude>**/*Mapper*.class</exclude>
                     </excludes>
+                    <rules>
+                        <rule>
+                            <element>BUNDLE</element>
+                            <limits>
+                                <limit>
+                                    <counter>INSTRUCTION</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>BRANCH</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>COMPLEXITY</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>LINE</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>METHOD</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>CLASS</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                            </limits>
+                        </rule>
+                    </rules>
                 </configuration>
                 <executions>
                     <execution>
