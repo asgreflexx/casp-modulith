@@ -28,6 +28,7 @@
         <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
         <de.flapdoodle.embed.mongo.spring3x.version>4.16.1</de.flapdoodle.embed.mongo.spring3x.version>
+        <javers-spring-boot-starter-mongo.version>7.7.0</javers-spring-boot-starter-mongo.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -75,6 +76,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-spring-boot-starter-mongo</artifactId>
+            <version>${javers-spring-boot-starter-mongo.version}</version>
         </dependency>
         <!-- Embedded Mongo https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo.spring -->
         <dependency>
