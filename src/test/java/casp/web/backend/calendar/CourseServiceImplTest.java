@@ -481,7 +481,7 @@ class CourseServiceImplTest {
         }
 
         private Course getCourseSaved() {
-            verify(courseRepository).setMetadataAndSave(courseCaptor.capture());
+            verify(courseRepository).save(courseCaptor.capture());
             return courseCaptor.getValue();
         }
 

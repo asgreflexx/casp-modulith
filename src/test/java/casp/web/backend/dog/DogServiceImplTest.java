@@ -91,7 +91,7 @@ class DogServiceImplTest {
     class SaveDog {
         @Test
         void createNewDog() {
-            when(dogRepository.setMetadataAndSave(dog)).thenAnswer(i -> i.getArgument(0));
+            when(dogRepository.save(dog)).thenAnswer(i -> i.getArgument(0));
 
             var actualDogDto = dogService.saveDog(dogDto);
 
@@ -101,12 +101,12 @@ class DogServiceImplTest {
 
         @Test
         void updateExistingDog() {
-            when(dogRepository.setMetadataAndSave(dog)).thenAnswer(i -> i.getArgument(0));
+            when(dogRepository.save(dog)).thenAnswer(i -> i.getArgument(0));
 
             dogService.saveDog(dogDto);
 
             verify(courseService).getSpacesByDogHasHandlers(Set.of());
-            verify(dogRepository).setMetadataAndSave(dogCaptor.capture());
+            verify(dogRepository).save(dogCaptor.capture());
             assertThat(dogCaptor.getValue()).usingRecursiveAssertion().isEqualTo(dog);
         }
     }

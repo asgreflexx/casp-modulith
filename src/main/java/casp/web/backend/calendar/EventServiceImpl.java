@@ -29,7 +29,7 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements 
         setCalendarEntriesAndMember(dto, event);
         setParticipants(dto, event);
 
-        baseRepository.setMetadataAndSave(event);
+        baseRepository.save(event);
     }
 
     @Override

@@ -83,7 +83,7 @@ class MemberServiceImpl implements MemberService {
                     }
                 });
 
-        return mapToMemberDto(memberRepository.setMetadataAndSave(member));
+        return mapToMemberDto(memberRepository.save(member));
     }
 
     @Override

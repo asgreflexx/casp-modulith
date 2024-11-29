@@ -12,7 +12,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
@@ -87,23 +86,5 @@ public class DogHasHandler extends BaseDocument {
     @Override
     public int hashCode() {
         return super.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", DogHasHandler.class.getSimpleName() + "[", "]")
-                .add("memberId=" + memberId)
-                .add("member=" + member)
-                .add("dogId=" + dogId)
-                .add("dog=" + dog)
-                .add("grades=" + grades)
-                .add("id=" + id)
-                .add("version=" + version)
-                .add("createdBy='" + createdBy + "'")
-                .add("created=" + created)
-                .add("modifiedBy='" + modifiedBy + "'")
-                .add("modified=" + modified)
-                .add("entityStatus=" + entityStatus)
-                .toString();
     }
 }

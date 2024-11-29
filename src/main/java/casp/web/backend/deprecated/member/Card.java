@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
@@ -71,22 +70,5 @@ public class Card extends BaseDocument {
     @Override
     public int hashCode() {
         return super.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Card.class.getSimpleName() + "[", "]")
-                .add("code='" + code + "'")
-                .add("memberId=" + memberId)
-                .add("member=" + member)
-                .add("balance=" + balance)
-                .add("id=" + id)
-                .add("version=" + version)
-                .add("createdBy='" + createdBy + "'")
-                .add("created=" + created)
-                .add("modifiedBy='" + modifiedBy + "'")
-                .add("modified=" + modified)
-                .add("entityStatus=" + entityStatus)
-                .toString();
     }
 }

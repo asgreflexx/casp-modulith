@@ -229,11 +229,11 @@ class MemberServiceImplTest {
     class SaveMember {
         @Test
         void emailDoesNotExists() {
-            when(memberRepository.setMetadataAndSave(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
+            when(memberRepository.save(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));
 
-            verify(memberRepository).setMetadataAndSave(memberCaptor.capture());
+            verify(memberRepository).save(memberCaptor.capture());
             verify(courseService).getSpacesByDogHasHandlers(Set.of());
             assertThat(memberCaptor.getValue())
                     .usingRecursiveComparison()
@@ -251,11 +251,11 @@ class MemberServiceImplTest {
         @Test
         void updateMember() {
             when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(member));
-            when(memberRepository.setMetadataAndSave(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
+            when(memberRepository.save(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));
 
-            verify(memberRepository).setMetadataAndSave(memberCaptor.capture());
+            verify(memberRepository).save(memberCaptor.capture());
             verify(courseService).getSpacesByDogHasHandlers(Set.of());
             assertThat(memberCaptor.getValue())
                     .usingRecursiveComparison()

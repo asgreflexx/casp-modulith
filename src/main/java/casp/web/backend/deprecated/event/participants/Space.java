@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.util.StringJoiner;
 
 /**
  * @deprecated use {@link casp.web.backend.calendar.data.participants.Space} instead.It will be removed in #3.
@@ -85,26 +84,5 @@ public class Space extends BaseParticipant {
 
     public void setDogHasHandler(DogHasHandler dogHasHandler) {
         this.dogHasHandler = dogHasHandler;
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Space.class.getSimpleName() + "[", "]")
-                .add("note='" + note + "'")
-                .add("paidPrice=" + paidPrice)
-                .add("isPaid=" + isPaid)
-                .add("paidDate=" + paidDate)
-                .add("participantType='" + participantType + "'")
-                .add("memberOrHandlerId=" + memberOrHandlerId)
-                .add("response=" + response)
-                .add("baseEvent=" + baseEvent)
-                .add("id=" + id)
-                .add("version=" + version)
-                .add("createdBy='" + createdBy + "'")
-                .add("created=" + created)
-                .add("modifiedBy='" + modifiedBy + "'")
-                .add("modified=" + modified)
-                .add("entityStatus=" + entityStatus)
-                .toString();
     }
 }

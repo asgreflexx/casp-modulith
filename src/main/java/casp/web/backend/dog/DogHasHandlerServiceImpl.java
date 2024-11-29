@@ -73,7 +73,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         dogHasHandler.setDog(dog);
         dogHasHandler.setMember(member);
 
-        return DOG_HAS_HANDLER_MAPPER.toTarget(dogHasHandlerRepository.setMetadataAndSave(dogHasHandler));
+        return DOG_HAS_HANDLER_MAPPER.toTarget(dogHasHandlerRepository.save(dogHasHandler));
     }
 
     @Override

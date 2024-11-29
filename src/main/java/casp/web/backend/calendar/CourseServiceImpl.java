@@ -70,7 +70,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         setCoTrainers(dto, course);
         setSpaces(dto, course);
 
-        courseRepository.setMetadataAndSave(course);
+        courseRepository.save(course);
     }
 
     @Override

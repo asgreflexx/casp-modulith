@@ -283,7 +283,7 @@ class ExamServiceImplTest {
         }
 
         private Exam getExamSaved() {
-            verify(examRepository).setMetadataAndSave(examCaptor.capture());
+            verify(examRepository).save(examCaptor.capture());
             return examCaptor.getValue();
         }
 

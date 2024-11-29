@@ -5,8 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.StringJoiner;
-
 
 /**
  * @deprecated use {@link casp.web.backend.calendar.data.Exam} instead. It will be removed in #3.
@@ -41,28 +39,5 @@ public class Exam extends BaseEvent {
     @Override
     public int hashCode() {
         return super.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Exam.class.getSimpleName() + "[", "]")
-                .add("judgeName='" + judgeName + "'")
-                .add("eventType='" + eventType + "'")
-                .add("name='" + name + "'")
-                .add("description='" + description + "'")
-                .add("memberId=" + memberId)
-                .add("dailyOption=" + dailyOption)
-                .add("weeklyOption=" + weeklyOption)
-                .add("minLocalDateTime=" + minLocalDateTime)
-                .add("maxLocalDateTime=" + maxLocalDateTime)
-                .add("participantsSize=" + participantsSize)
-                .add("id=" + id)
-                .add("version=" + version)
-                .add("createdBy='" + createdBy + "'")
-                .add("created=" + created)
-                .add("modifiedBy='" + modifiedBy + "'")
-                .add("modified=" + modified)
-                .add("entityStatus=" + entityStatus)
-                .toString();
     }
 }

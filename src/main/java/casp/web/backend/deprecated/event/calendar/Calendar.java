@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-import java.util.StringJoiner;
 
 /**
  * @deprecated use {@link CalendarEntry} instead. It will be removed in #3.
@@ -92,22 +91,5 @@ public class Calendar extends BaseDocument implements Comparable<Calendar> {
     @Override
     public int hashCode() {
         return super.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", Calendar.class.getSimpleName() + "[", "]")
-                .add("eventFrom=" + eventFrom)
-                .add("eventTo=" + eventTo)
-                .add("location='" + location + "'")
-                .add("baseEvent=" + baseEvent)
-                .add("id=" + id)
-                .add("version=" + version)
-                .add("createdBy='" + createdBy + "'")
-                .add("created=" + created)
-                .add("modifiedBy='" + modifiedBy + "'")
-                .add("modified=" + modified)
-                .add("entityStatus=" + entityStatus)
-                .toString();
     }
 }

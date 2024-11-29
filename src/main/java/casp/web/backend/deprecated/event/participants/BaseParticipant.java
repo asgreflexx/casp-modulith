@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Pattern;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.StringJoiner;
 import java.util.UUID;
 
 /**
@@ -79,22 +78,5 @@ public class BaseParticipant extends BaseDocument {
 
     public void setBaseEvent(BaseEvent baseEvent) {
         this.baseEvent = baseEvent;
-    }
-
-    @Override
-    public String toString() {
-        return new StringJoiner(", ", "[", "]")
-                .add("participantType='" + participantType + "'")
-                .add("memberOrHandlerId=" + memberOrHandlerId)
-                .add("response=" + response)
-                .add("baseEvent=" + baseEvent)
-                .add("id=" + id)
-                .add("version=" + version)
-                .add("createdBy='" + createdBy + "'")
-                .add("created=" + created)
-                .add("modifiedBy='" + modifiedBy + "'")
-                .add("modified=" + modified)
-                .add("entityStatus=" + entityStatus)
-                .toString();
     }
 }

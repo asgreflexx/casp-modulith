@@ -46,7 +46,7 @@ class DogServiceImpl implements DogService {
     @Override
     public DogDto saveDog(DogDto dogDto) {
         var dog = DOG_MAPPER.toSource(dogDto);
-        return mapToDogDto(dogRepository.setMetadataAndSave(dog));
+        return mapToDogDto(dogRepository.save(dog));
     }
 
     @Override

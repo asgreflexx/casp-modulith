@@ -285,7 +285,7 @@ class EventServiceImplTest {
         }
 
         private Event getEventSaved() {
-            verify(eventRepository).setMetadataAndSave(eventCaptor.capture());
+            verify(eventRepository).save(eventCaptor.capture());
             return eventCaptor.getValue();
         }
 

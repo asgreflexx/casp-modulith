@@ -29,7 +29,7 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
         setCalendarEntriesAndMember(dto, exam);
         setParticipants(dto, exam);
 
-        baseRepository.setMetadataAndSave(exam);
+        baseRepository.save(exam);
     }
 
     @Override

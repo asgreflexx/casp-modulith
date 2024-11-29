@@ -219,7 +219,7 @@ class DogHasHandlerServiceImplTest {
         void memberAndDogExist() {
             when(dogReferenceRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
             when(memberReferenceRepository.findOneByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
-            when(dogHasHandlerRepository.setMetadataAndSave(dogHasHandler)).thenAnswer(i -> i.getArgument(0));
+            when(dogHasHandlerRepository.save(dogHasHandler)).thenAnswer(i -> i.getArgument(0));
 
             var actualDogHasHandlerDto = dogHasHandlerService.saveDogHasHandler(dogHasHandlerDto);
 
@@ -234,7 +234,7 @@ class DogHasHandlerServiceImplTest {
             when(dogReferenceRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
             when(memberReferenceRepository.findOneByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
             when(dogHasHandlerRepository.findByDogIdAndMemberId(dog.getId(), member.getId())).thenReturn(Optional.of(existingDogHasHandler));
-            when(dogHasHandlerRepository.setMetadataAndSave(dogHasHandler)).thenAnswer(i -> i.getArgument(0));
+            when(dogHasHandlerRepository.save(dogHasHandler)).thenAnswer(i -> i.getArgument(0));
 
             var actualDogHasHandlerDto = dogHasHandlerService.saveDogHasHandler(dogHasHandlerDto);
 
