@@ -182,8 +182,7 @@
                     <excludes>
                         <exclude>**/*Test*.class</exclude>
                         <exclude>**/AdminApplication.class</exclude>
-                        <exclude>**/DevCorsConfiguration.class</exclude>
-                        <exclude>**/GlobalExceptionHandler.class</exclude>
+                        <exclude>**/configuration/**/*</exclude>
                         <exclude>**/deprecated/**/*.class</exclude>
                         <exclude>**/*BaseView.class</exclude>
                         <exclude>**/*BaseDocument.class</exclude>
