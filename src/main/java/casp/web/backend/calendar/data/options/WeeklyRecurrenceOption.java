@@ -5,6 +5,7 @@ import casp.web.backend.calendar.options.BaseRecurrenceOptionType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +19,22 @@ public class WeeklyRecurrenceOption extends RecurrenceOption {
     }
 
     public List<WeeklyOption> getOccurrences() {
-        return occurrences;
+        return occurrences.stream().sorted().toList();
     }
 
     public void setOccurrences(List<WeeklyOption> occurrences) {
         this.occurrences = occurrences;
+    }
+
+    @Override
+    public LocalDateTime min() {
+        var first = getOccurrences().getFirst();
+        return LocalDateTime.of(startRecurrence, first.getStartTime());
+    }
+
+    @Override
+    public LocalDateTime max() {
+        var last = getOccurrences().getLast();
+        return LocalDateTime.of(endRecurrence, last.getEndTime());
     }
 }

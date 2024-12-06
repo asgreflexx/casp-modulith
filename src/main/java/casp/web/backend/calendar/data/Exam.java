@@ -33,15 +33,18 @@ public class Exam extends BaseEvent implements ExamRequiredFields {
 
     @Override
     public Set<ExamParticipant> getParticipants() {
-        return participants
-                .stream()
-                .filter(p -> isDogHasHandlerNotDeleted(p.getDogHasHandler()))
-                .collect(Collectors.toSet());
+        return getNotDeletedParticipants();
     }
 
     @Override
     public void setParticipants(Set<ExamParticipant> participants) {
         this.participants = participants;
+    }
+
+    public void addParticipants(Set<ExamParticipant> newParticipants) {
+        var actualParticipants = getNotDeletedParticipants();
+        actualParticipants.addAll(newParticipants);
+        this.participants = actualParticipants;
     }
 
     @Override
@@ -52,5 +55,12 @@ public class Exam extends BaseEvent implements ExamRequiredFields {
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    private Set<ExamParticipant> getNotDeletedParticipants() {
+        return participants
+                .stream()
+                .filter(p -> isDogHasHandlerNotDeleted(p.getDogHasHandler()))
+                .collect(Collectors.toSet());
     }
 }

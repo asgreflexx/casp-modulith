@@ -12,18 +12,14 @@ enum DailyOptionUtility {
 
     static List<CalendarEntry> createCalendarEntries(DailyRecurrenceOption option) {
         List<CalendarEntry> calendarList = new ArrayList<>();
-        var eventFrom =
-                LocalDateTime.of(option.getStartRecurrence(), option.getStartTime());
-        var eventTo =
-                LocalDateTime.of(eventFrom.toLocalDate(), option.getEndTime());
-        var end =
-                LocalDateTime.of(option.getEndRecurrence(), option.getEndTime());
-
+        var eventFrom = option.min();
+        var end = option.max();
         do {
+            var eventTo =
+                    LocalDateTime.of(eventFrom.toLocalDate(), option.getEndTime());
             calendarList.add(new CalendarEntry(eventFrom, eventTo));
             eventFrom = eventFrom.plusDays(option.getRepeatEvery());
-            eventTo = eventTo.plusDays(option.getRepeatEvery());
-        } while (!eventTo.isAfter(end));
+        } while (!eventFrom.isAfter(end));
 
         return calendarList;
     }

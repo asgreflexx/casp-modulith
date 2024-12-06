@@ -120,26 +120,30 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     }
 
     private void setCoTrainers(CourseDto courseDto, Course course) {
-        var actualCoTrainers = course.getCoTrainers();
-        var newCoTrainers = courseDto.getNewCoTrainers()
+        var newCoTrainers = mapToCoTrainers(courseDto.getNewCoTrainers());
+        course.addCoTrainers(newCoTrainers);
+    }
+
+    private Set<CoTrainer> mapToCoTrainers(final Set<UUID> memberIds) {
+        return memberIds
                 .stream()
                 .flatMap(id -> findMemberReferenceById(id)
                         .map(CoTrainer::new)
                         .stream())
                 .collect(Collectors.toSet());
-        actualCoTrainers.addAll(newCoTrainers);
-        course.setCoTrainers(actualCoTrainers);
     }
 
     private void setSpaces(CourseDto courseDto, Course course) {
-        var actualSpaces = courseDto.getSpaces();
-        var newSpaces = courseDto.getNewSpaces()
+        var newSpaces = mapToSpaces(courseDto.getNewSpaces());
+        course.addSpaces(newSpaces);
+    }
+
+    private Set<Space> mapToSpaces(final Set<UUID> dogHasHandlerIds) {
+        return dogHasHandlerIds
                 .stream()
                 .flatMap(id -> findDogHandlerReferenceById(id)
                         .map(Space::new)
                         .stream())
                 .collect(Collectors.toSet());
-        actualSpaces.addAll(newSpaces);
-        course.setSpaces(actualSpaces);
     }
 }

@@ -8,6 +8,7 @@ import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,14 +39,16 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements 
     }
 
     private void setParticipants(EventDto eventDto, Event event) {
-        var actualParticipants = event.getParticipants();
-        var eventParticipantSet = eventDto.getNewParticipants()
+        var newParticipants = mapToParticipants(eventDto.getNewParticipants());
+        event.addParticipants(newParticipants);
+    }
+
+    private Set<EventParticipant> mapToParticipants(final Set<UUID> memberIds) {
+        return memberIds
                 .stream()
                 .flatMap(id -> findMemberReferenceById(id)
                         .map(EventParticipant::new)
                         .stream())
                 .collect(Collectors.toSet());
-        actualParticipants.addAll(eventParticipantSet);
-        event.setParticipants(actualParticipants);
     }
 }

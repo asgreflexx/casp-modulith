@@ -25,17 +25,17 @@ class BaseEventObserverImpl implements BaseEventObserver {
 
     @Override
     public void deleteBaseEventsByMemberId(UUID memberId) {
-        executeOperation(service -> service.deleteBaseEventsByMemberId(memberId));
+        performOperationOnAllServices(service -> service.deleteBaseEventsByMemberId(memberId));
     }
 
     @Override
     public void deactivateBaseEventsByMemberId(UUID memberId) {
-        executeOperation(service -> service.deactivateBaseEventsByMemberId(memberId));
+        performOperationOnAllServices(service -> service.deactivateBaseEventsByMemberId(memberId));
     }
 
     @Override
     public void activateBaseEventsByMemberId(UUID memberId) {
-        executeOperation(service -> service.activateBaseEventsByMemberId(memberId));
+        performOperationOnAllServices(service -> service.activateBaseEventsByMemberId(memberId));
     }
 
     @Override
@@ -46,7 +46,7 @@ class BaseEventObserverImpl implements BaseEventObserver {
                 .flatMap(observer -> observer.getValue().getCalendarEntriesBetweenFromAndTo(from, to));
     }
 
-    private void executeOperation(Consumer<BaseEventService<?>> operation) {
+    private void performOperationOnAllServices(Consumer<BaseEventService<?>> operation) {
         observerMap.values().forEach(operation);
     }
 }

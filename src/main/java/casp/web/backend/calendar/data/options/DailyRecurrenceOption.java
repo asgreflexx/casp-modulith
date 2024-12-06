@@ -6,6 +6,7 @@ import casp.web.backend.common.validation.EventOptionTimes;
 import casp.web.backend.common.validation.EventOptionTimesConstraint;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @EventOptionTimesConstraint
@@ -36,5 +37,15 @@ public class DailyRecurrenceOption extends RecurrenceOption implements EventOpti
 
     public void setEndTime(LocalTime endTime) {
         this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime min() {
+        return LocalDateTime.of(startRecurrence, startTime);
+    }
+
+    @Override
+    public LocalDateTime max() {
+        return LocalDateTime.of(endRecurrence, endTime);
     }
 }

@@ -37,10 +37,7 @@ public class Course extends BaseEvent implements BaseEventRequiredFields, Course
 
     @Override
     public Set<CoTrainer> getCoTrainers() {
-        return coTrainers
-                .stream()
-                .filter(ct -> isMemberNotDeleted(ct.getMember()))
-                .collect(Collectors.toSet());
+        return getNotDeletedCoTrainers();
     }
 
     @Override
@@ -48,12 +45,15 @@ public class Course extends BaseEvent implements BaseEventRequiredFields, Course
         this.coTrainers = coTrainers;
     }
 
+    public void addCoTrainers(Set<CoTrainer> coTrainers) {
+        var notDeletedCoTrainers = getNotDeletedCoTrainers();
+        notDeletedCoTrainers.addAll(coTrainers);
+        this.coTrainers = notDeletedCoTrainers;
+    }
+
     @Override
     public Set<Space> getSpaces() {
-        return spaces
-                .stream()
-                .filter(s -> isDogHasHandlerNotDeleted(s.getDogHasHandler()))
-                .collect(Collectors.toSet());
+        return getNotDeletedSpaces();
     }
 
     @Override
@@ -69,6 +69,12 @@ public class Course extends BaseEvent implements BaseEventRequiredFields, Course
         spaces.remove(space);
     }
 
+    public void addSpaces(Set<Space> spaces) {
+        var notDeletedSpaces = getNotDeletedSpaces();
+        notDeletedSpaces.addAll(spaces);
+        this.spaces = notDeletedSpaces;
+    }
+
     @Override
     public boolean equals(Object o) {
         return super.equals(o);
@@ -77,5 +83,19 @@ public class Course extends BaseEvent implements BaseEventRequiredFields, Course
     @Override
     public int hashCode() {
         return super.hashCode();
+    }
+
+    private Set<CoTrainer> getNotDeletedCoTrainers() {
+        return coTrainers
+                .stream()
+                .filter(ct -> isMemberNotDeleted(ct.getMember()))
+                .collect(Collectors.toSet());
+    }
+
+    private Set<Space> getNotDeletedSpaces() {
+        return spaces
+                .stream()
+                .filter(s -> isDogHasHandlerNotDeleted(s.getDogHasHandler()))
+                .collect(Collectors.toSet());
     }
 }

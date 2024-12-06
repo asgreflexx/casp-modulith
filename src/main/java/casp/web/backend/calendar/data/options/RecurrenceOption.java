@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @BaseEventOptionRecurrencesConstraint
 public abstract class RecurrenceOption implements BaseEventOptionValidation {
@@ -59,4 +60,8 @@ public abstract class RecurrenceOption implements BaseEventOptionValidation {
     public void setOptionType(BaseRecurrenceOptionType optionType) {
         this.optionType = optionType;
     }
+
+    public abstract LocalDateTime min();
+
+    public abstract LocalDateTime max();
 }

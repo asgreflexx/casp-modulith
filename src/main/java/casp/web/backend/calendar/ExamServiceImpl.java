@@ -8,6 +8,7 @@ import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -38,15 +39,16 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
     }
 
     private void setParticipants(ExamDto dto, Exam exam) {
-        var actualParticipants = dto.getParticipants();
-        var newParticipants = dto.getNewParticipants()
+        var newParticipants = mapToParticipants(dto.getNewParticipants());
+        exam.addParticipants(newParticipants);
+    }
+
+    private Set<ExamParticipant> mapToParticipants(final Set<UUID> dogHasHandlerIds) {
+        return dogHasHandlerIds
                 .stream()
                 .flatMap(id -> findDogHandlerReferenceById(id)
                         .map(ExamParticipant::new)
                         .stream())
                 .collect(Collectors.toSet());
-
-        actualParticipants.addAll(newParticipants);
-        exam.setParticipants(actualParticipants);
     }
 }

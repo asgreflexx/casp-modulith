@@ -21,15 +21,25 @@ public class Event extends BaseEvent implements EventRequiredFields {
 
     @Override
     public Set<EventParticipant> getParticipants() {
-        return participants
-                .stream()
-                .filter(p -> isMemberNotDeleted(p.getMember()))
-                .collect(Collectors.toSet());
+        return getNotDeletedParticipants();
     }
 
     @Override
     public void setParticipants(Set<EventParticipant> participants) {
         this.participants = participants;
+    }
+
+    public void addParticipants(Set<EventParticipant> newParticipants) {
+        var notDeletedParticipants = getNotDeletedParticipants();
+        notDeletedParticipants.addAll(newParticipants);
+        this.participants = notDeletedParticipants;
+    }
+
+    private Set<EventParticipant> getNotDeletedParticipants() {
+        return participants
+                .stream()
+                .filter(p -> isMemberNotDeleted(p.getMember()))
+                .collect(Collectors.toSet());
     }
 
     @Override
