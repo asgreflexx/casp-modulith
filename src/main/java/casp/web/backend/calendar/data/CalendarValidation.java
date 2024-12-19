@@ -1,4 +1,4 @@
-package casp.web.backend.common.validation;
+package casp.web.backend.calendar.data;
 
 import jakarta.validation.constraints.NotNull;
 

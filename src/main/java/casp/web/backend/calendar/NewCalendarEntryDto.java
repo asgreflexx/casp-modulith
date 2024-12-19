@@ -1,6 +1,6 @@
 package casp.web.backend.calendar;
 
-import casp.web.backend.common.validation.CalendarValidation;
+import casp.web.backend.calendar.data.CalendarValidation;
 
 import java.time.LocalDateTime;
 import java.util.Objects;

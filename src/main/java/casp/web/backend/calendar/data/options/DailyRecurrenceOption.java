@@ -2,8 +2,6 @@ package casp.web.backend.calendar.data.options;
 
 
 import casp.web.backend.calendar.options.BaseRecurrenceOptionType;
-import casp.web.backend.common.validation.EventOptionTimes;
-import casp.web.backend.common.validation.EventOptionTimesConstraint;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;

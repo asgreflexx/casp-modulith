@@ -1,8 +1,6 @@
 package casp.web.backend.calendar.data.options;
 
 import casp.web.backend.calendar.options.BaseRecurrenceOptionType;
-import casp.web.backend.common.validation.BaseEventOptionRecurrencesConstraint;
-import casp.web.backend.common.validation.BaseEventOptionValidation;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 

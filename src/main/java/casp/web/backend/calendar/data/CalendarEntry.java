@@ -1,6 +1,5 @@
 package casp.web.backend.calendar.data;
 
-import casp.web.backend.common.validation.CalendarValidation;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.data.annotation.Id;
 
