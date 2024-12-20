@@ -31,11 +31,11 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     }
 
     private static BooleanExpression mapToSpaceConstraint(Set<DogHasHandlerReference> dogHasHandlers) {
-        BooleanExpression combined = null;
-        for (var dhh : dogHasHandlers) {
-            combined = combined == null ? createSpaceExpression(dhh) : combined.or(createSpaceExpression(dhh));
-        }
-        return combined;
+        return dogHasHandlers
+                .stream()
+                .map(CourseCustomRepositoryImpl::createSpaceExpression)
+                .reduce(BooleanExpression::or)
+                .orElseThrow();
     }
 
     private static BooleanExpression createSpaceExpression(DogHasHandlerReference dhh) {
