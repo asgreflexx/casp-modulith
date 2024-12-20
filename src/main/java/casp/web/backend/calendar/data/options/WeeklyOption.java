@@ -20,14 +20,7 @@ public class WeeklyOption implements Comparable<WeeklyOption>, EventOptionTimes 
     private LocalTime endTime;
 
     private static int getCompareValue(LocalTime thisLocalTime, LocalTime otherLocalTime) {
-        var value = thisLocalTime.toNanoOfDay() - otherLocalTime.toNanoOfDay();
-        if (value < 0) {
-            return -1;
-        } else if (value > 0) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return thisLocalTime.compareTo(otherLocalTime);
     }
 
     public DayOfWeek getDayOfWeek() {
@@ -57,13 +50,13 @@ public class WeeklyOption implements Comparable<WeeklyOption>, EventOptionTimes 
     }
 
     @Override
-    public int compareTo(WeeklyOption o) {
-        var compareValue = getDayOfWeek().getValue() - o.getDayOfWeek().getValue();
+    public int compareTo(WeeklyOption other) {
+        var compareValue = dayOfWeek.compareTo(other.dayOfWeek);
         if (compareValue == 0) {
-            compareValue = getCompareValue(getStartTime(), o.getStartTime());
+            compareValue = getCompareValue(startTime, other.startTime);
         }
         if (compareValue == 0) {
-            compareValue = getCompareValue(getEndTime(), o.getEndTime());
+            compareValue = getCompareValue(endTime, other.endTime);
         }
         return compareValue;
     }
