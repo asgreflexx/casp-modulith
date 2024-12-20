@@ -35,6 +35,7 @@ import static casp.web.backend.deprecated.event.types.BaseEventV2Mapper.BASE_EVE
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @Service
+@SuppressWarnings("UnnecessaryFullyQualifiedName")
 public class BaseEventMigrationService {
     private static final Sort SORT = Sort.by("eventFrom").ascending().and(Sort.by("eventTo").ascending());
 

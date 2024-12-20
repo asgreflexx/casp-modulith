@@ -14,6 +14,7 @@ import java.util.List;
  */
 @Deprecated(forRemoval = true, since = "0.0.0")
 @Mapper
+@SuppressWarnings("UnnecessaryFullyQualifiedName")
 public interface BaseEventOptionV2Mapper {
     BaseEventOptionV2Mapper BASE_EVENT_OPTION_V2_MAPPER = Mappers.getMapper(BaseEventOptionV2Mapper.class);
 
