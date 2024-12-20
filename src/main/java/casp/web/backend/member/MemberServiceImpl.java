@@ -74,14 +74,7 @@ class MemberServiceImpl implements MemberService {
     public MemberDto saveMember(MemberDto memberDto) {
         var member = MEMBER_MAPPER.toSource(memberDto);
 
-        memberRepository.findOneByEmail(memberDto.getEmail())
-                .ifPresent(m -> {
-                    if (!member.equals(m)) {
-                        var msg = "Member with email %s already exists.".formatted(member.getEmail());
-                        LOG.error(msg);
-                        throw new IllegalStateException(msg);
-                    }
-                });
+        verifyForMemberConflict(memberDto, member);
 
         return mapToMemberDto(memberRepository.save(member));
     }
@@ -136,6 +129,17 @@ class MemberServiceImpl implements MemberService {
             memberV2.setCards(MEMBER_V2_MAPPER.toCardV2Set(cardV1Set));
             memberRepository.save(memberV2);
         });
+    }
+
+    private void verifyForMemberConflict(MemberDto memberDto, Member member) {
+        memberRepository.findOneByEmail(memberDto.getEmail())
+                .ifPresent(m -> {
+                    if (!member.equals(m)) {
+                        var msg = "Member with email %s already exists.".formatted(member.getEmail());
+                        LOG.error(msg);
+                        throw new IllegalStateException(msg);
+                    }
+                });
     }
 
     private MemberDto mapToMemberDto(Member member) {
