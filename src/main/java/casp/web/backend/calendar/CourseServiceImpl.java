@@ -1,0 +1,149 @@
+package casp.web.backend.calendar;
+
+import casp.web.backend.calendar.data.Course;
+import casp.web.backend.calendar.data.CourseRepository;
+import casp.web.backend.calendar.data.participants.CoTrainer;
+import casp.web.backend.calendar.data.participants.Space;
+import casp.web.backend.common.reference.DogHasHandlerReference;
+import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
+import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.deprecated.event.BaseEventMigrationService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
+
+@Service
+class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implements CourseService {
+    private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
+    private final CourseRepository courseRepository;
+
+    @Autowired
+    CourseServiceImpl(CourseRepository courseRepository,
+                      MemberReferenceRepository memberReferenceRepository,
+                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
+                      BaseEventMigrationService migrationService) {
+        super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
+        this.courseRepository = courseRepository;
+    }
+
+    private static void removeSpace(Course course, UUID spaceId) {
+        course.removeSpace(findSpaceById(course, spaceId));
+    }
+
+    private static Space findSpaceById(Course course, UUID spaceId) {
+        return course
+                .getSpaces()
+                .stream()
+                .filter(s -> s.getId().equals(spaceId))
+                .findAny()
+                .orElseThrow(() -> {
+                    var msg = "Space with id %s not found in course with id %s.".formatted(spaceId, course.getId());
+                    LOG.error(msg);
+                    return new NoSuchElementException(msg);
+                });
+    }
+
+    private static Stream<SpaceDto> filterAndMapToSpaceDto(Course course, Set<Space> expectedSpaces) {
+        return course.getSpaces()
+                .stream()
+                .filter(expectedSpaces::contains)
+                .map(s -> COURSE_MAPPER.toSpaceDto(s, course));
+    }
+
+    @Override
+    public void save(CourseDto dto) {
+        var course = COURSE_MAPPER.toSource(dto);
+
+        setCalendarEntriesAndMember(dto, course);
+        setCoTrainers(dto, course);
+        setSpaces(dto, course);
+
+        courseRepository.save(course);
+    }
+
+    @Override
+    public CourseDto getOneById(UUID id) {
+        return COURSE_MAPPER.toTarget(getOneByIdOrThrowException(id));
+    }
+
+    @Override
+    public Page<CourseDto> getAllByYear(int year, Pageable pageable) {
+        var coursePage = courseRepository.findAllByYear(year, pageable);
+        return COURSE_MAPPER.toTargetPage(coursePage);
+    }
+
+    @Override
+    public Set<String> getEmailsByCourseId(UUID id) {
+        return getOneByIdOrThrowException(id)
+                .getSpaces()
+                .stream()
+                .map(s -> s.getDogHasHandler().getMember().getEmail())
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void updateSpace(UUID courseId, SpaceDto spaceDto) {
+        var course = getOneByIdOrThrowException(courseId);
+        removeSpace(course, spaceDto.getId());
+        course.addSpace(COURSE_MAPPER.toSpace(spaceDto));
+        courseRepository.save(course);
+    }
+
+    @Override
+    public void removeSpace(UUID courseId, UUID spaceId) {
+        var course = getOneByIdOrThrowException(courseId);
+        removeSpace(course, spaceId);
+        courseRepository.save(course);
+    }
+
+    @Override
+    public Set<SpaceDto> getSpacesByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlerSet) {
+        if (dogHasHandlerSet.isEmpty()) {
+            return Collections.emptySet();
+        }
+        var expectedSpaces = dogHasHandlerSet.stream().map(Space::new).collect(Collectors.toSet());
+        return courseRepository.findAllByDogHasHandlers(dogHasHandlerSet)
+                .flatMap(c -> filterAndMapToSpaceDto(c, expectedSpaces))
+                .collect(Collectors.toSet());
+    }
+
+    private void setCoTrainers(CourseDto courseDto, Course course) {
+        var newCoTrainers = mapToCoTrainers(courseDto.getNewCoTrainers());
+        course.addCoTrainers(newCoTrainers);
+    }
+
+    private Set<CoTrainer> mapToCoTrainers(final Set<UUID> memberIds) {
+        return memberIds
+                .stream()
+                .flatMap(id -> findMemberReferenceById(id)
+                        .map(CoTrainer::new)
+                        .stream())
+                .collect(Collectors.toSet());
+    }
+
+    private void setSpaces(CourseDto courseDto, Course course) {
+        var newSpaces = mapToSpaces(courseDto.getNewSpaces());
+        course.addSpaces(newSpaces);
+    }
+
+    private Set<Space> mapToSpaces(final Set<UUID> dogHasHandlerIds) {
+        return dogHasHandlerIds
+                .stream()
+                .flatMap(id -> findDogHandlerReferenceById(id)
+                        .map(Space::new)
+                        .stream())
+                .collect(Collectors.toSet());
+    }
+}

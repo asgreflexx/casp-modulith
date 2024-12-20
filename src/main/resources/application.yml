@@ -8,3 +8,8 @@ casp:
   europenet-api-endpoint: https://europetnet.ehealth.gv.at/Index.aspx?mn={chipNumber}
   cron: 0 0 0 * * *
   internal-exception-response: "An internal error has occurred"
+
+# TODO It will be removed in #3.
+server:
+  tomcat:
+    connection-timeout: 3600000 # 1 Hour
