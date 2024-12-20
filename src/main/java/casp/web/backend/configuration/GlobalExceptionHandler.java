@@ -36,14 +36,28 @@ class GlobalExceptionHandler {
             IllegalArgumentException.class,
             IllegalStateException.class,
             MethodArgumentNotValidException.class,
-            MethodArgumentTypeMismatchException.class,
-            NoSuchElementException.class,
-            DuplicateKeyException.class
+            MethodArgumentTypeMismatchException.class
     })
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     GlobalExceptionResponse handleBadRequestException(Exception ex) {
         LOG.warn("User did something wrong", ex);
+        return new GlobalExceptionResponse(ex.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(NoSuchElementException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    GlobalExceptionResponse handleNoSuchElementException(NoSuchElementException ex) {
+        LOG.warn("The user requested an element that does not exist", ex);
+        return new GlobalExceptionResponse(ex.getLocalizedMessage());
+    }
+
+    @ExceptionHandler(DuplicateKeyException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.CONFLICT)
+    GlobalExceptionResponse handleDuplicateKeyException(DuplicateKeyException ex) {
+        LOG.warn("Duplicate key encountered", ex);
         return new GlobalExceptionResponse(ex.getLocalizedMessage());
     }
 

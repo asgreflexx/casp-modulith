@@ -72,3 +72,26 @@ means that altering the reference itself does not inherently propagate changes t
 See [How to Unit Test an Abstract Class](https://enterprisecraftsmanship.com/posts/how-to-unit-test-an-abstract-class/)
 
     ...  test class per concrete production class, where you create a test class per each concrete class of the hierarchy.
+
+### Exception <-> HttpStatus Map
+
+| **Java Exception**                        | **HTTP Status**              | **Explanation**                                                                                                                               |
+|-------------------------------------------|------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------|
+| `IllegalArgumentException`                | `400 Bad Request`            | The client sent an invalid request (e.g., incorrect parameters).                                                                              |
+| `IllegalStateException`                   | `400 Bad Request`            | The client sent an invalid request (However, this would only happen if the exception is due to user input or action, not pure server logic.). |
+| `MethodArgumentNotValidException`         | `400 Bad Request`            | Used in Spring for invalid request body (e.g., validation errors).                                                                            |
+| `MethodArgumentTypeMismatchException`     | `400 Bad Request`            | The client submitted a request that fails validation or has incompatible parameter types                                                      |
+| `MissingServletRequestParameterException` | `400 Bad Request`            | A required request parameter is missing.                                                                                                      |
+| `HttpRequestMethodNotSupportedException`  | `405 Method Not Allowed`     | The HTTP method used is not supported by the endpoint.                                                                                        |
+| `HttpMediaTypeNotSupportedException`      | `415 Unsupported Media Type` | The media type of the request is not supported.                                                                                               |
+| `ResourceNotFoundException` (custom)      | `404 Not Found`              | Resource requested by the user does not exist.                                                                                                |
+| `NoSuchElementException`                  | `404 Not Found`              | Typically used to indicate a missing resource (not always HTTP-based).                                                                        |
+| `UnauthorizedException` (custom)          | `401 Unauthorized`           | The client must authenticate itself before accessing the resource.                                                                            |
+| `AccessDeniedException`                   | `403 Forbidden`              | The user is authenticated but does not have the necessary permissions.                                                                        |
+| `ConflictException` (custom)              | `409 Conflict`               | A conflict occurred (e.g., duplicate resource creation).                                                                                      |
+| `DuplicateKeyException`                   | `409 Conflict`               | A duplicate entry issue, (`email`, `username`, etc.) that already exists in the database                                                      |
+| `UnsupportedOperationException`           | `405 Method Not Allowed`     | Operation not supported by the system or endpoint.                                                                                            |
+| `InternalServerErrorException` (custom)   | `500 Internal Server Error`  | Generic internal server error.                                                                                                                |
+| `ConstraintViolationException`            | `400 Bad Request`            | Violation of a database or validation constraint.                                                                                             |
+| `TimeoutException`                        | `504 Gateway Timeout`        | The server took too long to fulfill the request.                                                                                              |
+| `CustomRateLimitException`                | `429 Too Many Requests`      | Too many requests were made in a given time period.                                                                                           |
