@@ -41,6 +41,23 @@ class EuropeNetTasksImpl implements EuropeNetTasks {
         return EuropeNetState.NOT_CHECKED;
     }
 
+    private static EuropeNetState evaluateResponseBody(String chipNumber, String body) {
+        // simpler, than response.hasBody and afterward assert body != null
+        if (!ObjectUtils.isEmpty(body)) {
+            if (body.contains(DOG_IS_REGISTERED)) {
+                LOG.info("Dog with chipNumber: {} is registered", chipNumber);
+                return EuropeNetState.DOG_IS_REGISTERED;
+            } else if (body.contains(DOG_NOT_REGISTERED)) {
+                LOG.info("Dog with chipNumber: {} is not registered", chipNumber);
+                return EuropeNetState.DOG_NOT_REGISTERED;
+            } else {
+                return getNotCheckStatusBecauseOfUnexpectedResponse(body);
+            }
+        } else {
+            return getNotCheckStatusBecauseOfUnexpectedResponse(body);
+        }
+    }
+
     @Override
     public Page<DogDto> registerDogsManually(Pageable pageRequest) {
         var dogPage = dogService.getDogsThatWereNotChecked(pageRequest);
@@ -76,21 +93,7 @@ class EuropeNetTasksImpl implements EuropeNetTasks {
                 LOG.warn("EuroPetNet API not reachable. Status code:{},\n{}", response.getStatusCode(), response.getBody());
                 return EuropeNetState.API_NOT_REACHABLE;
             }
-            var body = response.getBody();
-            // simpler, than response.hasBody and afterward assert body != null
-            if (!ObjectUtils.isEmpty(body)) {
-                if (body.contains(DOG_IS_REGISTERED)) {
-                    LOG.info("Dog with chipNumber: {} is registered", chipNumber);
-                    return EuropeNetState.DOG_IS_REGISTERED;
-                } else if (body.contains(DOG_NOT_REGISTERED)) {
-                    LOG.info("Dog with chipNumber: {} is not registered", chipNumber);
-                    return EuropeNetState.DOG_NOT_REGISTERED;
-                } else {
-                    return getNotCheckStatusBecauseOfUnexpectedResponse(body);
-                }
-            } else {
-                return getNotCheckStatusBecauseOfUnexpectedResponse(body);
-            }
+            return evaluateResponseBody(chipNumber, response.getBody());
         } catch (RestClientException e) {
             LOG.warn("EuroPetNet API not reachable", e);
             return EuropeNetState.API_NOT_REACHABLE;
