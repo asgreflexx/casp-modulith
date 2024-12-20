@@ -6,7 +6,6 @@ import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.dog.DogHasHandlerOldRepository;
-import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import jakarta.annotation.Nullable;
@@ -54,20 +53,10 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public DogHasHandlerDto saveDogHasHandler(DogHasHandlerDto dogHasHandlerDto) {
-        var dog = dogReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerDto.getDogId(), EntityStatus.ACTIVE).
-                orElseThrow(() -> throwNoSuchElementException(Dog.class.getSimpleName(), dogHasHandlerDto.getDogId()));
-        var member = memberReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerDto.getMemberId(), EntityStatus.ACTIVE).
-                orElseThrow(() -> throwNoSuchElementException(MemberReference.class.getSimpleName(), dogHasHandlerDto.getMemberId()));
+        var dog = getActiveDogById(dogHasHandlerDto.getDogId());
+        var member = getActiveMemberById(dogHasHandlerDto.getMemberId());
 
-        dogHasHandlerRepository.findByDogIdAndMemberId(dogHasHandlerDto.getDogId(), dogHasHandlerDto.getMemberId())
-                .ifPresent(dhh -> {
-                    if (!dhh.getId().equals(dogHasHandlerDto.getId())) {
-                        var msg = "There is already a DogHasHandler[id: %s] with this dog[id: %s] and this member[id: %s]"
-                                .formatted(dhh.getId(), dhh.getDog().getId(), dhh.getMember().getId());
-                        LOG.error(msg);
-                        throw new IllegalStateException(msg);
-                    }
-                });
+        verifyForDogHasHandlerConflict(dogHasHandlerDto);
 
         var dogHasHandler = DOG_HAS_HANDLER_MAPPER.toSource(dogHasHandlerDto);
         dogHasHandler.setDog(dog);
@@ -149,6 +138,28 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
                 .collect(Collectors.toSet());
 
         dogHasHandlerRepository.saveAll(dogHasHandlerSet);
+    }
+
+    private void verifyForDogHasHandlerConflict(final DogHasHandlerDto dogHasHandlerDto) {
+        dogHasHandlerRepository.findByDogIdAndMemberId(dogHasHandlerDto.getDogId(), dogHasHandlerDto.getMemberId())
+                .ifPresent(dhh -> {
+                    if (!dhh.getId().equals(dogHasHandlerDto.getId())) {
+                        var msg = "There is already a DogHasHandler[id: %s] with this dog[id: %s] and this member[id: %s]"
+                                .formatted(dhh.getId(), dhh.getDog().getId(), dhh.getMember().getId());
+                        LOG.error(msg);
+                        throw new IllegalStateException(msg);
+                    }
+                });
+    }
+
+    private MemberReference getActiveMemberById(final UUID memberId) {
+        return memberReferenceRepository.findOneByIdAndEntityStatus(memberId, EntityStatus.ACTIVE).
+                orElseThrow(() -> throwNoSuchElementException("Member", memberId));
+    }
+
+    private DogReference getActiveDogById(final UUID dogId) {
+        return dogReferenceRepository.findOneByIdAndEntityStatus(dogId, EntityStatus.ACTIVE).
+                orElseThrow(() -> throwNoSuchElementException("Dog", dogId));
     }
 
     private void saveItWithNewStatus(DogHasHandler dogHasHandler, EntityStatus entityStatus) {
