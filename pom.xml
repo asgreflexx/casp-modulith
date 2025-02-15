@@ -28,6 +28,7 @@
         <maven-surefire-plugin.version>3.2.2</maven-surefire-plugin.version>
         <springdoc-openapi-starter-webmvc-ui.version>2.3.0</springdoc-openapi-starter-webmvc-ui.version>
         <de.flapdoodle.embed.mongo.spring3x.version>4.16.1</de.flapdoodle.embed.mongo.spring3x.version>
+        <javers-spring-boot-starter-mongo.version>7.7.0</javers-spring-boot-starter-mongo.version>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -75,6 +76,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.javers</groupId>
+            <artifactId>javers-spring-boot-starter-mongo</artifactId>
+            <version>${javers-spring-boot-starter-mongo.version}</version>
         </dependency>
         <!-- Embedded Mongo https://github.com/flapdoodle-oss/de.flapdoodle.embed.mongo.spring -->
         <dependency>
@@ -176,29 +182,78 @@
                     <excludes>
                         <exclude>**/*Test*.class</exclude>
                         <exclude>**/AdminApplication.class</exclude>
-                        <exclude>**/presentation/layer/configuration/*.class</exclude>
-                        <exclude>**/presentation/layer/dtos/**/*.class</exclude>
-                        <exclude>**/data/access/layer/commons/*.class</exclude>
-                        <exclude>**/data/access/layer/enumerations/*.class</exclude>
-                        <exclude>**/data/access/layer/dog/*Dog.class</exclude>
-                        <exclude>**/data/access/layer/dog/*DogHasHandler.class</exclude>
-                        <exclude>**/data/access/layer/dog/*Grade.class</exclude>
-                        <exclude>**/data/access/layer/event/calendar/*Calendar.class</exclude>
-                        <exclude>**/data/access/layer/event/options/*.class</exclude>
-                        <exclude>**/data/access/layer/event/participants/*BaseParticipant.class</exclude>
-                        <exclude>**/data/access/layer/event/participants/*CoTrainer.class</exclude>
-                        <exclude>**/data/access/layer/event/participants/*EventParticipant.class</exclude>
-                        <exclude>**/data/access/layer/event/participants/*ExamParticipant.class</exclude>
-                        <exclude>**/data/access/layer/event/participants/*Space.class</exclude>
-                        <exclude>**/data/access/layer/event/types/*BaseEvent.class</exclude>
-                        <exclude>**/data/access/layer/event/types/*Course.class</exclude>
-                        <exclude>**/data/access/layer/event/types/*Event.class</exclude>
-                        <exclude>**/data/access/layer/event/types/*Exam.class</exclude>
-                        <exclude>**/data/access/layer/event/TypesRegex.class</exclude>
-                        <exclude>**/data/access/layer/member/*Card.class</exclude>
-                        <exclude>**/data/access/layer/member/*Member.class</exclude>
-                        <exclude>**/data/access/layer/member/*MembershipFee.class</exclude>
+                        <exclude>**/configuration/**/*</exclude>
+                        <exclude>**/deprecated/**/*.class</exclude>
+                        <exclude>**/*BaseView.class</exclude>
+                        <exclude>**/*BaseDocument.class</exclude>
+                        <exclude>**/*Dog.class</exclude>
+                        <exclude>**/*DogReference.class</exclude>
+                        <exclude>**/*DogHasHandler.class</exclude>
+                        <exclude>**/*DogHasHandlerReference.class</exclude>
+                        <exclude>**/*Grade.class</exclude>
+                        <exclude>**/*GradeType.class</exclude>
+                        <exclude>**/*Calendar.class</exclude>
+                        <exclude>**/*CalendarEntry.class</exclude>
+                        <exclude>**/*RecurrenceOption.class</exclude>
+                        <exclude>**/*DailyRecurrenceOption.class</exclude>
+                        <exclude>**/*WeeklyOption.class</exclude>
+                        <exclude>**/*WeeklyRecurrenceOption.class</exclude>
+                        <exclude>**/*BaseParticipant.class</exclude>
+                        <exclude>**/*CoTrainer.class</exclude>
+                        <exclude>**/*EventParticipant.class</exclude>
+                        <exclude>**/*ExamParticipant.class</exclude>
+                        <exclude>**/*Space.class</exclude>
+                        <exclude>**/*BaseEvent.class</exclude>
+                        <exclude>**/*Course.class</exclude>
+                        <exclude>**/*Event.class</exclude>
+                        <exclude>**/*Exam.class</exclude>
+                        <exclude>**/*Member.class</exclude>
+                        <exclude>**/*MemberReference.class</exclude>
+                        <exclude>**/*MemberProperty.class</exclude>
+                        <exclude>**/*MembershipFee.class</exclude>
+                        <exclude>**/*Card.class</exclude>
+                        <exclude>**/*Dto.class</exclude>
+                        <exclude>**/*Read.class</exclude>
+                        <exclude>**/*Write.class</exclude>
+                        <exclude>**/*Mapper*.class</exclude>
                     </excludes>
+                    <rules>
+                        <rule>
+                            <element>BUNDLE</element>
+                            <limits>
+                                <limit>
+                                    <counter>INSTRUCTION</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>BRANCH</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>COMPLEXITY</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>LINE</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>METHOD</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                                <limit>
+                                    <counter>CLASS</counter>
+                                    <value>COVEREDRATIO</value>
+                                    <minimum>0.80</minimum>
+                                </limit>
+                            </limits>
+                        </rule>
+                    </rules>
                 </configuration>
                 <executions>
                     <execution>

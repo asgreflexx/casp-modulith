@@ -1,0 +1,88 @@
+package casp.web.backend.deprecated.event.participants;
+
+import casp.web.backend.deprecated.dog.DogHasHandler;
+import casp.web.backend.deprecated.event.types.Course;
+import com.querydsl.core.annotations.QueryEntity;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.PositiveOrZero;
+import org.springframework.data.annotation.TypeAlias;
+import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+import java.time.LocalDate;
+
+/**
+ * @deprecated use {@link casp.web.backend.calendar.data.participants.Space} instead.It will be removed in #3.
+ */
+@Deprecated(forRemoval = true, since = "0.0.0")
+@QueryEntity
+@Document(BaseParticipant.COLLECTION)
+@TypeAlias(Space.PARTICIPANT_TYPE)
+public class Space extends BaseParticipant {
+    public static final String PARTICIPANT_TYPE = "SPACE";
+
+    private String note;
+
+    @PositiveOrZero
+    @Digits(integer = 9, fraction = 2)
+    private double paidPrice;
+
+    private boolean isPaid;
+
+    private LocalDate paidDate;
+
+    @Valid
+    @DBRef
+    private DogHasHandler dogHasHandler;
+
+    public Space() {
+        super(PARTICIPANT_TYPE);
+    }
+
+    public Space(Course course, DogHasHandler dogHasHandler) {
+        super(PARTICIPANT_TYPE, dogHasHandler.getId(), course);
+        this.dogHasHandler = dogHasHandler;
+    }
+
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public double getPaidPrice() {
+        return paidPrice;
+    }
+
+    public void setPaidPrice(double paidPrice) {
+        this.paidPrice = paidPrice;
+    }
+
+    public boolean isPaid() {
+        return isPaid;
+    }
+
+    public void setIsPaid(boolean isPaid) {
+        this.isPaid = isPaid;
+    }
+
+    public LocalDate getPaidDate() {
+        return paidDate;
+    }
+
+    public void setPaidDate(LocalDate paidDate) {
+        this.paidDate = paidDate;
+    }
+
+    public DogHasHandler getDogHasHandler() {
+        return dogHasHandler;
+    }
+
+    public void setDogHasHandler(DogHasHandler dogHasHandler) {
+        this.dogHasHandler = dogHasHandler;
+    }
+}

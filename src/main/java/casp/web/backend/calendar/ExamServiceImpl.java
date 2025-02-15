@@ -1,0 +1,54 @@
+package casp.web.backend.calendar;
+
+import casp.web.backend.calendar.data.Exam;
+import casp.web.backend.calendar.data.ExamRepository;
+import casp.web.backend.calendar.data.participants.ExamParticipant;
+import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
+import casp.web.backend.common.reference.MemberReferenceRepository;
+import casp.web.backend.deprecated.event.BaseEventMigrationService;
+import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
+
+@Service
+class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements ExamService {
+
+    ExamServiceImpl(MemberReferenceRepository memberReferenceRepository,
+                    ExamRepository examRepository,
+                    BaseEventMigrationService migrationService,
+                    DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+        super(memberReferenceRepository, examRepository, dogHasHandlerReferenceRepository, migrationService);
+    }
+
+    @Override
+    public void save(ExamDto dto) {
+        var exam = EXAM_MAPPER.toSource(dto);
+        setCalendarEntriesAndMember(dto, exam);
+        setParticipants(dto, exam);
+
+        baseRepository.save(exam);
+    }
+
+    @Override
+    public ExamDto getOneById(UUID id) {
+        return EXAM_MAPPER.toTarget(getOneByIdOrThrowException(id));
+    }
+
+    private void setParticipants(ExamDto dto, Exam exam) {
+        var newParticipants = mapToParticipants(dto.getNewParticipants());
+        exam.addParticipants(newParticipants);
+    }
+
+    private Set<ExamParticipant> mapToParticipants(final Set<UUID> dogHasHandlerIds) {
+        return dogHasHandlerIds
+                .stream()
+                .flatMap(id -> findDogHandlerReferenceById(id)
+                        .map(ExamParticipant::new)
+                        .stream())
+                .collect(Collectors.toSet());
+    }
+}
