@@ -22,7 +22,9 @@ class OpenApiConfig {
     OpenAPI openAPI() {
         var bearerKey = "bearer-key";
         var openAPI = new OpenAPI()
-                .info(new Info().title(springdocProperties.getTitle()))
+                .info(new Info()
+                        .title(springdocProperties.getTitle())
+                        .version(springdocProperties.getVersion()))
                 .addSecurityItem(new SecurityRequirement().addList(bearerKey))
                 .components(new Components()
                         .addSecuritySchemes(bearerKey,
