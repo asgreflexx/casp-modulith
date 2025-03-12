@@ -15,6 +15,7 @@ import java.util.Set;
 class SpringdocProperties {
     private final Set<Server> servers = new HashSet<>();
     private String title;
+    private String version;
 
     Set<Server> getServers() {
         return servers;
@@ -33,5 +34,13 @@ class SpringdocProperties {
 
     void setTitle(final String title) {
         this.title = title;
+    }
+
+    String getVersion() {
+        return version;
+    }
+
+    void setVersion(final String version) {
+        this.version = version;
     }
 }
