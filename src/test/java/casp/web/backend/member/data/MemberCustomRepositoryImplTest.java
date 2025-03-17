@@ -77,17 +77,17 @@ class MemberCustomRepositoryImplTest {
         @NullAndEmptySource
         @ValueSource(strings = {"    "})
         void findAllWithoutValue(String name) {
-            assertThat(memberRepository.findAllByValue(name, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
         }
 
         @Test
         void findOneByName() {
-            assertThat(memberRepository.findAllByValue("John", Pageable.unpaged())).containsExactly(john);
+            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, "John", Pageable.unpaged())).containsExactly(john);
         }
 
         @Test
         void findAllByMultipleLettersSeparatedBySpaces() {
-            assertThat(memberRepository.findAllByValue("J X D", Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, "J X D", Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
         }
     }
 

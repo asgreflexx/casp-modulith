@@ -42,9 +42,10 @@ class MemberRestControllerTest {
 
     @Test
     void getMembers() {
-        when(memberService.getMembersByEntityStatus(EntityStatus.ACTIVE, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
+        var name = "name";
+        when(memberService.getMembersByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
 
-        var response = memberRestController.getMembers(EntityStatusParam.ACTIVE, Pageable.unpaged());
+        var response = memberRestController.getMembers(EntityStatusParam.ACTIVE, name, Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(memberDto));

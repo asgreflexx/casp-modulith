@@ -56,10 +56,10 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Page<Member> findAllByValue(String value, Pageable pageable) {
-        var expression = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
-        if (ObjectUtils.isNotEmpty(value)) {
-            expression = expression.andAnyOf(splitIntoWords(value));
+    public Page<Member> findAllByEntityStatusAndName(EntityStatus entityStatus, String name, Pageable pageable) {
+        var expression = MEMBER.entityStatus.eq(entityStatus);
+        if (ObjectUtils.isNotEmpty(name)) {
+            expression = expression.andAnyOf(splitIntoWords(name));
         }
         return createQuery().where(expression)
                 .fetchPage(pageable);

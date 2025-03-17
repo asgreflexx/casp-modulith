@@ -60,8 +60,8 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByEntityStatus(EntityStatus entityStatus, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatus(entityStatus, pageable);
+    public Page<MemberDto> getMembersByEntityStatusAndName(EntityStatus entityStatus, String name, Pageable pageable) {
+        var memberPage = memberRepository.findAllByEntityStatusAndName(entityStatus, name, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
@@ -109,7 +109,7 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public Page<MemberDto> getMembersByName(String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByValue(name, pageable);
+        var memberPage = memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
