@@ -14,7 +14,7 @@ public interface MemberService {
 
     Page<MemberDto> getMembersByFirstNameAndLastName(@Nullable String firstName, @Nullable String lastName, Pageable pageable);
 
-    Page<MemberDto> getMembersByEntityStatus(EntityStatus entityStatus, Pageable pageable);
+    Page<MemberDto> getMembersByEntityStatusAndName(EntityStatus entityStatus, @Nullable String name, Pageable pageable);
 
     MemberDto getMemberById(UUID id);
 
