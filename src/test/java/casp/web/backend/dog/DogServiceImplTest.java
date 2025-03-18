@@ -63,9 +63,9 @@ class DogServiceImplTest {
 
     @Test
     void getDogs() {
-        when(dogRepository.findAllByEntityStatus(EntityStatus.ACTIVE, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
+        when(dogRepository.findAllByValue("", Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
 
-        var dogPage = dogService.getDogs(Pageable.unpaged());
+        var dogPage = dogService.getDogs("", Pageable.unpaged());
 
         assertThat(dogPage).containsExactly(dogDto);
     }

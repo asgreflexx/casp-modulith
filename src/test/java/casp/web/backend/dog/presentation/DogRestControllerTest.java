@@ -55,9 +55,9 @@ class DogRestControllerTest {
 
     @Test
     void getDogs() {
-        when(dogService.getDogs(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
+        when(dogService.getDogs("", Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
 
-        var response = dogRestController.getDogs(Pageable.unpaged());
+        var response = dogRestController.getDogs("", Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dog));

@@ -26,7 +26,7 @@ public interface DogService {
 
     Page<DogDto> getDogsByNameOrOwnerName(String name, String ownerName, Pageable pageable);
 
-    Page<DogDto> getDogs(Pageable pageable);
+    Page<DogDto> getDogs(@Nullable String value, Pageable pageable);
 
     /**
      * Get dogs that were not checked.

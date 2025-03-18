@@ -69,8 +69,8 @@ class DogServiceImpl implements DogService {
     }
 
     @Override
-    public Page<DogDto> getDogs(Pageable pageable) {
-        return DOG_MAPPER.toTargetPage(dogRepository.findAllByEntityStatus(EntityStatus.ACTIVE, pageable));
+    public Page<DogDto> getDogs(String value, Pageable pageable) {
+        return DOG_MAPPER.toTargetPage(dogRepository.findAllByValue(value, pageable));
     }
 
     @Override

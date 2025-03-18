@@ -86,4 +86,32 @@ class DogCustomRepositoryImplTest {
                     .containsExactlyInAnyOrder(bonsai, charlie);
         }
     }
+
+    @Nested
+    class FindAllByValue {
+        @Test
+        void chipNumber() {
+            assertThat(dogRepository.findAllByValue(bonsai.getChipNumber(), Pageable.unpaged()))
+                    .containsExactly(bonsai);
+        }
+
+        @Test
+        void name() {
+            assertThat(dogRepository.findAllByValue(bonsai.getName(), Pageable.unpaged()))
+                    .containsExactly(bonsai);
+        }
+
+        @Test
+        void ownerName() {
+            assertThat(dogRepository.findAllByValue(bonsai.getOwnerName(), Pageable.unpaged()))
+                    .containsExactlyInAnyOrder(bonsai, charlie);
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        void value(String value) {
+            assertThat(dogRepository.findAllByValue(value, Pageable.unpaged()))
+                    .containsExactlyInAnyOrder(bonsai, charlie);
+        }
+    }
 }
