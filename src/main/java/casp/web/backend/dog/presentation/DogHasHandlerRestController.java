@@ -58,8 +58,9 @@ class DogHasHandlerRestController {
     }
 
     @GetMapping("search-by-name")
-    ResponseEntity<Page<DogHasHandlerRead>> searchByName(@RequestParam(required = false, defaultValue = "") String name, @ParameterObject Pageable pageable) {
-        var dogHasHandlerDtoPage = dogHasHandlerService.searchByName(name, pageable);
+    ResponseEntity<Page<DogHasHandlerRead>> searchByValue(@RequestParam(required = false, defaultValue = "") String value,
+                                                          @ParameterObject Pageable pageable) {
+        var dogHasHandlerDtoPage = dogHasHandlerService.searchByValue(value, pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogHasHandlerDtoPage));
     }
 

@@ -136,9 +136,9 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void searchByName() {
-        when(dogHasHandlerRepository.findAllByName(member.getLastName(), Pageable.unpaged())).thenReturn(dogHasHandlerPage);
+        when(dogHasHandlerRepository.findAllByValue(member.getLastName(), Pageable.unpaged())).thenReturn(dogHasHandlerPage);
 
-        var dogHasHandlerDtoPage = dogHasHandlerService.searchByName(member.getLastName(), Pageable.unpaged());
+        var dogHasHandlerDtoPage = dogHasHandlerService.searchByValue(member.getLastName(), Pageable.unpaged());
 
         assertThat(dogHasHandlerDtoPage).containsExactly(dogHasHandlerDto);
     }

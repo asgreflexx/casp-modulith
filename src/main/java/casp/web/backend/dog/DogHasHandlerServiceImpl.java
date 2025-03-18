@@ -93,8 +93,8 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     }
 
     @Override
-    public Page<DogHasHandlerDto> searchByName(@Nullable String name, Pageable pageable) {
-        var dogHasHandlerPage = dogHasHandlerRepository.findAllByName(name, pageable);
+    public Page<DogHasHandlerDto> searchByValue(@Nullable String value, Pageable pageable) {
+        var dogHasHandlerPage = dogHasHandlerRepository.findAllByValue(value, pageable);
         return DOG_HAS_HANDLER_MAPPER.toTargetPage(dogHasHandlerPage);
     }
 
@@ -140,7 +140,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         dogHasHandlerRepository.saveAll(dogHasHandlerSet);
     }
 
-    private void verifyForDogHasHandlerConflict(final DogHasHandlerDto dogHasHandlerDto) {
+    private void verifyForDogHasHandlerConflict(DogHasHandlerDto dogHasHandlerDto) {
         dogHasHandlerRepository.findByDogIdAndMemberId(dogHasHandlerDto.getDogId(), dogHasHandlerDto.getMemberId())
                 .ifPresent(dhh -> {
                     if (!dhh.getId().equals(dogHasHandlerDto.getId())) {
@@ -152,12 +152,12 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
                 });
     }
 
-    private MemberReference getActiveMemberById(final UUID memberId) {
+    private MemberReference getActiveMemberById(UUID memberId) {
         return memberReferenceRepository.findOneByIdAndEntityStatus(memberId, EntityStatus.ACTIVE).
                 orElseThrow(() -> throwNoSuchElementException("Member", memberId));
     }
 
-    private DogReference getActiveDogById(final UUID dogId) {
+    private DogReference getActiveDogById(UUID dogId) {
         return dogReferenceRepository.findOneByIdAndEntityStatus(dogId, EntityStatus.ACTIVE).
                 orElseThrow(() -> throwNoSuchElementException("Dog", dogId));
     }
