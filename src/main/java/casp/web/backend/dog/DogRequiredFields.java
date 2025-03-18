@@ -4,6 +4,7 @@ import casp.web.backend.common.enums.Gender;
 import casp.web.backend.dog.data.EuropeNetState;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
 
@@ -34,9 +35,10 @@ public interface DogRequiredFields {
 
     void setGender(@NotNull Gender gender);
 
+    @Pattern(regexp = "\\d+$")
     String getChipNumber();
 
-    void setChipNumber(String chipNumber);
+    void setChipNumber(@Pattern(regexp = "\\d+$") String chipNumber);
 
     LocalDate getRabiesDate();
 
