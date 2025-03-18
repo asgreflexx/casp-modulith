@@ -8,4 +8,6 @@ public interface DogCustomRepository {
     Page<Dog> findAllByNameOrOwnerName(@Nullable String dogName, @Nullable String ownerName, Pageable pageable);
 
     Page<Dog> findAllByEuropeNetStateNotChecked(Pageable pageable);
+
+    Page<Dog> findAllByValue(@Nullable String value, Pageable pageable);
 }
