@@ -17,7 +17,7 @@ public interface DogHasHandlerCustomRepository {
 
     Set<DogHasHandler> findAllByMemberIdAndEntityStatus(UUID memberId, EntityStatus entityStatus);
 
-    Page<DogHasHandler> findAllByName(@Nullable String name, Pageable pageable);
+    Page<DogHasHandler> findAllByValue(@Nullable String value, Pageable pageable);
 
     Optional<DogHasHandler> findByDogIdAndMemberId(UUID dogId, UUID memberId);
 }

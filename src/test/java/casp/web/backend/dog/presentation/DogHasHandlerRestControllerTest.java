@@ -71,9 +71,9 @@ class DogHasHandlerRestControllerTest {
 
     @Test
     void searchByName() {
-        when(dogHasHandlerService.searchByName(dogHasHandlerDto.getDog().getName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dogHasHandlerDto)));
+        when(dogHasHandlerService.searchByValue(dogHasHandlerDto.getDog().getName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dogHasHandlerDto)));
 
-        var response = controller.searchByName(dogHasHandlerDto.getDog().getName(), Pageable.unpaged());
+        var response = controller.searchByValue(dogHasHandlerDto.getDog().getName(), Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dogHasHandlerDto));
