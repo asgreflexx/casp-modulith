@@ -15,7 +15,9 @@ import org.springframework.stereotype.Component;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -75,6 +77,16 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
             LOG.error(msg);
             return new NoSuchElementException(msg);
         });
+    }
+
+    @Override
+    public Set<String> findAllActiveMembersEmails() {
+        return createQuery()
+                .where(MEMBER.entityStatus.eq(EntityStatus.ACTIVE))
+                .fetch()
+                .stream()
+                .map(Member::getEmail)
+                .collect(Collectors.toSet());
     }
 
     private SpringDataMongodbQuery<Member> createQuery() {

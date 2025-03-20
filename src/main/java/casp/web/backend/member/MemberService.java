@@ -36,4 +36,6 @@ public interface MemberService {
      */
     @Deprecated(forRemoval = true, since = "0.0.0")
     void migrateDataToV2();
+
+    Set<String> getActiveMembersEmail();
 }

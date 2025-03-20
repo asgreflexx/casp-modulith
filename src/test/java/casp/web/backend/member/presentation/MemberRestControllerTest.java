@@ -140,4 +140,14 @@ class MemberRestControllerTest {
         assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(memberService).migrateDataToV2();
     }
+
+    @Test
+    void getActiveMembersEmail() {
+        when(memberService.getActiveMembersEmail()).thenReturn(Set.of(memberDto.getEmail()));
+
+        var response = memberRestController.getActiveMembersEmail();
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(memberDto.getEmail());
+    }
 }

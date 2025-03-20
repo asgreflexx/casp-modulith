@@ -112,4 +112,9 @@ class MemberRestController {
         memberService.migrateDataToV2();
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("active-members-emails")
+    ResponseEntity<Set<String>> getActiveMembersEmail() {
+        return ResponseEntity.ok(memberService.getActiveMembersEmail());
+    }
 }

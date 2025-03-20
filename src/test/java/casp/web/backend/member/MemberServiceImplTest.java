@@ -174,6 +174,16 @@ class MemberServiceImplTest {
                 .satisfies(cardV2 -> assertEquals(card.getCode(), cardV2.getCode()));
     }
 
+    @Test
+    void getActiveMembersEmail() {
+        var email = "mail@mail.com";
+        when(memberRepository.findAllActiveMembersEmails()).thenReturn(Set.of(email));
+
+        var emailSet = memberService.getActiveMembersEmail();
+
+        assertThat(emailSet).containsExactly(email);
+    }
+
     @Nested
     class GetMemberById {
         @BeforeEach

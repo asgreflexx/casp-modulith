@@ -41,9 +41,16 @@ class MemberCustomRepositoryImplTest {
         member.setFirstName(firstName);
         member.setLastName(lastName);
         member.setEntityStatus(entityStatus);
+        member.setEmail("%s.%s@mail.com".formatted(firstName.toLowerCase(), lastName.toLowerCase()));
         Optional.ofNullable(role).ifPresent(member.getRoles()::add);
         member = memberRepository.save(member);
         return member;
+    }
+
+    @Test
+    void findAllActiveMembersEmails() {
+        assertThat(memberRepository.findAllActiveMembersEmails())
+                .containsExactlyInAnyOrder(john.getEmail(), doe.getEmail());
     }
 
     @Nested
