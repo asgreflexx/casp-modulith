@@ -33,22 +33,6 @@ pipeline {
             }
         }
 
-        stage('Upload coverage report to Codacy') {
-            when {
-                expression {
-                    env.BRANCH_NAME == env.EXPECTED_BRANCH_NAME && currentBuild.currentResult == env.EXPECTED_RESULT
-                }
-            }
-            steps {
-                script {
-                    sh """
-                        export CODACY_PROJECT_TOKEN=${CODACY_CREDENTIALS_PSW}
-                        bash <(curl -Ls https://coverage.codacy.com/get.sh) report -r target/site/jacoco/jacoco.xml
-                    """
-                }
-            }
-        }
-
         stage('Docker Build and Push') {
             when {
                 expression {
