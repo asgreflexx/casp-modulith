@@ -131,6 +131,11 @@ class MemberServiceImpl implements MemberService {
         });
     }
 
+    @Override
+    public Set<String> getActiveMembersEmail() {
+        return memberRepository.findAllActiveMembersEmails();
+    }
+
     private void verifyForMemberConflict(MemberDto memberDto, Member member) {
         memberRepository.findOneByEmail(memberDto.getEmail())
                 .ifPresent(m -> {

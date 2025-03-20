@@ -5,6 +5,7 @@ import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Set;
 import java.util.UUID;
 
 public interface MemberCustomRepository {
@@ -13,4 +14,6 @@ public interface MemberCustomRepository {
     Page<Member> findAllByEntityStatusAndName(EntityStatus entityStatus, @Nullable String name, Pageable pageable);
 
     Member findByIdAndEntityStatusCustom(UUID id, EntityStatus entityStatus);
+
+    Set<String> findAllActiveMembersEmails();
 }
