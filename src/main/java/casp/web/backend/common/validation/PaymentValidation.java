@@ -6,7 +6,15 @@ import jakarta.validation.ConstraintValidatorContext;
 
 public class PaymentValidation implements ConstraintValidator<PaymentConstraint, Payment> {
     @Override
-    public boolean isValid(Payment value, ConstraintValidatorContext context) {
-        return (value.getPaidPrice() > 0) == (value.getPaidDate() != null);
+    public boolean isValid(Payment payment, ConstraintValidatorContext context) {
+        return isPaid(payment) || isNotPaid(payment);
+    }
+
+    private static boolean isPaid(Payment payment) {
+        return payment.getPaidDate() != null && payment.getPaidPrice() != null;
+    }
+
+    private static boolean isNotPaid(Payment payment) {
+        return payment.getPaidDate() == null && payment.getPaidPrice() == null;
     }
 }

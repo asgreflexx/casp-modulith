@@ -13,7 +13,7 @@ public class SpaceDto implements SpaceWriteRequiredFields {
     private String courseName;
     private DogHasHandlerReference dogHasHandler;
     private String note;
-    private double paidPrice;
+    private Double paidPrice;
     private LocalDate paidDate;
     private EventResponse response;
 
@@ -58,12 +58,12 @@ public class SpaceDto implements SpaceWriteRequiredFields {
     }
 
     @Override
-    public double getPaidPrice() {
+    public Double getPaidPrice() {
         return paidPrice;
     }
 
     @Override
-    public void setPaidPrice(double paidPrice) {
+    public void setPaidPrice(Double paidPrice) {
         this.paidPrice = paidPrice;
     }
 
