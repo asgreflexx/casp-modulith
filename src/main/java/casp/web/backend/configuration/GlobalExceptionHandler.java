@@ -5,7 +5,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -53,11 +55,14 @@ class GlobalExceptionHandler {
         return new GlobalExceptionResponse(ex.getLocalizedMessage());
     }
 
-    @ExceptionHandler(DuplicateKeyException.class)
+    @ExceptionHandler({
+            DuplicateKeyException.class,
+            OptimisticLockingFailureException.class
+    })
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
-    GlobalExceptionResponse handleDuplicateKeyException(DuplicateKeyException ex) {
-        LOG.warn("Duplicate key encountered", ex);
+    GlobalExceptionResponse handleConflictException(DataAccessException ex) {
+        LOG.warn("A conflict encountered", ex);
         return new GlobalExceptionResponse(ex.getLocalizedMessage());
     }
 
