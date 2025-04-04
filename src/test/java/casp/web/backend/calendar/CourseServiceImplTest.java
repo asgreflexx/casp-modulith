@@ -162,7 +162,7 @@ class CourseServiceImplTest {
         @Test
         void containsDogHasHandlers() {
             var space = createSpace();
-            space.setPaidPrice(100);
+            space.setPaidPrice(100D);
             space.setPaidDate(LocalDate.now());
             course.addSpace(space);
             course.addSpace(createSpace());
