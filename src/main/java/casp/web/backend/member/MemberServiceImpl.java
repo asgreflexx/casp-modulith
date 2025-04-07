@@ -136,6 +136,11 @@ class MemberServiceImpl implements MemberService {
         return memberRepository.findAllActiveMembersEmails();
     }
 
+    @Override
+    public Page<MemberDto> getMembersByNotDogId(UUID dogId, String name, Pageable pageable) {
+        return MEMBER_MAPPER.toTargetPage(memberRepository.findAllByNotDogId(dogId, name, pageable));
+    }
+
     private void verifyForMemberConflict(MemberDto memberDto, Member member) {
         memberRepository.findOneByEmail(memberDto.getEmail())
                 .ifPresent(m -> {

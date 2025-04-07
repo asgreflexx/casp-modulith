@@ -117,4 +117,12 @@ class MemberRestController {
     ResponseEntity<Set<String>> getActiveMembersEmail() {
         return ResponseEntity.ok(memberService.getActiveMembersEmail());
     }
+
+    @GetMapping("by-not-dog-id/{dogId}")
+    ResponseEntity<Page<MemberRead>> getMembersByNotDogId(@PathVariable UUID dogId,
+                                                          @RequestParam(required = false) String name,
+                                                          @ParameterObject Pageable pageable) {
+        var memberDtoPage = memberService.getMembersByNotDogId(dogId, name, pageable);
+        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
+    }
 }

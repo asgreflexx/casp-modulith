@@ -78,6 +78,11 @@ class DogServiceImpl implements DogService {
         return DOG_MAPPER.toTargetPage(dogRepository.findAllByEuropeNetStateNotChecked(pageable));
     }
 
+    @Override
+    public Page<DogDto> getDogsByNotMemberId(UUID memberId, String name, Pageable pageable) {
+        return DOG_MAPPER.toTargetPage(dogRepository.findAllByNotMemberId(memberId, name, pageable));
+    }
+
     private Dog getActiveDog(UUID id) {
         return dogRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "Dog with id %s not found or it isn't active.".formatted(id);

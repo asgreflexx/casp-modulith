@@ -38,4 +38,12 @@ public interface MemberService {
     void migrateDataToV2();
 
     Set<String> getActiveMembersEmail();
+
+    /**
+     * All members except this dog's handler.
+     *
+     * @param dogId to be excluded.
+     * @return Members unrelated to this dog.
+     */
+    Page<MemberDto> getMembersByNotDogId(UUID dogId, @Nullable String name, Pageable pageable);
 }
