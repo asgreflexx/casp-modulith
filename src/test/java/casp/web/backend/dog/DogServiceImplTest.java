@@ -87,6 +87,15 @@ class DogServiceImplTest {
         assertThat(dogPage).containsExactly(dogDto);
     }
 
+    @Test
+    void getDogsByNotMemberId() {
+        var memberId = UUID.randomUUID();
+        when(dogRepository.findAllByNotMemberId(memberId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
+
+        assertThat(dogService.getDogsByNotMemberId(memberId, null, Pageable.unpaged()))
+                .containsExactly(dogDto);
+    }
+
     @Nested
     class SaveDog {
         @Test

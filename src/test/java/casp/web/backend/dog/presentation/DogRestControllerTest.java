@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
+import java.util.UUID;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
 import static casp.web.backend.dog.presentation.DogReadMapper.READ_MAPPER;
@@ -109,5 +110,17 @@ class DogRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dog));
+    }
+
+    @Test
+    void getDogsByNotMemberId() {
+        var memberId = UUID.randomUUID();
+        when(dogService.getDogsByNotMemberId(memberId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
+
+        var response = dogRestController.getDogsByNotMemberId(memberId, null, Pageable.unpaged());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody())
+                .containsExactly(READ_MAPPER.toTarget(dog));
     }
 }
