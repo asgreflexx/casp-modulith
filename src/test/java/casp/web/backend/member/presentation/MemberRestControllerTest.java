@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 import static casp.web.backend.member.presentation.MemberReadMapper.READ_MAPPER;
@@ -149,5 +150,15 @@ class MemberRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(memberDto.getEmail());
+    }
+
+    @Test
+    void getMembersByNotDogId() {
+        var dogId = UUID.randomUUID();
+        when(memberService.getMembersByNotDogId(dogId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
+
+        var response = memberRestController.getMembersByNotDogId(dogId, null, Pageable.unpaged());
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(memberDto));
     }
 }
