@@ -76,8 +76,7 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
         var query = new SpringDataMongodbQuery<>(mongoOperations, DogReference.class);
         var dog = QDogReference.dogReference;
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(dog.name.containsIgnoreCase(value)
-                        .or(dog.chipNumber.containsIgnoreCase(value)));
+                .and(dog.name.containsIgnoreCase(value));
         return query
                 .where(expression)
                 .fetchPage(pageable)
