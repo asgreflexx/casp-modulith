@@ -23,7 +23,8 @@ public class DogReference {
     @NotBlank
     private String name;
 
-    private String chipNumber;
+    @NotBlank
+    private String ownerName;
 
     public UUID getId() {
         return id;
@@ -49,12 +50,12 @@ public class DogReference {
         this.name = name;
     }
 
-    public String getChipNumber() {
-        return chipNumber;
+    public String getOwnerName() {
+        return ownerName;
     }
 
-    public void setChipNumber(String chipNumber) {
-        this.chipNumber = chipNumber;
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     @Override

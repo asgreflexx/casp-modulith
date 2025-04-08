@@ -13,5 +13,5 @@ public interface DogCustomRepository {
 
     Page<Dog> findAllByValue(@Nullable String value, Pageable pageable);
 
-    Page<Dog> findAllByNotMemberId(UUID memberId, @Nullable String dogName, Pageable pageable);
+    Page<Dog> findAllByNotMemberId(UUID memberId, @Nullable String name, Pageable pageable);
 }
