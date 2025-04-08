@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+// The values are derived from the DBRef fields, so the ignore parameters are unnecessary.
+@SuppressWarnings("java:S1172")
 @QueryEntity
 @Document
 public class DogHasHandler extends BaseDocument implements DogHasHandlerRequiredFields {
@@ -19,8 +21,14 @@ public class DogHasHandler extends BaseDocument implements DogHasHandlerRequired
     @DBRef
     private MemberReference member;
 
+    private String firstName;
+    private String lastName;
+
     @DBRef
     private DogReference dog;
+
+    private String dogName;
+    private String ownerName;
 
     private Set<Grade> grades = new HashSet<>();
 
@@ -34,6 +42,24 @@ public class DogHasHandler extends BaseDocument implements DogHasHandlerRequired
         this.member = member;
     }
 
+    public String getFirstName() {
+        this.firstName = member.getFirstName();
+        return firstName;
+    }
+
+    public void setFirstName(String ignore) {
+        this.firstName = this.member.getFirstName();
+    }
+
+    public String getLastName() {
+        this.lastName = member.getLastName();
+        return lastName;
+    }
+
+    public void setLastName(String ignore) {
+        this.lastName = member.getLastName();
+    }
+
     @Override
     public DogReference getDog() {
         return dog;
@@ -42,6 +68,24 @@ public class DogHasHandler extends BaseDocument implements DogHasHandlerRequired
     @Override
     public void setDog(DogReference dog) {
         this.dog = dog;
+    }
+
+    public String getDogName() {
+        this.dogName = dog.getName();
+        return dogName;
+    }
+
+    public void setDogName(String ignore) {
+        this.dogName = dog.getName();
+    }
+
+    public String getOwnerName() {
+        this.ownerName = dog.getOwnerName();
+        return ownerName;
+    }
+
+    public void setOwnerName(String ignore) {
+        this.ownerName = dog.getOwnerName();
     }
 
     @Override

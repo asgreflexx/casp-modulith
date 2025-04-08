@@ -97,7 +97,6 @@ class DogHasHandlerCustomRepositoryImplTest {
         void setUp() {
             activeDogHasHandler2 = new DogHasHandler();
             var dog = ReferenceTestFixture.createDogReference("Robert");
-            dog.setChipNumber("123456789");
             activeDogHasHandler2.setDog(dogReferenceRepository.save(dog));
             activeDogHasHandler2.setMember(memberRepository.save(ReferenceTestFixture.createMemberReference("Maximilian", "Mustermann")));
             dogHasHandlerRepository.save(activeDogHasHandler2);
@@ -113,7 +112,7 @@ class DogHasHandlerCustomRepositoryImplTest {
         }
 
         @ParameterizedTest
-        @ValueSource(strings = {"Rob", "Max", "Must", "12345"})
+        @ValueSource(strings = {"Rob", "Max", "Must"})
         void findByShortValue(String value) {
             var dogHasHandlerPage = dogHasHandlerRepository.findAllByValue(value, Pageable.unpaged());
 
