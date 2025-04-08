@@ -61,11 +61,12 @@ class DogCustomRepositoryImpl implements DogCustomRepository {
     }
 
     @Override
-    public Page<Dog> findAllByNotMemberId(UUID memberId, String dogName, Pageable pageable) {
+    public Page<Dog> findAllByNotMemberId(UUID memberId, String name, Pageable pageable) {
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE)
                 .and(dog.id.notIn(getDogIdsRelatedToThisMember(memberId)));
-        if (StringUtils.isNotBlank(dogName)) {
-            expression = expression.and(dog.name.containsIgnoreCase(dogName));
+        if (StringUtils.isNotBlank(name)) {
+            expression = expression.and(dog.name.containsIgnoreCase(name)
+                    .or(dog.ownerName.containsIgnoreCase(name)));
         }
         return createQuery().where(expression).fetchPage(pageable);
     }

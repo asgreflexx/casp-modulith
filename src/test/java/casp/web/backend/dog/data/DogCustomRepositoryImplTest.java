@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataMongoTest
 class DogCustomRepositoryImplTest {
+    private static final String FAMILY_NAME = "Doe";
     @Autowired
     private DogRepository dogRepository;
     @Autowired
@@ -38,18 +40,18 @@ class DogCustomRepositoryImplTest {
         memberRepository.deleteAll();
         dogRepository.deleteAll();
 
-        charlie = createDog("Charlie", EntityStatus.ACTIVE, EuropeNetState.DOG_IS_REGISTERED, UUID.randomUUID().toString());
-        bonsai = createDog("Bonsai", EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, UUID.randomUUID().toString());
-        createDog("INACTIVE", EntityStatus.INACTIVE, EuropeNetState.NOT_CHECKED, UUID.randomUUID().toString());
+        charlie = createDog("Charlie", "Charlie " + FAMILY_NAME, EntityStatus.ACTIVE, EuropeNetState.DOG_IS_REGISTERED, UUID.randomUUID().toString());
+        bonsai = createDog("Bonsai", "Bonsai " + FAMILY_NAME, EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, UUID.randomUUID().toString());
+        createDog("INACTIVE", "Inactive " + FAMILY_NAME, EntityStatus.INACTIVE, EuropeNetState.NOT_CHECKED, UUID.randomUUID().toString());
     }
 
-    private Dog createDog(String name, EntityStatus entityStatus, EuropeNetState europeNetState, String chipNumber) {
+    private Dog createDog(String name, String ownerName, EntityStatus entityStatus, EuropeNetState europeNetState, String chipNumber) {
         var dog = new Dog();
         dog.setEntityStatus(entityStatus);
         dog.setEuropeNetState(europeNetState);
         dog.setName(name);
         dog.setChipNumber(chipNumber);
-        dog.setOwnerName("John Doe");
+        dog.setOwnerName(ownerName);
         return dogRepository.save(dog);
     }
 
@@ -75,14 +77,15 @@ class DogCustomRepositoryImplTest {
         }
 
         @Test
-        void byMemberId() {
-            assertThat(dogRepository.findAllByNotMemberId(memberReference.getId(), null, Pageable.unpaged()))
-                    .containsExactly(bonsai);
-        }
-
-        @Test
         void byMemberIdAndName() {
             assertThat(dogRepository.findAllByNotMemberId(memberReference.getId(), charlie.getName(), Pageable.unpaged())).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        @ValueSource(strings = {"Bonsai", FAMILY_NAME})
+        void byMemberIdAndOwnerName(String name) {
+            assertThat(dogRepository.findAllByNotMemberId(memberReference.getId(), name, Pageable.unpaged())).containsExactly(bonsai);
         }
     }
 
@@ -91,13 +94,13 @@ class DogCustomRepositoryImplTest {
         @ParameterizedTest
         @NullAndEmptySource
         void findAllByEuropeNetStateNotChecked(String chipNumber) {
-            createDog("BAD_CHIP_NUMBER", EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, chipNumber);
+            createDog("BAD_CHIP_NUMBER", bonsai.getOwnerName(), EntityStatus.ACTIVE, EuropeNetState.NOT_CHECKED, chipNumber);
             assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
         }
 
         @Test
         void notRegistered() {
-            createDog("DOG_NOT_REGISTERED", EntityStatus.ACTIVE, EuropeNetState.DOG_NOT_REGISTERED, UUID.randomUUID().toString());
+            createDog("DOG_NOT_REGISTERED", bonsai.getOwnerName(), EntityStatus.ACTIVE, EuropeNetState.DOG_NOT_REGISTERED, UUID.randomUUID().toString());
             assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
         }
     }
@@ -120,7 +123,7 @@ class DogCustomRepositoryImplTest {
         @Test
         void findDogsByOwnerName() {
             assertThat(dogRepository.findAllByNameOrOwnerName(null, bonsai.getOwnerName(), Pageable.unpaged()).getContent())
-                    .containsExactlyInAnyOrder(bonsai, charlie);
+                    .containsExactlyInAnyOrder(bonsai);
         }
 
         @Test
@@ -146,7 +149,7 @@ class DogCustomRepositoryImplTest {
 
         @Test
         void ownerName() {
-            assertThat(dogRepository.findAllByValue(bonsai.getOwnerName(), Pageable.unpaged()))
+            assertThat(dogRepository.findAllByValue(FAMILY_NAME, Pageable.unpaged()))
                     .containsExactlyInAnyOrder(bonsai, charlie);
         }
 
