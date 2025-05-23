@@ -17,34 +17,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class MemberServiceImplTest {
@@ -207,18 +192,6 @@ class MemberServiceImplTest {
             assertThat(memberDto)
                     .usingRecursiveAssertion()
                     .isEqualTo(MEMBER_MAPPER.toTarget(member));
-        }
-
-        @Test
-        void dogHasHandlerIsCorrectlyMapped() {
-            var dogHasHandlerReference = mockDogHasHandler();
-
-            var memberDto = memberService.getMemberById(member.getId());
-
-            assertThat(memberDto.getDogHasHandlerSet())
-                    .singleElement()
-                    .usingRecursiveAssertion()
-                    .isEqualTo(MEMBER_MAPPER.toDogHasHandlerDto(dogHasHandlerReference));
         }
 
         @Test

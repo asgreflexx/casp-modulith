@@ -39,7 +39,6 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
 
     private Set<Card> cards = new HashSet<>();
 
-    private Set<DogHasHandlerDto> dogHasHandlerSet = new HashSet<>();
     private Set<SpaceDto> spaces = new HashSet<>();
 
     @Override
@@ -170,16 +169,6 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
     @Override
     public void setCards(Set<Card> cards) {
         this.cards = cards;
-    }
-
-    @Override
-    public Set<DogHasHandlerDto> getDogHasHandlerSet() {
-        return dogHasHandlerSet;
-    }
-
-    @Override
-    public void setDogHasHandlerSet(Set<DogHasHandlerDto> dogHasHandlerSet) {
-        this.dogHasHandlerSet = dogHasHandlerSet;
     }
 
     @Override

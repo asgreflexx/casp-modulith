@@ -16,10 +16,4 @@ public interface MemberMapper extends BaseDtoMapper<Member, MemberDto> {
     @Mapping(target = "entityStatus", ignore = true)
     @Override
     Member toSource(MemberDto source);
-
-    @Mapping(target = "dogId", source = "dogHasHandler.dog.id")
-    @Mapping(target = "dogName", source = "dogHasHandler.dog.name")
-    DogHasHandlerDto toDogHasHandlerDto(DogHasHandlerReference dogHasHandler);
-
-    Set<DogHasHandlerDto> toDogHasHandlerDtoSet(Set<DogHasHandlerReference> dogHasHandlerSet);
 }

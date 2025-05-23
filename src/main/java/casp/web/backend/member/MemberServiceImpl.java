@@ -155,7 +155,6 @@ class MemberServiceImpl implements MemberService {
     private MemberDto mapToMemberDto(Member member) {
         var memberDto = MEMBER_MAPPER.toTarget(member);
         var dogHasHandlerSet = dogHasHandlerReferenceRepository.findAllByMemberId(member.getId());
-        memberDto.setDogHasHandlerSet(MEMBER_MAPPER.toDogHasHandlerDtoSet(dogHasHandlerSet));
         memberDto.setSpaces(courseService.getSpacesByDogHasHandlers(dogHasHandlerSet));
         return memberDto;
     }
