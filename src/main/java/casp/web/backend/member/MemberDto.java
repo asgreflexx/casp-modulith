@@ -1,6 +1,5 @@
 package casp.web.backend.member;
 
-import casp.web.backend.calendar.SpaceDto;
 import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Gender;
@@ -38,8 +37,6 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
     private Set<MembershipFee> membershipFees = new HashSet<>();
 
     private Set<Card> cards = new HashSet<>();
-
-    private Set<SpaceDto> spaces = new HashSet<>();
 
     @Override
     public EntityStatus getEntityStatus() {
@@ -169,16 +166,6 @@ public class MemberDto extends BaseDto implements MemberDtoRequiredFields {
     @Override
     public void setCards(Set<Card> cards) {
         this.cards = cards;
-    }
-
-    @Override
-    public Set<SpaceDto> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<SpaceDto> spaces) {
-        this.spaces = spaces;
     }
 
     @Override
