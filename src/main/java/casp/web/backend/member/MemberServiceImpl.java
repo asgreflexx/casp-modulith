@@ -2,9 +2,7 @@ package casp.web.backend.member;
 
 
 import casp.web.backend.calendar.BaseEventObserver;
-import casp.web.backend.calendar.CourseService;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
 import casp.web.backend.dog.DogHasHandlerService;
@@ -30,26 +28,21 @@ class MemberServiceImpl implements MemberService {
     private static final String EMAIL_FORMAT_IF_DELETED = "%s---%s";
 
     private final MemberRepository memberRepository;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     private final DogHasHandlerService dogHasHandlerService;
     private final BaseEventObserver baseEventObserver;
-    private final CourseService courseService;
     private final CardRepository cardRepository;
     private final MemberOldRepository memberOldRepository;
 
     @Autowired
     MemberServiceImpl(MemberRepository memberRepository,
-                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository, DogHasHandlerService dogHasHandlerService,
+                      DogHasHandlerService dogHasHandlerService,
                       BaseEventObserver baseEventObserver,
-                      CourseService courseService,
                       CardRepository cardRepository,
                       MemberOldRepository memberOldRepository) {
         this.memberRepository = memberRepository;
         this.dogHasHandlerService = dogHasHandlerService;
         this.baseEventObserver = baseEventObserver;
-        this.courseService = courseService;
         this.cardRepository = cardRepository;
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
         this.memberOldRepository = memberOldRepository;
     }
 
@@ -67,7 +60,7 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto getMemberById(UUID id) {
-        return mapToMemberDto(memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE));
+        return MEMBER_MAPPER.toTarget(memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE));
     }
 
     @Override
@@ -76,7 +69,7 @@ class MemberServiceImpl implements MemberService {
 
         verifyForMemberConflict(memberDto, member);
 
-        return mapToMemberDto(memberRepository.save(member));
+        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
 
     @Override
@@ -104,7 +97,7 @@ class MemberServiceImpl implements MemberService {
         dogHasHandlerService.activateDogHasHandlersByMemberId(id);
         baseEventObserver.activateBaseEventsByMemberId(id);
         member.setEntityStatus(EntityStatus.ACTIVE);
-        return mapToMemberDto(memberRepository.save(member));
+        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
 
     @Override
@@ -150,13 +143,5 @@ class MemberServiceImpl implements MemberService {
                         throw new IllegalStateException(msg);
                     }
                 });
-    }
-
-    private MemberDto mapToMemberDto(Member member) {
-        var memberDto = MEMBER_MAPPER.toTarget(member);
-        var dogHasHandlerSet = dogHasHandlerReferenceRepository.findAllByMemberId(member.getId());
-        memberDto.setDogHasHandlerSet(MEMBER_MAPPER.toDogHasHandlerDtoSet(dogHasHandlerSet));
-        memberDto.setSpaces(courseService.getSpacesByDogHasHandlers(dogHasHandlerSet));
-        return memberDto;
     }
 }

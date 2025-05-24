@@ -40,13 +40,13 @@ class DogServiceImpl implements DogService {
 
     @Override
     public DogDto getDogById(UUID id) {
-        return mapToDogDto(getActiveDog(id));
+        return DOG_MAPPER.toTarget(getActiveDog(id));
     }
 
     @Override
     public DogDto saveDog(DogDto dogDto) {
         var dog = DOG_MAPPER.toSource(dogDto);
-        return mapToDogDto(dogRepository.save(dog));
+        return DOG_MAPPER.toTarget(dogRepository.save(dog));
     }
 
     @Override
@@ -60,7 +60,7 @@ class DogServiceImpl implements DogService {
     @Override
     public Optional<DogDto> getDogByChipNumber(String chipNumber) {
         return dogRepository.findOneByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)
-                .map(this::mapToDogDto);
+                .map(DOG_MAPPER::toTarget);
     }
 
     @Override
@@ -91,11 +91,4 @@ class DogServiceImpl implements DogService {
         });
     }
 
-    private DogDto mapToDogDto(Dog dog) {
-        var dogDto = DOG_MAPPER.toTarget(dog);
-        var dogHasHandlerSet = dogHasHandlerReferenceRepository.findAllByDogId(dog.getId());
-        dogDto.setDogHasHandlerSet(DOG_MAPPER.toDogHasHandlerSet(dogHasHandlerSet));
-        dogDto.setSpaces(courseService.getSpacesByDogHasHandlers(dogHasHandlerSet));
-        return dogDto;
-    }
 }

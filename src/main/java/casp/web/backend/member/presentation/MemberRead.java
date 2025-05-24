@@ -1,10 +1,8 @@
 package casp.web.backend.member.presentation;
 
-import casp.web.backend.calendar.SpaceDto;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.enums.Gender;
-import casp.web.backend.member.DogHasHandlerDto;
 import casp.web.backend.member.MemberDtoRequiredFields;
 import casp.web.backend.member.data.Card;
 import casp.web.backend.member.data.MembershipFee;
@@ -16,7 +14,6 @@ import java.util.Set;
 
 class MemberRead extends BaseView implements MemberDtoRequiredFields {
     private EntityStatus entityStatus;
-    private Set<DogHasHandlerDto> dogHasHandlerSet;
     private String firstName;
     private String lastName;
     private LocalDate birthDate;
@@ -29,7 +26,6 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     private Set<Role> roles;
     private Set<MembershipFee> membershipFees;
     private Set<Card> cards;
-    private Set<SpaceDto> spaces;
 
     @Override
     public EntityStatus getEntityStatus() {
@@ -40,16 +36,6 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     public void setEntityStatus(EntityStatus entityStatus) {
         this.entityStatus = entityStatus;
 
-    }
-
-    @Override
-    public Set<DogHasHandlerDto> getDogHasHandlerSet() {
-        return dogHasHandlerSet;
-    }
-
-    @Override
-    public void setDogHasHandlerSet(Set<DogHasHandlerDto> dogHasHandlerSet) {
-        this.dogHasHandlerSet = dogHasHandlerSet;
     }
 
     @Override
@@ -170,16 +156,6 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     @Override
     public void setCards(Set<Card> cards) {
         this.cards = cards;
-    }
-
-    @Override
-    public Set<SpaceDto> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<SpaceDto> spaces) {
-        this.spaces = spaces;
     }
 
     @Override

@@ -2,11 +2,6 @@ package casp.web.backend.calendar.data;
 
 import casp.web.backend.calendar.data.participants.Space;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,30 +11,14 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.Set;
-import java.util.stream.Stream;
 
 @Component
 class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> implements CourseCustomRepository {
-    private static final Logger LOG = LoggerFactory.getLogger(CourseCustomRepositoryImpl.class);
-
     private static final QCourse COURSE = QCourse.course;
 
     @Autowired
     CourseCustomRepositoryImpl(MongoOperations mongoOperations) {
         super(mongoOperations);
-    }
-
-    private static BooleanExpression mapToSpaceConstraint(Set<DogHasHandlerReference> dogHasHandlers) {
-        return dogHasHandlers
-                .stream()
-                .map(CourseCustomRepositoryImpl::createSpaceExpression)
-                .reduce(BooleanExpression::or)
-                .orElseThrow();
-    }
-
-    private static BooleanExpression createSpaceExpression(DogHasHandlerReference dhh) {
-        return COURSE.spaces.contains(new Space(dhh));
     }
 
     @Override
@@ -56,14 +35,9 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     }
 
     @Override
-    public Stream<Course> findAllByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlers) {
-        if (ObjectUtils.isEmpty(dogHasHandlers)) {
-            var msg = "The set of DogHasHandlerReference should not be empty.";
-            LOG.error(msg);
-            throw new IllegalArgumentException(msg);
-        }
+    public Page<Course> findAllBySpace(Space space, Pageable pageable) {
         return query()
-                .where(mapToSpaceConstraint(dogHasHandlers), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
-                .stream();
+                .where(COURSE.spaces.contains(space), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
+                .fetchPage(pageable);
     }
 }
