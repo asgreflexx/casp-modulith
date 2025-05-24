@@ -86,6 +86,11 @@ class DogHasHandlerRestController {
         return ResponseEntity.ok(READ_MAPPER.toTargetSet(dogHasHandlerService.getDogHasHandlerByMemberId(memberId)));
     }
 
+    @GetMapping("by-dog-id/{dogId}")
+    ResponseEntity<Set<DogHasHandlerRead>> getDogHasHandlerByDogId(@PathVariable UUID dogId) {
+        return ResponseEntity.ok(READ_MAPPER.toTargetSet(dogHasHandlerService.getDogHasHandlerByDogId(dogId)));
+    }
+
     /**
      * @deprecated It will be removed in #3.
      */

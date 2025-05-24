@@ -123,6 +123,16 @@ class DogHasHandlerRestControllerTest {
     }
 
     @Test
+    void getDogHasHandlerByDogId() {
+        when(dogHasHandlerService.getDogHasHandlerByDogId(dogHasHandlerDto.getDogId())).thenReturn(Set.of(dogHasHandlerDto));
+
+        var response = controller.getDogHasHandlerByDogId(dogHasHandlerDto.getDogId());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dogHasHandlerDto));
+    }
+
+    @Test
     void migrateDataToV2() {
         var response = controller.migrateDataToV2();
 

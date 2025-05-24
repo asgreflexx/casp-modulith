@@ -182,6 +182,15 @@ class DogHasHandlerServiceImplTest {
         assertThat(dogHasHandlerDtoSet).containsExactly(dogHasHandlerDto);
     }
 
+    @Test
+    void getDogHasHandlerByDogId() {
+        when(dogHasHandlerRepository.findAllByDogIdAndNotDeleted(dog.getId())).thenReturn(dogHasHandlerSet);
+
+        var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlerByDogId(dog.getId());
+
+        assertThat(dogHasHandlerDtoSet).containsExactly(dogHasHandlerDto);
+    }
+
     @Nested
     class DeleteDogHasHandlerById {
         @Test

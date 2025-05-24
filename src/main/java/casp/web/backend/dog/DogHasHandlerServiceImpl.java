@@ -136,6 +136,12 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
     }
 
     @Override
+    public Set<DogHasHandlerDto> getDogHasHandlerByDogId(UUID dogId) {
+        var dogHasHandlerSet = dogHasHandlerRepository.findAllByDogIdAndNotDeleted(dogId);
+        return DOG_HAS_HANDLER_MAPPER.toTargetSet(dogHasHandlerSet);
+    }
+
+    @Override
     public void migrateDataToV2() {
         var dogHasHandlerSet = dogHasHandlerOldRepository.findAll()
                 .stream()
