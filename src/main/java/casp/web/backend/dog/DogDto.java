@@ -22,18 +22,8 @@ public class DogDto extends BaseDto implements DogDtoRequiredFields {
     private String ownerName;
     private String ownerAddress;
     private EuropeNetState europeNetState = EuropeNetState.NOT_CHECKED;
-    private Set<DogHasHandler> dogHasHandlerSet = new HashSet<>();
     private Set<SpaceDto> spaces = new HashSet<>();
 
-    @Override
-    public Set<DogHasHandler> getDogHasHandlerSet() {
-        return dogHasHandlerSet;
-    }
-
-    @Override
-    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
-        this.dogHasHandlerSet = dogHasHandlerSet;
-    }
 
     @Override
     public String getName() {

@@ -194,16 +194,6 @@ class DogServiceImplTest {
         }
 
         @Test
-        void mapDogHasHandler() {
-            var dogHasHandlerReference = mockDogHasHandler();
-            when(dogRepository.findOneByIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
-
-            var result = dogService.getDogById(dog.getId());
-
-            assertThat(result.getDogHasHandlerSet()).singleElement().usingRecursiveAssertion().isEqualTo(DOG_MAPPER.toDogHasHandler(dogHasHandlerReference));
-        }
-
-        @Test
         void mapSpaces() {
             var dogHasHandlerReference = mockDogHasHandler();
             var spaceDto = mock(SpaceDto.class);
@@ -222,8 +212,6 @@ class DogServiceImplTest {
             var dogHasHandlerReference = mock(DogHasHandlerReference.class, Answers.RETURNS_DEEP_STUBS);
             when(dogHasHandlerReference.getId()).thenReturn(UUID.randomUUID());
             when(dogHasHandlerReference.getMember().getId()).thenReturn(UUID.randomUUID());
-            when(dogHasHandlerReference.getMember().getFirstName()).thenReturn("Bonsai");
-            when(dogHasHandlerReference.getMember().getLastName()).thenReturn("Yasmin");
             when(dogHasHandlerReferenceRepository.findAllByDogId(dog.getId())).thenReturn(Set.of(dogHasHandlerReference));
             return dogHasHandlerReference;
         }
