@@ -173,6 +173,15 @@ class DogHasHandlerServiceImplTest {
                 });
     }
 
+    @Test
+    void getDogHasHandlerByMemberId() {
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(dogHasHandlerSet);
+
+        var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlerByMemberId(member.getId());
+
+        assertThat(dogHasHandlerDtoSet).containsExactly(dogHasHandlerDto);
+    }
+
     @Nested
     class DeleteDogHasHandlerById {
         @Test

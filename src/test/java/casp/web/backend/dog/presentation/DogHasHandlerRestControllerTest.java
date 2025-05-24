@@ -12,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.Set;
@@ -109,6 +110,16 @@ class DogHasHandlerRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(dogHasHandlerDto.getMember().getEmail());
+    }
+
+    @Test
+    void getDogHasHandlerByMemberId() {
+        when(dogHasHandlerService.getDogHasHandlerByMemberId(dogHasHandlerDto.getMemberId())).thenReturn(Set.of(dogHasHandlerDto));
+
+        var response = controller.getDogHasHandlerByMemberId(dogHasHandlerDto.getMemberId());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dogHasHandlerDto));
     }
 
     @Test

@@ -50,6 +50,8 @@ public interface DogHasHandlerService {
 
     void activateDogHasHandlersByMemberId(UUID memberId);
 
+    Set<DogHasHandlerDto> getDogHasHandlerByMemberId(UUID memberId);
+
     /**
      * @deprecated It will be removed in #3.
      */
