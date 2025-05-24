@@ -12,17 +12,13 @@ import casp.web.backend.common.reference.MemberReferenceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataMongoTest
 class CourseCustomRepositoryImplTest {
@@ -89,67 +85,43 @@ class CourseCustomRepositoryImplTest {
     }
 
     @Nested
-    class FindAllByDogHasHandlers {
+    class FindAllBySpace {
 
         private Space space;
 
         @BeforeEach
         void setUp() {
-            space = createSpace(course);
+            space = new Space(createDogHasHandlerReference());
+            course.setSpaceLimit(course.getSpaceLimit() + 1);
+            course.addSpace(space);
             courseRepository.save(course);
         }
 
         @Test
-        void multipleCoursesOneDogHasHandler() {
+        void multipleCourses() {
             var course2 = createCourse();
             course2.setSpaceLimit(1);
             course2.addSpace(space);
             courseRepository.save(course2);
 
-            var courseSet = courseRepository.findAllByDogHasHandlers(Set.of(space.getDogHasHandler()));
+            var courseSet = courseRepository.findAllBySpace(space, Pageable.unpaged());
 
             assertThat(courseSet).
                     containsExactlyInAnyOrder(course, course2);
         }
 
         @Test
-        void multipleCoursesMultipleDogHasHandler() {
+        void oneCourseIsNotActive() {
             var course2 = createCourse();
-            var space2 = createSpace(course2);
+            course2.setSpaceLimit(1);
+            course2.addSpace(space);
+            course2.setEntityStatus(EntityStatus.DELETED);
             courseRepository.save(course2);
 
-            var courseSet = courseRepository.findAllByDogHasHandlers(Set.of(space.getDogHasHandler(), space2.getDogHasHandler()));
+            var coursePage = courseRepository.findAllBySpace(space, Pageable.unpaged());
 
-
-            assertThat(courseSet).
-                    containsExactlyInAnyOrder(course, course2);
-        }
-
-        @Test
-        void oneCourseIsNotActiveMultipleDogHasHandler() {
-            var course2 = createCourse();
-            var space2 = createSpace(course2);
-            course2.setEntityStatus(EntityStatus.INACTIVE);
-            courseRepository.save(course2);
-
-            var courseSet = courseRepository.findAllByDogHasHandlers(Set.of(space.getDogHasHandler(), space2.getDogHasHandler()));
-
-
-            assertThat(courseSet).
+            assertThat(coursePage).
                     containsExactlyInAnyOrder(course);
-        }
-
-        @ParameterizedTest
-        @NullAndEmptySource
-        void dogHasHandlerSetCannotBeNullNorEmpty(Set<DogHasHandlerReference> dogHasHandlerReferences) {
-            assertThrows(IllegalArgumentException.class, () -> courseRepository.findAllByDogHasHandlers(dogHasHandlerReferences));
-        }
-
-        private Space createSpace(Course course) {
-            var space = new Space(createDogHasHandlerReference());
-            course.setSpaceLimit(course.getSpaceLimit() + 1);
-            course.addSpace(space);
-            return space;
         }
 
         private DogHasHandlerReference createDogHasHandlerReference() {

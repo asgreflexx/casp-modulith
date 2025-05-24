@@ -4,7 +4,7 @@ import casp.web.backend.calendar.data.Course;
 import casp.web.backend.calendar.data.CourseRepository;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
-import casp.web.backend.common.reference.DogHasHandlerReference;
+import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
@@ -15,12 +15,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 
@@ -28,6 +26,7 @@ import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implements CourseService {
     private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
     private final CourseRepository courseRepository;
+    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
     CourseServiceImpl(CourseRepository courseRepository,
@@ -36,6 +35,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
                       BaseEventMigrationService migrationService) {
         super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
         this.courseRepository = courseRepository;
+        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     private static void removeSpace(Course course, UUID spaceId) {
@@ -53,13 +53,6 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
                     LOG.error(msg);
                     return new NoSuchElementException(msg);
                 });
-    }
-
-    private static Stream<SpaceDto> filterAndMapToSpaceDto(Course course, Set<Space> expectedSpaces) {
-        return course.getSpaces()
-                .stream()
-                .filter(expectedSpaces::contains)
-                .map(s -> COURSE_MAPPER.toSpaceDto(s, course));
     }
 
     @Override
@@ -109,14 +102,16 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     }
 
     @Override
-    public Set<SpaceDto> getSpacesByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlerSet) {
-        if (dogHasHandlerSet.isEmpty()) {
-            return Collections.emptySet();
-        }
-        var expectedSpaces = dogHasHandlerSet.stream().map(Space::new).collect(Collectors.toSet());
-        return courseRepository.findAllByDogHasHandlers(dogHasHandlerSet)
-                .flatMap(c -> filterAndMapToSpaceDto(c, expectedSpaces))
-                .collect(Collectors.toSet());
+    public Page<CourseDto> getCourseByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
+        var space = dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)
+                .map(Space::new)
+                .orElseThrow(() -> {
+                    var msg = "Dog has handler with id %s does not exist or it is not active.".formatted(dogHasHandlerId);
+                    LOG.error(msg);
+                    return new NoSuchElementException(msg);
+                });
+        var coursePage = courseRepository.findAllBySpace(space, pageable);
+        return COURSE_MAPPER.toTargetPage(coursePage);
     }
 
     private void setCoTrainers(CourseDto courseDto, Course course) {
@@ -124,7 +119,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         course.addCoTrainers(newCoTrainers);
     }
 
-    private Set<CoTrainer> mapToCoTrainers(final Set<UUID> memberIds) {
+    private Set<CoTrainer> mapToCoTrainers(Set<UUID> memberIds) {
         return memberIds
                 .stream()
                 .flatMap(id -> findMemberReferenceById(id)
@@ -138,7 +133,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
         course.addSpaces(newSpaces);
     }
 
-    private Set<Space> mapToSpaces(final Set<UUID> dogHasHandlerIds) {
+    private Set<Space> mapToSpaces(Set<UUID> dogHasHandlerIds) {
         return dogHasHandlerIds
                 .stream()
                 .flatMap(id -> findDogHandlerReferenceById(id)
