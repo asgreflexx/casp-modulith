@@ -2,7 +2,6 @@ package casp.web.backend.member;
 
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.deprecated.member.Card;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
@@ -46,8 +45,6 @@ import static org.mockito.Mockito.when;
 class MemberServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
-    @Mock
-    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     @Mock
     private CardRepository cardRepository;
     @Mock
@@ -232,6 +229,13 @@ class MemberServiceImplTest {
             assertThat(memberCaptor.getValue())
                     .usingRecursiveComparison()
                     .isEqualTo(member);
+        }
+
+        @Test
+        void memberIsDisabled() {
+            when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenThrow(new NoSuchElementException());
+
+            assertThrows(NoSuchElementException.class, () -> memberService.saveMember(MEMBER_MAPPER.toTarget(member)));
         }
     }
 

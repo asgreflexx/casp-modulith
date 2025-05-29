@@ -67,7 +67,7 @@ class MemberServiceImpl implements MemberService {
     public MemberDto saveMember(MemberDto memberDto) {
         var member = MEMBER_MAPPER.toSource(memberDto);
 
-        verifyForMemberConflict(memberDto, member);
+        analyseMember(member);
 
         return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
@@ -134,8 +134,11 @@ class MemberServiceImpl implements MemberService {
         return MEMBER_MAPPER.toTargetPage(memberRepository.findAllByNotDogId(dogId, name, pageable));
     }
 
-    private void verifyForMemberConflict(MemberDto memberDto, Member member) {
-        memberRepository.findOneByEmail(memberDto.getEmail())
+    // it fails if the member isn't active or another member with the same email already exists
+    private void analyseMember(Member member) {
+        memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE);
+
+        memberRepository.findOneByEmail(member.getEmail())
                 .ifPresent(m -> {
                     if (!member.equals(m)) {
                         var msg = "Member with email %s already exists.".formatted(member.getEmail());
