@@ -188,7 +188,16 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
             var dogHasHandler = DOG_HAS_HANDLER_V2_MAPPER.toDogHasHandler(dh);
             dogHasHandler.setDog(dog);
             dogHasHandler.setMember(member);
+            setTheCorrectEntityStatus(dog, member, dogHasHandler);
             return dogHasHandler;
         });
+    }
+
+    private void setTheCorrectEntityStatus(DogReference dog, MemberReference member, DogHasHandler dogHasHandler) {
+        if (dog.getEntityStatus() == EntityStatus.DELETED || member.getEntityStatus() == EntityStatus.DELETED) {
+            dogHasHandler.setEntityStatus(EntityStatus.DELETED);
+        } else if (dog.getEntityStatus() == EntityStatus.INACTIVE || member.getEntityStatus() == EntityStatus.INACTIVE) {
+            dogHasHandler.setEntityStatus(EntityStatus.INACTIVE);
+        }
     }
 }
