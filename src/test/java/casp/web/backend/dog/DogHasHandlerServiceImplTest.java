@@ -14,18 +14,30 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.*;
+import org.mockito.Answers;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.util.*;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Stream;
 
 import static casp.web.backend.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DogHasHandlerServiceImplTest {
@@ -185,6 +197,22 @@ class DogHasHandlerServiceImplTest {
         var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlerByDogId(dog.getId());
 
         assertThat(dogHasHandlerDtoSet).containsExactly(dogHasHandlerDto);
+    }
+
+    @ParameterizedTest
+    @MethodSource("migrateDataToV2")
+    void correctEntityStatus(EntityStatusData data) {
+        dogHasHandler.getDog().setEntityStatus(data.dogStatus);
+        dogHasHandler.getMember().setEntityStatus(data.memberStatus);
+        when(dogHasHandlerRepository.findAll()).thenReturn(dogHasHandlerPage.stream().toList());
+
+        dogHasHandlerService.correctEntityStatus();
+
+        verify(dogHasHandlerRepository).saveAll(dogHasHandlerSetCaptor.capture());
+
+        assertThat(dogHasHandlerSetCaptor.getValue())
+                .singleElement()
+                .satisfies(dhh -> assertSame(data.expectedDogHasHandlerStatus, dhh.getEntityStatus()));
     }
 
     @Nested

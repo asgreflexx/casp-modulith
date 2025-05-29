@@ -54,6 +54,8 @@ public interface DogHasHandlerService {
 
     Set<DogHasHandlerDto> getDogHasHandlerByDogId(UUID dogId);
 
+    void correctEntityStatus();
+
     /**
      * @deprecated It will be removed in #3.
      */
