@@ -18,7 +18,7 @@ public class Grade {
     private long points;
 
     @NotNull
-    private LocalDate examDate;
+    private LocalDate examDate = LocalDate.now();
 
     public String getName() {
         return name;
