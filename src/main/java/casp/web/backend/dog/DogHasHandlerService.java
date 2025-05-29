@@ -35,10 +35,10 @@ public interface DogHasHandlerService {
     /**
      * Search for an active DogHasHandler by name in members and dogs.
      *
-     * @param name of the DogHasHandler
+     * @param value of the DogHasHandler
      * @return a set of DogHasHandler with the given name, or an empty set if not found
      */
-    Page<DogHasHandlerDto> searchByName(@Nullable String name, Pageable pageable);
+    Page<DogHasHandlerDto> searchByValue(@Nullable String value, Pageable pageable);
 
     Page<DogHasHandlerDto> getAllDogHasHandlers(Pageable pageable);
 
@@ -49,6 +49,10 @@ public interface DogHasHandlerService {
     void deactivateDogHasHandlersByMemberId(UUID memberId);
 
     void activateDogHasHandlersByMemberId(UUID memberId);
+
+    Set<DogHasHandlerDto> getDogHasHandlerByMemberId(UUID memberId);
+
+    Set<DogHasHandlerDto> getDogHasHandlerByDogId(UUID dogId);
 
     /**
      * @deprecated It will be removed in #3.

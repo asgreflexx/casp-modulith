@@ -126,6 +126,18 @@ class CourseRestControllerTest {
     }
 
     @Test
+    void getCourseByDogHasHandlerId() {
+        var dogHasHandlerId = UUID.randomUUID();
+        when(courseService.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(courseDto)));
+
+        var response = courseRestController.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody())
+                .containsExactly(COURSE_READ_MAPPER.toTarget(courseDto));
+    }
+
+    @Test
     void migrateDataToV2() {
         var response = courseRestController.migrateDataToV2();
 

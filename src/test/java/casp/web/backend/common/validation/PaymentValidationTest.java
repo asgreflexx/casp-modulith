@@ -23,6 +23,9 @@ class PaymentValidationTest {
     class IsValid {
         @Test
         void isNotPaid() {
+            when(payment.getPaidPrice()).thenReturn(null);
+            when(payment.getPaidDate()).thenReturn(null);
+
             assertTrue(VALIDATION.isValid(payment, null));
         }
 
@@ -40,12 +43,14 @@ class PaymentValidationTest {
         @Test
         void dateIsNull() {
             when(payment.getPaidPrice()).thenReturn(1.0);
+            when(payment.getPaidDate()).thenReturn(null);
 
             assertFalse(VALIDATION.isValid(payment, null));
         }
 
         @Test
-        void priceIs0() {
+        void priceIsNull() {
+            when(payment.getPaidPrice()).thenReturn(null);
             when(payment.getPaidDate()).thenReturn(LocalDate.now());
 
             assertFalse(VALIDATION.isValid(payment, null));

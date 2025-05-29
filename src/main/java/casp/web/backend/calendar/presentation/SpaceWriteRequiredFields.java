@@ -4,11 +4,7 @@ import casp.web.backend.calendar.data.participants.EventResponse;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.validation.Payment;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
-
-import java.time.LocalDate;
 
 public interface SpaceWriteRequiredFields extends Payment {
     @Valid
@@ -20,10 +16,6 @@ public interface SpaceWriteRequiredFields extends Payment {
     String getNote();
 
     void setNote(String note);
-
-    void setPaidPrice(@PositiveOrZero @Digits(integer = 9, fraction = 2) double paidPrice);
-
-    void setPaidDate(LocalDate paidDate);
 
     @NotNull
     EventResponse getResponse();

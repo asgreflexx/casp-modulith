@@ -14,7 +14,7 @@ public interface MemberService {
 
     Page<MemberDto> getMembersByFirstNameAndLastName(@Nullable String firstName, @Nullable String lastName, Pageable pageable);
 
-    Page<MemberDto> getMembersByEntityStatus(EntityStatus entityStatus, Pageable pageable);
+    Page<MemberDto> getMembersByEntityStatusAndName(EntityStatus entityStatus, @Nullable String name, Pageable pageable);
 
     MemberDto getMemberById(UUID id);
 
@@ -36,4 +36,14 @@ public interface MemberService {
      */
     @Deprecated(forRemoval = true, since = "0.0.0")
     void migrateDataToV2();
+
+    Set<String> getActiveMembersEmail();
+
+    /**
+     * All members except this dog's handler.
+     *
+     * @param dogId to be excluded.
+     * @return Members unrelated to this dog.
+     */
+    Page<MemberDto> getMembersByNotDogId(UUID dogId, @Nullable String name, Pageable pageable);
 }

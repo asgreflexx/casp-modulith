@@ -57,9 +57,10 @@ class DogHasHandlerRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("search-by-name")
-    ResponseEntity<Page<DogHasHandlerRead>> searchByName(@RequestParam(required = false, defaultValue = "") String name, @ParameterObject Pageable pageable) {
-        var dogHasHandlerDtoPage = dogHasHandlerService.searchByName(name, pageable);
+    @GetMapping("search-by-value")
+    ResponseEntity<Page<DogHasHandlerRead>> searchByValue(@RequestParam(required = false, defaultValue = "") String value,
+                                                          @ParameterObject Pageable pageable) {
+        var dogHasHandlerDtoPage = dogHasHandlerService.searchByValue(value, pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogHasHandlerDtoPage));
     }
 
@@ -78,6 +79,16 @@ class DogHasHandlerRestController {
     @GetMapping("emails-by-ids")
     ResponseEntity<Set<String>> getMembersEmailByIds(@RequestParam @Size(min = 1) Set<UUID> ids) {
         return ResponseEntity.ok(dogHasHandlerService.getEmailsByDogHasHandlersIds(ids));
+    }
+
+    @GetMapping("by-member-id/{memberId}")
+    ResponseEntity<Set<DogHasHandlerRead>> getDogHasHandlerByMemberId(@PathVariable UUID memberId) {
+        return ResponseEntity.ok(READ_MAPPER.toTargetSet(dogHasHandlerService.getDogHasHandlerByMemberId(memberId)));
+    }
+
+    @GetMapping("by-dog-id/{dogId}")
+    ResponseEntity<Set<DogHasHandlerRead>> getDogHasHandlerByDogId(@PathVariable UUID dogId) {
+        return ResponseEntity.ok(READ_MAPPER.toTargetSet(dogHasHandlerService.getDogHasHandlerByDogId(dogId)));
     }
 
     /**

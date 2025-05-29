@@ -71,9 +71,9 @@ class DogHasHandlerRestControllerTest {
 
     @Test
     void searchByName() {
-        when(dogHasHandlerService.searchByName(dogHasHandlerDto.getDog().getName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dogHasHandlerDto)));
+        when(dogHasHandlerService.searchByValue(dogHasHandlerDto.getDog().getName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dogHasHandlerDto)));
 
-        var response = controller.searchByName(dogHasHandlerDto.getDog().getName(), Pageable.unpaged());
+        var response = controller.searchByValue(dogHasHandlerDto.getDog().getName(), Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dogHasHandlerDto));
@@ -109,6 +109,26 @@ class DogHasHandlerRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(dogHasHandlerDto.getMember().getEmail());
+    }
+
+    @Test
+    void getDogHasHandlerByMemberId() {
+        when(dogHasHandlerService.getDogHasHandlerByMemberId(dogHasHandlerDto.getMemberId())).thenReturn(Set.of(dogHasHandlerDto));
+
+        var response = controller.getDogHasHandlerByMemberId(dogHasHandlerDto.getMemberId());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dogHasHandlerDto));
+    }
+
+    @Test
+    void getDogHasHandlerByDogId() {
+        when(dogHasHandlerService.getDogHasHandlerByDogId(dogHasHandlerDto.getDogId())).thenReturn(Set.of(dogHasHandlerDto));
+
+        var response = controller.getDogHasHandlerByDogId(dogHasHandlerDto.getDogId());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dogHasHandlerDto));
     }
 
     @Test

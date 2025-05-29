@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DogDto extends BaseDto implements DogDtoRequiredFields {
+public class DogDto extends BaseDto implements DogRequiredFields {
     private String name;
     private String breederName;
     private String breedName;
@@ -22,18 +22,6 @@ public class DogDto extends BaseDto implements DogDtoRequiredFields {
     private String ownerName;
     private String ownerAddress;
     private EuropeNetState europeNetState = EuropeNetState.NOT_CHECKED;
-    private Set<DogHasHandler> dogHasHandlerSet = new HashSet<>();
-    private Set<SpaceDto> spaces = new HashSet<>();
-
-    @Override
-    public Set<DogHasHandler> getDogHasHandlerSet() {
-        return dogHasHandlerSet;
-    }
-
-    @Override
-    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
-        this.dogHasHandlerSet = dogHasHandlerSet;
-    }
 
     @Override
     public String getName() {
@@ -153,16 +141,6 @@ public class DogDto extends BaseDto implements DogDtoRequiredFields {
     @Override
     public void setEuropeNetState(EuropeNetState europeNetState) {
         this.europeNetState = europeNetState;
-    }
-
-    @Override
-    public Set<SpaceDto> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<SpaceDto> spaces) {
-        this.spaces = spaces;
     }
 
     @Override

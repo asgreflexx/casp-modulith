@@ -12,11 +12,4 @@ public interface CourseMapper extends BaseEventMapper<Course, CourseDto> {
     SpaceDto toSpaceDto(Space space);
 
     Space toSpace(SpaceDto spaceDto);
-
-    default SpaceDto toSpaceDto(Space space, Course course) {
-        var spaceDto = toSpaceDto(space);
-        spaceDto.setCourseId(course.getId());
-        spaceDto.setCourseName(course.getName());
-        return spaceDto;
-    }
 }

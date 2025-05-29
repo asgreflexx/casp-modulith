@@ -1,17 +1,13 @@
 package casp.web.backend.dog.presentation;
 
-import casp.web.backend.calendar.SpaceDto;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.enums.Gender;
-import casp.web.backend.dog.DogDtoRequiredFields;
-import casp.web.backend.dog.DogHasHandler;
+import casp.web.backend.dog.DogRequiredFields;
 import casp.web.backend.dog.data.EuropeNetState;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
-public class DogRead extends BaseView implements DogDtoRequiredFields {
+public class DogRead extends BaseView implements DogRequiredFields {
     private String name;
     private String breederName;
     private String breedName;
@@ -24,18 +20,6 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     private String ownerName;
     private String ownerAddress;
     private EuropeNetState europeNetState = EuropeNetState.NOT_CHECKED;
-    private Set<DogHasHandler> dogHasHandlerSet = new HashSet<>();
-    private Set<SpaceDto> spaces;
-
-    @Override
-    public Set<DogHasHandler> getDogHasHandlerSet() {
-        return dogHasHandlerSet;
-    }
-
-    @Override
-    public void setDogHasHandlerSet(Set<DogHasHandler> dogHasHandlerSet) {
-        this.dogHasHandlerSet = dogHasHandlerSet;
-    }
 
     @Override
     public String getName() {
@@ -155,16 +139,6 @@ public class DogRead extends BaseView implements DogDtoRequiredFields {
     @Override
     public void setEuropeNetState(EuropeNetState europeNetState) {
         this.europeNetState = europeNetState;
-    }
-
-    @Override
-    public Set<SpaceDto> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<SpaceDto> spaces) {
-        this.spaces = spaces;
     }
 
     @Override

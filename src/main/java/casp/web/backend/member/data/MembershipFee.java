@@ -1,14 +1,15 @@
 package casp.web.backend.member.data;
 
 import casp.web.backend.common.validation.Payment;
-import jakarta.validation.constraints.Digits;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
 public class MembershipFee implements Payment {
     private String comment;
-    private double paidPrice;
+    @NotNull
+    private Double paidPrice;
+    @NotNull
     private LocalDate paidDate;
 
     public String getComment() {
@@ -20,11 +21,12 @@ public class MembershipFee implements Payment {
     }
 
     @Override
-    public double getPaidPrice() {
+    public Double getPaidPrice() {
         return paidPrice;
     }
 
-    public void setPaidPrice(@PositiveOrZero @Digits(integer = 9, fraction = 2) double paidPrice) {
+    @Override
+    public void setPaidPrice(Double paidPrice) {
         this.paidPrice = paidPrice;
     }
 

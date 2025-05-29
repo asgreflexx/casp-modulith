@@ -158,43 +158,6 @@ class CourseServiceImplTest {
     }
 
     @Nested
-    class GetSpacesByDogHasHandlers {
-        @Test
-        void containsDogHasHandlers() {
-            var space = createSpace();
-            space.setPaidPrice(100);
-            space.setPaidDate(LocalDate.now());
-            course.addSpace(space);
-            course.addSpace(createSpace());
-            var dogHasHandlerSet = Set.of(space.getDogHasHandler());
-            when(courseRepository.findAllByDogHasHandlers(dogHasHandlerSet)).thenReturn(Stream.of(course));
-
-            var spaces = courseService.getSpacesByDogHasHandlers(dogHasHandlerSet);
-
-            assertThat(spaces)
-                    .singleElement()
-                    .satisfies(spaceDto -> {
-                        assertEquals(course.getId(), spaceDto.getCourseId());
-                        assertEquals(course.getName(), spaceDto.getCourseName());
-                        assertEquals(space.getId(), spaceDto.getId());
-                        assertEquals(space.getDogHasHandler(), spaceDto.getDogHasHandler());
-                        assertEquals(space.getNote(), spaceDto.getNote());
-                        assertEquals(space.getPaidPrice(), spaceDto.getPaidPrice());
-                        assertEquals(space.getPaidDate(), spaceDto.getPaidDate());
-                        assertSame(space.getResponse(), spaceDto.getResponse());
-                    });
-        }
-
-        @Test
-        void containsNoDogHasHandler() {
-            var spaces = courseService.getSpacesByDogHasHandlers(Set.of());
-
-            verifyNoInteractions(courseRepository);
-            assertThat(spaces).isEmpty();
-        }
-    }
-
-    @Nested
     class GetOneByIdAndCalendarEntryId {
 
         private CalendarEntry calendarEntry;
@@ -509,6 +472,31 @@ class CourseServiceImplTest {
             when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.getOneById(id));
+        }
+    }
+
+    @Nested
+    class GetCourseByDogHasHandlerId {
+        @Test
+        void dogHasHandlerDoesNotExist() {
+            var dogHasHandlerId = UUID.randomUUID();
+            var unpaged = Pageable.unpaged();
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> courseService.getCourseByDogHasHandlerId(dogHasHandlerId, unpaged));
+        }
+
+        @Test
+        void dogHasHandlerExist() {
+            var dogHasHandlerId = UUID.randomUUID();
+            var dogHasHandler = new DogHasHandlerReference();
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(courseRepository.findAllBySpace(new Space(dogHasHandler), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(course)));
+
+            var courseDtoPage = courseService.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
+
+            assertThat(courseDtoPage)
+                    .containsExactly(COURSE_MAPPER.toTarget(course));
         }
     }
 }

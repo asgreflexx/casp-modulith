@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 import static casp.web.backend.member.presentation.MemberReadMapper.READ_MAPPER;
@@ -42,9 +43,10 @@ class MemberRestControllerTest {
 
     @Test
     void getMembers() {
-        when(memberService.getMembersByEntityStatus(EntityStatus.ACTIVE, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
+        var name = "name";
+        when(memberService.getMembersByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
 
-        var response = memberRestController.getMembers(EntityStatusParam.ACTIVE, Pageable.unpaged());
+        var response = memberRestController.getMembers(EntityStatusParam.ACTIVE, name, Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(memberDto));
@@ -138,5 +140,25 @@ class MemberRestControllerTest {
 
         assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(memberService).migrateDataToV2();
+    }
+
+    @Test
+    void getActiveMembersEmail() {
+        when(memberService.getActiveMembersEmail()).thenReturn(Set.of(memberDto.getEmail()));
+
+        var response = memberRestController.getActiveMembersEmail();
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(memberDto.getEmail());
+    }
+
+    @Test
+    void getMembersByNotDogId() {
+        var dogId = UUID.randomUUID();
+        when(memberService.getMembersByNotDogId(dogId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
+
+        var response = memberRestController.getMembersByNotDogId(dogId, null, Pageable.unpaged());
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(memberDto));
     }
 }

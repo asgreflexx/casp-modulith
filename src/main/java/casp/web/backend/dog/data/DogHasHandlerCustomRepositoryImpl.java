@@ -50,11 +50,11 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
     }
 
     @Override
-    public Page<DogHasHandler> findAllByName(@Nullable String name, Pageable pageable) {
+    public Page<DogHasHandler> findAllByValue(@Nullable String value, Pageable pageable) {
         var expression = DOG_HAS_HANDLER.entityStatus.eq(EntityStatus.ACTIVE);
-        if (StringUtils.isNotBlank(name)) {
-            expression = expression.and(DOG_HAS_HANDLER.dog.id.in(findAllByDogName(name, pageable))
-                    .or(DOG_HAS_HANDLER.member.id.in(findAllByMemberName(name, pageable))));
+        if (StringUtils.isNotBlank(value)) {
+            expression = expression.and(DOG_HAS_HANDLER.dog.id.in(findAllByDogName(value, pageable))
+                    .or(DOG_HAS_HANDLER.member.id.in(findAllByMemberName(value, pageable))));
         }
         return query()
                 .where(expression)
@@ -72,10 +72,11 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
                 .findAny();
     }
 
-    private Set<UUID> findAllByDogName(String name, Pageable pageable) {
+    private Set<UUID> findAllByDogName(String value, Pageable pageable) {
         var query = new SpringDataMongodbQuery<>(mongoOperations, DogReference.class);
         var dog = QDogReference.dogReference;
-        var expression = dog.name.containsIgnoreCase(name).and(dog.entityStatus.eq(EntityStatus.ACTIVE));
+        var expression = dog.entityStatus.eq(EntityStatus.ACTIVE)
+                .and(dog.name.containsIgnoreCase(value));
         return query
                 .where(expression)
                 .fetchPage(pageable)

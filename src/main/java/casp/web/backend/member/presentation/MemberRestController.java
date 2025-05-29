@@ -41,8 +41,9 @@ class MemberRestController {
 
     @GetMapping
     ResponseEntity<Page<MemberRead>> getMembers(@RequestParam EntityStatusParam entityStatusParam,
+                                                @RequestParam(required = false, defaultValue = "") String name,
                                                 @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByEntityStatus(entityStatusParam.getEntityStatus(), pageable);
+        var memberDtoPage = memberService.getMembersByEntityStatusAndName(entityStatusParam.getEntityStatus(), name, pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
     }
 
@@ -110,5 +111,18 @@ class MemberRestController {
     ResponseEntity<Void> migrateDataToV2() {
         memberService.migrateDataToV2();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("active-members-emails")
+    ResponseEntity<Set<String>> getActiveMembersEmail() {
+        return ResponseEntity.ok(memberService.getActiveMembersEmail());
+    }
+
+    @GetMapping("by-not-dog-id/{dogId}")
+    ResponseEntity<Page<MemberRead>> getMembersByNotDogId(@PathVariable UUID dogId,
+                                                          @RequestParam(required = false) String name,
+                                                          @ParameterObject Pageable pageable) {
+        var memberDtoPage = memberService.getMembersByNotDogId(dogId, name, pageable);
+        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
     }
 }

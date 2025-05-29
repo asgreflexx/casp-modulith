@@ -136,9 +136,9 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void searchByName() {
-        when(dogHasHandlerRepository.findAllByName(member.getLastName(), Pageable.unpaged())).thenReturn(dogHasHandlerPage);
+        when(dogHasHandlerRepository.findAllByValue(member.getLastName(), Pageable.unpaged())).thenReturn(dogHasHandlerPage);
 
-        var dogHasHandlerDtoPage = dogHasHandlerService.searchByName(member.getLastName(), Pageable.unpaged());
+        var dogHasHandlerDtoPage = dogHasHandlerService.searchByValue(member.getLastName(), Pageable.unpaged());
 
         assertThat(dogHasHandlerDtoPage).containsExactly(dogHasHandlerDto);
     }
@@ -171,6 +171,24 @@ class DogHasHandlerServiceImplTest {
                     assertSame(dog, dhh.getDog());
                     assertSame(member, dhh.getMember());
                 });
+    }
+
+    @Test
+    void getDogHasHandlerByMemberId() {
+        when(dogHasHandlerRepository.findAllByMemberIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(dogHasHandlerSet);
+
+        var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlerByMemberId(member.getId());
+
+        assertThat(dogHasHandlerDtoSet).containsExactly(dogHasHandlerDto);
+    }
+
+    @Test
+    void getDogHasHandlerByDogId() {
+        when(dogHasHandlerRepository.findAllByDogIdAndNotDeleted(dog.getId())).thenReturn(dogHasHandlerSet);
+
+        var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlerByDogId(dog.getId());
+
+        assertThat(dogHasHandlerDtoSet).containsExactly(dogHasHandlerDto);
     }
 
     @Nested

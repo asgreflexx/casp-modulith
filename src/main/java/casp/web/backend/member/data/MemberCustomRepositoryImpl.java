@@ -1,6 +1,7 @@
 package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -13,9 +14,12 @@ import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuer
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -24,10 +28,12 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private static final QMember MEMBER = QMember.member;
     private static final String SPLIT_WORDS_WITH_SPACE = " ";
     private final MongoOperations mongoOperations;
+    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
-    MemberCustomRepositoryImpl(MongoOperations mongoOperations) {
+    MemberCustomRepositoryImpl(MongoOperations mongoOperations, DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         this.mongoOperations = mongoOperations;
+        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     private static BooleanExpression[] splitIntoWords(String name) {
@@ -56,10 +62,10 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Page<Member> findAllByValue(String value, Pageable pageable) {
-        var expression = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
-        if (ObjectUtils.isNotEmpty(value)) {
-            expression = expression.andAnyOf(splitIntoWords(value));
+    public Page<Member> findAllByEntityStatusAndName(EntityStatus entityStatus, String name, Pageable pageable) {
+        var expression = MEMBER.entityStatus.eq(entityStatus);
+        if (ObjectUtils.isNotEmpty(name)) {
+            expression = expression.andAnyOf(splitIntoWords(name));
         }
         return createQuery().where(expression)
                 .fetchPage(pageable);
@@ -75,6 +81,32 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
             LOG.error(msg);
             return new NoSuchElementException(msg);
         });
+    }
+
+    @Override
+    public Set<String> findAllActiveMembersEmails() {
+        return createQuery()
+                .where(MEMBER.entityStatus.eq(EntityStatus.ACTIVE))
+                .fetch()
+                .stream()
+                .map(Member::getEmail)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public Page<Member> findAllByNotDogId(UUID dogId, String name, Pageable pageable) {
+        var expression = MEMBER.entityStatus.eq(EntityStatus.ACTIVE)
+                .and(MEMBER.id.notIn(getMemberIdsRelatedToThisDog(dogId)));
+        if (ObjectUtils.isNotEmpty(name)) {
+            expression = expression.andAnyOf(splitIntoWords(name));
+        }
+        return createQuery()
+                .where(expression)
+                .fetchPage(pageable);
+    }
+
+    private List<UUID> getMemberIdsRelatedToThisDog(UUID dogId) {
+        return dogHasHandlerReferenceRepository.findAllByDogId(dogId).stream().map(dhh -> dhh.getMember().getId()).toList();
     }
 
     private SpringDataMongodbQuery<Member> createQuery() {

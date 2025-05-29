@@ -1,7 +1,6 @@
 package casp.web.backend.calendar;
 
 
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -18,5 +17,5 @@ public interface CourseService extends BaseEventService<CourseDto> {
 
     void removeSpace(UUID courseId, UUID spaceId);
 
-    Set<SpaceDto> getSpacesByDogHasHandlers(Set<DogHasHandlerReference> dogHasHandlerSet);
+    Page<CourseDto> getCourseByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable);
 }
