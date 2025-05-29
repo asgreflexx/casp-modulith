@@ -132,6 +132,14 @@ class DogHasHandlerRestControllerTest {
     }
 
     @Test
+    void correctEntityStatus() {
+        var response = controller.correctEntityStatus();
+
+        assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
+        verify(dogHasHandlerService).correctEntityStatus();
+    }
+
+    @Test
     void migrateDataToV2() {
         var response = controller.migrateDataToV2();
 
