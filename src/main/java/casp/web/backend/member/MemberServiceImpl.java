@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -60,7 +61,13 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto getMemberById(UUID id) {
-        return MEMBER_MAPPER.toTarget(memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE));
+        return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED)
+                .map(MEMBER_MAPPER::toTarget)
+                .orElseThrow(() -> {
+                    var msg = "Member with id %s not found.".formatted(id);
+                    LOG.error(msg);
+                    return new NoSuchElementException(msg);
+                });
     }
 
     @Override

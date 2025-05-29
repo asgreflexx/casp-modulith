@@ -185,15 +185,25 @@ class MemberServiceImplTest {
     }
 
 
-    @Test
-    void getMemberId() {
-        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
+    @Nested
+    class GetMemberId {
+        @Test
+        void notDeleted() {
+            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
 
-        var memberDto = memberService.getMemberById(member.getId());
+            var memberDto = memberService.getMemberById(member.getId());
 
-        assertThat(memberDto)
-                .usingRecursiveAssertion()
-                .isEqualTo(MEMBER_MAPPER.toTarget(member));
+            assertThat(memberDto)
+                    .usingRecursiveAssertion()
+                    .isEqualTo(MEMBER_MAPPER.toTarget(member));
+        }
+
+        @Test
+        void deleted() {
+            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> memberService.getMemberById(member.getId()));
+        }
     }
 
     @Nested

@@ -14,4 +14,6 @@ public interface MemberRepository extends BaseRepository<Member>, MemberCustomRe
     Optional<Member> findOneByEmail(String email);
 
     Set<Member> findAllByIdInAndEntityStatus(Set<UUID> membersId, EntityStatus entityStatus);
+
+    Optional<Member> findOneByIdAndEntityStatusNot(UUID id, EntityStatus entityStatus);
 }
