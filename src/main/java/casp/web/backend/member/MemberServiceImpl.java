@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -60,14 +61,20 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto getMemberById(UUID id) {
-        return MEMBER_MAPPER.toTarget(memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE));
+        return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED)
+                .map(MEMBER_MAPPER::toTarget)
+                .orElseThrow(() -> {
+                    var msg = "Member with id %s not found.".formatted(id);
+                    LOG.error(msg);
+                    return new NoSuchElementException(msg);
+                });
     }
 
     @Override
     public MemberDto saveMember(MemberDto memberDto) {
         var member = MEMBER_MAPPER.toSource(memberDto);
 
-        verifyForMemberConflict(memberDto, member);
+        analyseMember(member);
 
         return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
@@ -134,8 +141,11 @@ class MemberServiceImpl implements MemberService {
         return MEMBER_MAPPER.toTargetPage(memberRepository.findAllByNotDogId(dogId, name, pageable));
     }
 
-    private void verifyForMemberConflict(MemberDto memberDto, Member member) {
-        memberRepository.findOneByEmail(memberDto.getEmail())
+    // it fails if the member isn't active or another member with the same email already exists
+    private void analyseMember(Member member) {
+        memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE);
+
+        memberRepository.findOneByEmail(member.getEmail())
                 .ifPresent(m -> {
                     if (!member.equals(m)) {
                         var msg = "Member with email %s already exists.".formatted(member.getEmail());
