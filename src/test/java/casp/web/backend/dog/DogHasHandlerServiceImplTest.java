@@ -12,6 +12,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -26,6 +28,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static casp.web.backend.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -152,12 +155,16 @@ class DogHasHandlerServiceImplTest {
         assertThat(emailSet).containsExactly(member.getEmail());
     }
 
-    @Test
-    void migrateDataToV2() {
+    @ParameterizedTest
+    @MethodSource()
+    void migrateDataToV2(EntityStatusData data) {
         var dogHasHandlerV1 = mock(casp.web.backend.deprecated.dog.DogHasHandler.class, Answers.RETURNS_DEEP_STUBS);
         when(dogHasHandlerV1.getDogId()).thenReturn(dog.getId());
         when(dogHasHandlerV1.getMemberId()).thenReturn(member.getId());
+        when(dogHasHandlerV1.getEntityStatus()).thenReturn(EntityStatus.ACTIVE);
         when(dogHasHandlerOldRepository.findAll()).thenReturn(List.of(dogHasHandlerV1));
+        dog.setEntityStatus(data.dogStatus);
+        member.setEntityStatus(data.memberStatus);
         when(dogReferenceRepository.findById(dog.getId())).thenReturn(Optional.of(dog));
         when(memberReferenceRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
@@ -168,6 +175,7 @@ class DogHasHandlerServiceImplTest {
         assertThat(dogHasHandlerSetCaptor.getValue())
                 .singleElement()
                 .satisfies(dhh -> {
+                    assertSame(data.expectedDogHasHandlerStatus, dhh.getEntityStatus());
                     assertSame(dog, dhh.getDog());
                     assertSame(member, dhh.getMember());
                 });
@@ -189,6 +197,22 @@ class DogHasHandlerServiceImplTest {
         var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlerByDogId(dog.getId());
 
         assertThat(dogHasHandlerDtoSet).containsExactly(dogHasHandlerDto);
+    }
+
+    @ParameterizedTest
+    @MethodSource("migrateDataToV2")
+    void correctEntityStatus(EntityStatusData data) {
+        dogHasHandler.getDog().setEntityStatus(data.dogStatus);
+        dogHasHandler.getMember().setEntityStatus(data.memberStatus);
+        when(dogHasHandlerRepository.findAll()).thenReturn(dogHasHandlerPage.stream().toList());
+
+        dogHasHandlerService.correctEntityStatus();
+
+        verify(dogHasHandlerRepository).saveAll(dogHasHandlerSetCaptor.capture());
+
+        assertThat(dogHasHandlerSetCaptor.getValue())
+                .singleElement()
+                .satisfies(dhh -> assertSame(data.expectedDogHasHandlerStatus, dhh.getEntityStatus()));
     }
 
     @Nested
@@ -289,5 +313,16 @@ class DogHasHandlerServiceImplTest {
             var unknownId = UUID.randomUUID();
             assertThrows(NoSuchElementException.class, () -> dogHasHandlerService.getDogHasHandlerById(unknownId));
         }
+    }
+
+    private static Stream<EntityStatusData> migrateDataToV2() {
+        return Stream.of(new EntityStatusData(EntityStatus.DELETED, EntityStatus.INACTIVE, EntityStatus.DELETED),
+                new EntityStatusData(EntityStatus.ACTIVE, EntityStatus.DELETED, EntityStatus.DELETED),
+                new EntityStatusData(EntityStatus.INACTIVE, EntityStatus.ACTIVE, EntityStatus.INACTIVE),
+                new EntityStatusData(EntityStatus.ACTIVE, EntityStatus.INACTIVE, EntityStatus.INACTIVE));
+    }
+
+    private record EntityStatusData(EntityStatus dogStatus, EntityStatus memberStatus,
+                                    EntityStatus expectedDogHasHandlerStatus) {
     }
 }
