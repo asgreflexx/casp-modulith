@@ -91,22 +91,6 @@ class MemberRestControllerTest {
     }
 
     @Test
-    void deactivateMember() {
-        var response = memberRestController.deactivateMember(memberDto.getId());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        verify(memberService).deactivateMember(memberDto.getId());
-    }
-
-    @Test
-    void activateMember() {
-        var response = memberRestController.activateMember(memberDto.getId());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        verify(memberService).activateMember(memberDto.getId());
-    }
-
-    @Test
     void searchMembersByFirstNameOrLastName() {
         when(memberService.getMembersByName(memberDto.getFirstName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
 
@@ -160,5 +144,16 @@ class MemberRestControllerTest {
         var response = memberRestController.getMembersByNotDogId(dogId, null, Pageable.unpaged());
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(memberDto));
+    }
+
+    @Test
+    void toggleStatus() {
+        when(memberService.toggleStatus(memberDto.getId())).thenReturn(memberDto);
+
+        var response = memberRestController.toggleStatus(memberDto.getId());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).isEqualTo(READ_MAPPER.toTarget(memberDto));
+
     }
 }

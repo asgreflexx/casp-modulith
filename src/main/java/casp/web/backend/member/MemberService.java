@@ -22,10 +22,6 @@ public interface MemberService {
 
     void deleteMemberById(UUID id);
 
-    MemberDto deactivateMember(UUID id);
-
-    MemberDto activateMember(UUID id);
-
     Page<MemberDto> getMembersByName(@Nullable String name, Pageable pageable);
 
     Set<String> getMembersEmailByIds(Set<UUID> membersId);
@@ -46,4 +42,6 @@ public interface MemberService {
      * @return Members unrelated to this dog.
      */
     Page<MemberDto> getMembersByNotDogId(UUID dogId, @Nullable String name, Pageable pageable);
+
+    MemberDto toggleStatus(UUID id);
 }

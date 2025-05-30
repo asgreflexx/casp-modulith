@@ -61,13 +61,8 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public MemberDto getMemberById(UUID id) {
-        return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED)
-                .map(MEMBER_MAPPER::toTarget)
-                .orElseThrow(() -> {
-                    var msg = "Member with id %s not found.".formatted(id);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
+        var member = getMemberIfNotDeleted(id);
+        return MEMBER_MAPPER.toTarget(member);
     }
 
     @Override
@@ -87,24 +82,6 @@ class MemberServiceImpl implements MemberService {
         member.setEmail(EMAIL_FORMAT_IF_DELETED.formatted(member.getEmail(), id));
         member.setEntityStatus(EntityStatus.DELETED);
         memberRepository.save(member);
-    }
-
-    @Override
-    public MemberDto deactivateMember(UUID id) {
-        var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE);
-        dogHasHandlerService.deactivateDogHasHandlersByMemberId(id);
-        baseEventObserver.deactivateBaseEventsByMemberId(id);
-        member.setEntityStatus(EntityStatus.INACTIVE);
-        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
-    }
-
-    @Override
-    public MemberDto activateMember(UUID id) {
-        var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.INACTIVE);
-        dogHasHandlerService.activateDogHasHandlersByMemberId(id);
-        baseEventObserver.activateBaseEventsByMemberId(id);
-        member.setEntityStatus(EntityStatus.ACTIVE);
-        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
 
     @Override
@@ -141,6 +118,17 @@ class MemberServiceImpl implements MemberService {
         return MEMBER_MAPPER.toTargetPage(memberRepository.findAllByNotDogId(dogId, name, pageable));
     }
 
+    @Override
+    public MemberDto toggleStatus(final UUID id) {
+        var member = getMemberIfNotDeleted(id);
+        if (member.getEntityStatus() == EntityStatus.ACTIVE) {
+            deactivateMember(member);
+        } else {
+            activateMember(member);
+        }
+        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
+    }
+
     // it fails if the member isn't active or another member with the same email already exists
     private void analyseMember(Member member) {
         memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE);
@@ -153,5 +141,26 @@ class MemberServiceImpl implements MemberService {
                         throw new IllegalStateException(msg);
                     }
                 });
+    }
+
+    private Member getMemberIfNotDeleted(final UUID id) {
+        return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED)
+                .orElseThrow(() -> {
+                    var msg = "Member with id %s not found.".formatted(id);
+                    LOG.error(msg);
+                    return new NoSuchElementException(msg);
+                });
+    }
+
+    private void deactivateMember(final Member member) {
+        dogHasHandlerService.deactivateDogHasHandlersByMemberId(member.getId());
+        baseEventObserver.deactivateBaseEventsByMemberId(member.getId());
+        member.setEntityStatus(EntityStatus.INACTIVE);
+    }
+
+    private void activateMember(final Member member) {
+        dogHasHandlerService.activateDogHasHandlersByMemberId(member.getId());
+        baseEventObserver.activateBaseEventsByMemberId(member.getId());
+        member.setEntityStatus(EntityStatus.ACTIVE);
     }
 }

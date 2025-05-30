@@ -74,18 +74,6 @@ class MemberRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("{id}/deactivate")
-    ResponseEntity<MemberRead> deactivateMember(@PathVariable UUID id) {
-        var memberDto = memberService.deactivateMember(id);
-        return ResponseEntity.ok(READ_MAPPER.toTarget(memberDto));
-    }
-
-    @PostMapping("{id}/activate")
-    ResponseEntity<MemberRead> activateMember(@PathVariable UUID id) {
-        var memberDto = memberService.activateMember(id);
-        return ResponseEntity.ok(READ_MAPPER.toTarget(memberDto));
-    }
-
     @GetMapping("search-members-by-name")
     ResponseEntity<Page<MemberRead>> searchMembersByFirstNameOrLastName(@RequestParam(required = false, defaultValue = "") String name,
                                                                         @ParameterObject Pageable pageable) {
@@ -124,5 +112,10 @@ class MemberRestController {
                                                           @ParameterObject Pageable pageable) {
         var memberDtoPage = memberService.getMembersByNotDogId(dogId, name, pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
+    }
+
+    @PostMapping("toggle-status/{id}")
+    ResponseEntity<MemberRead> toggleStatus(final @PathVariable UUID id) {
+        return ResponseEntity.ok(READ_MAPPER.toTarget(memberService.toggleStatus(id)));
     }
 }
