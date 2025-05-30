@@ -110,28 +110,6 @@ class MemberServiceImplTest {
     }
 
     @Test
-    void deactivateMember() {
-        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
-        when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
-
-        assertSame(EntityStatus.INACTIVE, memberService.deactivateMember(member.getId()).getEntityStatus());
-
-        verify(dogHasHandlerService).deactivateDogHasHandlersByMemberId(member.getId());
-        verify(baseEventObserver).deactivateBaseEventsByMemberId(member.getId());
-    }
-
-    @Test
-    void activateMember() {
-        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.INACTIVE)).thenReturn(member);
-        when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
-        memberService.activateMember(member.getId());
-
-        verify(member).setEntityStatus(EntityStatus.ACTIVE);
-        verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
-        verify(baseEventObserver).activateBaseEventsByMemberId(member.getId());
-    }
-
-    @Test
     void migrateDataToV2() {
         var membershipFee = mock(MembershipFee.class);
         when(membershipFee.getPaidPrice()).thenReturn(1.0);
@@ -200,9 +178,10 @@ class MemberServiceImplTest {
 
         @Test
         void deleted() {
-            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.empty());
+            var memberId = member.getId();
+            when(memberRepository.findOneByIdAndEntityStatusNot(memberId, EntityStatus.DELETED)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> memberService.getMemberById(member.getId()));
+            assertThrows(NoSuchElementException.class, () -> memberService.getMemberById(memberId));
         }
     }
 
@@ -243,9 +222,11 @@ class MemberServiceImplTest {
 
         @Test
         void memberIsDisabled() {
+            var memberDto = MEMBER_MAPPER.toTarget(member);
+
             when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenThrow(new NoSuchElementException());
 
-            assertThrows(NoSuchElementException.class, () -> memberService.saveMember(MEMBER_MAPPER.toTarget(member)));
+            assertThrows(NoSuchElementException.class, () -> memberService.saveMember(memberDto));
         }
     }
 
@@ -272,6 +253,42 @@ class MemberServiceImplTest {
             verify(baseEventObserver).deleteBaseEventsByMemberId(member.getId());
             verify(member).setEntityStatus(EntityStatus.DELETED);
             verify(member).setEmail("%s---%s".formatted(member.getEmail(), member.getId()));
+        }
+    }
+
+    @Nested
+    class ToggleStatus {
+        @Test
+        void deleted() {
+            var memberId = member.getId();
+            when(memberRepository.findOneByIdAndEntityStatusNot(memberId, EntityStatus.DELETED)).thenThrow(new NoSuchElementException());
+
+            assertThrows(NoSuchElementException.class, () -> memberService.toggleStatus(memberId));
+        }
+
+        @Test
+        void deactivate() {
+            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
+            when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
+
+            var memberDto = memberService.toggleStatus(member.getId());
+
+            assertSame(EntityStatus.INACTIVE, memberDto.getEntityStatus());
+            verify(dogHasHandlerService).deactivateDogHasHandlersByMemberId(member.getId());
+            verify(baseEventObserver).deactivateBaseEventsByMemberId(member.getId());
+        }
+
+        @Test
+        void activate() {
+            member.setEntityStatus(EntityStatus.INACTIVE);
+            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
+            when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
+
+            var memberDto = memberService.toggleStatus(member.getId());
+
+            assertSame(EntityStatus.ACTIVE, memberDto.getEntityStatus());
+            verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
+            verify(baseEventObserver).activateBaseEventsByMemberId(member.getId());
         }
     }
 }
