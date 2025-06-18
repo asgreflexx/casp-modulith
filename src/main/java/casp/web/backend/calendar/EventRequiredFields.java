@@ -8,8 +8,7 @@ import java.util.Set;
 
 public interface EventRequiredFields {
     @NotNull
-    @Valid
-    Set<EventParticipant> getParticipants();
+    Set<@Valid EventParticipant> getParticipants();
 
-    void setParticipants(@NotNull @Valid Set<EventParticipant> participants);
+    void setParticipants(@NotNull Set<@Valid EventParticipant> participants);
 }

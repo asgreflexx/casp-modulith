@@ -5,7 +5,7 @@ import java.util.UUID;
 
 @CoTrainersDtoConstraint
 @SpacesDtoConstraint
-public interface CourseDtoRequiredFields extends BaseEventDtoRequiredFields, CourseRequiredFields {
+public interface CourseDtoRequiredFields extends CourseRequiredFields {
     Set<UUID> getNewCoTrainers();
 
     void setNewCoTrainers(Set<UUID> newCoTrainers);
