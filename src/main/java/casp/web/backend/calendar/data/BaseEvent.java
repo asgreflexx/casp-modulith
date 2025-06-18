@@ -3,7 +3,6 @@ package casp.web.backend.calendar.data;
 
 import casp.web.backend.calendar.BaseEventRequiredFields;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
-import casp.web.backend.calendar.presentation.BaseEventWriteRequiredFields;
 import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
@@ -15,7 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class BaseEvent extends BaseDocument implements BaseEventWriteRequiredFields, BaseEventRequiredFields {
+public abstract class BaseEvent extends BaseDocument implements BaseEventRequiredFields {
     protected BaseEventType eventType;
 
     protected String name;

@@ -40,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -191,6 +190,9 @@ class ExamServiceImplTest {
 
         @Test
         void setCalendarEntry() {
+            var memberReference = mockMember();
+            examDto.setMemberId(memberReference.getId());
+
             examService.save(examDto);
 
             var actualCourse = getExamSaved();
@@ -206,6 +208,8 @@ class ExamServiceImplTest {
 
         @Test
         void setRecurrenceOption() {
+            var memberReference = mockMember();
+            examDto.setMemberId(memberReference.getId());
             examDto.setNewCalendarEntry(null);
             var daily = new DailyRecurrenceOption();
             daily.setStartTime(LocalTime.of(1, 0, 0));
@@ -227,40 +231,17 @@ class ExamServiceImplTest {
         @Test
         void setNewMember() {
             var memberReference = mockMember();
-            examDto.setNewMemberId(memberReference.getId());
+            examDto.setMemberId(memberReference.getId());
 
             examService.save(examDto);
 
             assertEquals(memberReference, getExamSaved().getMember());
-        }
-
-        @Test
-        void keepSameMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            examDto.setMember(memberReference);
-
-            examService.save(examDto);
-
-            verifyNoInteractions(memberReferenceRepository);
-            assertEquals(memberReference, getExamSaved().getMember());
-        }
-
-        @Test
-        void updateMember() {
-            var actualMember = ReferenceTestFixture.createMemberReference();
-            var newMember = mockMember();
-            examDto.setMember(actualMember);
-            examDto.setNewMemberId(newMember.getId());
-
-            examService.save(examDto);
-
-            assertEquals(newMember, getExamSaved().getMember());
         }
 
         @Test
         void memberDoesNotExist() {
             var newMemberId = UUID.randomUUID();
-            examDto.setNewMemberId(newMemberId);
+            examDto.setMemberId(newMemberId);
             when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> examService.save(examDto));
@@ -268,6 +249,8 @@ class ExamServiceImplTest {
 
         @Test
         void addParticipant() {
+            var memberReference = mockMember();
+            examDto.setMemberId(memberReference.getId());
             var dogHasHandlerReference = new DogHasHandlerReference();
             dogHasHandlerReference.setId(UUID.randomUUID());
             dogHasHandlerReference.setDog(new DogReference());

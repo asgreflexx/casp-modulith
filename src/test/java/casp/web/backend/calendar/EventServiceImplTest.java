@@ -36,7 +36,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -194,6 +193,9 @@ class EventServiceImplTest {
 
         @Test
         void setCalendarEntry() {
+            var memberReference = mockMember();
+            eventDto.setMemberId(memberReference.getId());
+
             eventService.save(eventDto);
 
             var actualCourse = getEventSaved();
@@ -209,6 +211,8 @@ class EventServiceImplTest {
 
         @Test
         void setRecurrenceOption() {
+            var memberReference = mockMember();
+            eventDto.setMemberId(memberReference.getId());
             eventDto.setNewCalendarEntry(null);
             var daily = new DailyRecurrenceOption();
             daily.setStartTime(LocalTime.of(1, 0, 0));
@@ -231,40 +235,17 @@ class EventServiceImplTest {
         @Test
         void setNewMember() {
             var memberReference = mockMember();
-            eventDto.setNewMemberId(memberReference.getId());
+            eventDto.setMemberId(memberReference.getId());
 
             eventService.save(eventDto);
 
             assertEquals(memberReference, getEventSaved().getMember());
-        }
-
-        @Test
-        void keepSameMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            eventDto.setMember(memberReference);
-
-            eventService.save(eventDto);
-
-            verifyNoInteractions(memberReferenceRepository);
-            assertEquals(memberReference, getEventSaved().getMember());
-        }
-
-        @Test
-        void updateMember() {
-            var actualMember = ReferenceTestFixture.createMemberReference();
-            var newMember = mockMember();
-            eventDto.setMember(actualMember);
-            eventDto.setNewMemberId(newMember.getId());
-
-            eventService.save(eventDto);
-
-            assertEquals(newMember, getEventSaved().getMember());
         }
 
         @Test
         void memberDoesNotExist() {
             var newMemberId = UUID.randomUUID();
-            eventDto.setNewMemberId(newMemberId);
+            eventDto.setMemberId(newMemberId);
             when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> eventService.save(eventDto));
@@ -273,6 +254,7 @@ class EventServiceImplTest {
         @Test
         void addParticipant() {
             var memberReference = mockMember();
+            eventDto.setMemberId(memberReference.getId());
             var participant = new EventParticipant(memberReference);
             eventDto.getNewParticipants().add(participant.getId());
 
