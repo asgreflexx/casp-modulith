@@ -14,11 +14,13 @@ import java.lang.annotation.Target;
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {BaseEventOptionRecurrencesValidation.class})
-public @interface BaseEventOptionRecurrencesConstraint {
+@Constraint(validatedBy = {RecurrenceValidation.class})
+public @interface RecurrenceConstraint {
     String message() default "The start recurrence date must be before end recurrence date";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
+    int plusDays() default 1;
 }

@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
         @JsonSubTypes.Type(value = DailyRecurrenceOption.class, name = "DAILY"),
         @JsonSubTypes.Type(value = WeeklyRecurrenceOption.class, name = "WEEKLY")
 })
-@BaseEventOptionRecurrencesConstraint
+@RecurrenceConstraint
 public abstract class RecurrenceOption implements BaseEventOptionValidation {
     @NotNull
     protected BaseRecurrenceOptionType optionType;
