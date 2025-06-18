@@ -1,5 +1,6 @@
 package casp.web.backend.calendar.presentation;
 
+import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
 import casp.web.backend.common.base.BaseView;
@@ -8,7 +9,8 @@ import casp.web.backend.common.reference.MemberReference;
 import java.time.LocalDateTime;
 import java.util.List;
 
-abstract class BaseEventRead extends BaseView implements BaseEventWriteRequiredFields, BaseEventReadRequiredFields {
+abstract class BaseEventRead extends BaseView implements BaseEventReadRequiredFields {
+    protected BaseEventType eventType;
     protected String name;
     protected String description;
     protected String location;
@@ -17,6 +19,20 @@ abstract class BaseEventRead extends BaseView implements BaseEventWriteRequiredF
     protected LocalDateTime minTime;
     protected LocalDateTime maxTime;
     protected List<CalendarEntry> calendarEntries;
+
+    BaseEventRead(final BaseEventType eventType) {
+        this.eventType = eventType;
+    }
+
+    @Override
+    public BaseEventType getEventType() {
+        return this.eventType;
+    }
+
+    @Override
+    public void setEventType(final BaseEventType eventType) {
+        this.eventType = eventType;
+    }
 
     @Override
     public String getName() {

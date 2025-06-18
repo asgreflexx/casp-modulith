@@ -1,9 +1,12 @@
 package casp.web.backend.calendar.presentation;
 
+import casp.web.backend.calendar.NewCalendarEntryDto;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
-import casp.web.backend.common.reference.MemberReference;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.util.UUID;
 
 public interface BaseEventWriteRequiredFields {
     @NotBlank
@@ -20,12 +23,17 @@ public interface BaseEventWriteRequiredFields {
     void setLocation(String location);
 
     @Valid
-    MemberReference getMember();
+    NewCalendarEntryDto getNewCalendarEntryDto();
 
-    void setMember(@Valid MemberReference member);
+    void setNewCalendarEntryDto(@Valid NewCalendarEntryDto newCalendarEntryDto);
 
     @Valid
     RecurrenceOption getRecurrenceOption();
 
     void setRecurrenceOption(@Valid RecurrenceOption recurrenceOption);
+
+    @NotNull
+    UUID getMemberId();
+
+    void setMemberId(@NotNull UUID memberId);
 }

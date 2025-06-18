@@ -1,21 +1,18 @@
 package casp.web.backend.calendar.presentation;
 
-import casp.web.backend.calendar.BaseEventDtoWriteRequiredFields;
 import casp.web.backend.calendar.NewCalendarEntryDto;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
 import casp.web.backend.common.base.BaseView;
-import casp.web.backend.common.reference.MemberReference;
 
 import java.util.UUID;
 
-abstract class BaseEventWrite extends BaseView implements BaseEventDtoWriteRequiredFields {
+abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequiredFields {
     protected String name;
     protected String description;
     protected String location;
-    protected MemberReference member;
+    protected UUID memberId;
+    protected NewCalendarEntryDto newCalendarEntryDto;
     protected RecurrenceOption recurrenceOption;
-    protected UUID newMemberId;
-    protected NewCalendarEntryDto newCalendarEntry;
 
     @Override
     public String getName() {
@@ -48,13 +45,13 @@ abstract class BaseEventWrite extends BaseView implements BaseEventDtoWriteRequi
     }
 
     @Override
-    public MemberReference getMember() {
-        return member;
+    public UUID getMemberId() {
+        return memberId;
     }
 
     @Override
-    public void setMember(MemberReference member) {
-        this.member = member;
+    public void setMemberId(UUID memberId) {
+        this.memberId = memberId;
     }
 
     @Override
@@ -68,23 +65,13 @@ abstract class BaseEventWrite extends BaseView implements BaseEventDtoWriteRequi
     }
 
     @Override
-    public UUID getNewMemberId() {
-        return newMemberId;
+    public NewCalendarEntryDto getNewCalendarEntryDto() {
+        return newCalendarEntryDto;
     }
 
     @Override
-    public void setNewMemberId(UUID newMemberId) {
-        this.newMemberId = newMemberId;
-    }
-
-    @Override
-    public NewCalendarEntryDto getNewCalendarEntry() {
-        return newCalendarEntry;
-    }
-
-    @Override
-    public void setNewCalendarEntry(NewCalendarEntryDto newCalendarEntry) {
-        this.newCalendarEntry = newCalendarEntry;
+    public void setNewCalendarEntryDto(NewCalendarEntryDto newCalendarEntryDto) {
+        this.newCalendarEntryDto = newCalendarEntryDto;
     }
 
     @Override

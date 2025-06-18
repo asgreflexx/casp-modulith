@@ -1,6 +1,7 @@
 package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.CourseRequiredFields;
+import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
 
@@ -10,6 +11,10 @@ public class CourseRead extends BaseEventRead implements CourseRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers;
     private Set<Space> spaces;
+
+    CourseRead() {
+        super(BaseEventType.COURSE);
+    }
 
     @Override
     public int getSpaceLimit() {

@@ -1,6 +1,7 @@
 package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.ExamRequiredFields;
+import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
 
 import java.util.Set;
@@ -8,6 +9,10 @@ import java.util.Set;
 public class ExamRead extends BaseEventRead implements ExamRequiredFields {
     private String judgeName;
     private Set<ExamParticipant> participants;
+
+    ExamRead() {
+        super(BaseEventType.EXAM);
+    }
 
     @Override
     public String getJudgeName() {
