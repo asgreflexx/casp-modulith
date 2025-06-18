@@ -1,6 +1,7 @@
 package casp.web.backend.calendar;
 
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
+import casp.web.backend.calendar.presentation.CourseWrite;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,32 +17,32 @@ class CalendarDtoValidationTest {
     private static final CalendarDtoValidation VALIDATION = new CalendarDtoValidation();
 
     @Mock
-    private CourseDto courseDto;
+    private CourseWrite courseWrite;
 
     @Test
     void newCalendarEntryAndRecurrenceOptionAreEmpty() {
-        assertFalse(VALIDATION.isValid(courseDto, null));
+        assertFalse(VALIDATION.isValid(courseWrite, null));
     }
 
     @Test
     void newCalendarEntryIsEmpty() {
-        when(courseDto.getRecurrenceOption()).thenReturn(mock(DailyRecurrenceOption.class));
+        when(courseWrite.getRecurrenceOption()).thenReturn(mock(DailyRecurrenceOption.class));
 
-        assertTrue(VALIDATION.isValid(courseDto, null));
+        assertTrue(VALIDATION.isValid(courseWrite, null));
     }
 
     @Test
     void recurrenceOptionIsEmpty() {
-        when(courseDto.getNewCalendarEntry()).thenReturn(mock(NewCalendarEntryDto.class));
+        when(courseWrite.getNewCalendarEntry()).thenReturn(mock(NewCalendarEntryDto.class));
 
-        assertTrue(VALIDATION.isValid(courseDto, null));
+        assertTrue(VALIDATION.isValid(courseWrite, null));
     }
 
     @Test
     void newCalendarEntryAndRecurrenceOptionAreNotEmpty() {
-        when(courseDto.getNewCalendarEntry()).thenReturn(mock(NewCalendarEntryDto.class));
-        when(courseDto.getRecurrenceOption()).thenReturn(mock(DailyRecurrenceOption.class));
+        when(courseWrite.getNewCalendarEntry()).thenReturn(mock(NewCalendarEntryDto.class));
+        when(courseWrite.getRecurrenceOption()).thenReturn(mock(DailyRecurrenceOption.class));
 
-        assertFalse(VALIDATION.isValid(courseDto, null));
+        assertFalse(VALIDATION.isValid(courseWrite, null));
     }
 }

@@ -11,7 +11,7 @@ abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequired
     protected String description;
     protected String location;
     protected UUID memberId;
-    protected NewCalendarEntryDto newCalendarEntryDto;
+    protected NewCalendarEntryDto newCalendarEntry;
     protected RecurrenceOption recurrenceOption;
 
     @Override
@@ -65,13 +65,13 @@ abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequired
     }
 
     @Override
-    public NewCalendarEntryDto getNewCalendarEntryDto() {
-        return newCalendarEntryDto;
+    public NewCalendarEntryDto getNewCalendarEntry() {
+        return newCalendarEntry;
     }
 
     @Override
-    public void setNewCalendarEntryDto(NewCalendarEntryDto newCalendarEntryDto) {
-        this.newCalendarEntryDto = newCalendarEntryDto;
+    public void setNewCalendarEntry(NewCalendarEntryDto newCalendarEntry) {
+        this.newCalendarEntry = newCalendarEntry;
     }
 
     @Override
