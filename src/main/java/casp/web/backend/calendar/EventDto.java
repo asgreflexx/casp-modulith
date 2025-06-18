@@ -6,11 +6,9 @@ import casp.web.backend.calendar.data.participants.EventParticipant;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
-public class EventDto extends BaseEventDto implements EventDtoRequiredFields {
+public class EventDto extends BaseEventDto implements EventRequiredFields {
     private Set<EventParticipant> participants = new HashSet<>();
-    private Set<UUID> newParticipants = new HashSet<>();
 
     public EventDto() {
         super(BaseEventType.EVENT);
@@ -24,16 +22,6 @@ public class EventDto extends BaseEventDto implements EventDtoRequiredFields {
     @Override
     public void setParticipants(Set<EventParticipant> participants) {
         this.participants = participants;
-    }
-
-    @Override
-    public Set<UUID> getNewParticipants() {
-        return newParticipants;
-    }
-
-    @Override
-    public void setNewParticipants(Set<UUID> newParticipants) {
-        this.newParticipants = newParticipants;
     }
 
     @Override

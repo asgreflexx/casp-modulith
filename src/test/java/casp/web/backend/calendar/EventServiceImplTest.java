@@ -31,10 +31,12 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static casp.web.backend.calendar.EventMapper.EVENT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -250,31 +252,100 @@ class EventServiceImplTest {
 
             assertThrows(NoSuchElementException.class, () -> eventService.save(eventDto));
         }
+    }
+
+    @Nested
+    class Participants {
+        private EventDto eventDto;
+
+        @BeforeEach
+        void setUp() {
+            var newCalendarEntryDto = new NewCalendarEntryDto();
+            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
+            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
+            eventDto = new EventDto();
+            eventDto.setMemberId(mockMember().getId());
+            eventDto.setNewCalendarEntry(newCalendarEntryDto);
+        }
 
         @Test
-        void addParticipant() {
-            var memberReference = mockMember();
-            eventDto.setMemberId(memberReference.getId());
-            var participant = new EventParticipant(memberReference);
-            eventDto.getNewParticipants().add(participant.getId());
+        void addNewParticipantToNewEvent() {
+            var newParticipant = ReferenceTestFixture.createMemberReference("new", "participant");
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            var expectedParticipant = new EventParticipant(newParticipant);
+            eventDto.getParticipantIds().add(newParticipant.getId());
 
             eventService.save(eventDto);
 
             var actualEvent = getEventSaved();
             assertThat(actualEvent.getParticipants())
                     .singleElement()
-                    .isEqualTo(participant);
+                    .isEqualTo(expectedParticipant);
         }
 
-        private Event getEventSaved() {
-            verify(eventRepository).save(eventCaptor.capture());
-            return eventCaptor.getValue();
+        @Test
+        void addNewParticipantToEmptyList() {
+            var newParticipant = ReferenceTestFixture.createMemberReference("new", "participant");
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(EVENT_MAPPER.toSource(eventDto)));
+            var expectedParticipant = new EventParticipant(newParticipant);
+            eventDto.getParticipantIds().add(expectedParticipant.getId());
+
+            eventService.save(eventDto);
+
+            var actualEvent = getEventSaved();
+            assertThat(actualEvent.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
         }
 
-        private MemberReference mockMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
-            return memberReference;
+        @Test
+        void addExistingParticipantToEvent() {
+            var existingParticipant = ReferenceTestFixture.createMemberReference("existing", "participant");
+            var sourceEvent = EVENT_MAPPER.toSource(eventDto);
+            sourceEvent.addParticipants(Set.of(new EventParticipant(existingParticipant)));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(sourceEvent));
+            var expectedParticipant = new EventParticipant(existingParticipant);
+            eventDto.getParticipantIds().add(expectedParticipant.getId());
+
+            eventService.save(eventDto);
+
+            var actualEvent = getEventSaved();
+            assertThat(actualEvent.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+            verify(memberReferenceRepository, never()).findOneByIdAndEntityStatus(existingParticipant.getId(), EntityStatus.ACTIVE);
         }
+
+        @Test
+        void replaceExistingParticipantWithNewParticipant() {
+            var existingParticipant = ReferenceTestFixture.createMemberReference("existing", "participant");
+            var sourceEvent = EVENT_MAPPER.toSource(eventDto);
+            sourceEvent.addParticipants(Set.of(new EventParticipant(existingParticipant)));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(sourceEvent));
+            var newParticipant = ReferenceTestFixture.createMemberReference("new", "participant");
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            var expectedParticipant = new EventParticipant(newParticipant);
+            eventDto.getParticipantIds().add(expectedParticipant.getId());
+
+            eventService.save(eventDto);
+
+            var actualEvent = getEventSaved();
+            assertThat(actualEvent.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+        }
+    }
+
+    private Event getEventSaved() {
+        verify(eventRepository).save(eventCaptor.capture());
+        return eventCaptor.getValue();
+    }
+
+    private MemberReference mockMember() {
+        var memberReference = ReferenceTestFixture.createMemberReference();
+        when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
+        return memberReference;
     }
 }

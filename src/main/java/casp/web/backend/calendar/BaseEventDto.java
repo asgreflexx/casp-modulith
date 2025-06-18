@@ -12,7 +12,9 @@ import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public abstract class BaseEventDto extends BaseDto implements BaseEventWriteRequiredFields, BaseEventReadRequiredFields {
@@ -27,6 +29,7 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventWriteRequ
     protected LocalDateTime maxTime;
     protected NewCalendarEntryDto newCalendarEntry;
     protected List<CalendarEntry> calendarEntries = new ArrayList<>();
+    protected Set<UUID> participantIds = new HashSet<>();
 
     protected BaseEventDto(BaseEventType eventType) {
         this.eventType = eventType;
@@ -140,6 +143,16 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventWriteRequ
     @Override
     public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
         this.calendarEntries = calendarEntries;
+    }
+
+    @Override
+    public Set<UUID> getParticipantIds() {
+        return participantIds;
+    }
+
+    @Override
+    public void setParticipantIds(final Set<UUID> participantIds) {
+        this.participantIds = participantIds;
     }
 
     @Override

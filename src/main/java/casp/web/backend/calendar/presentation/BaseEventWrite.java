@@ -3,7 +3,11 @@ package casp.web.backend.calendar.presentation;
 import casp.web.backend.calendar.NewCalendarEntryDto;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
 import casp.web.backend.common.base.BaseView;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequiredFields {
@@ -13,6 +17,8 @@ abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequired
     protected UUID memberId;
     protected NewCalendarEntryDto newCalendarEntry;
     protected RecurrenceOption recurrenceOption;
+    @JsonSetter(nulls = Nulls.SKIP)
+    protected Set<UUID> participantIds = new HashSet<>();
 
     @Override
     public String getName() {
@@ -72,6 +78,16 @@ abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequired
     @Override
     public void setNewCalendarEntry(NewCalendarEntryDto newCalendarEntry) {
         this.newCalendarEntry = newCalendarEntry;
+    }
+
+    @Override
+    public Set<UUID> getParticipantIds() {
+        return this.participantIds;
+    }
+
+    @Override
+    public void setParticipantIds(final Set<UUID> participantIds) {
+        this.participantIds = participantIds;
     }
 
     @Override
