@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Component
-class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course, Space> implements CourseCustomRepository {
+class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> implements CourseCustomRepository {
     private static final QCourse COURSE = QCourse.course;
 
     @Autowired

@@ -34,7 +34,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
     protected final BaseRepository<D> baseRepository;
     private final MemberReferenceRepository memberReferenceRepository;
     private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
-    private final BaseEventCustomRepository<D, P> baseEventCustomRepository;
+    private final BaseEventCustomRepository<D> baseEventCustomRepository;
     private final Class<D> documentClass;
     private final BaseEventMigrationService migrationService;
 
@@ -45,7 +45,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                          BaseEventMigrationService migrationService) {
         this.memberReferenceRepository = memberReferenceRepository;
         this.baseRepository = baseRepository;
-        baseEventCustomRepository = (BaseEventCustomRepository<D, P>) baseRepository;
+        baseEventCustomRepository = (BaseEventCustomRepository<D>) baseRepository;
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
         this.migrationService = migrationService;
         var types = (ParameterizedType) getClass().getGenericSuperclass();
