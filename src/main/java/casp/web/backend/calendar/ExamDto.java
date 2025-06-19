@@ -5,12 +5,10 @@ import casp.web.backend.calendar.data.participants.ExamParticipant;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.UUID;
 
-public class ExamDto extends BaseEventDto implements ExamDtoRequiredFields {
+public class ExamDto extends BaseEventDto implements ExamRequiredFields {
     private String judgeName;
     private Set<ExamParticipant> participants = new HashSet<>();
-    private Set<UUID> newParticipants = new HashSet<>();
 
     public ExamDto() {
         super(BaseEventType.EXAM);
@@ -34,16 +32,6 @@ public class ExamDto extends BaseEventDto implements ExamDtoRequiredFields {
     @Override
     public void setParticipants(Set<ExamParticipant> participants) {
         this.participants = participants;
-    }
-
-    @Override
-    public Set<UUID> getNewParticipants() {
-        return newParticipants;
-    }
-
-    @Override
-    public void setNewParticipants(Set<UUID> newParticipants) {
-        this.newParticipants = newParticipants;
     }
 
     @Override
