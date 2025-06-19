@@ -5,7 +5,6 @@ import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface DogService {
@@ -22,10 +21,6 @@ public interface DogService {
 
     void deleteDogById(UUID id);
 
-    Optional<DogDto> getDogByChipNumber(String chipNumber);
-
-    Page<DogDto> getDogsByNameOrOwnerName(String name, String ownerName, Pageable pageable);
-
     Page<DogDto> getDogs(@Nullable String value, Pageable pageable);
 
     /**
@@ -36,12 +31,4 @@ public interface DogService {
      * @return a page of dogs that were not checked.
      */
     Page<DogDto> getDogsThatWereNotChecked(@Nullable Pageable pageable);
-
-    /**
-     * Find all dogs without this member as their handler.
-     *
-     * @param memberId to be excluded.
-     * @return Dogs unrelated to this member.
-     */
-    Page<DogDto> getDogsByNotMemberId(UUID memberId, @Nullable String name, Pageable pageable);
 }

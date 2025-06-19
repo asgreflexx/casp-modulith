@@ -71,33 +71,12 @@ class MemberServiceImplTest {
     }
 
     @Test
-    void getMembersByFirstNameOrLastName() {
-        var page = new PageImpl<>(List.of(member));
-        var pageable = Pageable.unpaged();
-        when(memberRepository.findAllByFirstNameAndLastName(member.getFirstName(), member.getLastName(), pageable)).thenReturn(page);
-
-        var memberDtoPage = memberService.getMembersByFirstNameAndLastName(member.getFirstName(), member.getLastName(), pageable);
-
-        assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
-    @Test
-    void getMembersByEntityStatusAndName() {
+    void getMembersByEntityStatusNameAndRoles() {
         var page = new PageImpl<>(List.of(member));
         var name = "name";
-        when(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged())).thenReturn(page);
+        when(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, Pageable.unpaged())).thenReturn(page);
 
-        var memberDtoPage = memberService.getMembersByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged());
-
-        assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
-    @Test
-    void getMembersByName() {
-        var page = new PageImpl<>(List.of(member));
-        when(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, member.getLastName(), Pageable.unpaged())).thenReturn(page);
-
-        var memberDtoPage = memberService.getMembersByName(member.getLastName(), Pageable.unpaged());
+        var memberDtoPage = memberService.getMembersByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, Pageable.unpaged());
 
         assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
     }
@@ -152,16 +131,6 @@ class MemberServiceImplTest {
 
         assertThat(emailSet).containsExactly(email);
     }
-
-    @Test
-    void getMembersByNotDogId() {
-        var dogId = UUID.randomUUID();
-        when(memberRepository.findAllByNotDogId(dogId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(member)));
-
-        assertThat(memberService.getMembersByNotDogId(dogId, null, Pageable.unpaged()))
-                .containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
 
     @Nested
     class GetMemberId {

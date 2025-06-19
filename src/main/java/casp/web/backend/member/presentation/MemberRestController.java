@@ -3,7 +3,6 @@ package casp.web.backend.member.presentation;
 import casp.web.backend.member.MemberService;
 import casp.web.backend.member.data.Role;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,8 +40,12 @@ class MemberRestController {
     @GetMapping
     ResponseEntity<Page<MemberRead>> getMembers(@RequestParam EntityStatusParam entityStatusParam,
                                                 @RequestParam(required = false, defaultValue = "") String name,
+                                                @RequestParam(required = false) Set<Role> roles,
                                                 @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByEntityStatusAndName(entityStatusParam.getEntityStatus(), name, pageable);
+        var memberDtoPage = memberService.getMembersByEntityStatusNameAndRoles(entityStatusParam.getEntityStatus(),
+                name,
+                roles,
+                pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
     }
 
@@ -51,14 +53,6 @@ class MemberRestController {
     ResponseEntity<MemberRead> getMemberById(@PathVariable UUID id) {
         var memberDto = memberService.getMemberById(id);
         return ResponseEntity.ok(READ_MAPPER.toTarget(memberDto));
-    }
-
-    @GetMapping("search-members-by-firstname-and-lastname")
-    ResponseEntity<Page<MemberRead>> getMemberByFirstNameAndLastName(@RequestParam @NotBlank String firstName,
-                                                                     @RequestParam @NotBlank String lastName,
-                                                                     @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByFirstNameAndLastName(firstName, lastName, pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
     }
 
     @PostMapping
@@ -72,18 +66,6 @@ class MemberRestController {
     ResponseEntity<Void> deleteMember(@PathVariable UUID id) {
         memberService.deleteMemberById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("search-members-by-name")
-    ResponseEntity<Page<MemberRead>> searchMembersByFirstNameOrLastName(@RequestParam(required = false, defaultValue = "") String name,
-                                                                        @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByName(name, pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
-    }
-
-    @GetMapping("roles")
-    ResponseEntity<List<Role>> getMemberRoles() {
-        return ResponseEntity.ok(Role.getAllRolesSorted());
     }
 
     @GetMapping("emails-by-ids")
@@ -104,14 +86,6 @@ class MemberRestController {
     @GetMapping("active-members-emails")
     ResponseEntity<Set<String>> getActiveMembersEmail() {
         return ResponseEntity.ok(memberService.getActiveMembersEmail());
-    }
-
-    @GetMapping("by-not-dog-id/{dogId}")
-    ResponseEntity<Page<MemberRead>> getMembersByNotDogId(@PathVariable UUID dogId,
-                                                          @RequestParam(required = false) String name,
-                                                          @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByNotDogId(dogId, name, pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
     }
 
     @PostMapping("toggle-status/{id}")

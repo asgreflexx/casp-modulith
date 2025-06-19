@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
@@ -58,17 +57,6 @@ class DogServiceImpl implements DogService {
     }
 
     @Override
-    public Optional<DogDto> getDogByChipNumber(String chipNumber) {
-        return dogRepository.findOneByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)
-                .map(DOG_MAPPER::toTarget);
-    }
-
-    @Override
-    public Page<DogDto> getDogsByNameOrOwnerName(String name, String ownerName, Pageable pageable) {
-        return DOG_MAPPER.toTargetPage(dogRepository.findAllByNameOrOwnerName(name, ownerName, pageable));
-    }
-
-    @Override
     public Page<DogDto> getDogs(String value, Pageable pageable) {
         return DOG_MAPPER.toTargetPage(dogRepository.findAllByValue(value, pageable));
     }
@@ -76,11 +64,6 @@ class DogServiceImpl implements DogService {
     @Override
     public Page<DogDto> getDogsThatWereNotChecked(Pageable pageable) {
         return DOG_MAPPER.toTargetPage(dogRepository.findAllByEuropeNetStateNotChecked(pageable));
-    }
-
-    @Override
-    public Page<DogDto> getDogsByNotMemberId(UUID memberId, String name, Pageable pageable) {
-        return DOG_MAPPER.toTargetPage(dogRepository.findAllByNotMemberId(memberId, name, pageable));
     }
 
     private Dog getActiveDog(UUID id) {

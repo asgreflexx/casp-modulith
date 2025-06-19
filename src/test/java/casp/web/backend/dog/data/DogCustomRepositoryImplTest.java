@@ -2,17 +2,13 @@ package casp.web.backend.dog.data;
 
 
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.common.reference.DogReference;
-import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Pageable;
@@ -56,40 +52,6 @@ class DogCustomRepositoryImplTest {
     }
 
     @Nested
-    class FindAllByNotMemberId {
-
-        private MemberReference memberReference;
-
-        @BeforeEach
-        void setUp() {
-            var charlieReference = new DogReference();
-            charlieReference.setId(charlie.getId());
-            charlieReference.setName(charlie.getName());
-            memberReference = new MemberReference();
-            memberReference.setFirstName("firstName");
-            memberReference.setLastName("lastName");
-            memberReference.setEmail("email@email.com");
-            memberReference = memberRepository.save(memberReference);
-            var dogHasHandler = new DogHasHandlerReference();
-            dogHasHandler.setDog(charlieReference);
-            dogHasHandler.setMember(memberReference);
-            dogHasHandlerRepository.save(dogHasHandler);
-        }
-
-        @Test
-        void byMemberIdAndName() {
-            assertThat(dogRepository.findAllByNotMemberId(memberReference.getId(), charlie.getName(), Pageable.unpaged())).isEmpty();
-        }
-
-        @ParameterizedTest
-        @NullAndEmptySource
-        @ValueSource(strings = {"Bonsai", FAMILY_NAME})
-        void byMemberIdAndOwnerName(String name) {
-            assertThat(dogRepository.findAllByNotMemberId(memberReference.getId(), name, Pageable.unpaged())).containsExactly(bonsai);
-        }
-    }
-
-    @Nested
     class FindAllByEuropeNetStateNotChecked {
         @ParameterizedTest
         @NullAndEmptySource
@@ -102,34 +64,6 @@ class DogCustomRepositoryImplTest {
         void notRegistered() {
             createDog("DOG_NOT_REGISTERED", bonsai.getOwnerName(), EntityStatus.ACTIVE, EuropeNetState.DOG_NOT_REGISTERED, UUID.randomUUID().toString());
             assertThat(dogRepository.findAllByEuropeNetStateNotChecked(Pageable.unpaged())).containsExactly(bonsai);
-        }
-    }
-
-    @Nested
-    class FindAllByChipNumberOrDogNameOrOwnerName {
-
-        @Test
-        void findDogByDogName() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(bonsai.getName(), null, Pageable.unpaged()))
-                    .containsExactly(bonsai);
-        }
-
-        @Test
-        void findDogByDogNameAndOwnerName() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(bonsai.getName(), bonsai.getOwnerName(), Pageable.unpaged()))
-                    .containsExactly(bonsai);
-        }
-
-        @Test
-        void findDogsByOwnerName() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(null, bonsai.getOwnerName(), Pageable.unpaged()).getContent())
-                    .containsExactlyInAnyOrder(bonsai);
-        }
-
-        @Test
-        void findDogsWithoutParameters() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(null, null, Pageable.unpaged()).stream())
-                    .containsExactlyInAnyOrder(bonsai, charlie);
         }
     }
 

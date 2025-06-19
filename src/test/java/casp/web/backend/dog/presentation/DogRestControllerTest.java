@@ -15,9 +15,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
 import static casp.web.backend.dog.presentation.DogReadMapper.READ_MAPPER;
@@ -41,7 +38,7 @@ class DogRestControllerTest {
     @BeforeEach
     void setUp() {
         dog = DOG_MAPPER.toTarget(TestFixture.createDog());
-        dog.setChipNumber(String.valueOf(new Random().nextInt()));
+        dog.setChipNumber("1234567890");
     }
 
     @Test
@@ -90,37 +87,5 @@ class DogRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dog));
-    }
-
-    @Test
-    void getDogByChipNumber() {
-        when(dogService.getDogByChipNumber(dog.getChipNumber())).thenReturn(Optional.of(dog));
-
-        var response = dogRestController.getDogByChipNumber(dog.getChipNumber());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).isEqualTo(READ_MAPPER.toTarget(dog));
-    }
-
-    @Test
-    void getDogsByNameOrOwnerName() {
-        when(dogService.getDogsByNameOrOwnerName(dog.getName(), dog.getOwnerName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
-
-        var response = dogRestController.getDogsByNameOrOwnerName(dog.getName(), dog.getOwnerName(), Pageable.unpaged());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dog));
-    }
-
-    @Test
-    void getDogsByNotMemberId() {
-        var memberId = UUID.randomUUID();
-        when(dogService.getDogsByNotMemberId(memberId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
-
-        var response = dogRestController.getDogsByNotMemberId(memberId, null, Pageable.unpaged());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody())
-                .containsExactly(READ_MAPPER.toTarget(dog));
     }
 }

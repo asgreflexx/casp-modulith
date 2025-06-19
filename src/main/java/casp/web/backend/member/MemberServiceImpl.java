@@ -8,6 +8,7 @@ import casp.web.backend.deprecated.member.MemberOldRepository;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
+import casp.web.backend.member.data.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,14 +49,8 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByFirstNameAndLastName(String firstName, String lastName, Pageable pageable) {
-        var memberPage = memberRepository.findAllByFirstNameAndLastName(firstName, lastName, pageable);
-        return MEMBER_MAPPER.toTargetPage(memberPage);
-    }
-
-    @Override
-    public Page<MemberDto> getMembersByEntityStatusAndName(EntityStatus entityStatus, String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatusAndName(entityStatus, name, pageable);
+    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, final Set<Role> roles, Pageable pageable) {
+        var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(entityStatus, name, roles, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
@@ -85,12 +80,6 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByName(String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, pageable);
-        return MEMBER_MAPPER.toTargetPage(memberPage);
-    }
-
-    @Override
     public Set<String> getMembersEmailByIds(Set<UUID> membersId) {
         return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE)
                 .stream()
@@ -111,11 +100,6 @@ class MemberServiceImpl implements MemberService {
     @Override
     public Set<String> getActiveMembersEmail() {
         return memberRepository.findAllActiveMembersEmails();
-    }
-
-    @Override
-    public Page<MemberDto> getMembersByNotDogId(UUID dogId, String name, Pageable pageable) {
-        return MEMBER_MAPPER.toTargetPage(memberRepository.findAllByNotDogId(dogId, name, pageable));
     }
 
     @Override
