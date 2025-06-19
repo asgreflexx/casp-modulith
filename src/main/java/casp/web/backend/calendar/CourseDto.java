@@ -11,7 +11,7 @@ import java.util.UUID;
 public class CourseDto extends BaseEventDto<Space> implements CourseDtoRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers = new HashSet<>();
-    private Set<UUID> newCoTrainers = new HashSet<>();
+    private Set<UUID> coTrainerIds = new HashSet<>();
 
     public CourseDto() {
         super(BaseEventType.COURSE);
@@ -38,13 +38,13 @@ public class CourseDto extends BaseEventDto<Space> implements CourseDtoRequiredF
     }
 
     @Override
-    public Set<UUID> getNewCoTrainers() {
-        return newCoTrainers;
+    public Set<UUID> getCoTrainerIds() {
+        return coTrainerIds;
     }
 
     @Override
-    public void setNewCoTrainers(Set<UUID> newCoTrainers) {
-        this.newCoTrainers = newCoTrainers;
+    public void setCoTrainerIds(Set<UUID> coTrainerIds) {
+        this.coTrainerIds = coTrainerIds;
     }
 
     @Override

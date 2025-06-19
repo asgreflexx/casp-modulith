@@ -4,7 +4,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface CourseDtoRequiredFields extends CourseRequiredFields {
-    Set<UUID> getNewCoTrainers();
+    Set<UUID> getCoTrainerIds();
 
-    void setNewCoTrainers(Set<UUID> newCoTrainers);
+    void setCoTrainerIds(Set<UUID> coTrainerIds);
 }

@@ -116,8 +116,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     }
 
     private void setCoTrainers(CourseDto courseDto, Course course) {
-        var newCoTrainers = mapToCoTrainers(courseDto.getNewCoTrainers());
-        course.addCoTrainers(newCoTrainers);
+        course.addCoTrainers(mapToCoTrainers(courseDto.getCoTrainerIds()));
     }
 
     private Set<CoTrainer> mapToCoTrainers(Set<UUID> memberIds) {

@@ -397,7 +397,7 @@ class CourseServiceImplTest {
             var memberReference = mockMember();
             var coTrainer = new CoTrainer(memberReference);
             courseDto.setMemberId(memberReference.getId());
-            courseDto.getNewCoTrainers().add(coTrainer.getId());
+            courseDto.getCoTrainerIds().add(coTrainer.getId());
 
             courseService.save(courseDto);
 
