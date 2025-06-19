@@ -14,6 +14,4 @@ public interface MemberCustomRepository {
     Member findByIdAndEntityStatusCustom(UUID id, EntityStatus entityStatus);
 
     Set<String> findAllActiveMembersEmails();
-
-    Page<Member> findAllByNotDogId(UUID dogReferenceId, @Nullable String name, Pageable pageable);
 }

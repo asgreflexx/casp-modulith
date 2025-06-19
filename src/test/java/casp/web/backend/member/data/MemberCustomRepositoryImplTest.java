@@ -1,11 +1,8 @@
 package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
-import casp.web.backend.common.reference.MemberReference;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -103,45 +100,6 @@ class MemberCustomRepositoryImplTest {
         void memberNotFound() {
             var memberId = UUID.randomUUID();
             assertThrows(NoSuchElementException.class, () -> memberRepository.findByIdAndEntityStatusCustom(memberId, EntityStatus.DELETED));
-        }
-    }
-
-    @Nested
-    class FindAllByNotDogId {
-        private DogReference dogReference;
-
-        @BeforeEach
-        void setUp() {
-            var johnReference = new MemberReference();
-            johnReference.setId(john.getId());
-            johnReference.setFirstName(john.getFirstName());
-            johnReference.setLastName(john.getLastName());
-            johnReference.setEmail(john.getEmail());
-            dogReference = new DogReference();
-            dogReference.setName("Bella");
-            dogReference = dogRepository.save(dogReference);
-            var dogHasHandler = new DogHasHandlerReference();
-            dogHasHandler.setDog(dogReference);
-            dogHasHandler.setMember(johnReference);
-            dogHasHandlerRepository.save(dogHasHandler);
-        }
-
-        @Test
-        void byDogId() {
-            assertThat(memberRepository.findAllByNotDogId(dogReference.getId(), null, Pageable.unpaged()))
-                    .containsExactly(doe);
-        }
-
-        @Test
-        void byDogIdAndFirstName() {
-            assertThat(memberRepository.findAllByNotDogId(dogReference.getId(), john.getFirstName(), Pageable.unpaged()))
-                    .isEmpty();
-        }
-
-        @Test
-        void byDogIdAndLastName() {
-            assertThat(memberRepository.findAllByNotDogId(dogReference.getId(), john.getLastName(), Pageable.unpaged()))
-                    .isEmpty();
         }
     }
 }

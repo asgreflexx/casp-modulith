@@ -132,16 +132,6 @@ class MemberServiceImplTest {
         assertThat(emailSet).containsExactly(email);
     }
 
-    @Test
-    void getMembersByNotDogId() {
-        var dogId = UUID.randomUUID();
-        when(memberRepository.findAllByNotDogId(dogId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(member)));
-
-        assertThat(memberService.getMembersByNotDogId(dogId, null, Pageable.unpaged()))
-                .containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
-
     @Nested
     class GetMemberId {
         @Test

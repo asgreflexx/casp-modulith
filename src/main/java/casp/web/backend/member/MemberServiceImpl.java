@@ -103,11 +103,6 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByNotDogId(UUID dogId, String name, Pageable pageable) {
-        return MEMBER_MAPPER.toTargetPage(memberRepository.findAllByNotDogId(dogId, name, pageable));
-    }
-
-    @Override
     public MemberDto toggleStatus(final UUID id) {
         var member = getMemberIfNotDeleted(id);
         if (member.getEntityStatus() == EntityStatus.ACTIVE) {

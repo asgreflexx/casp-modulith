@@ -1,7 +1,6 @@
 package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -14,7 +13,6 @@ import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuer
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -28,12 +26,10 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private static final QMember MEMBER = QMember.member;
     private static final String SPLIT_WORDS_WITH_SPACE = " ";
     private final MongoOperations mongoOperations;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
-    MemberCustomRepositoryImpl(MongoOperations mongoOperations, DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+    MemberCustomRepositoryImpl(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     private static BooleanExpression[] splitIntoWords(String name) {
@@ -81,22 +77,6 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .stream()
                 .map(Member::getEmail)
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public Page<Member> findAllByNotDogId(UUID dogId, String name, Pageable pageable) {
-        var expression = MEMBER.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(MEMBER.id.notIn(getMemberIdsRelatedToThisDog(dogId)));
-        if (ObjectUtils.isNotEmpty(name)) {
-            expression = expression.andAnyOf(splitIntoWords(name));
-        }
-        return createQuery()
-                .where(expression)
-                .fetchPage(pageable);
-    }
-
-    private List<UUID> getMemberIdsRelatedToThisDog(UUID dogId) {
-        return dogHasHandlerReferenceRepository.findAllByDogId(dogId).stream().map(dhh -> dhh.getMember().getId()).toList();
     }
 
     private SpringDataMongodbQuery<Member> createQuery() {

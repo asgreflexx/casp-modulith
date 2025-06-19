@@ -88,14 +88,6 @@ class MemberRestController {
         return ResponseEntity.ok(memberService.getActiveMembersEmail());
     }
 
-    @GetMapping("by-not-dog-id/{dogId}")
-    ResponseEntity<Page<MemberRead>> getMembersByNotDogId(@PathVariable UUID dogId,
-                                                          @RequestParam(required = false) String name,
-                                                          @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByNotDogId(dogId, name, pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
-    }
-
     @PostMapping("toggle-status/{id}")
     ResponseEntity<MemberRead> toggleStatus(final @PathVariable UUID id) {
         return ResponseEntity.ok(READ_MAPPER.toTarget(memberService.toggleStatus(id)));
