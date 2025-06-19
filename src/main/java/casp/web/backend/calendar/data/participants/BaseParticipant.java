@@ -7,7 +7,7 @@ import org.springframework.data.annotation.Id;
 import java.util.Objects;
 import java.util.UUID;
 
-abstract class BaseParticipant {
+public abstract class BaseParticipant {
     @NotNull
     protected BaseParticipantType participantType;
 

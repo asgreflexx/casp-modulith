@@ -1,6 +1,5 @@
 package casp.web.backend.calendar.data;
 
-import casp.web.backend.calendar.BaseEventRequiredFields;
 import casp.web.backend.calendar.CourseRequiredFields;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
@@ -13,13 +12,11 @@ import java.util.stream.Collectors;
 
 @QueryEntity
 @Document
-public class Course extends BaseEvent implements BaseEventRequiredFields, CourseRequiredFields {
+public class Course extends BaseEvent<Space> implements CourseRequiredFields {
 
     private int spaceLimit;
 
     private Set<CoTrainer> coTrainers = new HashSet<>();
-
-    private Set<Space> spaces = new HashSet<>();
 
     public Course() {
         super(BaseEventType.COURSE);
@@ -51,28 +48,19 @@ public class Course extends BaseEvent implements BaseEventRequiredFields, Course
         this.coTrainers = notDeletedCoTrainers;
     }
 
-    @Override
-    public Set<Space> getSpaces() {
-        return getNotDeletedSpaces();
-    }
-
-    @Override
-    public void setSpaces(Set<Space> spaces) {
-        this.spaces = spaces;
-    }
-
     public void addSpace(Space space) {
-        spaces.add(space);
+        participants.add(space);
     }
 
     public void removeSpace(Space space) {
-        spaces.remove(space);
+        participants.remove(space);
     }
 
-    public void addSpaces(Set<Space> spaces) {
-        var notDeletedSpaces = getNotDeletedSpaces();
-        notDeletedSpaces.addAll(spaces);
-        this.spaces = notDeletedSpaces;
+    @Override
+    Set<Space> getNotDeletedParticipants() {
+        return participants.stream()
+                .filter(s -> isDogHasHandlerNotDeleted(s.getDogHasHandler()))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -89,13 +77,6 @@ public class Course extends BaseEvent implements BaseEventRequiredFields, Course
         return coTrainers
                 .stream()
                 .filter(ct -> isMemberNotDeleted(ct.getMember()))
-                .collect(Collectors.toSet());
-    }
-
-    private Set<Space> getNotDeletedSpaces() {
-        return spaces
-                .stream()
-                .filter(s -> isDogHasHandlerNotDeleted(s.getDogHasHandler()))
                 .collect(Collectors.toSet());
     }
 }

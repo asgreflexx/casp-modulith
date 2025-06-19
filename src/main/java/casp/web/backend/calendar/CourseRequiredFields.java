@@ -9,7 +9,7 @@ import jakarta.validation.constraints.PositiveOrZero;
 import java.util.Set;
 
 @CourseSpacesConstraint
-public interface CourseRequiredFields {
+public interface CourseRequiredFields extends BaseEventRequiredFields<Space> {
     @PositiveOrZero
     int getSpaceLimit();
 
@@ -19,9 +19,4 @@ public interface CourseRequiredFields {
     Set<@Valid CoTrainer> getCoTrainers();
 
     void setCoTrainers(@NotNull Set<@Valid CoTrainer> coTrainers);
-
-    @NotNull
-    Set<@Valid Space> getSpaces();
-
-    void setSpaces(@NotNull Set<@Valid Space> spaces);
 }
