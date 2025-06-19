@@ -19,11 +19,12 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 
 @Service
-class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implements CourseService {
+class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> implements CourseService {
     private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
     private final CourseRepository courseRepository;
     private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
@@ -44,7 +45,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
 
     private static Space findSpaceById(Course course, UUID spaceId) {
         return course
-                .getSpaces()
+                .getParticipants()
                 .stream()
                 .filter(s -> s.getId().equals(spaceId))
                 .findAny()
@@ -61,7 +62,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
 
         setCalendarEntriesAndMember(dto, course);
         setCoTrainers(dto, course);
-        setSpaces(dto, course);
+        setParticipants(dto, course);
 
         courseRepository.save(course);
     }
@@ -80,7 +81,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     @Override
     public Set<String> getEmailsByCourseId(UUID id) {
         return getOneByIdOrThrowException(id)
-                .getSpaces()
+                .getParticipants()
                 .stream()
                 .map(s -> s.getDogHasHandler().getMember().getEmail())
                 .collect(Collectors.toSet());
@@ -128,17 +129,10 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
                 .collect(Collectors.toSet());
     }
 
-    private void setSpaces(CourseDto courseDto, Course course) {
-        var newSpaces = mapToSpaces(courseDto.getNewSpaces());
-        course.addSpaces(newSpaces);
-    }
-
-    private Set<Space> mapToSpaces(Set<UUID> dogHasHandlerIds) {
-        return dogHasHandlerIds
-                .stream()
-                .flatMap(id -> findDogHandlerReferenceById(id)
-                        .map(Space::new)
-                        .stream())
-                .collect(Collectors.toSet());
+    @Override
+    Stream<Space> mapToParticipant(final UUID id) {
+        return findDogHandlerReferenceById(id)
+                .map(Space::new)
+                .stream();
     }
 }

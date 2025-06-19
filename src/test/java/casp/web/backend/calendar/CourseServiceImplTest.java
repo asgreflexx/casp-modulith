@@ -212,7 +212,7 @@ class CourseServiceImplTest {
 
             verify(courseRepository).save(courseCaptor.capture());
 
-            assertThat(courseCaptor.getValue().getSpaces())
+            assertThat(courseCaptor.getValue().getParticipants())
                     .isEmpty();
         }
 
@@ -247,7 +247,7 @@ class CourseServiceImplTest {
 
             verify(courseRepository).save(courseCaptor.capture());
 
-            assertThat(courseCaptor.getValue().getSpaces())
+            assertThat(courseCaptor.getValue().getParticipants())
                     .singleElement()
                     .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
         }
@@ -278,7 +278,7 @@ class CourseServiceImplTest {
             dogHasHandler.setMember(member);
             dogHasHandler.setDog(new DogReference());
             var space = new Space(dogHasHandler);
-            course.setSpaces(Set.of(space));
+            course.setParticipants(Set.of(space));
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             var emailSet = courseService.getEmailsByCourseId(course.getId());
@@ -416,13 +416,13 @@ class CourseServiceImplTest {
             dogHasHandlerReference.setDog(new DogReference());
             dogHasHandlerReference.setMember(ReferenceTestFixture.createMemberReference());
             var space = new Space(dogHasHandlerReference);
-            courseDto.setNewSpaces(Set.of(space.getId()));
+            courseDto.setParticipantIds(Set.of(space.getId()));
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(space.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
 
             courseService.save(courseDto);
 
             var actualCourse = getCourseSaved();
-            assertThat(actualCourse.getSpaces())
+            assertThat(actualCourse.getParticipants())
                     .singleElement()
                     .isEqualTo(space);
         }

@@ -37,7 +37,7 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course, S
     @Override
     public Page<Course> findAllBySpace(Space space, Pageable pageable) {
         return query()
-                .where(COURSE.spaces.contains(space), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
+                .where(COURSE.participants.contains(space), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
                 .fetchPage(pageable);
     }
 }
