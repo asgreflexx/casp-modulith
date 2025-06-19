@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface MemberCustomRepository {
-    Page<Member> findAllByFirstNameAndLastName(@Nullable String firstName, @Nullable String lastName, Pageable pageable);
-
     Page<Member> findAllByEntityStatusNameAndRoles(EntityStatus entityStatus, @Nullable String name, @Nullable final Set<Role> roles, Pageable pageable);
 
     Member findByIdAndEntityStatusCustom(UUID id, EntityStatus entityStatus);

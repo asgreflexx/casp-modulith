@@ -62,16 +62,6 @@ class MemberRestControllerTest {
     }
 
     @Test
-    void getMemberByFirstNameAndLastName() {
-        when(memberService.getMembersByFirstNameAndLastName(memberDto.getFirstName(), memberDto.getLastName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
-
-        var response = memberRestController.getMemberByFirstNameAndLastName(memberDto.getFirstName(), memberDto.getLastName(), Pageable.unpaged());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(memberDto));
-    }
-
-    @Test
     void saveMember() {
         when(memberService.saveMember(memberDto)).thenReturn(memberDto);
 

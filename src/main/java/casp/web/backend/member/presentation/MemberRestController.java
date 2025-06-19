@@ -3,7 +3,6 @@ package casp.web.backend.member.presentation;
 import casp.web.backend.member.MemberService;
 import casp.web.backend.member.data.Role;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,14 +53,6 @@ class MemberRestController {
     ResponseEntity<MemberRead> getMemberById(@PathVariable UUID id) {
         var memberDto = memberService.getMemberById(id);
         return ResponseEntity.ok(READ_MAPPER.toTarget(memberDto));
-    }
-
-    @GetMapping("search-members-by-firstname-and-lastname")
-    ResponseEntity<Page<MemberRead>> getMemberByFirstNameAndLastName(@RequestParam @NotBlank String firstName,
-                                                                     @RequestParam @NotBlank String lastName,
-                                                                     @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByFirstNameAndLastName(firstName, lastName, pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
     }
 
     @PostMapping

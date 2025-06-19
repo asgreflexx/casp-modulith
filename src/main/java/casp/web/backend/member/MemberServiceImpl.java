@@ -49,12 +49,6 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByFirstNameAndLastName(String firstName, String lastName, Pageable pageable) {
-        var memberPage = memberRepository.findAllByFirstNameAndLastName(firstName, lastName, pageable);
-        return MEMBER_MAPPER.toTargetPage(memberPage);
-    }
-
-    @Override
     public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, final Set<Role> roles, Pageable pageable) {
         var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(entityStatus, name, roles, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);

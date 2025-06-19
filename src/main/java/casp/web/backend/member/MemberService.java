@@ -11,10 +11,6 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface MemberService {
-
-
-    Page<MemberDto> getMembersByFirstNameAndLastName(@Nullable String firstName, @Nullable String lastName, Pageable pageable);
-
     Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, @Nullable String name, @Nullable final Set<Role> roles, Pageable pageable);
 
     MemberDto getMemberById(UUID id);

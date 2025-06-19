@@ -67,30 +67,6 @@ class MemberCustomRepositoryImplTest {
     }
 
     @Nested
-    class FindAllByFirstNameAndLastName {
-
-        @Test
-        void findNoneByFirstNameAndLastName() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName("John", "Doe", Pageable.unpaged())).isEmpty();
-        }
-
-        @Test
-        void findOneByFirstName() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName("John", null, Pageable.unpaged())).containsExactly(john);
-        }
-
-        @Test
-        void findOneByLastName() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName(null, "John", Pageable.unpaged())).containsExactly(john);
-        }
-
-        @Test
-        void findAllWithoutValues() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName(null, null, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
-        }
-    }
-
-    @Nested
     class FindAllByValue {
 
         @ParameterizedTest

@@ -49,19 +49,6 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Page<Member> findAllByFirstNameAndLastName(String firstName, String lastName, Pageable pageable) {
-        var expression = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
-        if (ObjectUtils.isNotEmpty(firstName)) {
-            expression = expression.and(MEMBER.firstName.equalsIgnoreCase(firstName));
-        }
-        if (ObjectUtils.isNotEmpty(lastName)) {
-            expression = expression.and(MEMBER.lastName.equalsIgnoreCase(lastName));
-        }
-        return createQuery().where(expression)
-                .fetchPage(pageable);
-    }
-
-    @Override
     public Page<Member> findAllByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, final Set<Role> roles, Pageable pageable) {
         var expression = MEMBER.entityStatus.eq(entityStatus);
         if (ObjectUtils.isNotEmpty(name)) {

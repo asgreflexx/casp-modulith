@@ -71,17 +71,6 @@ class MemberServiceImplTest {
     }
 
     @Test
-    void getMembersByFirstNameOrLastName() {
-        var page = new PageImpl<>(List.of(member));
-        var pageable = Pageable.unpaged();
-        when(memberRepository.findAllByFirstNameAndLastName(member.getFirstName(), member.getLastName(), pageable)).thenReturn(page);
-
-        var memberDtoPage = memberService.getMembersByFirstNameAndLastName(member.getFirstName(), member.getLastName(), pageable);
-
-        assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
-    @Test
     void getMembersByEntityStatusNameAndRoles() {
         var page = new PageImpl<>(List.of(member));
         var name = "name";
