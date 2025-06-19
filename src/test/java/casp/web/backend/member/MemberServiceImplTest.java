@@ -93,16 +93,6 @@ class MemberServiceImplTest {
     }
 
     @Test
-    void getMembersByName() {
-        var page = new PageImpl<>(List.of(member));
-        when(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, member.getLastName(), null, Pageable.unpaged())).thenReturn(page);
-
-        var memberDtoPage = memberService.getMembersByName(member.getLastName(), Pageable.unpaged());
-
-        assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
-    @Test
     void getMembersEmailByIds() {
         when(memberRepository.findAllByIdInAndEntityStatus(Collections.singleton(member.getId()), EntityStatus.ACTIVE)).thenReturn(Set.of(member));
 

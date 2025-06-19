@@ -23,8 +23,6 @@ public interface MemberService {
 
     void deleteMemberById(UUID id);
 
-    Page<MemberDto> getMembersByName(@Nullable String name, Pageable pageable);
-
     Set<String> getMembersEmailByIds(Set<UUID> membersId);
 
 

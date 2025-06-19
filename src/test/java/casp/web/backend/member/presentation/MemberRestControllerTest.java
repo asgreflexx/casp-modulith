@@ -91,16 +91,6 @@ class MemberRestControllerTest {
     }
 
     @Test
-    void searchMembersByFirstNameOrLastName() {
-        when(memberService.getMembersByName(memberDto.getFirstName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(memberDto)));
-
-        var response = memberRestController.searchMembersByFirstNameOrLastName(memberDto.getFirstName(), Pageable.unpaged());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(memberDto));
-    }
-
-    @Test
     void getMemberRoles() {
         var response = memberRestController.getMemberRoles();
 

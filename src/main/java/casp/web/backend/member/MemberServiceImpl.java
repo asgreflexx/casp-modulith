@@ -86,12 +86,6 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByName(String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, pageable);
-        return MEMBER_MAPPER.toTargetPage(memberPage);
-    }
-
-    @Override
     public Set<String> getMembersEmailByIds(Set<UUID> membersId) {
         return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE)
                 .stream()

@@ -78,13 +78,6 @@ class MemberRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("search-members-by-name")
-    ResponseEntity<Page<MemberRead>> searchMembersByFirstNameOrLastName(@RequestParam(required = false, defaultValue = "") String name,
-                                                                        @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByName(name, pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
-    }
-
     @GetMapping("roles")
     ResponseEntity<List<Role>> getMemberRoles() {
         return ResponseEntity.ok(Role.getAllRolesSorted());
