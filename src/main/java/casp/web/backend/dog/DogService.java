@@ -31,12 +31,4 @@ public interface DogService {
      * @return a page of dogs that were not checked.
      */
     Page<DogDto> getDogsThatWereNotChecked(@Nullable Pageable pageable);
-
-    /**
-     * Find all dogs without this member as their handler.
-     *
-     * @param memberId to be excluded.
-     * @return Dogs unrelated to this member.
-     */
-    Page<DogDto> getDogsByNotMemberId(UUID memberId, @Nullable String name, Pageable pageable);
 }
