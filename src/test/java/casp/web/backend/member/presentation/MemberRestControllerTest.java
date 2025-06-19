@@ -4,7 +4,6 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.member.MemberDto;
 import casp.web.backend.member.MemberService;
 import casp.web.backend.member.TestFixture;
-import casp.web.backend.member.data.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,14 +87,6 @@ class MemberRestControllerTest {
 
         assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(memberService).deleteMemberById(memberDto.getId());
-    }
-
-    @Test
-    void getMemberRoles() {
-        var response = memberRestController.getMemberRoles();
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).containsSequence(Role.getAllRolesSorted());
     }
 
     @Test

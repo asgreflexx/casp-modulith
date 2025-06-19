@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -76,11 +75,6 @@ class MemberRestController {
     ResponseEntity<Void> deleteMember(@PathVariable UUID id) {
         memberService.deleteMemberById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("roles")
-    ResponseEntity<List<Role>> getMemberRoles() {
-        return ResponseEntity.ok(Role.getAllRolesSorted());
     }
 
     @GetMapping("emails-by-ids")
