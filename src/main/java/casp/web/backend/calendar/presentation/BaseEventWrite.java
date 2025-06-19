@@ -1,21 +1,24 @@
 package casp.web.backend.calendar.presentation;
 
-import casp.web.backend.calendar.BaseEventDtoWriteRequiredFields;
 import casp.web.backend.calendar.NewCalendarEntryDto;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
 import casp.web.backend.common.base.BaseView;
-import casp.web.backend.common.reference.MemberReference;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
-abstract class BaseEventWrite extends BaseView implements BaseEventDtoWriteRequiredFields {
+abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequiredFields {
     protected String name;
     protected String description;
     protected String location;
-    protected MemberReference member;
-    protected RecurrenceOption recurrenceOption;
-    protected UUID newMemberId;
+    protected UUID memberId;
     protected NewCalendarEntryDto newCalendarEntry;
+    protected RecurrenceOption recurrenceOption;
+    @JsonSetter(nulls = Nulls.SKIP)
+    protected Set<UUID> participantIds = new HashSet<>();
 
     @Override
     public String getName() {
@@ -48,13 +51,13 @@ abstract class BaseEventWrite extends BaseView implements BaseEventDtoWriteRequi
     }
 
     @Override
-    public MemberReference getMember() {
-        return member;
+    public UUID getMemberId() {
+        return memberId;
     }
 
     @Override
-    public void setMember(MemberReference member) {
-        this.member = member;
+    public void setMemberId(UUID memberId) {
+        this.memberId = memberId;
     }
 
     @Override
@@ -68,16 +71,6 @@ abstract class BaseEventWrite extends BaseView implements BaseEventDtoWriteRequi
     }
 
     @Override
-    public UUID getNewMemberId() {
-        return newMemberId;
-    }
-
-    @Override
-    public void setNewMemberId(UUID newMemberId) {
-        this.newMemberId = newMemberId;
-    }
-
-    @Override
     public NewCalendarEntryDto getNewCalendarEntry() {
         return newCalendarEntry;
     }
@@ -85,6 +78,16 @@ abstract class BaseEventWrite extends BaseView implements BaseEventDtoWriteRequi
     @Override
     public void setNewCalendarEntry(NewCalendarEntryDto newCalendarEntry) {
         this.newCalendarEntry = newCalendarEntry;
+    }
+
+    @Override
+    public Set<UUID> getParticipantIds() {
+        return this.participantIds;
+    }
+
+    @Override
+    public void setParticipantIds(final Set<UUID> participantIds) {
+        this.participantIds = participantIds;
     }
 
     @Override

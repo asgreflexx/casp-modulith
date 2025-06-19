@@ -8,14 +8,13 @@ import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.EventMapper.EVENT_MAPPER;
 
 @Service
-class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements EventService {
+class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto, EventParticipant> implements EventService {
 
     @Autowired
     EventServiceImpl(EventRepository eventRepository,
@@ -38,17 +37,9 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto> implements 
         return EVENT_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
-    private void setParticipants(EventDto eventDto, Event event) {
-        var newParticipants = mapToParticipants(eventDto.getNewParticipants());
-        event.addParticipants(newParticipants);
-    }
-
-    private Set<EventParticipant> mapToParticipants(final Set<UUID> memberIds) {
-        return memberIds
-                .stream()
-                .flatMap(id -> findMemberReferenceById(id)
-                        .map(EventParticipant::new)
-                        .stream())
-                .collect(Collectors.toSet());
+    @Override
+    Stream<EventParticipant> mapToParticipant(UUID id) {
+        return findMemberReferenceById(id)
+                .map(EventParticipant::new).stream();
     }
 }

@@ -59,9 +59,9 @@ class CourseTest {
     @MethodSource
     void getNotDeletedSpaces(DeletedSpace deletedSpace) {
         var spaceSet = mockSpaceSet(deletedSpace);
-        course.setSpaces(spaceSet);
+        course.setParticipants(spaceSet);
 
-        assertThat(course.getSpaces())
+        assertThat(course.getParticipants())
                 .singleElement()
                 .isEqualTo(activeSpace);
     }
@@ -70,9 +70,9 @@ class CourseTest {
     @MethodSource("getNotDeletedSpaces")
     void getSpaceListSize(DeletedSpace deletedSpace) {
         var spaceSet = mockSpaceSet(deletedSpace);
-        course.setSpaces(spaceSet);
+        course.setParticipants(spaceSet);
 
-        assertEquals(1, course.getSpaces().size());
+        assertEquals(1, course.getParticipants().size());
     }
 
     private Set<Space> mockSpaceSet(DeletedSpace deletedSpace) {

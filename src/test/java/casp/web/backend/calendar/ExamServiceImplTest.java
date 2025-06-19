@@ -8,9 +8,7 @@ import casp.web.backend.calendar.data.ExamRepository;
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
@@ -35,12 +33,13 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -191,6 +190,9 @@ class ExamServiceImplTest {
 
         @Test
         void setCalendarEntry() {
+            var memberReference = mockMember();
+            examDto.setMemberId(memberReference.getId());
+
             examService.save(examDto);
 
             var actualCourse = getExamSaved();
@@ -206,6 +208,8 @@ class ExamServiceImplTest {
 
         @Test
         void setRecurrenceOption() {
+            var memberReference = mockMember();
+            examDto.setMemberId(memberReference.getId());
             examDto.setNewCalendarEntry(null);
             var daily = new DailyRecurrenceOption();
             daily.setStartTime(LocalTime.of(1, 0, 0));
@@ -227,70 +231,20 @@ class ExamServiceImplTest {
         @Test
         void setNewMember() {
             var memberReference = mockMember();
-            examDto.setNewMemberId(memberReference.getId());
+            examDto.setMemberId(memberReference.getId());
 
             examService.save(examDto);
 
             assertEquals(memberReference, getExamSaved().getMember());
-        }
-
-        @Test
-        void keepSameMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            examDto.setMember(memberReference);
-
-            examService.save(examDto);
-
-            verifyNoInteractions(memberReferenceRepository);
-            assertEquals(memberReference, getExamSaved().getMember());
-        }
-
-        @Test
-        void updateMember() {
-            var actualMember = ReferenceTestFixture.createMemberReference();
-            var newMember = mockMember();
-            examDto.setMember(actualMember);
-            examDto.setNewMemberId(newMember.getId());
-
-            examService.save(examDto);
-
-            assertEquals(newMember, getExamSaved().getMember());
         }
 
         @Test
         void memberDoesNotExist() {
             var newMemberId = UUID.randomUUID();
-            examDto.setNewMemberId(newMemberId);
+            examDto.setMemberId(newMemberId);
             when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> examService.save(examDto));
-        }
-
-        @Test
-        void addParticipant() {
-            var dogHasHandlerReference = new DogHasHandlerReference();
-            dogHasHandlerReference.setId(UUID.randomUUID());
-            dogHasHandlerReference.setDog(new DogReference());
-            dogHasHandlerReference.setMember(ReferenceTestFixture.createMemberReference());
-            var participant = new ExamParticipant(dogHasHandlerReference);
-            examDto.setNewParticipants(Set.of(participant.getId()));
-            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(participant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
-
-            examService.save(examDto);
-
-            var actualCourse = getExamSaved();
-            assertThat(actualCourse.getParticipants()).singleElement().isEqualTo(participant);
-        }
-
-        private Exam getExamSaved() {
-            verify(examRepository).save(examCaptor.capture());
-            return examCaptor.getValue();
-        }
-
-        private MemberReference mockMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
-            return memberReference;
         }
     }
 
@@ -313,5 +267,100 @@ class ExamServiceImplTest {
 
             assertThrows(NoSuchElementException.class, () -> examService.deleteById(id));
         }
+    }
+
+    @Nested
+    class Participants {
+        private ExamDto examDto;
+
+        @BeforeEach
+        void setUp() {
+            var newCalendarEntryDto = new NewCalendarEntryDto();
+            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
+            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
+            examDto = new ExamDto();
+            examDto.setMemberId(mockMember().getId());
+            examDto.setNewCalendarEntry(newCalendarEntryDto);
+        }
+
+        @Test
+        void addNewParticipantToNewExam() {
+            var newParticipant = ReferenceTestFixture.createDogHasHandlerReference("dog", "new", "participant");
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            when(examRepository.findOneByIdAndEntityStatus(examDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            var expectedParticipant = new ExamParticipant(newParticipant);
+            examDto.getParticipantIds().add(newParticipant.getId());
+
+            examService.save(examDto);
+
+            var actualCourse = getExamSaved();
+            assertThat(actualCourse.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+        }
+
+        @Test
+        void addNewParticipantToEmptyList() {
+            var newParticipant = ReferenceTestFixture.createDogHasHandlerReference("dog", "new", "participant");
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            when(examRepository.findOneByIdAndEntityStatus(examDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(EXAM_MAPPER.toSource(examDto)));
+            var expectedParticipant = new ExamParticipant(newParticipant);
+            examDto.getParticipantIds().add(newParticipant.getId());
+
+            examService.save(examDto);
+
+            var actualCourse = getExamSaved();
+            assertThat(actualCourse.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+        }
+
+        @Test
+        void addExistingParticipantToEvent() {
+            var existingParticipant = ReferenceTestFixture.createDogHasHandlerReference("dog", "existing", "participant");
+            var sourceExam = EXAM_MAPPER.toSource(examDto);
+            sourceExam.addParticipants(Set.of(new ExamParticipant(existingParticipant)));
+            when(examRepository.findOneByIdAndEntityStatus(examDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(sourceExam));
+            var expectedParticipant = new ExamParticipant(existingParticipant);
+            examDto.getParticipantIds().add(expectedParticipant.getId());
+
+            examService.save(examDto);
+
+            var actualCourse = getExamSaved();
+            assertThat(actualCourse.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+            verify(dogHasHandlerReferenceRepository, never()).findOneByIdAndEntityStatus(existingParticipant.getId(), EntityStatus.ACTIVE);
+        }
+
+        @Test
+        void replaceExistingParticipantWithNewParticipant() {
+            var existingParticipant = ReferenceTestFixture.createDogHasHandlerReference("dog", "existing", "participant");
+            var sourceExam = EXAM_MAPPER.toSource(examDto);
+            sourceExam.addParticipants(Set.of(new ExamParticipant(existingParticipant)));
+            when(examRepository.findOneByIdAndEntityStatus(examDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(sourceExam));
+            var newParticipant = ReferenceTestFixture.createDogHasHandlerReference("dog", "new", "participant");
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            var expectedParticipant = new ExamParticipant(newParticipant);
+            examDto.getParticipantIds().add(expectedParticipant.getId());
+
+            examService.save(examDto);
+
+            var actualCourse = getExamSaved();
+            assertThat(actualCourse.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+        }
+    }
+
+    private Exam getExamSaved() {
+        verify(examRepository).save(examCaptor.capture());
+        return examCaptor.getValue();
+    }
+
+    private MemberReference mockMember() {
+        var memberReference = ReferenceTestFixture.createMemberReference();
+        when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
+        return memberReference;
     }
 }

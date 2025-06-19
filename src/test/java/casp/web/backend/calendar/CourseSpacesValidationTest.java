@@ -21,7 +21,7 @@ class CourseSpacesValidationTest {
     @Test
     void isValid() {
         when(course.getSpaceLimit()).thenReturn(1);
-        when(course.getSpaces().size()).thenReturn(1);
+        when(course.getParticipants().size()).thenReturn(1);
 
         assertTrue(VALIDATION.isValid(course, null));
     }
@@ -29,7 +29,7 @@ class CourseSpacesValidationTest {
     @Test
     void isInvalid() {
         when(course.getSpaceLimit()).thenReturn(1);
-        when(course.getSpaces().size()).thenReturn(2);
+        when(course.getParticipants().size()).thenReturn(2);
 
         assertFalse(VALIDATION.isValid(course, null));
     }

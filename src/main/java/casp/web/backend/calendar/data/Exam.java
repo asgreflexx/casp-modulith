@@ -5,17 +5,14 @@ import casp.web.backend.calendar.data.participants.ExamParticipant;
 import com.querydsl.core.annotations.QueryEntity;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 
 @QueryEntity
 @Document
-public class Exam extends BaseEvent implements ExamRequiredFields {
+public class Exam extends BaseEvent<ExamParticipant> implements ExamRequiredFields {
     private String judgeName;
-
-    private Set<ExamParticipant> participants = new HashSet<>();
 
     public Exam() {
         super(BaseEventType.EXAM);
@@ -31,20 +28,11 @@ public class Exam extends BaseEvent implements ExamRequiredFields {
         this.judgeName = judgeName;
     }
 
-    @Override
-    public Set<ExamParticipant> getParticipants() {
-        return getNotDeletedParticipants();
-    }
-
-    @Override
-    public void setParticipants(Set<ExamParticipant> participants) {
-        this.participants = participants;
-    }
-
-    public void addParticipants(Set<ExamParticipant> newParticipants) {
-        var actualParticipants = getNotDeletedParticipants();
-        actualParticipants.addAll(newParticipants);
-        this.participants = actualParticipants;
+    Set<ExamParticipant> getNotDeletedParticipants() {
+        return participants
+                .stream()
+                .filter(p -> isDogHasHandlerNotDeleted(p.getDogHasHandler()))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -55,12 +43,5 @@ public class Exam extends BaseEvent implements ExamRequiredFields {
     @Override
     public int hashCode() {
         return super.hashCode();
-    }
-
-    private Set<ExamParticipant> getNotDeletedParticipants() {
-        return participants
-                .stream()
-                .filter(p -> isDogHasHandlerNotDeleted(p.getDogHasHandler()))
-                .collect(Collectors.toSet());
     }
 }

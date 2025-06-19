@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @EventOptionTimesConstraint
+@RecurrenceConstraint
 public class DailyRecurrenceOption extends RecurrenceOption implements EventOptionTimes {
     @NotNull
     private LocalTime startTime;

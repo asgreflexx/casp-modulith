@@ -4,27 +4,33 @@ package casp.web.backend.calendar;
 import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
+import casp.web.backend.calendar.data.participants.BaseParticipant;
+import casp.web.backend.calendar.presentation.BaseEventWriteRequiredFields;
 import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.reference.MemberReference;
 import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
-public abstract class BaseEventDto extends BaseDto implements BaseEventDtoWriteRequiredFields, BaseEventRequiredFields {
+public abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto implements BaseEventWriteRequiredFields, BaseEventRequiredFields<P> {
     protected BaseEventType eventType;
     protected String name;
     protected String description;
     protected String location;
     protected MemberReference member;
-    protected UUID newMemberId;
+    protected UUID memberId;
     protected RecurrenceOption recurrenceOption;
     protected LocalDateTime minTime;
     protected LocalDateTime maxTime;
     protected NewCalendarEntryDto newCalendarEntry;
     protected List<CalendarEntry> calendarEntries = new ArrayList<>();
+    protected Set<UUID> participantIds = new HashSet<>();
+    protected Set<P> participants = new HashSet<>();
 
     protected BaseEventDto(BaseEventType eventType) {
         this.eventType = eventType;
@@ -71,13 +77,13 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoWriteR
     }
 
     @Override
-    public UUID getNewMemberId() {
-        return newMemberId;
+    public UUID getMemberId() {
+        return memberId;
     }
 
     @Override
-    public void setNewMemberId(UUID newMemberId) {
-        this.newMemberId = newMemberId;
+    public void setMemberId(UUID memberId) {
+        this.memberId = memberId;
     }
 
     @Override
@@ -138,6 +144,26 @@ public abstract class BaseEventDto extends BaseDto implements BaseEventDtoWriteR
     @Override
     public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
         this.calendarEntries = calendarEntries;
+    }
+
+    @Override
+    public Set<UUID> getParticipantIds() {
+        return participantIds;
+    }
+
+    @Override
+    public void setParticipantIds(final Set<UUID> participantIds) {
+        this.participantIds = participantIds;
+    }
+
+    @Override
+    public Set<@Valid P> getParticipants() {
+        return this.participants;
+    }
+
+    @Override
+    public void setParticipants(final Set<@Valid P> participants) {
+        this.participants = participants;
     }
 
     @Override

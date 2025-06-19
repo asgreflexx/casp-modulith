@@ -5,6 +5,7 @@ import casp.web.backend.calendar.data.BaseEventCustomRepository;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.Course;
 import casp.web.backend.calendar.data.Exam;
+import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.calendar.options.RecurrenceOptionUtility;
 import casp.web.backend.common.base.BaseRepository;
 import casp.web.backend.common.enums.EntityStatus;
@@ -23,11 +24,11 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static casp.web.backend.calendar.CalendarEntryMapper.CALENDAR_MAPPER;
 
-abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto> implements BaseEventService<T> {
+abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<T> {
     private static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
 
     protected final BaseRepository<D> baseRepository;
@@ -49,14 +50,6 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         this.migrationService = migrationService;
         var types = (ParameterizedType) getClass().getGenericSuperclass();
         documentClass = (Class<D>) types.getActualTypeArguments()[0];
-    }
-
-    private static <D extends BaseEvent> CalendarEntryDto mapToCalendarEntryDto(D d, CalendarEntry ce) {
-        var calendarEntryDto = CALENDAR_MAPPER.fromBaseEvent(d);
-        calendarEntryDto.setEntryFrom(ce.getEntryFrom());
-        calendarEntryDto.setEntryTo(ce.getEntryTo());
-        calendarEntryDto.setCalendarEntryId(ce.getId());
-        return calendarEntryDto;
     }
 
     private static boolean isWithinRange(CalendarEntry calendarEntry, LocalDateTime from, LocalDateTime to) {
@@ -93,7 +86,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
                 .flatMap(d -> d.getCalendarEntries()
                         .stream()
                         .filter(ce -> isWithinRange(ce, from, to))
-                        .map(ce -> mapToCalendarEntryDto(d, ce)));
+                        .map(ce -> new CalendarEntryDto(ce, d)));
     }
 
     @Override
@@ -155,6 +148,34 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
         return dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE);
     }
 
+    protected Set<P> getExistingParticipantsMatchingDtoParticipantIds(final T dto) {
+        return baseRepository.findOneByIdAndEntityStatus(dto.getId(), EntityStatus.ACTIVE)
+                .stream()
+                .flatMap(p -> p.getParticipants().stream())
+                .filter(p -> dto.getParticipantIds().contains(p.getId()))
+                .collect(Collectors.toSet());
+    }
+
+    protected Set<P> getNewParticipants(final T dto, final Set<P> existingParticipants) {
+        var existingParticipantIds = existingParticipants.stream().map(P::getId).collect(Collectors.toSet());
+        return dto.getParticipantIds().stream()
+                .filter(participantId -> !existingParticipantIds.contains(participantId))
+                .flatMap(this::mapToParticipant)
+                .collect(Collectors.toSet());
+    }
+
+    protected void setParticipants(T dto, D d) {
+        // 1. Get existing active participants from the DB event that are also desired in the DTO's list
+        var existingParticipants = getExistingParticipantsMatchingDtoParticipantIds(dto);
+
+        // 2. Determine which participant IDs from the DTO are genuinely new (not already linked to the existing event)
+        var newParticipants = getNewParticipants(dto, existingParticipants);
+
+        // 3. Combine the existing participants (those already in the DB and still desired) with the new ones
+        d.addParticipants(existingParticipants);
+        d.addParticipants(newParticipants);
+    }
+
     private void setCalendarEntries(T dto, D document) {
         if (null == dto.getRecurrenceOption()) {
             var newCalendarEntry = dto.getNewCalendarEntry();
@@ -166,15 +187,14 @@ abstract class BaseEventServiceImpl<D extends BaseEvent, T extends BaseEventDto>
     }
 
     private void setMember(T dto, D document) {
-        if (dto.getNewMemberId() != null) {
-            var memberReference = findMemberReferenceById(dto.getNewMemberId())
-                    .orElseThrow(() -> {
-                        var msg = "Member with id %s does not exist or it is not active.".formatted(dto.getNewMemberId());
-                        LOG.error(msg);
-                        return new NoSuchElementException(msg);
-                    });
-
-            document.setMember(memberReference);
-        }
+        findMemberReferenceById(dto.getMemberId())
+                .ifPresentOrElse(document::setMember,
+                        () -> {
+                            var msg = "Member with id %s does not exist or it is not active.".formatted(dto.getMemberId());
+                            LOG.error(msg);
+                            throw new NoSuchElementException(msg);
+                        });
     }
+
+    abstract Stream<P> mapToParticipant(UUID id);
 }

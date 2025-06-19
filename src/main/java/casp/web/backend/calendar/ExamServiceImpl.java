@@ -8,14 +8,13 @@ import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
 
 @Service
-class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements ExamService {
+class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipant> implements ExamService {
 
     ExamServiceImpl(MemberReferenceRepository memberReferenceRepository,
                     ExamRepository examRepository,
@@ -38,17 +37,10 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
         return EXAM_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
-    private void setParticipants(ExamDto dto, Exam exam) {
-        var newParticipants = mapToParticipants(dto.getNewParticipants());
-        exam.addParticipants(newParticipants);
-    }
-
-    private Set<ExamParticipant> mapToParticipants(final Set<UUID> dogHasHandlerIds) {
-        return dogHasHandlerIds
-                .stream()
-                .flatMap(id -> findDogHandlerReferenceById(id)
+    @Override
+    Stream<ExamParticipant> mapToParticipant(final UUID id) {
+        return findDogHandlerReferenceById(id)
                         .map(ExamParticipant::new)
-                        .stream())
-                .collect(Collectors.toSet());
+                .stream();
     }
 }
