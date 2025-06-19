@@ -1,15 +1,20 @@
 package casp.web.backend.calendar.presentation;
 
+import casp.web.backend.calendar.BaseEventRequiredFields;
 import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
+import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.reference.MemberReference;
+import jakarta.validation.Valid;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-abstract class BaseEventRead extends BaseView implements BaseEventReadRequiredFields {
+abstract class BaseEventRead<P extends BaseParticipant> extends BaseView implements BaseEventRequiredFields<P> {
     protected BaseEventType eventType;
     protected String name;
     protected String description;
@@ -19,6 +24,7 @@ abstract class BaseEventRead extends BaseView implements BaseEventReadRequiredFi
     protected LocalDateTime minTime;
     protected LocalDateTime maxTime;
     protected List<CalendarEntry> calendarEntries;
+    protected Set<P> participants = new HashSet<>();
 
     BaseEventRead(final BaseEventType eventType) {
         this.eventType = eventType;
@@ -112,6 +118,16 @@ abstract class BaseEventRead extends BaseView implements BaseEventReadRequiredFi
     @Override
     public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
         this.calendarEntries = calendarEntries;
+    }
+
+    @Override
+    public Set<@Valid P> getParticipants() {
+        return participants;
+    }
+
+    @Override
+    public void setParticipants(final Set<@Valid P> participants) {
+        this.participants = participants;
     }
 
     @Override

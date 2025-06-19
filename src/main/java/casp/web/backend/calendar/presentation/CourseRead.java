@@ -7,10 +7,9 @@ import casp.web.backend.calendar.data.participants.Space;
 
 import java.util.Set;
 
-public class CourseRead extends BaseEventRead implements CourseRequiredFields {
+public class CourseRead extends BaseEventRead<Space> implements CourseRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers;
-    private Set<Space> spaces;
 
     CourseRead() {
         super(BaseEventType.COURSE);
@@ -34,16 +33,6 @@ public class CourseRead extends BaseEventRead implements CourseRequiredFields {
     @Override
     public void setCoTrainers(Set<CoTrainer> coTrainers) {
         this.coTrainers = coTrainers;
-    }
-
-    @Override
-    public Set<Space> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<Space> spaces) {
-        this.spaces = spaces;
     }
 
     @Override
