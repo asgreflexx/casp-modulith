@@ -8,6 +8,7 @@ import casp.web.backend.deprecated.member.MemberOldRepository;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
+import casp.web.backend.member.data.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,8 +55,8 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByEntityStatusAndName(EntityStatus entityStatus, String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatusAndName(entityStatus, name, pageable);
+    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, final Set<Role> roles, Pageable pageable) {
+        var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(entityStatus, name, roles, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
@@ -86,7 +87,7 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public Page<MemberDto> getMembersByName(String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, pageable);
+        var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 

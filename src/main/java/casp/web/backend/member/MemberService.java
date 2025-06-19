@@ -2,6 +2,7 @@ package casp.web.backend.member;
 
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.member.data.Role;
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,7 +15,7 @@ public interface MemberService {
 
     Page<MemberDto> getMembersByFirstNameAndLastName(@Nullable String firstName, @Nullable String lastName, Pageable pageable);
 
-    Page<MemberDto> getMembersByEntityStatusAndName(EntityStatus entityStatus, @Nullable String name, Pageable pageable);
+    Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, @Nullable String name, @Nullable final Set<Role> roles, Pageable pageable);
 
     MemberDto getMemberById(UUID id);
 

@@ -42,8 +42,12 @@ class MemberRestController {
     @GetMapping
     ResponseEntity<Page<MemberRead>> getMembers(@RequestParam EntityStatusParam entityStatusParam,
                                                 @RequestParam(required = false, defaultValue = "") String name,
+                                                @RequestParam(required = false) Set<Role> roles,
                                                 @ParameterObject Pageable pageable) {
-        var memberDtoPage = memberService.getMembersByEntityStatusAndName(entityStatusParam.getEntityStatus(), name, pageable);
+        var memberDtoPage = memberService.getMembersByEntityStatusNameAndRoles(entityStatusParam.getEntityStatus(),
+                name,
+                roles,
+                pageable);
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(memberDtoPage));
     }
 

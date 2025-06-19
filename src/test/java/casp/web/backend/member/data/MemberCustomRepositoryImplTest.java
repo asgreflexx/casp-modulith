@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -96,17 +97,22 @@ class MemberCustomRepositoryImplTest {
         @NullAndEmptySource
         @ValueSource(strings = {"    "})
         void findAllWithoutValue(String name) {
-            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
         }
 
         @Test
         void findOneByName() {
-            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, "John", Pageable.unpaged())).containsExactly(john);
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, "John", null, Pageable.unpaged())).containsExactly(john);
         }
 
         @Test
         void findAllByMultipleLettersSeparatedBySpaces() {
-            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, "J X D", Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, "J X D", null, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+        }
+
+        @Test
+        void findAllByRoles() {
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, null, Set.of(Role.CASHIER), Pageable.unpaged())).containsExactlyInAnyOrder(doe);
         }
     }
 
