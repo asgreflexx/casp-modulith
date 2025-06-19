@@ -1,5 +1,6 @@
 package casp.web.backend.calendar.data;
 
+import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.common.enums.EntityStatus;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -12,7 +13,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent> implements BaseEventCustomRepository<T> {
+abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<P>, P extends BaseParticipant> implements BaseEventCustomRepository<T, P> {
     private static final QBaseEvent BASE_EVENT = QBaseEvent.baseEvent;
     final MongoOperations mongoOperations;
     private final Class<T> baseEventClass;

@@ -1,5 +1,6 @@
 package casp.web.backend.calendar.data;
 
+import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.common.enums.EntityStatus;
 
 import java.time.LocalDateTime;
@@ -7,7 +8,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-public interface BaseEventCustomRepository<T extends BaseEvent> {
+public interface BaseEventCustomRepository<T extends BaseEvent<P>, P extends BaseParticipant> {
     Set<T> findAllByMemberIdAndNotDeleted(UUID memberId);
 
     Set<T> findAllByMemberIdAndStatus(UUID memberId, EntityStatus status);

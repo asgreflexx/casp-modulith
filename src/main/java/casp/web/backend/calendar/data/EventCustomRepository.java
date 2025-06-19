@@ -1,4 +1,6 @@
 package casp.web.backend.calendar.data;
 
-public interface EventCustomRepository extends BaseEventCustomRepository<Event> {
+import casp.web.backend.calendar.data.participants.EventParticipant;
+
+public interface EventCustomRepository extends BaseEventCustomRepository<Event, EventParticipant> {
 }
