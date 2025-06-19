@@ -66,15 +66,6 @@ class DogServiceImplTest {
     }
 
     @Test
-    void getDogsByNameOrOwnerName() {
-        when(dogRepository.findAllByNameOrOwnerName(dog.getName(), dog.getOwnerName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
-
-        var dogPage = dogService.getDogsByNameOrOwnerName(dog.getName(), dog.getOwnerName(), Pageable.unpaged());
-
-        assertThat(dogPage).containsExactly(dogDto);
-    }
-
-    @Test
     void getDogsByNotMemberId() {
         var memberId = UUID.randomUUID();
         when(dogRepository.findAllByNotMemberId(memberId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));

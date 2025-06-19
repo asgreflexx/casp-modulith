@@ -21,8 +21,6 @@ public interface DogService {
 
     void deleteDogById(UUID id);
 
-    Page<DogDto> getDogsByNameOrOwnerName(String name, String ownerName, Pageable pageable);
-
     Page<DogDto> getDogs(@Nullable String value, Pageable pageable);
 
     /**

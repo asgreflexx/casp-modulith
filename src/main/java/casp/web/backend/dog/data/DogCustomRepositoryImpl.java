@@ -28,19 +28,6 @@ class DogCustomRepositoryImpl implements DogCustomRepository {
     }
 
     @Override
-    public Page<Dog> findAllByNameOrOwnerName(String dogName, String ownerName, Pageable pageable) {
-        var expression = dog.entityStatus.eq(EntityStatus.ACTIVE);
-        if (StringUtils.isNotBlank(dogName)) {
-            expression = expression.and(dog.name.equalsIgnoreCase(dogName));
-        }
-        if (StringUtils.isNotBlank(ownerName)) {
-            expression = expression.and(dog.ownerName.equalsIgnoreCase(ownerName));
-        }
-        return createQuery().where(expression)
-                .fetchPage(pageable);
-    }
-
-    @Override
     public Page<Dog> findAllByEuropeNetStateNotChecked(Pageable pageable) {
         var expression = dog.entityStatus.eq(EntityStatus.ACTIVE)
                 .and(dog.chipNumber.isNotNull().and(dog.chipNumber.isNotEmpty()))

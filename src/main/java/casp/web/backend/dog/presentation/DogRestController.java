@@ -68,14 +68,6 @@ class DogRestController {
         return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogDtoPage));
     }
 
-    @GetMapping("by-dog-name-or-owner-name")
-    ResponseEntity<Page<DogRead>> getDogsByNameOrOwnerName(@RequestParam(required = false) String name,
-                                                           @RequestParam(required = false) String ownerName,
-                                                           @ParameterObject Pageable pageable) {
-        var dogDtoPage = dogService.getDogsByNameOrOwnerName(name, ownerName, pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogDtoPage));
-    }
-
     @GetMapping("by-not-member-id/{memberId}")
     ResponseEntity<Page<DogRead>> getDogsByNotMemberId(@PathVariable UUID memberId, @RequestParam(required = false) String name, @ParameterObject Pageable pageable) {
         var dogDtoPage = dogService.getDogsByNotMemberId(memberId, name, pageable);

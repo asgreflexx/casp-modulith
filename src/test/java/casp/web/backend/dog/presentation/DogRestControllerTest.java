@@ -91,16 +91,6 @@ class DogRestControllerTest {
     }
 
     @Test
-    void getDogsByNameOrOwnerName() {
-        when(dogService.getDogsByNameOrOwnerName(dog.getName(), dog.getOwnerName(), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
-
-        var response = dogRestController.getDogsByNameOrOwnerName(dog.getName(), dog.getOwnerName(), Pageable.unpaged());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dog));
-    }
-
-    @Test
     void getDogsByNotMemberId() {
         var memberId = UUID.randomUUID();
         when(dogService.getDogsByNotMemberId(memberId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));

@@ -106,34 +106,6 @@ class DogCustomRepositoryImplTest {
     }
 
     @Nested
-    class FindAllByChipNumberOrDogNameOrOwnerName {
-
-        @Test
-        void findDogByDogName() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(bonsai.getName(), null, Pageable.unpaged()))
-                    .containsExactly(bonsai);
-        }
-
-        @Test
-        void findDogByDogNameAndOwnerName() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(bonsai.getName(), bonsai.getOwnerName(), Pageable.unpaged()))
-                    .containsExactly(bonsai);
-        }
-
-        @Test
-        void findDogsByOwnerName() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(null, bonsai.getOwnerName(), Pageable.unpaged()).getContent())
-                    .containsExactlyInAnyOrder(bonsai);
-        }
-
-        @Test
-        void findDogsWithoutParameters() {
-            assertThat(dogRepository.findAllByNameOrOwnerName(null, null, Pageable.unpaged()).stream())
-                    .containsExactlyInAnyOrder(bonsai, charlie);
-        }
-    }
-
-    @Nested
     class FindAllByValue {
         @Test
         void chipNumber() {
