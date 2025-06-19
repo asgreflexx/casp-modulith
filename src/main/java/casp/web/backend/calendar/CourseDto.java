@@ -8,12 +8,10 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class CourseDto extends BaseEventDto implements CourseDtoRequiredFields {
+public class CourseDto extends BaseEventDto<Space> implements CourseDtoRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers = new HashSet<>();
     private Set<UUID> newCoTrainers = new HashSet<>();
-    private Set<Space> spaces = new HashSet<>();
-    private Set<UUID> newSpaces = new HashSet<>();
 
     public CourseDto() {
         super(BaseEventType.COURSE);
@@ -47,26 +45,6 @@ public class CourseDto extends BaseEventDto implements CourseDtoRequiredFields {
     @Override
     public void setNewCoTrainers(Set<UUID> newCoTrainers) {
         this.newCoTrainers = newCoTrainers;
-    }
-
-    @Override
-    public Set<Space> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<Space> spaces) {
-        this.spaces = spaces;
-    }
-
-    @Override
-    public Set<UUID> getNewSpaces() {
-        return newSpaces;
-    }
-
-    @Override
-    public void setNewSpaces(Set<UUID> newSpaces) {
-        this.newSpaces = newSpaces;
     }
 
     @Override

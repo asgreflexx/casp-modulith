@@ -9,8 +9,4 @@ public interface CourseDtoRequiredFields extends CourseRequiredFields {
     Set<UUID> getNewCoTrainers();
 
     void setNewCoTrainers(Set<UUID> newCoTrainers);
-
-    Set<UUID> getNewSpaces();
-
-    void setNewSpaces(Set<UUID> newSpaces);
 }
