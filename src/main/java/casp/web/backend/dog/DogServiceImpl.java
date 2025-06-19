@@ -13,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
@@ -55,12 +54,6 @@ class DogServiceImpl implements DogService {
         dogHasHandlerService.deleteDogHasHandlersByDogId(id);
         dog.setEntityStatus(EntityStatus.DELETED);
         dogRepository.save(dog);
-    }
-
-    @Override
-    public Optional<DogDto> getDogByChipNumber(String chipNumber) {
-        return dogRepository.findOneByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)
-                .map(DOG_MAPPER::toTarget);
     }
 
     @Override

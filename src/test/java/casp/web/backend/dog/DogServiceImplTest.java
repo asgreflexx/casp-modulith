@@ -1,9 +1,7 @@
 package casp.web.backend.dog;
 
 import casp.web.backend.calendar.CourseService;
-import casp.web.backend.calendar.SpaceDto;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogRepository;
@@ -11,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -23,14 +20,12 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -68,14 +63,6 @@ class DogServiceImplTest {
         var dogPage = dogService.getDogs("", Pageable.unpaged());
 
         assertThat(dogPage).containsExactly(dogDto);
-    }
-
-    @Test
-    void getDogByChipNumber() {
-        var chipNumber = UUID.randomUUID().toString();
-        when(dogRepository.findOneByChipNumberAndEntityStatus(chipNumber, EntityStatus.ACTIVE)).thenReturn(Optional.of(dog));
-
-        assertThat(dogService.getDogByChipNumber(chipNumber)).usingRecursiveComparison().isEqualTo(Optional.of(dogDto));
     }
 
     @Test

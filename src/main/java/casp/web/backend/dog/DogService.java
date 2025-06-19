@@ -5,7 +5,6 @@ import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Optional;
 import java.util.UUID;
 
 public interface DogService {
@@ -21,8 +20,6 @@ public interface DogService {
     DogDto saveDog(DogDto dogDto);
 
     void deleteDogById(UUID id);
-
-    Optional<DogDto> getDogByChipNumber(String chipNumber);
 
     Page<DogDto> getDogsByNameOrOwnerName(String name, String ownerName, Pageable pageable);
 
