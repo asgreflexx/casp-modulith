@@ -8,6 +8,7 @@ import casp.web.backend.calendar.data.ExamRepository;
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
@@ -21,6 +22,8 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -350,6 +353,31 @@ class ExamServiceImplTest {
             assertThat(actualCourse.getParticipants())
                     .singleElement()
                     .isEqualTo(expectedParticipant);
+        }
+    }
+
+    @Nested
+    class GetExamsByDogHasHandlerId {
+        @Test
+        void dogHasHandlerDoesNotExist() {
+            var dogHasHandlerId = UUID.randomUUID();
+            var unpaged = Pageable.unpaged();
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> examService.getExamsByDogHasHandlerId(dogHasHandlerId, unpaged));
+        }
+
+        @Test
+        void dogHasHandlerExist() {
+            var dogHasHandlerId = UUID.randomUUID();
+            var dogHasHandler = new DogHasHandlerReference();
+            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
+            when(examRepository.findAllByParticipant(new ExamParticipant(dogHasHandler), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(exam)));
+
+            var examDtoPage = examService.getExamsByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
+
+            assertThat(examDtoPage)
+                    .containsExactly(EXAM_MAPPER.toTarget(exam));
         }
     }
 

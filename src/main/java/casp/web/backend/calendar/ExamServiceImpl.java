@@ -6,6 +6,8 @@ import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -15,12 +17,14 @@ import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
 
 @Service
 class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipant> implements ExamService {
+    private final ExamRepository examRepository;
 
     ExamServiceImpl(MemberReferenceRepository memberReferenceRepository,
                     ExamRepository examRepository,
                     BaseEventMigrationService migrationService,
                     DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         super(memberReferenceRepository, examRepository, dogHasHandlerReferenceRepository, migrationService);
+        this.examRepository = examRepository;
     }
 
     @Override
@@ -38,9 +42,16 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipan
     }
 
     @Override
+    public Page<ExamDto> getExamsByDogHasHandlerId(final UUID dogHasHandlerId, final Pageable pageable) {
+        var dogHasHandlerReference = findDogHandlerReferenceByIdOrThrowException(dogHasHandlerId);
+        var examPage = examRepository.findAllByParticipant(new ExamParticipant(dogHasHandlerReference), pageable);
+        return EXAM_MAPPER.toTargetPage(examPage);
+    }
+
+    @Override
     Stream<ExamParticipant> mapToParticipant(final UUID id) {
         return findDogHandlerReferenceById(id)
-                        .map(ExamParticipant::new)
+                .map(ExamParticipant::new)
                 .stream();
     }
 }

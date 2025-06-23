@@ -101,14 +101,8 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
 
     @Override
     public Page<CourseDto> getCoursesByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
-        var space = findDogHandlerReferenceById(dogHasHandlerId)
-                .map(Space::new)
-                .orElseThrow(() -> {
-                    var msg = "Dog has handler with id %s does not exist or it is not active.".formatted(dogHasHandlerId);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
-        var coursePage = courseRepository.findAllBySpace(space, pageable);
+        var dogHasHandlerReference = findDogHandlerReferenceByIdOrThrowException(dogHasHandlerId);
+        var coursePage = courseRepository.findAllBySpace(new Space(dogHasHandlerReference), pageable);
         return COURSE_MAPPER.toTargetPage(coursePage);
     }
 
