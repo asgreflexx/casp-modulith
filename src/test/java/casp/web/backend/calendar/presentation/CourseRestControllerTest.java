@@ -126,11 +126,11 @@ class CourseRestControllerTest {
     }
 
     @Test
-    void getCourseByDogHasHandlerId() {
+    void getCoursesByDogHasHandlerId() {
         var dogHasHandlerId = UUID.randomUUID();
-        when(courseService.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(courseDto)));
+        when(courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(courseDto)));
 
-        var response = courseRestController.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
+        var response = courseRestController.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody())

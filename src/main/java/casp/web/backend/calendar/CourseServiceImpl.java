@@ -4,7 +4,6 @@ import casp.web.backend.calendar.data.Course;
 import casp.web.backend.calendar.data.CourseRepository;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
-import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
@@ -27,7 +26,6 @@ import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> implements CourseService {
     private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
     private final CourseRepository courseRepository;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
     CourseServiceImpl(CourseRepository courseRepository,
@@ -36,7 +34,6 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
                       BaseEventMigrationService migrationService) {
         super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
         this.courseRepository = courseRepository;
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     private static void removeSpace(Course course, UUID spaceId) {
@@ -103,8 +100,8 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     }
 
     @Override
-    public Page<CourseDto> getCourseByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
-        var space = dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)
+    public Page<CourseDto> getCoursesByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
+        var space = findDogHandlerReferenceById(dogHasHandlerId)
                 .map(Space::new)
                 .orElseThrow(() -> {
                     var msg = "Dog has handler with id %s does not exist or it is not active.".formatted(dogHasHandlerId);

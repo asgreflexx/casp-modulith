@@ -460,14 +460,14 @@ class CourseServiceImplTest {
     }
 
     @Nested
-    class GetCourseByDogHasHandlerId {
+    class GetCoursesByDogHasHandlerId {
         @Test
         void dogHasHandlerDoesNotExist() {
             var dogHasHandlerId = UUID.randomUUID();
             var unpaged = Pageable.unpaged();
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> courseService.getCourseByDogHasHandlerId(dogHasHandlerId, unpaged));
+            assertThrows(NoSuchElementException.class, () -> courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, unpaged));
         }
 
         @Test
@@ -477,7 +477,7 @@ class CourseServiceImplTest {
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
             when(courseRepository.findAllBySpace(new Space(dogHasHandler), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(course)));
 
-            var courseDtoPage = courseService.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
+            var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
 
             assertThat(courseDtoPage)
                     .containsExactly(COURSE_MAPPER.toTarget(course));

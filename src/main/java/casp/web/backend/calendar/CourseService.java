@@ -17,5 +17,5 @@ public interface CourseService extends BaseEventService<CourseDto> {
 
     void removeSpace(UUID courseId, UUID spaceId);
 
-    Page<CourseDto> getCourseByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable);
+    Page<CourseDto> getCoursesByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable);
 }
