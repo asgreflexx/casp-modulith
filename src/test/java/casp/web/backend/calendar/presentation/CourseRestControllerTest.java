@@ -1,8 +1,8 @@
 package casp.web.backend.calendar.presentation;
 
+import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.calendar.CourseDto;
 import casp.web.backend.calendar.CourseService;
-import casp.web.backend.calendar.SpaceDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,11 +18,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import static casp.web.backend.calendar.presentation.CourseReadMapper.COURSE_READ_MAPPER;
+import static casp.web.backend.calendar.presentation.CourseWriteMapper.COURSE_WRITE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,8 +61,7 @@ class CourseRestControllerTest {
         var response = courseRestController.getOneById(courseDto.getId());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody())
-                .isEqualTo(COURSE_READ_MAPPER.toTarget(courseDto));
+        assertThat(response.getBody()).isEqualTo(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
     @Test
@@ -81,8 +79,7 @@ class CourseRestControllerTest {
         var response = courseRestController.getAllByYear(2024, Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody())
-                .containsExactly(COURSE_READ_MAPPER.toTarget(courseDto));
+        assertThat(response.getBody()).containsExactly(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
     @Test
@@ -97,10 +94,13 @@ class CourseRestControllerTest {
 
     @Test
     void updateSpace() {
-        var response = courseRestController.updateSpace(courseDto.getId(), mock(SpaceWrite.class));
+        var spaceWrite = new SpaceWrite();
+        spaceWrite.setDogHasHandler(ReferenceTestFixture.createDogHasHandlerReference());
+        var spaceWriteSet = Set.of(spaceWrite);
+        var response = courseRestController.updateSpaces(courseDto.getId(), spaceWriteSet);
 
         assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(courseService).updateSpace(eq(courseDto.getId()), any(SpaceDto.class));
+        verify(courseService).updateSpaces(courseDto.getId(), COURSE_WRITE_MAPPER.toSpaceDtos(spaceWriteSet));
     }
 
     @Test
@@ -121,8 +121,7 @@ class CourseRestControllerTest {
         var response = courseRestController.getCalendarEntry(courseDto.getId(), calendarEntryId);
 
         assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody())
-                .isEqualTo(COURSE_READ_MAPPER.toTarget(courseDto));
+        assertThat(response.getBody()).isEqualTo(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
     @Test
@@ -133,8 +132,7 @@ class CourseRestControllerTest {
         var response = courseRestController.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
 
         assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody())
-                .containsExactly(COURSE_READ_MAPPER.toTarget(courseDto));
+        assertThat(response.getBody()).containsExactly(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
     @Test

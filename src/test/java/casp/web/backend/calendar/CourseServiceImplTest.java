@@ -233,40 +233,19 @@ class CourseServiceImplTest {
         }
     }
 
-    @Nested
-    class SaveSpace {
-        @Test
-        void updateSpace() {
-            var space = createSpace();
-            course.addSpace(space);
+    @Test
+    void updateSpaces() {
+        var space = createSpace();
+        when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+        space.setNote("spaceChanged");
+        courseService.updateSpaces(course.getId(), Set.of(COURSE_MAPPER.toSpaceDto(space)));
 
-            space.setNote("spaceChanged");
-            courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(space));
+        verify(courseRepository).save(courseCaptor.capture());
 
-            verify(courseRepository).save(courseCaptor.capture());
-
-            assertThat(courseCaptor.getValue().getParticipants())
-                    .singleElement()
-                    .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
-        }
-
-        @Test
-        void courseDoesNotExist() {
-            var id = UUID.randomUUID();
-            var space = new Space();
-            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(id, COURSE_MAPPER.toSpaceDto(space)));
-        }
-
-        @Test
-        void spaceDoesNotExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(createSpace())));
-        }
+        assertThat(courseCaptor.getValue().getParticipants())
+                .singleElement()
+                .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
     }
 
     @Nested

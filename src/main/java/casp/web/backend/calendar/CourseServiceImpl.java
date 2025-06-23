@@ -85,10 +85,9 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     }
 
     @Override
-    public void updateSpace(UUID courseId, SpaceDto spaceDto) {
+    public void updateSpaces(UUID courseId, Set<SpaceDto> spaceDtos) {
         var course = getOneByIdOrThrowException(courseId);
-        removeSpace(course, spaceDto.getId());
-        course.addSpace(COURSE_MAPPER.toSpace(spaceDto));
+        course.setParticipants(COURSE_MAPPER.toSpaces(spaceDtos));
         courseRepository.save(course);
     }
 

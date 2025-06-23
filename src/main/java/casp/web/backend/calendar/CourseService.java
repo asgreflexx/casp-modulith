@@ -13,7 +13,7 @@ public interface CourseService extends BaseEventService<CourseDto> {
 
     Set<String> getEmailsByCourseId(UUID id);
 
-    void updateSpace(UUID courseId, SpaceDto spaceDto);
+    void updateSpaces(UUID courseId, Set<SpaceDto> spaceDto);
 
     void removeSpace(UUID courseId, UUID spaceId);
 

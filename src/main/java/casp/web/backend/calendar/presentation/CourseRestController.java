@@ -9,7 +9,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Set;
 import java.util.UUID;
@@ -57,9 +65,9 @@ class CourseRestController {
         return ResponseEntity.ok(courseService.getEmailsByCourseId(id));
     }
 
-    @PatchMapping("{courseId}/space")
-    ResponseEntity<Void> updateSpace(@PathVariable UUID courseId, @RequestBody @Valid SpaceWrite space) {
-        courseService.updateSpace(courseId, COURSE_WRITE_MAPPER.toSpaceDto(space));
+    @PatchMapping("{courseId}/spaces")
+    ResponseEntity<Void> updateSpaces(@PathVariable UUID courseId, @RequestBody Set<@Valid SpaceWrite> spaces) {
+        courseService.updateSpaces(courseId, COURSE_WRITE_MAPPER.toSpaceDtos(spaces));
         return ResponseEntity.noContent().build();
     }
 
