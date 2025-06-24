@@ -24,6 +24,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -199,19 +201,38 @@ class CourseServiceImplTest {
         }
     }
 
-    @Test
-    void updateSpaces() {
-        var space = createSpace();
-        when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+    @Nested
+    class UpdateSpaces {
 
-        space.setNote("spaceChanged");
-        courseService.updateSpaces(course.getId(), Set.of(COURSE_MAPPER.toSpaceDto(space)));
+        private Space space;
 
-        verify(courseRepository).save(courseCaptor.capture());
+        @BeforeEach
+        void setUp() {
+            space = createSpace();
+            space.setNote("spaceChanged");
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+        }
 
-        assertThat(courseCaptor.getValue().getParticipants())
-                .singleElement()
-                .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
+        @Test
+        void savesSuccessfully() {
+            courseService.updateSpaces(course.getId(), course.getVersion(), Set.of(COURSE_MAPPER.toSpaceDto(space)));
+
+            var courseDto = getCourseSaved();
+
+            assertThat(courseDto.getParticipants())
+                    .singleElement()
+                    .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
+        }
+
+        @Test
+        void throwsOptimisticLockingFailure() {
+            var id = course.getId();
+            var badVersion = course.getVersion() + 1;
+            var spaceDtos = Set.of(COURSE_MAPPER.toSpaceDto(space));
+
+            assertThrows(OptimisticLockingFailureException.class, () -> courseService.updateSpaces(id, badVersion, spaceDtos));
+            verify(courseRepository, never()).save(course);
+        }
     }
 
     @Nested
@@ -372,11 +393,6 @@ class CourseServiceImplTest {
                     .isEqualTo(space);
         }
 
-        private Course getCourseSaved() {
-            verify(courseRepository).save(courseCaptor.capture());
-            return courseCaptor.getValue();
-        }
-
         private MemberReference mockMember() {
             var memberReference = ReferenceTestFixture.createMemberReference();
             when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
@@ -427,5 +443,10 @@ class CourseServiceImplTest {
             assertThat(courseDtoPage)
                     .containsExactly(COURSE_MAPPER.toTarget(course));
         }
+    }
+
+    private Course getCourseSaved() {
+        verify(courseRepository).save(courseCaptor.capture());
+        return courseCaptor.getValue();
     }
 }

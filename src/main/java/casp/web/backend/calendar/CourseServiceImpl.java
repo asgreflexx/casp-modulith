@@ -10,6 +10,7 @@ import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -67,10 +68,16 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     }
 
     @Override
-    public void updateSpaces(UUID courseId, Set<SpaceDto> spaceDtos) {
+    public CourseDto updateSpaces(UUID courseId, long courseVersion, Set<SpaceDto> spaceDtos) {
         var course = getOneByIdOrThrowException(courseId);
+        var actualVersion = course.getVersion();
+        if (actualVersion != courseVersion) {
+            var msg = "The course with id %s has been updated in the meantime. The actual version is %d".formatted(courseId, actualVersion);
+            LOG.error(msg);
+            throw new OptimisticLockingFailureException(msg);
+        }
         course.setParticipants(COURSE_MAPPER.toSpaces(spaceDtos));
-        courseRepository.save(course);
+        return COURSE_MAPPER.toTarget(courseRepository.save(course));
     }
 
     @Override
@@ -94,7 +101,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     }
 
     @Override
-    Stream<Space> mapToParticipant(final UUID id) {
+    Stream<Space> mapToParticipant(UUID id) {
         return findDogHandlerReferenceById(id)
                 .map(Space::new)
                 .stream();

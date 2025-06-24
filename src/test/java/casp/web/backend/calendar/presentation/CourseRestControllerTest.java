@@ -3,6 +3,7 @@ package casp.web.backend.calendar.presentation;
 import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.calendar.CourseDto;
 import casp.web.backend.calendar.CourseService;
+import casp.web.backend.calendar.data.participants.Space;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,13 +95,18 @@ class CourseRestControllerTest {
 
     @Test
     void updateSpace() {
+        var dogHasHandler = ReferenceTestFixture.createDogHasHandlerReference();
         var spaceWrite = new SpaceWrite();
-        spaceWrite.setDogHasHandler(ReferenceTestFixture.createDogHasHandlerReference());
+        spaceWrite.setDogHasHandler(dogHasHandler);
         var spaceWriteSet = Set.of(spaceWrite);
-        var response = courseRestController.updateSpaces(courseDto.getId(), spaceWriteSet);
+        var space = new Space(dogHasHandler);
+        courseDto.setParticipants(Set.of(space));
+        when(courseService.updateSpaces(courseDto.getId(), courseDto.getVersion(), COURSE_WRITE_MAPPER.toSpaceDtos(spaceWriteSet))).thenReturn(courseDto);
 
-        assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(courseService).updateSpaces(courseDto.getId(), COURSE_WRITE_MAPPER.toSpaceDtos(spaceWriteSet));
+        var response = courseRestController.updateSpaces(courseDto.getId(), courseDto.getVersion(), spaceWriteSet);
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).isEqualTo(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
     @Test

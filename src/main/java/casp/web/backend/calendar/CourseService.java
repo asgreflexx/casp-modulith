@@ -13,7 +13,7 @@ public interface CourseService extends BaseEventService<CourseDto> {
 
     Set<String> getEmailsByCourseId(UUID id);
 
-    void updateSpaces(UUID courseId, Set<SpaceDto> spaceDto);
+    CourseDto updateSpaces(UUID courseId, long courseVersion, Set<SpaceDto> spaceDto);
 
     Page<CourseDto> getCoursesByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable);
 }
