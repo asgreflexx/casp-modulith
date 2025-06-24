@@ -8,11 +8,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 import static casp.web.backend.calendar.presentation.ExamReadMapper.EXAM_READ_MAPPER;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -64,6 +68,17 @@ class ExamRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertEquals(EXAM_READ_MAPPER.toTarget(examDto), response.getBody());
+    }
+
+    @Test
+    void getExamsByDogHasHandlerId() {
+        var dogHasHandlerId = UUID.randomUUID();
+        when(examService.getExamsByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(examDto)));
+
+        var response = examRestController.getExamsByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).containsExactly(EXAM_READ_MAPPER.toTarget(examDto));
     }
 
     @Test
