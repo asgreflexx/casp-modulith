@@ -218,6 +218,7 @@
                         <exclude>**/*MemberProperty.class</exclude>
                         <exclude>**/*MembershipFee.class</exclude>
                         <exclude>**/*Card.class</exclude>
+                        <exclude>**/*Role.class</exclude>
                         <exclude>**/*Dto.class</exclude>
                         <exclude>**/*Read.class</exclude>
                         <exclude>**/*Write.class</exclude>
