@@ -37,4 +37,8 @@ public enum ReferenceTestFixture {
         dogHasHandlerReference.setMember(memberReference);
         return dogHasHandlerReference;
     }
+
+    public static DogHasHandlerReference createDogHasHandlerReference() {
+        return createDogHasHandlerReference("Riley", "John", "Doe");
+    }
 }

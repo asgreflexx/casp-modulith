@@ -24,6 +24,7 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -200,72 +202,36 @@ class CourseServiceImplTest {
     }
 
     @Nested
-    class RemoveSpace {
-        @Test
-        void spaceExist() {
-            var space = createSpace();
-            course.addSpace(space);
+    class UpdateSpaces {
 
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+        private Space space;
 
-            courseService.removeSpace(course.getId(), space.getId());
-
-            verify(courseRepository).save(courseCaptor.capture());
-
-            assertThat(courseCaptor.getValue().getParticipants())
-                    .isEmpty();
-        }
-
-        @Test
-        void courseDoesNotExist() {
-            var id = UUID.randomUUID();
-            var idSpace = UUID.randomUUID();
-            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(id, idSpace));
-        }
-
-        @Test
-        void spaceDoesNotExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(course.getId(), UUID.randomUUID()));
-        }
-    }
-
-    @Nested
-    class SaveSpace {
-        @Test
-        void updateSpace() {
-            var space = createSpace();
-            course.addSpace(space);
-
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
+        @BeforeEach
+        void setUp() {
+            space = createSpace();
             space.setNote("spaceChanged");
-            courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(space));
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+        }
 
-            verify(courseRepository).save(courseCaptor.capture());
+        @Test
+        void savesSuccessfully() {
+            courseService.updateSpaces(course.getId(), course.getVersion(), Set.of(COURSE_MAPPER.toSpaceDto(space)));
 
-            assertThat(courseCaptor.getValue().getParticipants())
+            var courseDto = getCourseSaved();
+
+            assertThat(courseDto.getParticipants())
                     .singleElement()
                     .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
         }
 
         @Test
-        void courseDoesNotExist() {
-            var id = UUID.randomUUID();
-            var space = new Space();
-            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+        void throwsOptimisticLockingFailure() {
+            var id = course.getId();
+            var badVersion = course.getVersion() + 1;
+            var spaceDtos = Set.of(COURSE_MAPPER.toSpaceDto(space));
 
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(id, COURSE_MAPPER.toSpaceDto(space)));
-        }
-
-        @Test
-        void spaceDoesNotExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(createSpace())));
+            assertThrows(OptimisticLockingFailureException.class, () -> courseService.updateSpaces(id, badVersion, spaceDtos));
+            verify(courseRepository, never()).save(course);
         }
     }
 
@@ -427,11 +393,6 @@ class CourseServiceImplTest {
                     .isEqualTo(space);
         }
 
-        private Course getCourseSaved() {
-            verify(courseRepository).save(courseCaptor.capture());
-            return courseCaptor.getValue();
-        }
-
         private MemberReference mockMember() {
             var memberReference = ReferenceTestFixture.createMemberReference();
             when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
@@ -460,14 +421,14 @@ class CourseServiceImplTest {
     }
 
     @Nested
-    class GetCourseByDogHasHandlerId {
+    class GetCoursesByDogHasHandlerId {
         @Test
         void dogHasHandlerDoesNotExist() {
             var dogHasHandlerId = UUID.randomUUID();
             var unpaged = Pageable.unpaged();
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
-            assertThrows(NoSuchElementException.class, () -> courseService.getCourseByDogHasHandlerId(dogHasHandlerId, unpaged));
+            assertThrows(NoSuchElementException.class, () -> courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, unpaged));
         }
 
         @Test
@@ -477,10 +438,15 @@ class CourseServiceImplTest {
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
             when(courseRepository.findAllBySpace(new Space(dogHasHandler), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(course)));
 
-            var courseDtoPage = courseService.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
+            var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
 
             assertThat(courseDtoPage)
                     .containsExactly(COURSE_MAPPER.toTarget(course));
         }
+    }
+
+    private Course getCourseSaved() {
+        verify(courseRepository).save(courseCaptor.capture());
+        return courseCaptor.getValue();
     }
 }
