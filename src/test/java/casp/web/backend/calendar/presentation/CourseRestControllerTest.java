@@ -104,16 +104,6 @@ class CourseRestControllerTest {
     }
 
     @Test
-    void removeSpace() {
-        var spaceId = UUID.randomUUID();
-
-        var response = courseRestController.removeSpace(courseDto.getId(), spaceId);
-
-        assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(courseService).removeSpace(courseDto.getId(), spaceId);
-    }
-
-    @Test
     void getCalendarEntry() {
         var calendarEntryId = UUID.randomUUID();
         when(courseService.getOneByIdAndCalendarEntryId(courseDto.getId(), calendarEntryId)).thenReturn(courseDto);

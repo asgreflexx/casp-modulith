@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,23 +33,6 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
                       BaseEventMigrationService migrationService) {
         super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
         this.courseRepository = courseRepository;
-    }
-
-    private static void removeSpace(Course course, UUID spaceId) {
-        course.removeSpace(findSpaceById(course, spaceId));
-    }
-
-    private static Space findSpaceById(Course course, UUID spaceId) {
-        return course
-                .getParticipants()
-                .stream()
-                .filter(s -> s.getId().equals(spaceId))
-                .findAny()
-                .orElseThrow(() -> {
-                    var msg = "Space with id %s not found in course with id %s.".formatted(spaceId, course.getId());
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
     }
 
     @Override
@@ -88,13 +70,6 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     public void updateSpaces(UUID courseId, Set<SpaceDto> spaceDtos) {
         var course = getOneByIdOrThrowException(courseId);
         course.setParticipants(COURSE_MAPPER.toSpaces(spaceDtos));
-        courseRepository.save(course);
-    }
-
-    @Override
-    public void removeSpace(UUID courseId, UUID spaceId) {
-        var course = getOneByIdOrThrowException(courseId);
-        removeSpace(course, spaceId);
         courseRepository.save(course);
     }
 

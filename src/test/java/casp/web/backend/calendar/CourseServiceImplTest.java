@@ -199,40 +199,6 @@ class CourseServiceImplTest {
         }
     }
 
-    @Nested
-    class RemoveSpace {
-        @Test
-        void spaceExist() {
-            var space = createSpace();
-            course.addSpace(space);
-
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            courseService.removeSpace(course.getId(), space.getId());
-
-            verify(courseRepository).save(courseCaptor.capture());
-
-            assertThat(courseCaptor.getValue().getParticipants())
-                    .isEmpty();
-        }
-
-        @Test
-        void courseDoesNotExist() {
-            var id = UUID.randomUUID();
-            var idSpace = UUID.randomUUID();
-            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(id, idSpace));
-        }
-
-        @Test
-        void spaceDoesNotExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(course.getId(), UUID.randomUUID()));
-        }
-    }
-
     @Test
     void updateSpaces() {
         var space = createSpace();

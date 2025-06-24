@@ -71,12 +71,6 @@ class CourseRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("{courseId}/space/{spaceId}")
-    ResponseEntity<Void> removeSpace(@PathVariable UUID courseId, @PathVariable UUID spaceId) {
-        courseService.removeSpace(courseId, spaceId);
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("{courseId}/calendar-entry/{calendarEntryId}")
     ResponseEntity<CourseRead> getCalendarEntry(@PathVariable UUID courseId, @PathVariable UUID calendarEntryId) {
         var courseDto = courseService.getOneByIdAndCalendarEntryId(courseId, calendarEntryId);
