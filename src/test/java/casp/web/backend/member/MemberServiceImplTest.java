@@ -158,6 +158,7 @@ class MemberServiceImplTest {
     class SaveMember {
         @Test
         void emailDoesNotExists() {
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
             when(memberRepository.save(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));
@@ -170,6 +171,7 @@ class MemberServiceImplTest {
 
         @Test
         void emailExistsButBelongsToOtherMember() {
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
             when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(new Member()));
             var memberDto = MEMBER_MAPPER.toTarget(member);
 
@@ -178,6 +180,7 @@ class MemberServiceImplTest {
 
         @Test
         void updateMember() {
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
             when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(member));
             when(memberRepository.save(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
@@ -191,11 +194,11 @@ class MemberServiceImplTest {
 
         @Test
         void memberIsDisabled() {
+            member.setEntityStatus(EntityStatus.INACTIVE);
             var memberDto = MEMBER_MAPPER.toTarget(member);
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
-            when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenThrow(new NoSuchElementException());
-
-            assertThrows(NoSuchElementException.class, () -> memberService.saveMember(memberDto));
+            assertThrows(IllegalStateException.class, () -> memberService.saveMember(memberDto));
         }
     }
 

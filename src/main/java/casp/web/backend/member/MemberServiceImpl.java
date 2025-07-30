@@ -49,7 +49,10 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, final Set<Role> roles, Pageable pageable) {
+    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus,
+                                                                String name,
+                                                                Set<Role> roles,
+                                                                Pageable pageable) {
         var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(entityStatus, name, roles, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
@@ -81,10 +84,7 @@ class MemberServiceImpl implements MemberService {
 
     @Override
     public Set<String> getMembersEmailByIds(Set<UUID> membersId) {
-        return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE)
-                .stream()
-                .map(Member::getEmail)
-                .collect(Collectors.toSet());
+        return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE).stream().map(Member::getEmail).collect(Collectors.toSet());
     }
 
     @Override
@@ -103,7 +103,7 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberDto toggleStatus(final UUID id) {
+    public MemberDto toggleStatus(UUID id) {
         var member = getMemberIfNotDeleted(id);
         if (member.getEntityStatus() == EntityStatus.ACTIVE) {
             deactivateMember(member);
@@ -113,36 +113,40 @@ class MemberServiceImpl implements MemberService {
         return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
 
-    // it fails if the member isn't active or another member with the same email already exists
+    // if member exists, it must be active
+    // if an existing member already contains the member.email, it will fail
     private void analyseMember(Member member) {
-        memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE);
-
-        memberRepository.findOneByEmail(member.getEmail())
-                .ifPresent(m -> {
-                    if (!member.equals(m)) {
-                        var msg = "Member with email %s already exists.".formatted(member.getEmail());
-                        LOG.error(msg);
-                        throw new IllegalStateException(msg);
-                    }
-                });
+        memberRepository.findById(member.getId()).ifPresent(m -> {
+            if (m.getEntityStatus() != EntityStatus.ACTIVE) {
+                var msg = "Member with id %s is not active.".formatted(member.getId());
+                LOG.error(msg);
+                throw new IllegalStateException(msg);
+            }
+        });
+        memberRepository.findOneByEmail(member.getEmail()).ifPresent(m -> {
+            if (!member.equals(m)) {
+                var msg = "Member with email %s already exists.".formatted(member.getEmail());
+                LOG.error(msg);
+                throw new IllegalStateException(msg);
+            }
+        });
     }
 
-    private Member getMemberIfNotDeleted(final UUID id) {
-        return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED)
-                .orElseThrow(() -> {
-                    var msg = "Member with id %s not found.".formatted(id);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
+    private Member getMemberIfNotDeleted(UUID id) {
+        return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED).orElseThrow(() -> {
+            var msg = "Member with id %s not found.".formatted(id);
+            LOG.error(msg);
+            return new NoSuchElementException(msg);
+        });
     }
 
-    private void deactivateMember(final Member member) {
+    private void deactivateMember(Member member) {
         dogHasHandlerService.deactivateDogHasHandlersByMemberId(member.getId());
         baseEventObserver.deactivateBaseEventsByMemberId(member.getId());
         member.setEntityStatus(EntityStatus.INACTIVE);
     }
 
-    private void activateMember(final Member member) {
+    private void activateMember(Member member) {
         dogHasHandlerService.activateDogHasHandlersByMemberId(member.getId());
         baseEventObserver.activateBaseEventsByMemberId(member.getId());
         member.setEntityStatus(EntityStatus.ACTIVE);
