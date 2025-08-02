@@ -123,9 +123,9 @@ class EventServiceImplTest {
         var calendarEntry2 = new CalendarEntry(from, to);
         var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
         event.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
-        when(eventRepository.findAllBetweenFromAndTo(from, to)).thenReturn(Stream.of(event));
+        when(eventRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(event));
 
-        var calendarEntryDtoStream = eventService.getCalendarEntriesBetweenFromAndTo(from, to);
+        var calendarEntryDtoStream = eventService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
 
         assertThat(calendarEntryDtoStream)
                 .singleElement()

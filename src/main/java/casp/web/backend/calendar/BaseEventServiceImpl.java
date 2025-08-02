@@ -81,8 +81,8 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
     }
 
     @Override
-    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to) {
-        return baseEventCustomRepository.findAllBetweenFromAndTo(from, to)
+    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, UUID memberId) {
+        return baseEventCustomRepository.findAllBetweenFromAndToOrMemberId(from, to, memberId)
                 .flatMap(d -> d.getCalendarEntries()
                         .stream()
                         .filter(ce -> isWithinRange(ce, from, to))
@@ -157,7 +157,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                 });
     }
 
-    protected Set<P> getExistingParticipantsMatchingDtoParticipantIds(final T dto) {
+    protected Set<P> getExistingParticipantsMatchingDtoParticipantIds(T dto) {
         return baseRepository.findOneByIdAndEntityStatus(dto.getId(), EntityStatus.ACTIVE)
                 .stream()
                 .flatMap(p -> p.getParticipants().stream())
@@ -165,7 +165,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                 .collect(Collectors.toSet());
     }
 
-    protected Set<P> getNewParticipants(final T dto, final Set<P> existingParticipants) {
+    protected Set<P> getNewParticipants(T dto, Set<P> existingParticipants) {
         var existingParticipantIds = existingParticipants.stream().map(P::getId).collect(Collectors.toSet());
         return dto.getParticipantIds().stream()
                 .filter(participantId -> !existingParticipantIds.contains(participantId))

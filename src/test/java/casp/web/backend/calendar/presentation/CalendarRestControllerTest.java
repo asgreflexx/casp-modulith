@@ -10,8 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.stream.Stream;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -28,9 +27,9 @@ class CalendarRestControllerTest {
 
     @Test
     void getCalendarEntries() {
-        when(baseEventObserver.getCalendarEntriesBetweenFromAndTo(LocalDateTime.MIN, LocalDateTime.MAX, Set.of())).thenReturn(Stream.of(calendarEntryDto));
+        when(baseEventObserver.getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime.MIN, LocalDateTime.MAX, null)).thenReturn(List.of(calendarEntryDto));
 
-        var calendarEntries = calendarRestController.getCalendarEntries(LocalDate.MIN, LocalDate.MAX, Set.of());
+        var calendarEntries = calendarRestController.getCalendarEntries(LocalDate.MIN, LocalDate.MAX, null);
 
         assertThat(calendarEntries.getBody())
                 .containsExactly(calendarEntryDto);

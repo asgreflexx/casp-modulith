@@ -145,9 +145,9 @@ class CourseServiceImplTest {
         var calendarEntry2 = new CalendarEntry(from, to);
         var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
         course.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
-        when(courseRepository.findAllBetweenFromAndTo(from, to)).thenReturn(Stream.of(course));
+        when(courseRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(course));
 
-        var calendarEntryDtoStream = courseService.getCalendarEntriesBetweenFromAndTo(from, to);
+        var calendarEntryDtoStream = courseService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
 
         assertThat(calendarEntryDtoStream)
                 .singleElement()

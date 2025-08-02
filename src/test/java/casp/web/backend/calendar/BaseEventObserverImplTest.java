@@ -1,8 +1,6 @@
 package casp.web.backend.calendar;
 
-import casp.web.backend.calendar.data.BaseEventType;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,12 +8,10 @@ import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -64,36 +60,26 @@ class BaseEventObserverImplTest {
         verify(examService).activateBaseEventsByMemberId(memberId);
     }
 
-    @Nested
-    class GetCalendarEntriesBetweenFromAndTo {
+    @Test
+    void getCalendarEntriesBetweenFromAndToOrMemberId() {
+        var from = LocalDateTime.now();
+        var to = from.plusDays(1);
+        var courseCalendarEntryDto = new CalendarEntryDto();
+        courseCalendarEntryDto.setEntryFrom(from);
+        courseCalendarEntryDto.setEntryTo(from.plusHours(1));
+        var eventCalendarEntryDto = new CalendarEntryDto();
+        eventCalendarEntryDto.setEntryFrom(from.plusHours(2));
+        eventCalendarEntryDto.setEntryTo(from.plusHours(3));
+        var examCalendarEntryDto = new CalendarEntryDto();
+        examCalendarEntryDto.setEntryFrom(from.plusHours(4));
+        examCalendarEntryDto.setEntryTo(from.plusHours(5));
+        when(courseService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId)).thenReturn(Stream.of(courseCalendarEntryDto));
+        when(eventService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId)).thenReturn(Stream.of(eventCalendarEntryDto));
+        when(examService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId)).thenReturn(Stream.of(examCalendarEntryDto));
 
-        private static final LocalDateTime FROM = LocalDateTime.now();
-        private static final LocalDateTime TO = FROM.plusHours(1);
+        var calendarEntryDtoList = observer.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId);
 
-        @Test
-        void getCalendarEntriesBetweenFromAndTo() {
-            var courseCalendarEntryDto = mock(CalendarEntryDto.class);
-            var eventCalendarEntryDto = mock(CalendarEntryDto.class);
-            var examCalendarEntryDto = mock(CalendarEntryDto.class);
-            when(courseService.getCalendarEntriesBetweenFromAndTo(FROM, TO)).thenReturn(Stream.of(courseCalendarEntryDto));
-            when(eventService.getCalendarEntriesBetweenFromAndTo(FROM, TO)).thenReturn(Stream.of(eventCalendarEntryDto));
-            when(examService.getCalendarEntriesBetweenFromAndTo(FROM, TO)).thenReturn(Stream.of(examCalendarEntryDto));
-
-            var calendarEntryDtoSet = observer.getCalendarEntriesBetweenFromAndTo(FROM, TO, Set.of());
-
-            assertThat(calendarEntryDtoSet)
-                    .containsExactlyInAnyOrder(courseCalendarEntryDto, eventCalendarEntryDto, examCalendarEntryDto);
-        }
-
-        @Test
-        void getEventCalendarEntries() {
-            var eventCalendarEntryDto = mock(CalendarEntryDto.class);
-            when(eventService.getCalendarEntriesBetweenFromAndTo(FROM, TO)).thenReturn(Stream.of(eventCalendarEntryDto));
-
-            var calendarEntryDtoSet = observer.getCalendarEntriesBetweenFromAndTo(FROM, TO, Set.of(BaseEventType.EVENT));
-
-            assertThat(calendarEntryDtoSet)
-                    .containsExactlyInAnyOrder(eventCalendarEntryDto);
-        }
+        assertThat(calendarEntryDtoList)
+                .containsExactly(courseCalendarEntryDto, eventCalendarEntryDto, examCalendarEntryDto);
     }
 }
