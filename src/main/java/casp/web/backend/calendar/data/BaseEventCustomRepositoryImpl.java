@@ -1,6 +1,8 @@
 package casp.web.backend.calendar.data;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.DogHasHandlerReference;
+import casp.web.backend.common.reference.QDogHasHandlerReference;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
@@ -38,14 +40,10 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
         return findAllByCriteria(criteria);
     }
 
-    @Override
-    public Stream<T> findAllBetweenFromAndTo(LocalDateTime from, LocalDateTime to) {
-        var criteria = BASE_EVENT.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(BASE_EVENT.minTime.loe(to))
-                .and(BASE_EVENT.maxTime.goe(from));
-        return query()
-                .where(criteria)
-                .stream();
+    protected static BooleanExpression createTimeRangeCriteria(LocalDateTime from, LocalDateTime to) {
+        return BASE_EVENT.entityStatus.eq(EntityStatus.ACTIVE)
+                .and(BASE_EVENT.maxTime.goe(from)
+                        .and(BASE_EVENT.minTime.loe(to)));
     }
 
     private Set<T> findAllByCriteria(BooleanExpression criteria) {
@@ -57,5 +55,13 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
 
     SpringDataMongodbQuery<T> query() {
         return new SpringDataMongodbQuery<>(mongoOperations, baseEventClass);
+    }
+
+    protected Stream<DogHasHandlerReference> findDogHasHandlersByMemberId(UUID memberId) {
+        var dogHasHandlerReference = QDogHasHandlerReference.dogHasHandlerReference;
+        var dogHasHandlerReferenceQuery = new SpringDataMongodbQuery<>(mongoOperations, DogHasHandlerReference.class);
+        return dogHasHandlerReferenceQuery.where(dogHasHandlerReference.entityStatus.eq(EntityStatus.ACTIVE)
+                        .and(dogHasHandlerReference.member.id.eq(memberId)))
+                .stream();
     }
 }

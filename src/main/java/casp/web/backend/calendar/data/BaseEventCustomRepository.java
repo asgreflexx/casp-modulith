@@ -1,6 +1,7 @@
 package casp.web.backend.calendar.data;
 
 import casp.web.backend.common.enums.EntityStatus;
+import jakarta.annotation.Nullable;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -12,5 +13,5 @@ public interface BaseEventCustomRepository<T extends BaseEvent<?>> {
 
     Set<T> findAllByMemberIdAndStatus(UUID memberId, EntityStatus status);
 
-    Stream<T> findAllBetweenFromAndTo(LocalDateTime from, LocalDateTime to);
+    Stream<T> findAllBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId);
 }
