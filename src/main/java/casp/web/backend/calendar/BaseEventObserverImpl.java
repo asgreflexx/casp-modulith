@@ -40,7 +40,7 @@ class BaseEventObserverImpl implements BaseEventObserver {
     @Override
     public List<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, UUID memberId) {
         return observerMap.entrySet()
-                .parallelStream()
+                .stream()
                 .flatMap(observer -> observer.getValue().getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId))
                 .sorted()
                 .toList();
