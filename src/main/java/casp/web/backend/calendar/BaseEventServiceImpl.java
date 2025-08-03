@@ -52,10 +52,6 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
         documentClass = (Class<D>) types.getActualTypeArguments()[0];
     }
 
-    private static boolean isWithinRange(CalendarEntry calendarEntry, LocalDateTime from, LocalDateTime to) {
-        return !calendarEntry.getEntryFrom().isBefore(from) && !calendarEntry.getEntryTo().isAfter(to);
-    }
-
     @Override
     public void deleteById(UUID id) {
         var document = getOneByIdOrThrowException(id);
@@ -85,7 +81,6 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
         return baseEventCustomRepository.findAllBetweenFromAndToOrMemberId(from, to, memberId)
                 .flatMap(d -> d.getCalendarEntries()
                         .stream()
-                        .filter(ce -> isWithinRange(ce, from, to))
                         .map(ce -> new CalendarEntryDto(ce, d)));
     }
 

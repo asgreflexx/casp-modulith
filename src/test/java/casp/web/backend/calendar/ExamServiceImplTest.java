@@ -28,7 +28,6 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -117,10 +116,8 @@ class ExamServiceImplTest {
     void getCalendarEntries() {
         var from = LocalDateTime.now().minusDays(1);
         var to = from.plusDays(1);
-        var calendarEntry1 = new CalendarEntry(from.minusHours(1), from);
-        var calendarEntry2 = new CalendarEntry(from, to);
-        var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
-        exam.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
+        var calendarEntry = new CalendarEntry(from, to);
+        exam.addCalendarEntry(calendarEntry);
         when(examRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(exam));
 
         var calendarEntryDtoStream = examService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
@@ -128,8 +125,8 @@ class ExamServiceImplTest {
         assertThat(calendarEntryDtoStream)
                 .singleElement()
                 .satisfies(ce -> {
-                    assertEquals(calendarEntry2.getEntryFrom(), ce.getEntryFrom());
-                    assertEquals(calendarEntry2.getEntryTo(), ce.getEntryTo());
+                    assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
+                    assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
                     assertSame(exam.getEventType(), ce.getEventType());
                 });
     }
