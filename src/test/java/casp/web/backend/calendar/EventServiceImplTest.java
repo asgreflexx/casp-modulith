@@ -23,8 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -119,10 +117,8 @@ class EventServiceImplTest {
     void getCalendarEntries() {
         var from = LocalDateTime.now().minusDays(1);
         var to = from.plusDays(1);
-        var calendarEntry1 = new CalendarEntry(from.minusHours(1), from);
-        var calendarEntry2 = new CalendarEntry(from, to);
-        var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
-        event.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
+        var calendarEntry = new CalendarEntry(from, to);
+        event.addCalendarEntry(calendarEntry);
         when(eventRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(event));
 
         var calendarEntryDtoStream = eventService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
@@ -130,8 +126,8 @@ class EventServiceImplTest {
         assertThat(calendarEntryDtoStream)
                 .singleElement()
                 .satisfies(ce -> {
-                    assertEquals(calendarEntry2.getEntryFrom(), ce.getEntryFrom());
-                    assertEquals(calendarEntry2.getEntryTo(), ce.getEntryTo());
+                    assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
+                    assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
                     assertSame(event.getEventType(), ce.getEventType());
                 });
     }
