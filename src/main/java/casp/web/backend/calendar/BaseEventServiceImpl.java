@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -82,23 +81,6 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                 .flatMap(d -> d.getCalendarEntries()
                         .stream()
                         .map(ce -> new CalendarEntryDto(ce, d)));
-    }
-
-    @Override
-    public T getOneByIdAndCalendarEntryId(UUID id, UUID calendarEntryId) {
-        var dto = getOneById(id);
-        var calendarEntry = dto.getCalendarEntries()
-                .stream()
-                .filter(ce -> calendarEntryId.equals(ce.getId()))
-                .findAny()
-                .orElseThrow(() -> {
-                    var msg = "The Calendar entry with Id %s not found in %s with Id %s"
-                            .formatted(calendarEntryId, documentClass.getSimpleName(), id);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
-        dto.setCalendarEntries(List.of(calendarEntry));
-        return dto;
     }
 
     @SuppressWarnings("unchecked")

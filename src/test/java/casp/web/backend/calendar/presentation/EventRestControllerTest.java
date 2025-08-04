@@ -10,10 +10,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 
-import java.util.UUID;
-
-import static casp.web.backend.calendar.presentation.EventReadMapper.EVENT_READ_MAPPER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -53,17 +49,6 @@ class EventRestControllerTest {
 
         assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(eventService).deleteById(eventDto.getId());
-    }
-
-    @Test
-    void getCalendarEntry() {
-        var calendarEntryId = UUID.randomUUID();
-        when(eventService.getOneByIdAndCalendarEntryId(eventDto.getId(), calendarEntryId)).thenReturn(eventDto);
-
-        var response = eventRestController.getCalendarEntry(eventDto.getId(), calendarEntryId);
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertEquals(EVENT_READ_MAPPER.toTarget(eventDto), response.getBody());
     }
 
     @Test

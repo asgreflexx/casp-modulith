@@ -74,12 +74,6 @@ class CourseRestController {
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
-    @GetMapping("{courseId}/calendar-entry/{calendarEntryId}")
-    ResponseEntity<CourseRead> getCalendarEntry(@PathVariable UUID courseId, @PathVariable UUID calendarEntryId) {
-        var courseDto = courseService.getOneByIdAndCalendarEntryId(courseId, calendarEntryId);
-        return ResponseEntity.ok(COURSE_READ_MAPPER.toTarget(courseDto));
-    }
-
     @GetMapping("/space/{dogHasHandlerId}")
     public ResponseEntity<Page<CourseRead>> getCoursesByDogHasHandlerId(@PathVariable UUID dogHasHandlerId, @ParameterObject Pageable pageable) {
         var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, pageable);

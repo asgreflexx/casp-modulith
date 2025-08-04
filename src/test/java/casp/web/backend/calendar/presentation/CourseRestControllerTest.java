@@ -110,17 +110,6 @@ class CourseRestControllerTest {
     }
 
     @Test
-    void getCalendarEntry() {
-        var calendarEntryId = UUID.randomUUID();
-        when(courseService.getOneByIdAndCalendarEntryId(courseDto.getId(), calendarEntryId)).thenReturn(courseDto);
-
-        var response = courseRestController.getCalendarEntry(courseDto.getId(), calendarEntryId);
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).isEqualTo(COURSE_READ_MAPPER.toTarget(courseDto));
-    }
-
-    @Test
     void getCoursesByDogHasHandlerId() {
         var dogHasHandlerId = UUID.randomUUID();
         when(courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(courseDto)));
