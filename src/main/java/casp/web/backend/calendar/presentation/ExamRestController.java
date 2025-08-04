@@ -50,6 +50,12 @@ class ExamRestController {
         return ResponseEntity.ok(EXAM_READ_MAPPER.toTargetPage(examDtoPage));
     }
 
+    @GetMapping("{id}")
+    ResponseEntity<ExamRead> getOneById(@PathVariable UUID id) {
+        var examDto = examService.getOneById(id);
+        return ResponseEntity.ok(EXAM_READ_MAPPER.toTarget(examDto));
+    }
+
     /**
      * @deprecated It will be removed in #3.
      */

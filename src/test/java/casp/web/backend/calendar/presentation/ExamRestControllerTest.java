@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import static casp.web.backend.calendar.presentation.ExamReadMapper.EXAM_READ_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
@@ -67,6 +68,16 @@ class ExamRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(EXAM_READ_MAPPER.toTarget(examDto));
+    }
+
+    @Test
+    void getOneById() {
+        when(examService.getOneById(examDto.getId())).thenReturn(examDto);
+
+        var response = examRestController.getOneById(examDto.getId());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertEquals(EXAM_READ_MAPPER.toTarget(examDto), response.getBody());
     }
 
     @Test
