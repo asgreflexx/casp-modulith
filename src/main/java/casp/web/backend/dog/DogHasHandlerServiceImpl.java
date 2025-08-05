@@ -138,7 +138,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public Set<DogHasHandlerDto> getDogHasHandlerByDogId(UUID dogId) {
-        var dogHasHandlerSet = dogHasHandlerRepository.findAllByDogIdAndNotDeleted(dogId);
+        var dogHasHandlerSet = dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE);
         return DOG_HAS_HANDLER_MAPPER.toTargetSet(dogHasHandlerSet);
     }
 

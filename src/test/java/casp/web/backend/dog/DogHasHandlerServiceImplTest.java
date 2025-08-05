@@ -192,7 +192,7 @@ class DogHasHandlerServiceImplTest {
 
     @Test
     void getDogHasHandlerByDogId() {
-        when(dogHasHandlerRepository.findAllByDogIdAndNotDeleted(dog.getId())).thenReturn(dogHasHandlerSet);
+        when(dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dog.getId(), EntityStatus.ACTIVE)).thenReturn(dogHasHandlerSet);
 
         var dogHasHandlerDtoSet = dogHasHandlerService.getDogHasHandlerByDogId(dog.getId());
 
@@ -319,7 +319,8 @@ class DogHasHandlerServiceImplTest {
         return Stream.of(new EntityStatusData(EntityStatus.DELETED, EntityStatus.INACTIVE, EntityStatus.DELETED),
                 new EntityStatusData(EntityStatus.ACTIVE, EntityStatus.DELETED, EntityStatus.DELETED),
                 new EntityStatusData(EntityStatus.INACTIVE, EntityStatus.ACTIVE, EntityStatus.INACTIVE),
-                new EntityStatusData(EntityStatus.ACTIVE, EntityStatus.INACTIVE, EntityStatus.INACTIVE));
+                new EntityStatusData(EntityStatus.ACTIVE, EntityStatus.INACTIVE, EntityStatus.INACTIVE),
+                new EntityStatusData(EntityStatus.ACTIVE, EntityStatus.ACTIVE, EntityStatus.ACTIVE));
     }
 
     private record EntityStatusData(EntityStatus dogStatus, EntityStatus memberStatus,
