@@ -19,8 +19,6 @@ interface BaseEventService<T extends BaseEventDto> {
 
     Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId);
 
-    T getOneByIdAndCalendarEntryId(UUID id, UUID calendarEntryId);
-
     T getOneById(UUID id);
 
     /**

@@ -44,16 +44,16 @@ class ExamRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("{examId}/calendar-entry/{calendarEntryId}")
-    ResponseEntity<ExamRead> getCalendarEntry(@PathVariable UUID examId, @PathVariable UUID calendarEntryId) {
-        var examDto = examService.getOneByIdAndCalendarEntryId(examId, calendarEntryId);
-        return ResponseEntity.ok(EXAM_READ_MAPPER.toTarget(examDto));
-    }
-
     @GetMapping("participants/{dogHasHandlerId}")
     ResponseEntity<Page<ExamRead>> getExamsByDogHasHandlerId(@PathVariable UUID dogHasHandlerId, @ParameterObject Pageable pageable) {
         var examDtoPage = examService.getExamsByDogHasHandlerId(dogHasHandlerId, pageable);
         return ResponseEntity.ok(EXAM_READ_MAPPER.toTargetPage(examDtoPage));
+    }
+
+    @GetMapping("{id}")
+    ResponseEntity<ExamRead> getOneById(@PathVariable UUID id) {
+        var examDto = examService.getOneById(id);
+        return ResponseEntity.ok(EXAM_READ_MAPPER.toTarget(examDto));
     }
 
     /**

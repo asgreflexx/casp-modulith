@@ -60,17 +60,6 @@ class ExamRestControllerTest {
     }
 
     @Test
-    void getCalendarEntry() {
-        var calendarEntryId = UUID.randomUUID();
-        when(examService.getOneByIdAndCalendarEntryId(examDto.getId(), calendarEntryId)).thenReturn(examDto);
-
-        var response = examRestController.getCalendarEntry(examDto.getId(), calendarEntryId);
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertEquals(EXAM_READ_MAPPER.toTarget(examDto), response.getBody());
-    }
-
-    @Test
     void getExamsByDogHasHandlerId() {
         var dogHasHandlerId = UUID.randomUUID();
         when(examService.getExamsByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(examDto)));
@@ -79,6 +68,16 @@ class ExamRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(EXAM_READ_MAPPER.toTarget(examDto));
+    }
+
+    @Test
+    void getOneById() {
+        when(examService.getOneById(examDto.getId())).thenReturn(examDto);
+
+        var response = examRestController.getOneById(examDto.getId());
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertEquals(EXAM_READ_MAPPER.toTarget(examDto), response.getBody());
     }
 
     @Test

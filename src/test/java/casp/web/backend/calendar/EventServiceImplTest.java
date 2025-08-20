@@ -133,49 +133,6 @@ class EventServiceImplTest {
     }
 
     @Nested
-    class GetOneByIdAndCalendarEntryId {
-
-        private CalendarEntry calendarEntry;
-
-        @BeforeEach
-        void setUp() {
-            calendarEntry = new CalendarEntry(LocalDateTime.MIN, LocalDateTime.MAX);
-            event.addCalendarEntry(calendarEntry);
-            event.addCalendarEntry(new CalendarEntry(LocalDateTime.now(), LocalDateTime.now().plusHours(1)));
-        }
-
-        @Test
-        void eventExist() {
-            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
-
-            var courseDto = eventService.getOneByIdAndCalendarEntryId(event.getId(), calendarEntry.getId());
-
-            assertEquals(event.getId(), courseDto.getId());
-            assertThat(courseDto.getCalendarEntries())
-                    .singleElement()
-                    .satisfies(ce -> {
-                        assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
-                        assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
-                    });
-        }
-
-        @Test
-        void eventDoesNotExist() {
-            var id = UUID.randomUUID();
-            when(eventRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> eventService.getOneByIdAndCalendarEntryId(id, calendarEntry.getId()));
-        }
-
-        @Test
-        void calendarEntryDoesNotExist() {
-            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
-
-            assertThrows(NoSuchElementException.class, () -> eventService.getOneByIdAndCalendarEntryId(event.getId(), UUID.randomUUID()));
-        }
-    }
-
-    @Nested
     class Save {
         private EventDto eventDto;
         private NewCalendarEntryDto newCalendarEntryDto;
