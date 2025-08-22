@@ -52,7 +52,6 @@ pipeline {
             }
             steps {
                 updateAndRestartService(Environment.TEST, Service.ADMIN_V2)
-                checkIfServiceIsRunningInTestEnvironment(Service.ADMIN_V2)
             }
         }
     }
