@@ -46,14 +46,7 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
                         .and(BASE_EVENT.minTime.loe(to)));
     }
 
-    private Set<T> findAllByCriteria(BooleanExpression criteria) {
-        return query()
-                .where(criteria)
-                .stream()
-                .collect(Collectors.toSet());
-    }
-
-    SpringDataMongodbQuery<T> query() {
+    protected SpringDataMongodbQuery<T> query() {
         return new SpringDataMongodbQuery<>(mongoOperations, baseEventClass);
     }
 
@@ -63,5 +56,12 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
         return dogHasHandlerReferenceQuery.where(dogHasHandlerReference.entityStatus.eq(EntityStatus.ACTIVE)
                         .and(dogHasHandlerReference.member.id.eq(memberId)))
                 .stream();
+    }
+
+    private Set<T> findAllByCriteria(BooleanExpression criteria) {
+        return query()
+                .where(criteria)
+                .stream()
+                .collect(Collectors.toSet());
     }
 }
