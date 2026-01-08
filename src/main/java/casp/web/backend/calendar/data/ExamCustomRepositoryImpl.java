@@ -10,7 +10,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -35,16 +34,10 @@ class ExamCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Exam> imple
         var criteria = createTimeRangeCriteria(from, to);
         if (memberId != null) {
             criteria = criteria.and(EXAM.member.id.eq(memberId)
-                    .or(EXAM.participants.any().in(findDogHasHandlersAndMapToExamParticipants(memberId))));
+                    .or(EXAM.participants.any().dogHasHandler.id.in(findDogHasHandlerIdsByMemberId(memberId))));
         }
         return query()
                 .where(criteria)
                 .stream();
-    }
-
-    private List<ExamParticipant> findDogHasHandlersAndMapToExamParticipants(UUID memberId) {
-        return findDogHasHandlersByMemberId(memberId)
-                .map(ExamParticipant::new)
-                .toList();
     }
 }
