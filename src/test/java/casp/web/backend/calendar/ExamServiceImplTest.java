@@ -8,7 +8,6 @@ import casp.web.backend.calendar.data.ExamRepository;
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
@@ -310,29 +309,15 @@ class ExamServiceImplTest {
         }
     }
 
-    @Nested
-    class GetExamsByDogHasHandlerId {
-        @Test
-        void dogHasHandlerDoesNotExist() {
-            var dogHasHandlerId = UUID.randomUUID();
-            var unpaged = Pageable.unpaged();
-            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+    @Test
+    void getExamsByDogHasHandlerId() {
+        var dogHasHandlerId = UUID.randomUUID();
+        when(examRepository.findAllByParticipantId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(exam)));
 
-            assertThrows(NoSuchElementException.class, () -> examService.getExamsByDogHasHandlerId(dogHasHandlerId, unpaged));
-        }
+        var examDtoPage = examService.getExamsByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
 
-        @Test
-        void dogHasHandlerExist() {
-            var dogHasHandlerId = UUID.randomUUID();
-            var dogHasHandler = new DogHasHandlerReference();
-            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
-            when(examRepository.findAllByParticipant(new ExamParticipant(dogHasHandler), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(exam)));
-
-            var examDtoPage = examService.getExamsByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
-
-            assertThat(examDtoPage)
-                    .containsExactly(EXAM_MAPPER.toTarget(exam));
-        }
+        assertThat(examDtoPage)
+                .containsExactly(EXAM_MAPPER.toTarget(exam));
     }
 
     private Exam getExamSaved() {

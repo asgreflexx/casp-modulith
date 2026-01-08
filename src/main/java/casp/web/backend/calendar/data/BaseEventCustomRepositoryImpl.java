@@ -10,12 +10,14 @@ import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuer
 import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements BaseEventCustomRepository<T> {
     private static final QBaseEvent BASE_EVENT = QBaseEvent.baseEvent;
+    private static final QDogHasHandlerReference DOG_HAS_HANDLER_REFERENCE = QDogHasHandlerReference.dogHasHandlerReference;
     final MongoOperations mongoOperations;
     private final Class<T> baseEventClass;
 
@@ -51,13 +53,18 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
     }
 
     protected List<UUID> findDogHasHandlerIdsByMemberId(UUID memberId) {
-        var dogHasHandlerReference = QDogHasHandlerReference.dogHasHandlerReference;
-        var dogHasHandlerReferenceQuery = new SpringDataMongodbQuery<>(mongoOperations, DogHasHandlerReference.class);
-        return dogHasHandlerReferenceQuery.where(dogHasHandlerReference.entityStatus.eq(EntityStatus.ACTIVE)
-                        .and(dogHasHandlerReference.member.id.eq(memberId)))
+        var memberIdCondition = DOG_HAS_HANDLER_REFERENCE.member.id.eq(memberId);
+        return activeDogHasHandlerQuery(memberIdCondition)
                 .stream()
                 .map(DogHasHandlerReference::getId)
                 .toList();
+    }
+
+    protected Optional<UUID> findActiveDogHandlerReferenceById(UUID participantId) {
+        return activeDogHasHandlerQuery(DOG_HAS_HANDLER_REFERENCE.id.eq(participantId))
+                .stream()
+                .findAny()
+                .map(DogHasHandlerReference::getId);
     }
 
     private Set<T> findAllByCriteria(BooleanExpression criteria) {
@@ -65,5 +72,13 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
                 .where(criteria)
                 .stream()
                 .collect(Collectors.toSet());
+    }
+
+    private SpringDataMongodbQuery<DogHasHandlerReference> dogHasHandlerQuery() {
+        return new SpringDataMongodbQuery<>(mongoOperations, DogHasHandlerReference.class);
+    }
+
+    private SpringDataMongodbQuery<DogHasHandlerReference> activeDogHasHandlerQuery(BooleanExpression expression) {
+        return dogHasHandlerQuery().where(DOG_HAS_HANDLER_REFERENCE.entityStatus.eq(EntityStatus.ACTIVE), expression);
     }
 }
