@@ -1,9 +1,6 @@
 package casp.web.backend.calendar.data;
 
-import casp.web.backend.calendar.data.participants.CoTrainer;
-import casp.web.backend.calendar.data.participants.Space;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.MemberReference;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -37,9 +34,12 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     }
 
     @Override
-    public Page<Course> findAllBySpace(Space space, Pageable pageable) {
+    public Page<Course> findAllBySpaceId(UUID spaceId, Pageable pageable) {
+        if (findActiveDogHandlerReferenceById(spaceId).isEmpty()) {
+            return Page.empty();
+        }
         return query()
-                .where(COURSE.participants.contains(space), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
+                .where(COURSE.participants.any().dogHasHandler.id.eq(spaceId), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
                 .fetchPage(pageable);
     }
 
@@ -48,17 +48,11 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         var criteria = createTimeRangeCriteria(from, to);
         if (memberId != null) {
             criteria = criteria.and(COURSE.member.id.eq(memberId)
-                    .or(COURSE.coTrainers.contains(mapToCoTrainer(memberId)))
+                    .or(COURSE.coTrainers.any().member.id.eq(memberId))
                     .or(COURSE.participants.any().dogHasHandler.id.in(findDogHasHandlerIdsByMemberId(memberId))));
         }
         return query()
                 .where(criteria)
                 .stream();
-    }
-
-    private static CoTrainer mapToCoTrainer(UUID memberId) {
-        var memberReference = new MemberReference();
-        memberReference.setId(memberId);
-        return new CoTrainer(memberReference);
     }
 }

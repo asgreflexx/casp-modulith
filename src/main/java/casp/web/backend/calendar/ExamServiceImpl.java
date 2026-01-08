@@ -43,8 +43,7 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipan
 
     @Override
     public Page<ExamDto> getExamsByDogHasHandlerId(final UUID dogHasHandlerId, final Pageable pageable) {
-        var dogHasHandlerReference = findDogHandlerReferenceByIdOrThrowException(dogHasHandlerId);
-        var examPage = examRepository.findAllByParticipant(new ExamParticipant(dogHasHandlerReference), pageable);
+        var examPage = examRepository.findAllByParticipantId(dogHasHandlerId, pageable);
         return EXAM_MAPPER.toTargetPage(examPage);
     }
 

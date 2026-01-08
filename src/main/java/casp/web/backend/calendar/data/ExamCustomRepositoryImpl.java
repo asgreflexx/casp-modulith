@@ -1,6 +1,5 @@
 package casp.web.backend.calendar.data;
 
-import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.enums.EntityStatus;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,14 @@ class ExamCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Exam> imple
     }
 
     @Override
-    public Page<Exam> findAllByParticipant(ExamParticipant participant, Pageable pageable) {
+    public Page<Exam> findAllByParticipantId(UUID participantId, Pageable pageable) {
+        if (findActiveDogHandlerReferenceById(participantId).isEmpty()) {
+            return Page.empty();
+        }
+
+        var participantCriteria = EXAM.participants.any().dogHasHandler.id.eq(participantId);
         return query()
-                .where(EXAM.participants.contains(participant), EXAM.entityStatus.eq(EntityStatus.ACTIVE))
+                .where(participantCriteria, EXAM.entityStatus.eq(EntityStatus.ACTIVE))
                 .fetchPage(pageable);
     }
 

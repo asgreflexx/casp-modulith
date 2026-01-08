@@ -87,13 +87,15 @@ class CourseCustomRepositoryImplTest {
     }
 
     @Nested
-    class FindAllBySpace {
+    class FindAllBySpaceId {
 
         private Space space;
+        private DogHasHandlerReference dogHasHandlerReference;
 
         @BeforeEach
         void setUp() {
-            space = new Space(createDogHasHandlerReference());
+            dogHasHandlerReference = createDogHasHandlerReference();
+            space = new Space(dogHasHandlerReference);
             course.setSpaceLimit(course.getSpaceLimit() + 1);
             course.addSpace(space);
             courseRepository.save(course);
@@ -106,7 +108,7 @@ class CourseCustomRepositoryImplTest {
             course2.addSpace(space);
             courseRepository.save(course2);
 
-            var courseSet = courseRepository.findAllBySpace(space, Pageable.unpaged());
+            var courseSet = courseRepository.findAllBySpaceId(space.getId(), Pageable.unpaged());
 
             assertThat(courseSet).
                     containsExactlyInAnyOrder(course, course2);
@@ -120,10 +122,24 @@ class CourseCustomRepositoryImplTest {
             course2.setEntityStatus(EntityStatus.DELETED);
             courseRepository.save(course2);
 
-            var coursePage = courseRepository.findAllBySpace(space, Pageable.unpaged());
+            var coursePage = courseRepository.findAllBySpaceId(space.getId(), Pageable.unpaged());
 
             assertThat(coursePage).
                     containsExactlyInAnyOrder(course);
+        }
+
+        @Test
+        void spaceIsNotActive() {
+            dogHasHandlerReference.setEntityStatus(EntityStatus.DELETED);
+            dogHasHandlerReferenceRepository.save(dogHasHandlerReference);
+            var course2 = createCourse();
+            course2.setSpaceLimit(1);
+            course2.addSpace(space);
+            courseRepository.save(course2);
+
+            var coursePage = courseRepository.findAllBySpaceId(space.getId(), Pageable.unpaged());
+
+            assertThat(coursePage).isEmpty();
         }
     }
 

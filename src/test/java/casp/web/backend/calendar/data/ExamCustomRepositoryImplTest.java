@@ -3,6 +3,7 @@ package casp.web.backend.calendar.data;
 import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,10 +39,11 @@ class ExamCustomRepositoryImplTest {
     class FindAllByParticipantId {
 
         private ExamParticipant participant;
+        private DogHasHandlerReference dogHasHandlerReference;
 
         @BeforeEach
         void setUp() {
-            var dogHasHandlerReference = dogHasHandlerReferenceRepository.save(ReferenceTestFixture.createDogHasHandlerReference());
+            dogHasHandlerReference = dogHasHandlerReferenceRepository.save(ReferenceTestFixture.createDogHasHandlerReference());
             participant = new ExamParticipant(dogHasHandlerReference);
         }
 
@@ -50,7 +52,7 @@ class ExamCustomRepositoryImplTest {
             var exam1 = createExam("Exam1", EntityStatus.ACTIVE, participant);
             var exam2 = createExam("Exam2", EntityStatus.ACTIVE, participant);
 
-            var examPage = examRepository.findAllByParticipant(participant, Pageable.unpaged());
+            var examPage = examRepository.findAllByParticipantId(participant.getId(), Pageable.unpaged());
 
             assertThat(examPage)
                     .containsExactlyInAnyOrder(exam1, exam2);
@@ -61,10 +63,21 @@ class ExamCustomRepositoryImplTest {
             var exam1 = createExam("Exam1", EntityStatus.ACTIVE, participant);
             createExam("Exam2", EntityStatus.INACTIVE, participant);
 
-            var examPage = examRepository.findAllByParticipant(participant, Pageable.unpaged());
+            var examPage = examRepository.findAllByParticipantId(participant.getId(), Pageable.unpaged());
 
             assertThat(examPage)
                     .containsExactlyInAnyOrder(exam1);
+        }
+
+        @Test
+        void participantIsNotActive() {
+            dogHasHandlerReference.setEntityStatus(EntityStatus.INACTIVE);
+            dogHasHandlerReferenceRepository.save(dogHasHandlerReference);
+            createExam("Exam1", EntityStatus.ACTIVE, participant);
+
+            var examPage = examRepository.findAllByParticipantId(participant.getId(), Pageable.unpaged());
+
+            assertThat(examPage).isEmpty();
         }
     }
 
