@@ -1,6 +1,5 @@
 package casp.web.backend.calendar.data;
 
-import casp.web.backend.calendar.data.participants.Space;
 import casp.web.backend.common.enums.EntityStatus;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +34,12 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     }
 
     @Override
-    public Page<Course> findAllBySpace(Space space, Pageable pageable) {
+    public Page<Course> findAllBySpaceId(UUID spaceId, Pageable pageable) {
+        if (findActiveDogHandlerReferenceById(spaceId).isEmpty()) {
+            return Page.empty();
+        }
         return query()
-                .where(COURSE.participants.contains(space), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
+                .where(COURSE.participants.any().dogHasHandler.id.eq(spaceId), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
                 .fetchPage(pageable);
     }
 

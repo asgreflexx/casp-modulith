@@ -125,15 +125,6 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
         return dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE);
     }
 
-    protected DogHasHandlerReference findDogHandlerReferenceByIdOrThrowException(UUID dogHasHandlerId) {
-        return findDogHandlerReferenceById(dogHasHandlerId)
-                .orElseThrow(() -> {
-                    var msg = "Dog has handler with id %s does not exist or it is not active.".formatted(dogHasHandlerId);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
-    }
-
     protected Set<P> getExistingParticipantsMatchingDtoParticipantIds(T dto) {
         return baseRepository.findOneByIdAndEntityStatus(dto.getId(), EntityStatus.ACTIVE)
                 .stream()

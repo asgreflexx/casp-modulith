@@ -374,29 +374,15 @@ class CourseServiceImplTest {
         }
     }
 
-    @Nested
-    class GetCoursesByDogHasHandlerId {
-        @Test
-        void dogHasHandlerDoesNotExist() {
-            var dogHasHandlerId = UUID.randomUUID();
-            var unpaged = Pageable.unpaged();
-            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+    @Test
+    void getCoursesByDogHasHandlerId() {
+        var dogHasHandlerId = UUID.randomUUID();
+        when(courseRepository.findAllBySpaceId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(course)));
 
-            assertThrows(NoSuchElementException.class, () -> courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, unpaged));
-        }
+        var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
 
-        @Test
-        void dogHasHandlerExist() {
-            var dogHasHandlerId = UUID.randomUUID();
-            var dogHasHandler = new DogHasHandlerReference();
-            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
-            when(courseRepository.findAllBySpace(new Space(dogHasHandler), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(course)));
-
-            var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
-
-            assertThat(courseDtoPage)
-                    .containsExactly(COURSE_MAPPER.toTarget(course));
-        }
+        assertThat(courseDtoPage)
+                .containsExactly(COURSE_MAPPER.toTarget(course));
     }
 
     private Course getCourseSaved() {
