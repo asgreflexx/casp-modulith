@@ -1,7 +1,5 @@
 package casp.web.backend.calendar.data;
 
-import casp.web.backend.calendar.data.participants.EventParticipant;
-import casp.web.backend.common.reference.MemberReference;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -25,16 +23,10 @@ class EventCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Event> imp
         var criteria = createTimeRangeCriteria(from, to);
         if (memberId != null) {
             criteria = criteria.and(EVENT.member.id.eq(memberId)
-                    .or(EVENT.participants.contains(mapToParticipant(memberId))));
+                    .or(EVENT.participants.any().member.id.eq(memberId)));
         }
         return query()
                 .where(criteria)
                 .stream();
-    }
-
-    private EventParticipant mapToParticipant(UUID memberId) {
-        var memberReference = new MemberReference();
-        memberReference.setId(memberId);
-        return new EventParticipant(memberReference);
     }
 }
