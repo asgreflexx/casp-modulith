@@ -9,10 +9,10 @@ import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuer
 
 import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements BaseEventCustomRepository<T> {
     private static final QBaseEvent BASE_EVENT = QBaseEvent.baseEvent;
@@ -46,22 +46,24 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
                         .and(BASE_EVENT.minTime.loe(to)));
     }
 
+    protected SpringDataMongodbQuery<T> query() {
+        return new SpringDataMongodbQuery<>(mongoOperations, baseEventClass);
+    }
+
+    protected List<UUID> findDogHasHandlerIdsByMemberId(UUID memberId) {
+        var dogHasHandlerReference = QDogHasHandlerReference.dogHasHandlerReference;
+        var dogHasHandlerReferenceQuery = new SpringDataMongodbQuery<>(mongoOperations, DogHasHandlerReference.class);
+        return dogHasHandlerReferenceQuery.where(dogHasHandlerReference.entityStatus.eq(EntityStatus.ACTIVE)
+                        .and(dogHasHandlerReference.member.id.eq(memberId)))
+                .stream()
+                .map(DogHasHandlerReference::getId)
+                .toList();
+    }
+
     private Set<T> findAllByCriteria(BooleanExpression criteria) {
         return query()
                 .where(criteria)
                 .stream()
                 .collect(Collectors.toSet());
-    }
-
-    SpringDataMongodbQuery<T> query() {
-        return new SpringDataMongodbQuery<>(mongoOperations, baseEventClass);
-    }
-
-    protected Stream<DogHasHandlerReference> findDogHasHandlersByMemberId(UUID memberId) {
-        var dogHasHandlerReference = QDogHasHandlerReference.dogHasHandlerReference;
-        var dogHasHandlerReferenceQuery = new SpringDataMongodbQuery<>(mongoOperations, DogHasHandlerReference.class);
-        return dogHasHandlerReferenceQuery.where(dogHasHandlerReference.entityStatus.eq(EntityStatus.ACTIVE)
-                        .and(dogHasHandlerReference.member.id.eq(memberId)))
-                .stream();
     }
 }

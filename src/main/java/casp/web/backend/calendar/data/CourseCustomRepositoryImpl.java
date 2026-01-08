@@ -3,7 +3,6 @@ package casp.web.backend.calendar.data;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.MemberReference;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -51,7 +49,7 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         if (memberId != null) {
             criteria = criteria.and(COURSE.member.id.eq(memberId)
                     .or(COURSE.coTrainers.contains(mapToCoTrainer(memberId)))
-                    .or(COURSE.participants.any().dogHasHandler.in(findDogHasHandlersAndMapToSpaces(memberId))));
+                    .or(COURSE.participants.any().dogHasHandler.id.in(findDogHasHandlerIdsByMemberId(memberId))));
         }
         return query()
                 .where(criteria)
@@ -63,9 +61,4 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         memberReference.setId(memberId);
         return new CoTrainer(memberReference);
     }
-
-    private List<DogHasHandlerReference> findDogHasHandlersAndMapToSpaces(UUID memberId) {
-        return findDogHasHandlersByMemberId(memberId).toList();
-    }
-
 }
