@@ -1,5 +1,7 @@
 package casp.web.backend.calendar.data;
 
+import casp.web.backend.calendar.CoursesFeesStatsByYearDto;
+import casp.web.backend.calendar.CoursesFeesStatsDto;
 import casp.web.backend.calendar.data.participants.QSpace;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.deprecated.dog.QDogHasHandler;
@@ -68,7 +70,7 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     // "%s.%s" is a false positive
     @SuppressWarnings("java:S1192")
     @Override
-    public CoursesFeesStats getCoursesFeesStats() {
+    public CoursesFeesStatsDto getCoursesFeesStats() {
         var thisYear = LocalDate.now().getYear();
         var lastYear = thisYear - 1;
         var twoYearsAgo = thisYear - 2;
@@ -104,10 +106,10 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         var thisYearStats = generateCoursesFeesStatsByYear(thisYear, coursesFeesStatsMap);
         var lastYearStats = generateCoursesFeesStatsByYear(lastYear, coursesFeesStatsMap);
         var twoYearsAgoStats = generateCoursesFeesStatsByYear(twoYearsAgo, coursesFeesStatsMap);
-        return new CoursesFeesStats(thisYearStats, lastYearStats, twoYearsAgoStats);
+        return new CoursesFeesStatsDto(thisYearStats, lastYearStats, twoYearsAgoStats);
     }
 
-    private CoursesFeesStatsByYear generateCoursesFeesStatsByYear(int year, Map<Integer, Double> coursesFeesStatsMap) {
-        return new CoursesFeesStatsByYear(year, coursesFeesStatsMap.getOrDefault(year, 0.0));
+    private CoursesFeesStatsByYearDto generateCoursesFeesStatsByYear(int year, Map<Integer, Double> coursesFeesStatsMap) {
+        return new CoursesFeesStatsByYearDto(year, coursesFeesStatsMap.getOrDefault(year, 0.0));
     }
 }

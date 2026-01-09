@@ -16,4 +16,6 @@ public interface CourseService extends BaseEventService<CourseDto> {
     CourseDto updateSpaces(UUID courseId, long courseVersion, Set<SpaceDto> spaceDto);
 
     Page<CourseDto> getCoursesByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable);
+
+    CoursesFeesStatsDto getCoursesFeesStats();
 }

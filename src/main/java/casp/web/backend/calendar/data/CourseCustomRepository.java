@@ -1,5 +1,6 @@
 package casp.web.backend.calendar.data;
 
+import casp.web.backend.calendar.CoursesFeesStatsDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -10,5 +11,5 @@ public interface CourseCustomRepository extends BaseEventCustomRepository<Course
 
     Page<Course> findAllBySpaceId(UUID spaceId, Pageable pageable);
 
-    CoursesFeesStats getCoursesFeesStats();
+    CoursesFeesStatsDto getCoursesFeesStats();
 }

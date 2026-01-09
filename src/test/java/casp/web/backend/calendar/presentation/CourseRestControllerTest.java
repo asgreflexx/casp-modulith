@@ -3,6 +3,7 @@ package casp.web.backend.calendar.presentation;
 import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.calendar.CourseDto;
 import casp.web.backend.calendar.CourseService;
+import casp.web.backend.calendar.CoursesFeesStatsDto;
 import casp.web.backend.calendar.data.participants.Space;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -118,6 +119,17 @@ class CourseRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).containsExactly(COURSE_READ_MAPPER.toTarget(courseDto));
+    }
+
+    @Test
+    void getCoursesFeesStats() {
+        var expectedCoursesFeesStatsDto = mock(CoursesFeesStatsDto.class);
+        when(courseService.getCoursesFeesStats()).thenReturn(expectedCoursesFeesStatsDto);
+
+        var response = courseRestController.getCoursesFeesStats();
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).isEqualTo(expectedCoursesFeesStatsDto);
     }
 
     @Test

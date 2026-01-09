@@ -1,6 +1,7 @@
 package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.CourseService;
+import casp.web.backend.calendar.CoursesFeesStatsDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springdoc.core.annotations.ParameterObject;
@@ -88,5 +89,10 @@ class CourseRestController {
     ResponseEntity<Void> migrateDataToV2() {
         courseService.migrateDataToV2();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("courses-fees-stats")
+    ResponseEntity<CoursesFeesStatsDto> getCoursesFeesStats() {
+        return ResponseEntity.ok(courseService.getCoursesFeesStats());
     }
 }

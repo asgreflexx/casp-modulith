@@ -86,6 +86,11 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
         return COURSE_MAPPER.toTargetPage(coursePage);
     }
 
+    @Override
+    public CoursesFeesStatsDto getCoursesFeesStats() {
+        return courseRepository.getCoursesFeesStats();
+    }
+
     private void setCoTrainers(CourseDto courseDto, Course course) {
         course.addCoTrainers(mapToCoTrainers(courseDto.getCoTrainerIds()));
     }
