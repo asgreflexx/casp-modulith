@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -46,21 +47,33 @@ class MemberCustomRepositoryImplTest {
         createMember("deleted", "deleted", EntityStatus.DELETED, null);
     }
 
-    private Member createMember(String firstName, String lastName, EntityStatus entityStatus, @Nullable Role role) {
-        var member = new Member();
-        member.setFirstName(firstName);
-        member.setLastName(lastName);
-        member.setEntityStatus(entityStatus);
-        member.setEmail("%s.%s@mail.com".formatted(firstName.toLowerCase(), lastName.toLowerCase()));
-        Optional.ofNullable(role).ifPresent(member.getRoles()::add);
-        member = memberRepository.save(member);
-        return member;
-    }
-
     @Test
     void findAllActiveMembersEmails() {
         assertThat(memberRepository.findAllActiveMembersEmails())
                 .containsExactlyInAnyOrder(john.getEmail(), doe.getEmail());
+    }
+
+    @Test
+    void getMembershipFeesStats() {
+        addMembershipFee(LocalDate.now(), john);
+        addMembershipFee(LocalDate.now(), john);
+        addMembershipFee(LocalDate.now().minusYears(1), john);
+        addMembershipFee(LocalDate.now().minusYears(3), john);
+        doe.setEntityStatus(EntityStatus.INACTIVE);
+        addMembershipFee(LocalDate.now(), doe);
+
+        var membershipFeesStats = memberRepository.getMembershipFeesStats();
+
+        var thisYear = membershipFeesStats.thisYear();
+        var lastYear = membershipFeesStats.lastYear();
+        var twoYearsAgo = membershipFeesStats.twoYearsAgo();
+        var year = LocalDate.now().getYear();
+        assertEquals(year, thisYear.year());
+        assertEquals(2.0, thisYear.totalPaid());
+        assertEquals(year - 1, lastYear.year());
+        assertEquals(1.0, lastYear.totalPaid());
+        assertEquals(year - 2, twoYearsAgo.year());
+        assertEquals(0.0, twoYearsAgo.totalPaid());
     }
 
     @Nested
@@ -101,6 +114,25 @@ class MemberCustomRepositoryImplTest {
             var memberId = UUID.randomUUID();
             assertThrows(NoSuchElementException.class, () -> memberRepository.findByIdAndEntityStatusCustom(memberId, EntityStatus.DELETED));
         }
+    }
+
+    private Member createMember(String firstName, String lastName, EntityStatus entityStatus, @Nullable Role role) {
+        var member = new Member();
+        member.setFirstName(firstName);
+        member.setLastName(lastName);
+        member.setEntityStatus(entityStatus);
+        member.setEmail("%s.%s@mail.com".formatted(firstName.toLowerCase(), lastName.toLowerCase()));
+        Optional.ofNullable(role).ifPresent(member.getRoles()::add);
+        member = memberRepository.save(member);
+        return member;
+    }
+
+    private void addMembershipFee(LocalDate paidDate, Member member) {
+        var membershipFee = new MembershipFee();
+        membershipFee.setPaidDate(paidDate);
+        membershipFee.setPaidPrice(1.0);
+        member.getMembershipFees().add(membershipFee);
+        memberRepository.save(member);
     }
 }
 

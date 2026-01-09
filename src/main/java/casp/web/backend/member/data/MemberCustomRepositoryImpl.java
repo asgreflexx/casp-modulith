@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -24,24 +25,13 @@ import java.util.stream.Collectors;
 class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private static final Logger LOG = LoggerFactory.getLogger(MemberCustomRepositoryImpl.class);
     private static final QMember MEMBER = QMember.member;
+    private static final BooleanExpression ACTIVE_MEMBER_STATUS_FILTER = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
     private static final String SPLIT_WORDS_WITH_SPACE = " ";
     private final MongoOperations mongoOperations;
 
     @Autowired
     MemberCustomRepositoryImpl(MongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
-    }
-
-    private static BooleanExpression[] splitIntoWords(String name) {
-        return Arrays.stream(name.trim().split(SPLIT_WORDS_WITH_SPACE))
-                .map(String::trim)
-                .filter(ObjectUtils::isNotEmpty)
-                .map(MemberCustomRepositoryImpl::createFullTextExpression)
-                .toArray(BooleanExpression[]::new);
-    }
-
-    private static BooleanExpression createFullTextExpression(String word) {
-        return MEMBER.firstName.containsIgnoreCase(word).or(MEMBER.lastName.containsIgnoreCase(word));
     }
 
     @Override
@@ -72,14 +62,53 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     @Override
     public Set<String> findAllActiveMembersEmails() {
         return createQuery()
-                .where(MEMBER.entityStatus.eq(EntityStatus.ACTIVE))
+                .where(ACTIVE_MEMBER_STATUS_FILTER)
                 .fetch()
                 .stream()
                 .map(Member::getEmail)
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public MembershipFeesStats getMembershipFeesStats() {
+        var year = LocalDate.now().getYear();
+        var thisYear = sumMembershipFeesByYear(year);
+        var lastYear = sumMembershipFeesByYear(year - 1);
+        var twoYearsAgo = sumMembershipFeesByYear(year - 2);
+        return new MembershipFeesStats(thisYear, lastYear, twoYearsAgo);
+    }
+
+    private static BooleanExpression[] splitIntoWords(String name) {
+        return Arrays.stream(name.trim().split(SPLIT_WORDS_WITH_SPACE))
+                .map(String::trim)
+                .filter(ObjectUtils::isNotEmpty)
+                .map(MemberCustomRepositoryImpl::createFullTextExpression)
+                .toArray(BooleanExpression[]::new);
+    }
+
+    private static BooleanExpression createFullTextExpression(String word) {
+        return MEMBER.firstName.containsIgnoreCase(word).or(MEMBER.lastName.containsIgnoreCase(word));
+    }
+
+    private static double calculateTotalPaidFeesForYear(int year, Set<MembershipFee> msf) {
+        return msf
+                .stream()
+                .filter(m -> m.getPaidDate().getYear() == year)
+                .mapToDouble(MembershipFee::getPaidPrice).sum();
+    }
+
     private SpringDataMongodbQuery<Member> createQuery() {
         return new SpringDataMongodbQuery<>(mongoOperations, Member.class);
+    }
+
+    private MembershipFeesStatsByYear sumMembershipFeesByYear(int year) {
+        var paymentRange = MEMBER.membershipFees.any().paidDate.between(LocalDate.of(year, 1, 1),
+                LocalDate.of(year, 12, 31));
+        double totalPaid = createQuery()
+                .where(ACTIVE_MEMBER_STATUS_FILTER, paymentRange)
+                .stream()
+                .map(member -> calculateTotalPaidFeesForYear(year, member.getMembershipFees()))
+                .reduce(0.0, Double::sum);
+        return new MembershipFeesStatsByYear(year, totalPaid);
     }
 }

@@ -14,4 +14,6 @@ public interface MemberCustomRepository {
     Member findByIdAndEntityStatusCustom(UUID id, EntityStatus entityStatus);
 
     Set<String> findAllActiveMembersEmails();
+
+    MembershipFeesStats getMembershipFeesStats();
 }
