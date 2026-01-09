@@ -1,6 +1,8 @@
 package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.member.MembershipFeesStatsByYearDto;
+import casp.web.backend.member.MembershipFeesStatsDto;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.apache.commons.lang3.ObjectUtils;
 import org.slf4j.Logger;
@@ -76,7 +78,7 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public MembershipFeesStats getMembershipFeesStats() {
+    public MembershipFeesStatsDto getMembershipFeesStats() {
         var thisYear = LocalDate.now().getYear();
         var lastYear = thisYear - 1;
         var twoYearsAgo = thisYear - 2;
@@ -102,7 +104,7 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
         var thisYearStats = generateMembershipFeesStatsByYear(thisYear, membershipFeesStatsMap);
         var lastYearStats = generateMembershipFeesStatsByYear(lastYear, membershipFeesStatsMap);
         var twoYearsAgoStats = generateMembershipFeesStatsByYear(twoYearsAgo, membershipFeesStatsMap);
-        return new MembershipFeesStats(thisYearStats, lastYearStats, twoYearsAgoStats);
+        return new MembershipFeesStatsDto(thisYearStats, lastYearStats, twoYearsAgoStats);
     }
 
     private static BooleanExpression[] splitIntoWords(String name) {
@@ -117,8 +119,8 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
         return MEMBER.firstName.containsIgnoreCase(word).or(MEMBER.lastName.containsIgnoreCase(word));
     }
 
-    private static MembershipFeesStatsByYear generateMembershipFeesStatsByYear(int year, Map<Integer, Double> membershipFeesStatsMap) {
-        return new MembershipFeesStatsByYear(year, membershipFeesStatsMap.getOrDefault(year, 0.0));
+    private static MembershipFeesStatsByYearDto generateMembershipFeesStatsByYear(int year, Map<Integer, Double> membershipFeesStatsMap) {
+        return new MembershipFeesStatsByYearDto(year, membershipFeesStatsMap.getOrDefault(year, 0.0));
     }
 
     private SpringDataMongodbQuery<Member> createQuery() {

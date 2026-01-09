@@ -1,6 +1,7 @@
 package casp.web.backend.member.presentation;
 
 import casp.web.backend.member.MemberService;
+import casp.web.backend.member.MembershipFeesStatsDto;
 import casp.web.backend.member.data.Role;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
@@ -91,5 +92,10 @@ class MemberRestController {
     @PostMapping("toggle-status/{id}")
     ResponseEntity<MemberRead> toggleStatus(final @PathVariable UUID id) {
         return ResponseEntity.ok(READ_MAPPER.toTarget(memberService.toggleStatus(id)));
+    }
+
+    @GetMapping("membership-fees-stats")
+    ResponseEntity<MembershipFeesStatsDto> getMembershipFeesStats() {
+        return ResponseEntity.ok(memberService.getMembershipFeesStats());
     }
 }

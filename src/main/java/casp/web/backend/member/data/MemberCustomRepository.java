@@ -1,6 +1,7 @@
 package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.member.MembershipFeesStatsDto;
 import jakarta.annotation.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,5 +16,5 @@ public interface MemberCustomRepository {
 
     Set<String> findAllActiveMembersEmails();
 
-    MembershipFeesStats getMembershipFeesStats();
+    MembershipFeesStatsDto getMembershipFeesStats();
 }

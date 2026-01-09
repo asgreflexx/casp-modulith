@@ -132,6 +132,16 @@ class MemberServiceImplTest {
         assertThat(emailSet).containsExactly(email);
     }
 
+    @Test
+    void getMembershipFeesStats() {
+        var expectedMembershipFeesStatsDto = mock(MembershipFeesStatsDto.class);
+        when(memberRepository.getMembershipFeesStats()).thenReturn(expectedMembershipFeesStatsDto);
+
+        MembershipFeesStatsDto actualMembershipFeesStatsDto = memberService.getMembershipFeesStats();
+
+        assertEquals(expectedMembershipFeesStatsDto, actualMembershipFeesStatsDto);
+    }
+
     @Nested
     class GetMemberId {
         @Test
