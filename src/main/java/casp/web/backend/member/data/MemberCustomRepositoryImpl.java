@@ -9,11 +9,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -26,7 +29,10 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private static final Logger LOG = LoggerFactory.getLogger(MemberCustomRepositoryImpl.class);
     private static final QMember MEMBER = QMember.member;
     private static final BooleanExpression ACTIVE_MEMBER_STATUS_FILTER = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
+    private static final QMembershipFee MEMBERSHIP_FEE = QMembershipFee.membershipFee;
     private static final String SPLIT_WORDS_WITH_SPACE = " ";
+    private static final String TOTAL_PAID = "totalPaid";
+    private static final String AGGREGATION_ID = "_id";
     private final MongoOperations mongoOperations;
 
     @Autowired
@@ -71,11 +77,32 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     @Override
     public MembershipFeesStats getMembershipFeesStats() {
-        var year = LocalDate.now().getYear();
-        var thisYear = sumMembershipFeesByYear(year);
-        var lastYear = sumMembershipFeesByYear(year - 1);
-        var twoYearsAgo = sumMembershipFeesByYear(year - 2);
-        return new MembershipFeesStats(thisYear, lastYear, twoYearsAgo);
+        var thisYear = LocalDate.now().getYear();
+        var lastYear = thisYear - 1;
+        var twoYearsAgo = thisYear - 2;
+        var membershipFeeFieldName = MEMBER.membershipFees.getMetadata().getName();
+        var paidDateFieldName = MEMBERSHIP_FEE.paidDate.getMetadata().getName();
+        var paidPriceFieldName = MEMBERSHIP_FEE.paidPrice.getMetadata().getName();
+
+        var aggregation = Aggregation.newAggregation(
+                Aggregation.match(Criteria.where(MEMBER.entityStatus.getMetadata().getName()).is(EntityStatus.ACTIVE.name())),
+                Aggregation.unwind(membershipFeeFieldName),
+                Aggregation.project()
+                        .and("%s.%s".formatted(membershipFeeFieldName, paidDateFieldName)).extractYear().as(paidDateFieldName)
+                        .and("%s.%s".formatted(membershipFeeFieldName, paidPriceFieldName)).as(paidPriceFieldName),
+                Aggregation.match(Criteria.where(paidDateFieldName).in(twoYearsAgo, lastYear, thisYear)),
+                Aggregation.group(paidDateFieldName).sum(paidPriceFieldName).as(TOTAL_PAID)
+        );
+        var membershipFeesStatsMap = mongoOperations.aggregate(aggregation, Member.class, Map.class)
+                .getMappedResults()
+                .stream()
+                .collect(Collectors.toMap(v -> (Integer) v.get(AGGREGATION_ID),
+                        v -> (Double) v.get(TOTAL_PAID)));
+
+        var thisYearStats = generateMembershipFeesStatsByYear(thisYear, membershipFeesStatsMap);
+        var lastYearStats = generateMembershipFeesStatsByYear(lastYear, membershipFeesStatsMap);
+        var twoYearsAgoStats = generateMembershipFeesStatsByYear(twoYearsAgo, membershipFeesStatsMap);
+        return new MembershipFeesStats(thisYearStats, lastYearStats, twoYearsAgoStats);
     }
 
     private static BooleanExpression[] splitIntoWords(String name) {
@@ -90,25 +117,11 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
         return MEMBER.firstName.containsIgnoreCase(word).or(MEMBER.lastName.containsIgnoreCase(word));
     }
 
-    private static double calculateTotalPaidFeesForYear(int year, Set<MembershipFee> msf) {
-        return msf
-                .stream()
-                .filter(m -> m.getPaidDate().getYear() == year)
-                .mapToDouble(MembershipFee::getPaidPrice).sum();
+    private static MembershipFeesStatsByYear generateMembershipFeesStatsByYear(int year, Map<Integer, Double> membershipFeesStatsMap) {
+        return new MembershipFeesStatsByYear(year, membershipFeesStatsMap.getOrDefault(year, 0.0));
     }
 
     private SpringDataMongodbQuery<Member> createQuery() {
         return new SpringDataMongodbQuery<>(mongoOperations, Member.class);
-    }
-
-    private MembershipFeesStatsByYear sumMembershipFeesByYear(int year) {
-        var paymentRange = MEMBER.membershipFees.any().paidDate.between(LocalDate.of(year, 1, 1),
-                LocalDate.of(year, 12, 31));
-        double totalPaid = createQuery()
-                .where(ACTIVE_MEMBER_STATUS_FILTER, paymentRange)
-                .stream()
-                .map(member -> calculateTotalPaidFeesForYear(year, member.getMembershipFees()))
-                .reduce(0.0, Double::sum);
-        return new MembershipFeesStatsByYear(year, totalPaid);
     }
 }
