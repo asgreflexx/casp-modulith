@@ -3,6 +3,7 @@ package casp.web.backend.member.presentation;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.member.MemberDto;
 import casp.web.backend.member.MemberService;
+import casp.web.backend.member.MembershipFeesStatsDto;
 import casp.web.backend.member.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +23,7 @@ import static casp.web.backend.member.presentation.MemberReadMapper.READ_MAPPER;
 import static casp.web.backend.member.presentation.MemberWriteMapper.WRITE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -114,6 +116,16 @@ class MemberRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).isEqualTo(READ_MAPPER.toTarget(memberDto));
+    }
 
+    @Test
+    void getMembershipFeesStats() {
+        var expectedMembershipFeesStatsDto = mock(MembershipFeesStatsDto.class);
+        when(memberService.getMembershipFeesStats()).thenReturn(expectedMembershipFeesStatsDto);
+
+        var response = memberRestController.getMembershipFeesStats();
+
+        assertSame(HttpStatus.OK, response.getStatusCode());
+        assertThat(response.getBody()).isEqualTo(expectedMembershipFeesStatsDto);
     }
 }

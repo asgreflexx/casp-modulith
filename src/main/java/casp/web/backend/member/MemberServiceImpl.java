@@ -113,6 +113,11 @@ class MemberServiceImpl implements MemberService {
         return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
 
+    @Override
+    public MembershipFeesStatsDto getMembershipFeesStats() {
+        return memberRepository.getMembershipFeesStats();
+    }
+
     // if member exists, it must be active
     // if an existing member already contains the member.email, it will fail
     private void analyseMember(Member member) {

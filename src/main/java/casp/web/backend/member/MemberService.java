@@ -31,4 +31,6 @@ public interface MemberService {
     Set<String> getActiveMembersEmail();
 
     MemberDto toggleStatus(UUID id);
+
+    MembershipFeesStatsDto getMembershipFeesStats();
 }
