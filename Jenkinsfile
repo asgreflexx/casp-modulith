@@ -8,15 +8,10 @@ pipeline {
 
     agent any
 
-    environment {
-        EXPECTED_BRANCH_NAME = 'develop'
-        EXPECTED_RESULT = 'SUCCESS'
-        CODACY_CREDENTIALS = credentials('codacy-token')
-    }
-
     options {
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '5'))
+        skipStagesAfterUnstable()
     }
 
     tools {
@@ -34,22 +29,14 @@ pipeline {
         }
 
         stage('Docker Build and Push') {
-            when {
-                expression {
-                    env.BRANCH_NAME == env.EXPECTED_BRANCH_NAME && currentBuild.currentResult == env.EXPECTED_RESULT
-                }
-            }
+            when { branch 'develop' }
             steps {
                 buildImageAndPush(Service.ADMIN_V2)
             }
         }
 
         stage('Restart Service') {
-            when {
-                expression {
-                    env.BRANCH_NAME == env.EXPECTED_BRANCH_NAME && currentBuild.currentResult == env.EXPECTED_RESULT
-                }
-            }
+            when { branch 'develop' }
             steps {
                 updateAndRestartService(Environment.TEST, Service.ADMIN_V2)
             }
