@@ -1,5 +1,6 @@
 package casp.web.backend;
 
+import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 
@@ -26,5 +27,18 @@ public enum ReferenceTestFixture {
         var dogReference = new DogReference();
         dogReference.setName(name);
         return dogReference;
+    }
+
+    public static DogHasHandlerReference createDogHasHandlerReference(String dogName, String firstName, String lastName) {
+        var dogReference = createDogReference(dogName);
+        var memberReference = createMemberReference(firstName, lastName);
+        var dogHasHandlerReference = new DogHasHandlerReference();
+        dogHasHandlerReference.setDog(dogReference);
+        dogHasHandlerReference.setMember(memberReference);
+        return dogHasHandlerReference;
+    }
+
+    public static DogHasHandlerReference createDogHasHandlerReference() {
+        return createDogHasHandlerReference("Riley", "John", "Doe");
     }
 }

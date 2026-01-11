@@ -3,14 +3,8 @@ package casp.web.backend.calendar;
 import java.util.Set;
 import java.util.UUID;
 
-@CoTrainersDtoConstraint
-@SpacesDtoConstraint
-public interface CourseDtoRequiredFields extends BaseEventDtoRequiredFields, CourseRequiredFields {
-    Set<UUID> getNewCoTrainers();
+public interface CourseDtoRequiredFields extends CourseRequiredFields {
+    Set<UUID> getCoTrainerIds();
 
-    void setNewCoTrainers(Set<UUID> newCoTrainers);
-
-    Set<UUID> getNewSpaces();
-
-    void setNewSpaces(Set<UUID> newSpaces);
+    void setCoTrainerIds(Set<UUID> coTrainerIds);
 }

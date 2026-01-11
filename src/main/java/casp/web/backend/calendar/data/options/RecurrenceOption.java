@@ -1,13 +1,23 @@
 package casp.web.backend.calendar.data.options;
 
 import casp.web.backend.calendar.options.BaseRecurrenceOptionType;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@BaseEventOptionRecurrencesConstraint
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = "optionType"
+)
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = DailyRecurrenceOption.class, name = "DAILY"),
+        @JsonSubTypes.Type(value = WeeklyRecurrenceOption.class, name = "WEEKLY")
+})
 public abstract class RecurrenceOption implements BaseEventOptionValidation {
     @NotNull
     protected BaseRecurrenceOptionType optionType;

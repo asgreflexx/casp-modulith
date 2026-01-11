@@ -4,29 +4,28 @@ import casp.web.backend.calendar.data.Course;
 import casp.web.backend.calendar.data.CourseRepository;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
-import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 
 @Service
-class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implements CourseService {
+class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> implements CourseService {
     private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
     private final CourseRepository courseRepository;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
     CourseServiceImpl(CourseRepository courseRepository,
@@ -35,24 +34,6 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
                       BaseEventMigrationService migrationService) {
         super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
         this.courseRepository = courseRepository;
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
-    }
-
-    private static void removeSpace(Course course, UUID spaceId) {
-        course.removeSpace(findSpaceById(course, spaceId));
-    }
-
-    private static Space findSpaceById(Course course, UUID spaceId) {
-        return course
-                .getSpaces()
-                .stream()
-                .filter(s -> s.getId().equals(spaceId))
-                .findAny()
-                .orElseThrow(() -> {
-                    var msg = "Space with id %s not found in course with id %s.".formatted(spaceId, course.getId());
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
     }
 
     @Override
@@ -61,7 +42,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
 
         setCalendarEntriesAndMember(dto, course);
         setCoTrainers(dto, course);
-        setSpaces(dto, course);
+        setParticipants(dto, course);
 
         courseRepository.save(course);
     }
@@ -80,43 +61,38 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
     @Override
     public Set<String> getEmailsByCourseId(UUID id) {
         return getOneByIdOrThrowException(id)
-                .getSpaces()
+                .getParticipants()
                 .stream()
                 .map(s -> s.getDogHasHandler().getMember().getEmail())
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public void updateSpace(UUID courseId, SpaceDto spaceDto) {
+    public CourseDto updateSpaces(UUID courseId, long courseVersion, Set<SpaceDto> spaceDtos) {
         var course = getOneByIdOrThrowException(courseId);
-        removeSpace(course, spaceDto.getId());
-        course.addSpace(COURSE_MAPPER.toSpace(spaceDto));
-        courseRepository.save(course);
+        var actualVersion = course.getVersion();
+        if (actualVersion != courseVersion) {
+            var msg = "The course with id %s has been updated in the meantime. The actual version is %d".formatted(courseId, actualVersion);
+            LOG.error(msg);
+            throw new OptimisticLockingFailureException(msg);
+        }
+        course.setParticipants(COURSE_MAPPER.toSpaces(spaceDtos));
+        return COURSE_MAPPER.toTarget(courseRepository.save(course));
     }
 
     @Override
-    public void removeSpace(UUID courseId, UUID spaceId) {
-        var course = getOneByIdOrThrowException(courseId);
-        removeSpace(course, spaceId);
-        courseRepository.save(course);
-    }
-
-    @Override
-    public Page<CourseDto> getCourseByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
-        var space = dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)
-                .map(Space::new)
-                .orElseThrow(() -> {
-                    var msg = "Dog has handler with id %s does not exist or it is not active.".formatted(dogHasHandlerId);
-                    LOG.error(msg);
-                    return new NoSuchElementException(msg);
-                });
-        var coursePage = courseRepository.findAllBySpace(space, pageable);
+    public Page<CourseDto> getCoursesByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
+        var coursePage = courseRepository.findAllBySpaceId(dogHasHandlerId, pageable);
         return COURSE_MAPPER.toTargetPage(coursePage);
     }
 
+    @Override
+    public CoursesFeesStatsDto getCoursesFeesStats() {
+        return courseRepository.getCoursesFeesStats();
+    }
+
     private void setCoTrainers(CourseDto courseDto, Course course) {
-        var newCoTrainers = mapToCoTrainers(courseDto.getNewCoTrainers());
-        course.addCoTrainers(newCoTrainers);
+        course.addCoTrainers(mapToCoTrainers(courseDto.getCoTrainerIds()));
     }
 
     private Set<CoTrainer> mapToCoTrainers(Set<UUID> memberIds) {
@@ -128,17 +104,10 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto> implemen
                 .collect(Collectors.toSet());
     }
 
-    private void setSpaces(CourseDto courseDto, Course course) {
-        var newSpaces = mapToSpaces(courseDto.getNewSpaces());
-        course.addSpaces(newSpaces);
-    }
-
-    private Set<Space> mapToSpaces(Set<UUID> dogHasHandlerIds) {
-        return dogHasHandlerIds
-                .stream()
-                .flatMap(id -> findDogHandlerReferenceById(id)
-                        .map(Space::new)
-                        .stream())
-                .collect(Collectors.toSet());
+    @Override
+    Stream<Space> mapToParticipant(UUID id) {
+        return findDogHandlerReferenceById(id)
+                .map(Space::new)
+                .stream();
     }
 }

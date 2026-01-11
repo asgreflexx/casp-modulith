@@ -1,8 +1,5 @@
 package casp.web.backend.calendar.presentation;
 
-import casp.web.backend.calendar.CourseDtoRequiredFields;
-import casp.web.backend.calendar.data.participants.CoTrainer;
-import casp.web.backend.calendar.data.participants.Space;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 
@@ -10,63 +7,23 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class CourseWrite extends BaseEventWrite implements CourseDtoRequiredFields {
+public class CourseWrite extends BaseEventWrite {
     @JsonSetter(nulls = Nulls.SKIP)
-    private Set<CoTrainer> coTrainers = new HashSet<>();
-    @JsonSetter(nulls = Nulls.SKIP)
-    private Set<UUID> newCoTrainers = new HashSet<>();
-    @JsonSetter(nulls = Nulls.SKIP)
-    private Set<Space> spaces = new HashSet<>();
-    @JsonSetter(nulls = Nulls.SKIP)
-    private Set<UUID> newSpaces = new HashSet<>();
+    private Set<UUID> coTrainerIds = new HashSet<>();
     private int spaceLimit;
 
-    @Override
-    public Set<CoTrainer> getCoTrainers() {
-        return coTrainers;
+    public Set<UUID> getCoTrainerIds() {
+        return coTrainerIds;
     }
 
-    @Override
-    public void setCoTrainers(Set<CoTrainer> coTrainers) {
-        this.coTrainers = coTrainers;
+    public void setCoTrainerIds(Set<UUID> coTrainerIds) {
+        this.coTrainerIds = coTrainerIds;
     }
 
-    @Override
-    public Set<UUID> getNewCoTrainers() {
-        return newCoTrainers;
-    }
-
-    @Override
-    public void setNewCoTrainers(Set<UUID> newCoTrainers) {
-        this.newCoTrainers = newCoTrainers;
-    }
-
-    @Override
-    public Set<Space> getSpaces() {
-        return spaces;
-    }
-
-    @Override
-    public void setSpaces(Set<Space> spaces) {
-        this.spaces = spaces;
-    }
-
-    @Override
-    public Set<UUID> getNewSpaces() {
-        return newSpaces;
-    }
-
-    @Override
-    public void setNewSpaces(Set<UUID> newSpaces) {
-        this.newSpaces = newSpaces;
-    }
-
-    @Override
     public int getSpaceLimit() {
         return spaceLimit;
     }
 
-    @Override
     public void setSpaceLimit(int spaceLimit) {
         this.spaceLimit = spaceLimit;
     }

@@ -91,6 +91,12 @@ class DogHasHandlerRestController {
         return ResponseEntity.ok(READ_MAPPER.toTargetSet(dogHasHandlerService.getDogHasHandlerByDogId(dogId)));
     }
 
+    @PostMapping("correct-entity-status")
+    ResponseEntity<Void> correctEntityStatus() {
+        dogHasHandlerService.correctEntityStatus();
+        return ResponseEntity.noContent().build();
+    }
+
     /**
      * @deprecated It will be removed in #3.
      */

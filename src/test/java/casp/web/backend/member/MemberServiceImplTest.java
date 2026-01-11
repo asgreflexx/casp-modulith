@@ -2,7 +2,6 @@ package casp.web.backend.member;
 
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.deprecated.member.Card;
 import casp.web.backend.deprecated.member.CardRepository;
 import casp.web.backend.deprecated.member.MemberOldRepository;
@@ -47,8 +46,6 @@ class MemberServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
     @Mock
-    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
-    @Mock
     private CardRepository cardRepository;
     @Mock
     private MemberOldRepository memberOldRepository;
@@ -74,33 +71,12 @@ class MemberServiceImplTest {
     }
 
     @Test
-    void getMembersByFirstNameOrLastName() {
-        var page = new PageImpl<>(List.of(member));
-        var pageable = Pageable.unpaged();
-        when(memberRepository.findAllByFirstNameAndLastName(member.getFirstName(), member.getLastName(), pageable)).thenReturn(page);
-
-        var memberDtoPage = memberService.getMembersByFirstNameAndLastName(member.getFirstName(), member.getLastName(), pageable);
-
-        assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
-    @Test
-    void getMembersByEntityStatusAndName() {
+    void getMembersByEntityStatusNameAndRoles() {
         var page = new PageImpl<>(List.of(member));
         var name = "name";
-        when(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged())).thenReturn(page);
+        when(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, Pageable.unpaged())).thenReturn(page);
 
-        var memberDtoPage = memberService.getMembersByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged());
-
-        assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
-    }
-
-    @Test
-    void getMembersByName() {
-        var page = new PageImpl<>(List.of(member));
-        when(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, member.getLastName(), Pageable.unpaged())).thenReturn(page);
-
-        var memberDtoPage = memberService.getMembersByName(member.getLastName(), Pageable.unpaged());
+        var memberDtoPage = memberService.getMembersByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, Pageable.unpaged());
 
         assertThat(memberDtoPage).containsExactly(MEMBER_MAPPER.toTarget(member));
     }
@@ -110,28 +86,6 @@ class MemberServiceImplTest {
         when(memberRepository.findAllByIdInAndEntityStatus(Collections.singleton(member.getId()), EntityStatus.ACTIVE)).thenReturn(Set.of(member));
 
         assertThat(memberService.getMembersEmailByIds(Set.of(member.getId()))).containsExactly(member.getEmail());
-    }
-
-    @Test
-    void deactivateMember() {
-        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
-        when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
-
-        assertSame(EntityStatus.INACTIVE, memberService.deactivateMember(member.getId()).getEntityStatus());
-
-        verify(dogHasHandlerService).deactivateDogHasHandlersByMemberId(member.getId());
-        verify(baseEventObserver).deactivateBaseEventsByMemberId(member.getId());
-    }
-
-    @Test
-    void activateMember() {
-        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.INACTIVE)).thenReturn(member);
-        when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
-        memberService.activateMember(member.getId());
-
-        verify(member).setEntityStatus(EntityStatus.ACTIVE);
-        verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
-        verify(baseEventObserver).activateBaseEventsByMemberId(member.getId());
     }
 
     @Test
@@ -179,30 +133,42 @@ class MemberServiceImplTest {
     }
 
     @Test
-    void getMembersByNotDogId() {
-        var dogId = UUID.randomUUID();
-        when(memberRepository.findAllByNotDogId(dogId, null, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(member)));
+    void getMembershipFeesStats() {
+        var expectedMembershipFeesStatsDto = mock(MembershipFeesStatsDto.class);
+        when(memberRepository.getMembershipFeesStats()).thenReturn(expectedMembershipFeesStatsDto);
 
-        assertThat(memberService.getMembersByNotDogId(dogId, null, Pageable.unpaged()))
-                .containsExactly(MEMBER_MAPPER.toTarget(member));
+        MembershipFeesStatsDto actualMembershipFeesStatsDto = memberService.getMembershipFeesStats();
+
+        assertEquals(expectedMembershipFeesStatsDto, actualMembershipFeesStatsDto);
     }
 
+    @Nested
+    class GetMemberId {
+        @Test
+        void notDeleted() {
+            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
 
-    @Test
-    void getMemberId() {
-        when(memberRepository.findByIdAndEntityStatusCustom(member.getId(), EntityStatus.ACTIVE)).thenReturn(member);
+            var memberDto = memberService.getMemberById(member.getId());
 
-        var memberDto = memberService.getMemberById(member.getId());
+            assertThat(memberDto)
+                    .usingRecursiveAssertion()
+                    .isEqualTo(MEMBER_MAPPER.toTarget(member));
+        }
 
-        assertThat(memberDto)
-                .usingRecursiveAssertion()
-                .isEqualTo(MEMBER_MAPPER.toTarget(member));
+        @Test
+        void deleted() {
+            var memberId = member.getId();
+            when(memberRepository.findOneByIdAndEntityStatusNot(memberId, EntityStatus.DELETED)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> memberService.getMemberById(memberId));
+        }
     }
 
     @Nested
     class SaveMember {
         @Test
         void emailDoesNotExists() {
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
             when(memberRepository.save(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));
@@ -215,6 +181,7 @@ class MemberServiceImplTest {
 
         @Test
         void emailExistsButBelongsToOtherMember() {
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
             when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(new Member()));
             var memberDto = MEMBER_MAPPER.toTarget(member);
 
@@ -223,6 +190,7 @@ class MemberServiceImplTest {
 
         @Test
         void updateMember() {
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
             when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(member));
             when(memberRepository.save(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
@@ -232,6 +200,15 @@ class MemberServiceImplTest {
             assertThat(memberCaptor.getValue())
                     .usingRecursiveComparison()
                     .isEqualTo(member);
+        }
+
+        @Test
+        void memberIsDisabled() {
+            member.setEntityStatus(EntityStatus.INACTIVE);
+            var memberDto = MEMBER_MAPPER.toTarget(member);
+            when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+
+            assertThrows(IllegalStateException.class, () -> memberService.saveMember(memberDto));
         }
     }
 
@@ -258,6 +235,42 @@ class MemberServiceImplTest {
             verify(baseEventObserver).deleteBaseEventsByMemberId(member.getId());
             verify(member).setEntityStatus(EntityStatus.DELETED);
             verify(member).setEmail("%s---%s".formatted(member.getEmail(), member.getId()));
+        }
+    }
+
+    @Nested
+    class ToggleStatus {
+        @Test
+        void deleted() {
+            var memberId = member.getId();
+            when(memberRepository.findOneByIdAndEntityStatusNot(memberId, EntityStatus.DELETED)).thenThrow(new NoSuchElementException());
+
+            assertThrows(NoSuchElementException.class, () -> memberService.toggleStatus(memberId));
+        }
+
+        @Test
+        void deactivate() {
+            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
+            when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
+
+            var memberDto = memberService.toggleStatus(member.getId());
+
+            assertSame(EntityStatus.INACTIVE, memberDto.getEntityStatus());
+            verify(dogHasHandlerService).deactivateDogHasHandlersByMemberId(member.getId());
+            verify(baseEventObserver).deactivateBaseEventsByMemberId(member.getId());
+        }
+
+        @Test
+        void activate() {
+            member.setEntityStatus(EntityStatus.INACTIVE);
+            when(memberRepository.findOneByIdAndEntityStatusNot(member.getId(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
+            when(memberRepository.save(member)).thenAnswer(i -> i.getArgument(0));
+
+            var memberDto = memberService.toggleStatus(member.getId());
+
+            assertSame(EntityStatus.ACTIVE, memberDto.getEntityStatus());
+            verify(dogHasHandlerService).activateDogHasHandlersByMemberId(member.getId());
+            verify(baseEventObserver).activateBaseEventsByMemberId(member.getId());
         }
     }
 }

@@ -1,11 +1,8 @@
 package casp.web.backend.member.data;
 
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
-import casp.web.backend.common.reference.MemberReference;
 import jakarta.annotation.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -17,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -48,45 +47,33 @@ class MemberCustomRepositoryImplTest {
         createMember("deleted", "deleted", EntityStatus.DELETED, null);
     }
 
-    private Member createMember(String firstName, String lastName, EntityStatus entityStatus, @Nullable Role role) {
-        var member = new Member();
-        member.setFirstName(firstName);
-        member.setLastName(lastName);
-        member.setEntityStatus(entityStatus);
-        member.setEmail("%s.%s@mail.com".formatted(firstName.toLowerCase(), lastName.toLowerCase()));
-        Optional.ofNullable(role).ifPresent(member.getRoles()::add);
-        member = memberRepository.save(member);
-        return member;
-    }
-
     @Test
     void findAllActiveMembersEmails() {
         assertThat(memberRepository.findAllActiveMembersEmails())
                 .containsExactlyInAnyOrder(john.getEmail(), doe.getEmail());
     }
 
-    @Nested
-    class FindAllByFirstNameAndLastName {
+    @Test
+    void getMembershipFeesStats() {
+        addMembershipFee(LocalDate.now(), john);
+        addMembershipFee(LocalDate.now(), john);
+        addMembershipFee(LocalDate.now().minusYears(1), john);
+        addMembershipFee(LocalDate.now().minusYears(3), john);
+        doe.setEntityStatus(EntityStatus.INACTIVE);
+        addMembershipFee(LocalDate.now(), doe);
 
-        @Test
-        void findNoneByFirstNameAndLastName() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName("John", "Doe", Pageable.unpaged())).isEmpty();
-        }
+        var membershipFeesStats = memberRepository.getMembershipFeesStats();
 
-        @Test
-        void findOneByFirstName() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName("John", null, Pageable.unpaged())).containsExactly(john);
-        }
-
-        @Test
-        void findOneByLastName() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName(null, "John", Pageable.unpaged())).containsExactly(john);
-        }
-
-        @Test
-        void findAllWithoutValues() {
-            assertThat(memberRepository.findAllByFirstNameAndLastName(null, null, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
-        }
+        var thisYear = membershipFeesStats.thisYear();
+        var lastYear = membershipFeesStats.lastYear();
+        var twoYearsAgo = membershipFeesStats.twoYearsAgo();
+        var year = LocalDate.now().getYear();
+        assertEquals(year, thisYear.year());
+        assertEquals(2.0, thisYear.totalPaid());
+        assertEquals(year - 1, lastYear.year());
+        assertEquals(1.0, lastYear.totalPaid());
+        assertEquals(year - 2, twoYearsAgo.year());
+        assertEquals(0.0, twoYearsAgo.totalPaid());
     }
 
     @Nested
@@ -96,17 +83,22 @@ class MemberCustomRepositoryImplTest {
         @NullAndEmptySource
         @ValueSource(strings = {"    "})
         void findAllWithoutValue(String name) {
-            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, name, null, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
         }
 
         @Test
         void findOneByName() {
-            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, "John", Pageable.unpaged())).containsExactly(john);
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, "John", null, Pageable.unpaged())).containsExactly(john);
         }
 
         @Test
         void findAllByMultipleLettersSeparatedBySpaces() {
-            assertThat(memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, "J X D", Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, "J X D", null, Pageable.unpaged())).containsExactlyInAnyOrder(doe, john);
+        }
+
+        @Test
+        void findAllByRoles() {
+            assertThat(memberRepository.findAllByEntityStatusNameAndRoles(EntityStatus.ACTIVE, null, Set.of(Role.CASHIER), Pageable.unpaged())).containsExactlyInAnyOrder(doe);
         }
     }
 
@@ -124,43 +116,23 @@ class MemberCustomRepositoryImplTest {
         }
     }
 
-    @Nested
-    class FindAllByNotDogId {
-        private DogReference dogReference;
+    private Member createMember(String firstName, String lastName, EntityStatus entityStatus, @Nullable Role role) {
+        var member = new Member();
+        member.setFirstName(firstName);
+        member.setLastName(lastName);
+        member.setEntityStatus(entityStatus);
+        member.setEmail("%s.%s@mail.com".formatted(firstName.toLowerCase(), lastName.toLowerCase()));
+        Optional.ofNullable(role).ifPresent(member.getRoles()::add);
+        member = memberRepository.save(member);
+        return member;
+    }
 
-        @BeforeEach
-        void setUp() {
-            var johnReference = new MemberReference();
-            johnReference.setId(john.getId());
-            johnReference.setFirstName(john.getFirstName());
-            johnReference.setLastName(john.getLastName());
-            johnReference.setEmail(john.getEmail());
-            dogReference = new DogReference();
-            dogReference.setName("Bella");
-            dogReference = dogRepository.save(dogReference);
-            var dogHasHandler = new DogHasHandlerReference();
-            dogHasHandler.setDog(dogReference);
-            dogHasHandler.setMember(johnReference);
-            dogHasHandlerRepository.save(dogHasHandler);
-        }
-
-        @Test
-        void byDogId() {
-            assertThat(memberRepository.findAllByNotDogId(dogReference.getId(), null, Pageable.unpaged()))
-                    .containsExactly(doe);
-        }
-
-        @Test
-        void byDogIdAndFirstName() {
-            assertThat(memberRepository.findAllByNotDogId(dogReference.getId(), john.getFirstName(), Pageable.unpaged()))
-                    .isEmpty();
-        }
-
-        @Test
-        void byDogIdAndLastName() {
-            assertThat(memberRepository.findAllByNotDogId(dogReference.getId(), john.getLastName(), Pageable.unpaged()))
-                    .isEmpty();
-        }
+    private void addMembershipFee(LocalDate paidDate, Member member) {
+        var membershipFee = new MembershipFee();
+        membershipFee.setPaidDate(paidDate);
+        membershipFee.setPaidPrice(1.0);
+        member.getMembershipFees().add(membershipFee);
+        memberRepository.save(member);
     }
 }
 

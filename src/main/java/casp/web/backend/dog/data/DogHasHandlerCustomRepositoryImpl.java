@@ -50,6 +50,12 @@ class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository
     }
 
     @Override
+    public Set<DogHasHandler> findAllByDogIdAndEntityStatus(UUID dogId, EntityStatus entityStatus) {
+        var expression = DOG_HAS_HANDLER.dog.id.eq(dogId).and(DOG_HAS_HANDLER.entityStatus.eq(entityStatus));
+        return executeQuery(expression);
+    }
+
+    @Override
     public Page<DogHasHandler> findAllByValue(@Nullable String value, Pageable pageable) {
         var expression = DOG_HAS_HANDLER.entityStatus.eq(EntityStatus.ACTIVE);
         if (StringUtils.isNotBlank(value)) {

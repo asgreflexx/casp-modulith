@@ -41,9 +41,9 @@ class EventRestController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("{eventId}/calendar-entry/{calendarEntryId}")
-    ResponseEntity<EventRead> getCalendarEntry(@PathVariable UUID eventId, @PathVariable UUID calendarEntryId) {
-        var eventDto = eventService.getOneByIdAndCalendarEntryId(eventId, calendarEntryId);
+    @GetMapping("{id}")
+    ResponseEntity<EventRead> getOneById(@PathVariable UUID id) {
+        var eventDto = eventService.getOneById(id);
         return ResponseEntity.ok(EVENT_READ_MAPPER.toTarget(eventDto));
     }
 

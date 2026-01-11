@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -137,8 +138,15 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     @Override
     public Set<DogHasHandlerDto> getDogHasHandlerByDogId(UUID dogId) {
-        var dogHasHandlerSet = dogHasHandlerRepository.findAllByDogIdAndNotDeleted(dogId);
+        var dogHasHandlerSet = dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE);
         return DOG_HAS_HANDLER_MAPPER.toTargetSet(dogHasHandlerSet);
+    }
+
+    @Override
+    public void correctEntityStatus() {
+        var dogHasHandlers = new HashSet<>(dogHasHandlerRepository.findAll());
+        dogHasHandlers.forEach(this::setTheCorrectEntityStatus);
+        dogHasHandlerRepository.saveAll(dogHasHandlers);
     }
 
     @Override
@@ -188,7 +196,18 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
             var dogHasHandler = DOG_HAS_HANDLER_V2_MAPPER.toDogHasHandler(dh);
             dogHasHandler.setDog(dog);
             dogHasHandler.setMember(member);
+            setTheCorrectEntityStatus(dogHasHandler);
             return dogHasHandler;
         });
+    }
+
+    private void setTheCorrectEntityStatus(DogHasHandler dogHasHandler) {
+        var dog = dogHasHandler.getDog();
+        var member = dogHasHandler.getMember();
+        if (dog.getEntityStatus() == EntityStatus.DELETED || member.getEntityStatus() == EntityStatus.DELETED) {
+            dogHasHandler.setEntityStatus(EntityStatus.DELETED);
+        } else if (dog.getEntityStatus() == EntityStatus.INACTIVE || member.getEntityStatus() == EntityStatus.INACTIVE) {
+            dogHasHandler.setEntityStatus(EntityStatus.INACTIVE);
+        }
     }
 }

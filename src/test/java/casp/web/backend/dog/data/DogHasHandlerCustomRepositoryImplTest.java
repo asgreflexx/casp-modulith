@@ -71,14 +71,6 @@ class DogHasHandlerCustomRepositoryImplTest {
         assertThat(dogHasHandlers).containsExactly(activeDogHasHandler);
     }
 
-    private DogHasHandler createDogHasHandler(EntityStatus entityStatus, MemberReference member, DogReference dog) {
-        var dogHasHandler = new DogHasHandler();
-        dogHasHandler.setEntityStatus(entityStatus);
-        dogHasHandler.setDog(dog);
-        dogHasHandler.setMember(member);
-        return dogHasHandlerRepository.save(dogHasHandler);
-    }
-
     @Test
     void findByDogIdAndMemberId() {
         var dogHasHandlerOptional = dogHasHandlerRepository.findByDogIdAndMemberId(dogId, memberId);
@@ -86,6 +78,13 @@ class DogHasHandlerCustomRepositoryImplTest {
         assertThat(dogHasHandlerOptional)
                 .isPresent()
                 .hasValue(activeDogHasHandler);
+    }
+
+    @Test
+    void findAllByDogIdAndEntityStatus() {
+        var dogHasHandlers = dogHasHandlerRepository.findAllByDogIdAndEntityStatus(dogId, EntityStatus.ACTIVE);
+
+        assertThat(dogHasHandlers).containsExactly(activeDogHasHandler);
     }
 
     @Nested
@@ -139,5 +138,13 @@ class DogHasHandlerCustomRepositoryImplTest {
 
             assertThat(dogHasHandlerPage).containsExactly(activeDogHasHandler);
         }
+    }
+
+    private DogHasHandler createDogHasHandler(EntityStatus entityStatus, MemberReference member, DogReference dog) {
+        var dogHasHandler = new DogHasHandler();
+        dogHasHandler.setEntityStatus(entityStatus);
+        dogHasHandler.setDog(dog);
+        dogHasHandler.setMember(member);
+        return dogHasHandlerRepository.save(dogHasHandler);
     }
 }

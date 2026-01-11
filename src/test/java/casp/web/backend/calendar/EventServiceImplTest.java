@@ -23,20 +23,19 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static casp.web.backend.calendar.EventMapper.EVENT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,64 +117,19 @@ class EventServiceImplTest {
     void getCalendarEntries() {
         var from = LocalDateTime.now().minusDays(1);
         var to = from.plusDays(1);
-        var calendarEntry1 = new CalendarEntry(from.minusHours(1), from);
-        var calendarEntry2 = new CalendarEntry(from, to);
-        var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
-        event.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
-        when(eventRepository.findAllBetweenFromAndTo(from, to)).thenReturn(Stream.of(event));
+        var calendarEntry = new CalendarEntry(from, to);
+        event.addCalendarEntry(calendarEntry);
+        when(eventRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(event));
 
-        var calendarEntryDtoStream = eventService.getCalendarEntriesBetweenFromAndTo(from, to);
+        var calendarEntryDtoStream = eventService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
 
         assertThat(calendarEntryDtoStream)
                 .singleElement()
                 .satisfies(ce -> {
-                    assertEquals(calendarEntry2.getEntryFrom(), ce.getEntryFrom());
-                    assertEquals(calendarEntry2.getEntryTo(), ce.getEntryTo());
+                    assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
+                    assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
                     assertSame(event.getEventType(), ce.getEventType());
                 });
-    }
-
-    @Nested
-    class GetOneByIdAndCalendarEntryId {
-
-        private CalendarEntry calendarEntry;
-
-        @BeforeEach
-        void setUp() {
-            calendarEntry = new CalendarEntry(LocalDateTime.MIN, LocalDateTime.MAX);
-            event.addCalendarEntry(calendarEntry);
-            event.addCalendarEntry(new CalendarEntry(LocalDateTime.now(), LocalDateTime.now().plusHours(1)));
-        }
-
-        @Test
-        void eventExist() {
-            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
-
-            var courseDto = eventService.getOneByIdAndCalendarEntryId(event.getId(), calendarEntry.getId());
-
-            assertEquals(event.getId(), courseDto.getId());
-            assertThat(courseDto.getCalendarEntries())
-                    .singleElement()
-                    .satisfies(ce -> {
-                        assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
-                        assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
-                    });
-        }
-
-        @Test
-        void eventDoesNotExist() {
-            var id = UUID.randomUUID();
-            when(eventRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> eventService.getOneByIdAndCalendarEntryId(id, calendarEntry.getId()));
-        }
-
-        @Test
-        void calendarEntryDoesNotExist() {
-            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
-
-            assertThrows(NoSuchElementException.class, () -> eventService.getOneByIdAndCalendarEntryId(event.getId(), UUID.randomUUID()));
-        }
     }
 
     @Nested
@@ -194,6 +148,9 @@ class EventServiceImplTest {
 
         @Test
         void setCalendarEntry() {
+            var memberReference = mockMember();
+            eventDto.setMemberId(memberReference.getId());
+
             eventService.save(eventDto);
 
             var actualCourse = getEventSaved();
@@ -209,6 +166,8 @@ class EventServiceImplTest {
 
         @Test
         void setRecurrenceOption() {
+            var memberReference = mockMember();
+            eventDto.setMemberId(memberReference.getId());
             eventDto.setNewCalendarEntry(null);
             var daily = new DailyRecurrenceOption();
             daily.setStartTime(LocalTime.of(1, 0, 0));
@@ -231,68 +190,115 @@ class EventServiceImplTest {
         @Test
         void setNewMember() {
             var memberReference = mockMember();
-            eventDto.setNewMemberId(memberReference.getId());
+            eventDto.setMemberId(memberReference.getId());
 
             eventService.save(eventDto);
 
             assertEquals(memberReference, getEventSaved().getMember());
-        }
-
-        @Test
-        void keepSameMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            eventDto.setMember(memberReference);
-
-            eventService.save(eventDto);
-
-            verifyNoInteractions(memberReferenceRepository);
-            assertEquals(memberReference, getEventSaved().getMember());
-        }
-
-        @Test
-        void updateMember() {
-            var actualMember = ReferenceTestFixture.createMemberReference();
-            var newMember = mockMember();
-            eventDto.setMember(actualMember);
-            eventDto.setNewMemberId(newMember.getId());
-
-            eventService.save(eventDto);
-
-            assertEquals(newMember, getEventSaved().getMember());
         }
 
         @Test
         void memberDoesNotExist() {
             var newMemberId = UUID.randomUUID();
-            eventDto.setNewMemberId(newMemberId);
+            eventDto.setMemberId(newMemberId);
             when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> eventService.save(eventDto));
         }
+    }
+
+    @Nested
+    class Participants {
+        private EventDto eventDto;
+
+        @BeforeEach
+        void setUp() {
+            var newCalendarEntryDto = new NewCalendarEntryDto();
+            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
+            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
+            eventDto = new EventDto();
+            eventDto.setMemberId(mockMember().getId());
+            eventDto.setNewCalendarEntry(newCalendarEntryDto);
+        }
 
         @Test
-        void addParticipant() {
-            var memberReference = mockMember();
-            var participant = new EventParticipant(memberReference);
-            eventDto.getNewParticipants().add(participant.getId());
+        void addNewParticipantToNewEvent() {
+            var newParticipant = ReferenceTestFixture.createMemberReference("new", "participant");
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+            var expectedParticipant = new EventParticipant(newParticipant);
+            eventDto.getParticipantIds().add(newParticipant.getId());
 
             eventService.save(eventDto);
 
             var actualEvent = getEventSaved();
             assertThat(actualEvent.getParticipants())
                     .singleElement()
-                    .isEqualTo(participant);
+                    .isEqualTo(expectedParticipant);
         }
 
-        private Event getEventSaved() {
-            verify(eventRepository).save(eventCaptor.capture());
-            return eventCaptor.getValue();
+        @Test
+        void addNewParticipantToEmptyList() {
+            var newParticipant = ReferenceTestFixture.createMemberReference("new", "participant");
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(EVENT_MAPPER.toSource(eventDto)));
+            var expectedParticipant = new EventParticipant(newParticipant);
+            eventDto.getParticipantIds().add(expectedParticipant.getId());
+
+            eventService.save(eventDto);
+
+            var actualEvent = getEventSaved();
+            assertThat(actualEvent.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
         }
 
-        private MemberReference mockMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
-            return memberReference;
+        @Test
+        void addExistingParticipantToEvent() {
+            var existingParticipant = ReferenceTestFixture.createMemberReference("existing", "participant");
+            var sourceEvent = EVENT_MAPPER.toSource(eventDto);
+            sourceEvent.addParticipants(Set.of(new EventParticipant(existingParticipant)));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(sourceEvent));
+            var expectedParticipant = new EventParticipant(existingParticipant);
+            eventDto.getParticipantIds().add(expectedParticipant.getId());
+
+            eventService.save(eventDto);
+
+            var actualEvent = getEventSaved();
+            assertThat(actualEvent.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+            verify(memberReferenceRepository, never()).findOneByIdAndEntityStatus(existingParticipant.getId(), EntityStatus.ACTIVE);
         }
+
+        @Test
+        void replaceExistingParticipantWithNewParticipant() {
+            var existingParticipant = ReferenceTestFixture.createMemberReference("existing", "participant");
+            var sourceEvent = EVENT_MAPPER.toSource(eventDto);
+            sourceEvent.addParticipants(Set.of(new EventParticipant(existingParticipant)));
+            when(eventRepository.findOneByIdAndEntityStatus(eventDto.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(sourceEvent));
+            var newParticipant = ReferenceTestFixture.createMemberReference("new", "participant");
+            when(memberReferenceRepository.findOneByIdAndEntityStatus(newParticipant.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(newParticipant));
+            var expectedParticipant = new EventParticipant(newParticipant);
+            eventDto.getParticipantIds().add(expectedParticipant.getId());
+
+            eventService.save(eventDto);
+
+            var actualEvent = getEventSaved();
+            assertThat(actualEvent.getParticipants())
+                    .singleElement()
+                    .isEqualTo(expectedParticipant);
+        }
+    }
+
+    private Event getEventSaved() {
+        verify(eventRepository).save(eventCaptor.capture());
+        return eventCaptor.getValue();
+    }
+
+    private MemberReference mockMember() {
+        var memberReference = ReferenceTestFixture.createMemberReference();
+        when(memberReferenceRepository.findOneByIdAndEntityStatus(memberReference.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(memberReference));
+        return memberReference;
     }
 }

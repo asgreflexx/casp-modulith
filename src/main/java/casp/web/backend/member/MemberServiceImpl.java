@@ -8,6 +8,7 @@ import casp.web.backend.deprecated.member.MemberOldRepository;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
+import casp.web.backend.member.data.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -47,27 +49,25 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByFirstNameAndLastName(String firstName, String lastName, Pageable pageable) {
-        var memberPage = memberRepository.findAllByFirstNameAndLastName(firstName, lastName, pageable);
-        return MEMBER_MAPPER.toTargetPage(memberPage);
-    }
-
-    @Override
-    public Page<MemberDto> getMembersByEntityStatusAndName(EntityStatus entityStatus, String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatusAndName(entityStatus, name, pageable);
+    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus,
+                                                                String name,
+                                                                Set<Role> roles,
+                                                                Pageable pageable) {
+        var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(entityStatus, name, roles, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
 
     @Override
     public MemberDto getMemberById(UUID id) {
-        return MEMBER_MAPPER.toTarget(memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE));
+        var member = getMemberIfNotDeleted(id);
+        return MEMBER_MAPPER.toTarget(member);
     }
 
     @Override
     public MemberDto saveMember(MemberDto memberDto) {
         var member = MEMBER_MAPPER.toSource(memberDto);
 
-        verifyForMemberConflict(memberDto, member);
+        analyseMember(member);
 
         return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
@@ -83,35 +83,8 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public MemberDto deactivateMember(UUID id) {
-        var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE);
-        dogHasHandlerService.deactivateDogHasHandlersByMemberId(id);
-        baseEventObserver.deactivateBaseEventsByMemberId(id);
-        member.setEntityStatus(EntityStatus.INACTIVE);
-        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
-    }
-
-    @Override
-    public MemberDto activateMember(UUID id) {
-        var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.INACTIVE);
-        dogHasHandlerService.activateDogHasHandlersByMemberId(id);
-        baseEventObserver.activateBaseEventsByMemberId(id);
-        member.setEntityStatus(EntityStatus.ACTIVE);
-        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
-    }
-
-    @Override
-    public Page<MemberDto> getMembersByName(String name, Pageable pageable) {
-        var memberPage = memberRepository.findAllByEntityStatusAndName(EntityStatus.ACTIVE, name, pageable);
-        return MEMBER_MAPPER.toTargetPage(memberPage);
-    }
-
-    @Override
     public Set<String> getMembersEmailByIds(Set<UUID> membersId) {
-        return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE)
-                .stream()
-                .map(Member::getEmail)
-                .collect(Collectors.toSet());
+        return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE).stream().map(Member::getEmail).collect(Collectors.toSet());
     }
 
     @Override
@@ -130,18 +103,57 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Page<MemberDto> getMembersByNotDogId(UUID dogId, String name, Pageable pageable) {
-        return MEMBER_MAPPER.toTargetPage(memberRepository.findAllByNotDogId(dogId, name, pageable));
+    public MemberDto toggleStatus(UUID id) {
+        var member = getMemberIfNotDeleted(id);
+        if (member.getEntityStatus() == EntityStatus.ACTIVE) {
+            deactivateMember(member);
+        } else {
+            activateMember(member);
+        }
+        return MEMBER_MAPPER.toTarget(memberRepository.save(member));
     }
 
-    private void verifyForMemberConflict(MemberDto memberDto, Member member) {
-        memberRepository.findOneByEmail(memberDto.getEmail())
-                .ifPresent(m -> {
-                    if (!member.equals(m)) {
-                        var msg = "Member with email %s already exists.".formatted(member.getEmail());
-                        LOG.error(msg);
-                        throw new IllegalStateException(msg);
-                    }
-                });
+    @Override
+    public MembershipFeesStatsDto getMembershipFeesStats() {
+        return memberRepository.getMembershipFeesStats();
+    }
+
+    // if member exists, it must be active
+    // if an existing member already contains the member.email, it will fail
+    private void analyseMember(Member member) {
+        memberRepository.findById(member.getId()).ifPresent(m -> {
+            if (m.getEntityStatus() != EntityStatus.ACTIVE) {
+                var msg = "Member with id %s is not active.".formatted(member.getId());
+                LOG.error(msg);
+                throw new IllegalStateException(msg);
+            }
+        });
+        memberRepository.findOneByEmail(member.getEmail()).ifPresent(m -> {
+            if (!member.equals(m)) {
+                var msg = "Member with email %s already exists.".formatted(member.getEmail());
+                LOG.error(msg);
+                throw new IllegalStateException(msg);
+            }
+        });
+    }
+
+    private Member getMemberIfNotDeleted(UUID id) {
+        return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED).orElseThrow(() -> {
+            var msg = "Member with id %s not found.".formatted(id);
+            LOG.error(msg);
+            return new NoSuchElementException(msg);
+        });
+    }
+
+    private void deactivateMember(Member member) {
+        dogHasHandlerService.deactivateDogHasHandlersByMemberId(member.getId());
+        baseEventObserver.deactivateBaseEventsByMemberId(member.getId());
+        member.setEntityStatus(EntityStatus.INACTIVE);
+    }
+
+    private void activateMember(Member member) {
+        dogHasHandlerService.activateDogHasHandlersByMemberId(member.getId());
+        baseEventObserver.activateBaseEventsByMemberId(member.getId());
+        member.setEntityStatus(EntityStatus.ACTIVE);
     }
 }

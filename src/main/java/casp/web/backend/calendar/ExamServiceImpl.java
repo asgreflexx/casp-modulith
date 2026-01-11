@@ -6,22 +6,25 @@ import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.deprecated.event.BaseEventMigrationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
 
 @Service
-class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements ExamService {
+class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipant> implements ExamService {
+    private final ExamRepository examRepository;
 
     ExamServiceImpl(MemberReferenceRepository memberReferenceRepository,
                     ExamRepository examRepository,
                     BaseEventMigrationService migrationService,
                     DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         super(memberReferenceRepository, examRepository, dogHasHandlerReferenceRepository, migrationService);
+        this.examRepository = examRepository;
     }
 
     @Override
@@ -38,17 +41,16 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto> implements Exa
         return EXAM_MAPPER.toTarget(getOneByIdOrThrowException(id));
     }
 
-    private void setParticipants(ExamDto dto, Exam exam) {
-        var newParticipants = mapToParticipants(dto.getNewParticipants());
-        exam.addParticipants(newParticipants);
+    @Override
+    public Page<ExamDto> getExamsByDogHasHandlerId(final UUID dogHasHandlerId, final Pageable pageable) {
+        var examPage = examRepository.findAllByParticipantId(dogHasHandlerId, pageable);
+        return EXAM_MAPPER.toTargetPage(examPage);
     }
 
-    private Set<ExamParticipant> mapToParticipants(final Set<UUID> dogHasHandlerIds) {
-        return dogHasHandlerIds
-                .stream()
-                .flatMap(id -> findDogHandlerReferenceById(id)
-                        .map(ExamParticipant::new)
-                        .stream())
-                .collect(Collectors.toSet());
+    @Override
+    Stream<ExamParticipant> mapToParticipant(final UUID id) {
+        return findDogHandlerReferenceById(id)
+                .map(ExamParticipant::new)
+                .stream();
     }
 }

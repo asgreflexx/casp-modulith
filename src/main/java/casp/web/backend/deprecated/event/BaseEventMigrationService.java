@@ -97,7 +97,7 @@ public class BaseEventMigrationService {
         var calendarEntries = mapCalendarEntries(cv1.getId());
         courseV2.setCalendarEntries(calendarEntries.calendarEntries);
         courseV2.setLocation(calendarEntries.location);
-        courseV2.setSpaces(mapToSpaceV2(cv1.getId()));
+        courseV2.setParticipants(mapToSpaceV2(cv1.getId()));
         courseV2.setCoTrainers(mapToCoTrainerV2(cv1.getId()));
         mapToBaseEventOptionV2(cv1).ifPresent(courseV2::setRecurrenceOption);
         return courseV2;

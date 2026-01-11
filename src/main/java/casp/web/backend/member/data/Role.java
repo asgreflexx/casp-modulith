@@ -1,9 +1,5 @@
 package casp.web.backend.member.data;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-
 public enum Role {
     USER,
     ADMIN,
@@ -12,11 +8,5 @@ public enum Role {
     REPRESENTATIVE,
     CASHIER,
     CASH,
-    KEY_OWNER;
-
-    public static List<Role> getAllRolesSorted() {
-        return Arrays.stream(values())
-                .sorted(Comparator.comparing(Enum::name))
-                .toList();
-    }
+    KEY_OWNER
 }

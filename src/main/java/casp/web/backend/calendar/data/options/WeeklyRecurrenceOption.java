@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@RecurrenceConstraint(message = "The start recurrence date must be at least 6 days before the end recurrence date", plusDays = 6)
 public class WeeklyRecurrenceOption extends RecurrenceOption {
     @Valid
     @NotEmpty

@@ -77,7 +77,7 @@ class BaseEventMigrationServiceTest {
         when(memberReferenceRepository.findById(memberId)).thenReturn(Optional.of(memberReference));
     }
 
-    private void assertV2(BaseEvent baseEvent) {
+    private void assertV2(BaseEvent<?> baseEvent) {
         assertEquals(id, baseEvent.getId());
         assertEquals(memberId, baseEvent.getMember().getId());
         assertEquals(LOCATION, baseEvent.getLocation());
@@ -252,7 +252,7 @@ class BaseEventMigrationServiceTest {
                     .singleElement()
                     .satisfies(courseV2 -> {
                         assertV2(courseV2);
-                        assertThat(courseV2.getSpaces())
+                        assertThat(courseV2.getParticipants())
                                 .singleElement()
                                 .satisfies(s -> assertEquals(spaceDhhId, s.getId()));
                     });

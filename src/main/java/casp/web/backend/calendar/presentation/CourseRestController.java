@@ -1,12 +1,14 @@
 package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.CourseService;
+import casp.web.backend.calendar.CoursesFeesStatsDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -65,27 +68,16 @@ class CourseRestController {
         return ResponseEntity.ok(courseService.getEmailsByCourseId(id));
     }
 
-    @PatchMapping("{courseId}/space")
-    ResponseEntity<Void> updateSpace(@PathVariable UUID courseId, @RequestBody @Valid SpaceWrite space) {
-        courseService.updateSpace(courseId, COURSE_WRITE_MAPPER.toSpaceDto(space));
-        return ResponseEntity.noContent().build();
-    }
-
-    @DeleteMapping("{courseId}/space/{spaceId}")
-    ResponseEntity<Void> removeSpace(@PathVariable UUID courseId, @PathVariable UUID spaceId) {
-        courseService.removeSpace(courseId, spaceId);
-        return ResponseEntity.noContent().build();
-    }
-
-    @GetMapping("{courseId}/calendar-entry/{calendarEntryId}")
-    ResponseEntity<CourseRead> getCalendarEntry(@PathVariable UUID courseId, @PathVariable UUID calendarEntryId) {
-        var courseDto = courseService.getOneByIdAndCalendarEntryId(courseId, calendarEntryId);
+    @PatchMapping("{courseId}/spaces")
+    ResponseEntity<CourseRead> updateSpaces(@PathVariable UUID courseId, @RequestHeader(value = HttpHeaders.IF_MATCH) long version, @RequestBody Set<@Valid SpaceWrite> spaces) {
+        var spaceDtos = COURSE_WRITE_MAPPER.toSpaceDtos(spaces);
+        var courseDto = courseService.updateSpaces(courseId, version, spaceDtos);
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
     @GetMapping("/space/{dogHasHandlerId}")
-    public ResponseEntity<Page<CourseRead>> getCourseByDogHasHandlerId(@PathVariable UUID dogHasHandlerId, @ParameterObject Pageable pageable) {
-        var courseDtoPage = courseService.getCourseByDogHasHandlerId(dogHasHandlerId, pageable);
+    public ResponseEntity<Page<CourseRead>> getCoursesByDogHasHandlerId(@PathVariable UUID dogHasHandlerId, @ParameterObject Pageable pageable) {
+        var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, pageable);
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTargetPage(courseDtoPage));
     }
 
@@ -97,5 +89,10 @@ class CourseRestController {
     ResponseEntity<Void> migrateDataToV2() {
         courseService.migrateDataToV2();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("courses-fees-stats")
+    ResponseEntity<CoursesFeesStatsDto> getCoursesFeesStats() {
+        return ResponseEntity.ok(courseService.getCoursesFeesStats());
     }
 }

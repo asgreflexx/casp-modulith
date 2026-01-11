@@ -6,11 +6,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 @Service
 class BaseEventObserverImpl implements BaseEventObserver {
@@ -39,11 +38,12 @@ class BaseEventObserverImpl implements BaseEventObserver {
     }
 
     @Override
-    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndTo(LocalDateTime from, LocalDateTime to, Set<BaseEventType> eventTypeSet) {
+    public List<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, UUID memberId) {
         return observerMap.entrySet()
-                .parallelStream()
-                .filter(observer -> eventTypeSet.isEmpty() || eventTypeSet.contains(observer.getKey()))
-                .flatMap(observer -> observer.getValue().getCalendarEntriesBetweenFromAndTo(from, to));
+                .stream()
+                .flatMap(observer -> observer.getValue().getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId))
+                .sorted()
+                .toList();
     }
 
     private void performOperationOnAllServices(Consumer<BaseEventService<?>> operation) {

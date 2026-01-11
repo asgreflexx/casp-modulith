@@ -24,13 +24,13 @@ import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -43,8 +43,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -140,133 +141,62 @@ class CourseServiceImplTest {
     void getCalendarEntries() {
         var from = LocalDateTime.now().minusDays(1);
         var to = from.plusDays(1);
-        var calendarEntry1 = new CalendarEntry(from.minusHours(1), from);
-        var calendarEntry2 = new CalendarEntry(from, to);
-        var calendarEntry3 = new CalendarEntry(to, to.plusHours(1));
-        course.setCalendarEntries(new ArrayList<>(List.of(calendarEntry1, calendarEntry2, calendarEntry3)));
-        when(courseRepository.findAllBetweenFromAndTo(from, to)).thenReturn(Stream.of(course));
+        var calendarEntry = new CalendarEntry(from, to);
+        course.addCalendarEntry(calendarEntry);
+        when(courseRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(course));
 
-        var calendarEntryDtoStream = courseService.getCalendarEntriesBetweenFromAndTo(from, to);
+        var calendarEntryDtoStream = courseService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
 
         assertThat(calendarEntryDtoStream)
                 .singleElement()
                 .satisfies(ce -> {
-                    assertEquals(calendarEntry2.getEntryFrom(), ce.getEntryFrom());
-                    assertEquals(calendarEntry2.getEntryTo(), ce.getEntryTo());
+                    assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
+                    assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
                     assertSame(course.getEventType(), ce.getEventType());
                 });
     }
 
-    @Nested
-    class GetOneByIdAndCalendarEntryId {
+    @Test
+    void getCoursesFeesStats() {
+        var expectedCoursesFeesStatsDto = mock(CoursesFeesStatsDto.class);
+        when(courseRepository.getCoursesFeesStats()).thenReturn(expectedCoursesFeesStatsDto);
 
-        private CalendarEntry calendarEntry;
+        var actualCoursesFeesStatsDto = courseService.getCoursesFeesStats();
+
+        assertEquals(expectedCoursesFeesStatsDto, actualCoursesFeesStatsDto);
+    }
+
+    @Nested
+    class UpdateSpaces {
+
+        private Space space;
 
         @BeforeEach
         void setUp() {
-            calendarEntry = new CalendarEntry(LocalDateTime.MIN, LocalDateTime.MAX);
-            course.addCalendarEntry(calendarEntry);
-            course.addCalendarEntry(new CalendarEntry(LocalDateTime.now(), LocalDateTime.now().plusHours(1)));
-        }
-
-        @Test
-        void courseExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            var courseDto = courseService.getOneByIdAndCalendarEntryId(course.getId(), calendarEntry.getId());
-
-            assertEquals(course.getId(), courseDto.getId());
-            assertThat(courseDto.getCalendarEntries())
-                    .singleElement()
-                    .satisfies(ce -> {
-                        assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
-                        assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
-                    });
-        }
-
-        @Test
-        void courseDoesNotExist() {
-            var id = UUID.randomUUID();
-            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> courseService.getOneByIdAndCalendarEntryId(id, calendarEntry.getId()));
-        }
-
-        @Test
-        void calendarEntryDoesNotExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertThrows(NoSuchElementException.class, () -> courseService.getOneByIdAndCalendarEntryId(course.getId(), UUID.randomUUID()));
-        }
-    }
-
-    @Nested
-    class RemoveSpace {
-        @Test
-        void spaceExist() {
-            var space = createSpace();
-            course.addSpace(space);
-
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            courseService.removeSpace(course.getId(), space.getId());
-
-            verify(courseRepository).save(courseCaptor.capture());
-
-            assertThat(courseCaptor.getValue().getSpaces())
-                    .isEmpty();
-        }
-
-        @Test
-        void courseDoesNotExist() {
-            var id = UUID.randomUUID();
-            var idSpace = UUID.randomUUID();
-            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
-
-            assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(id, idSpace));
-        }
-
-        @Test
-        void spaceDoesNotExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertThrows(NoSuchElementException.class, () -> courseService.removeSpace(course.getId(), UUID.randomUUID()));
-        }
-    }
-
-    @Nested
-    class SaveSpace {
-        @Test
-        void updateSpace() {
-            var space = createSpace();
-            course.addSpace(space);
-
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
+            space = createSpace();
             space.setNote("spaceChanged");
-            courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(space));
+            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
+        }
 
-            verify(courseRepository).save(courseCaptor.capture());
+        @Test
+        void savesSuccessfully() {
+            courseService.updateSpaces(course.getId(), course.getVersion(), Set.of(COURSE_MAPPER.toSpaceDto(space)));
 
-            assertThat(courseCaptor.getValue().getSpaces())
+            var courseDto = getCourseSaved();
+
+            assertThat(courseDto.getParticipants())
                     .singleElement()
                     .satisfies(s -> assertEquals(space.getNote(), s.getNote()));
         }
 
         @Test
-        void courseDoesNotExist() {
-            var id = UUID.randomUUID();
-            var space = new Space();
-            when(courseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+        void throwsOptimisticLockingFailure() {
+            var id = course.getId();
+            var badVersion = course.getVersion() + 1;
+            var spaceDtos = Set.of(COURSE_MAPPER.toSpaceDto(space));
 
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(id, COURSE_MAPPER.toSpaceDto(space)));
-        }
-
-        @Test
-        void spaceDoesNotExist() {
-            when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
-
-            assertThrows(NoSuchElementException.class, () -> courseService.updateSpace(course.getId(), COURSE_MAPPER.toSpaceDto(createSpace())));
+            assertThrows(OptimisticLockingFailureException.class, () -> courseService.updateSpaces(id, badVersion, spaceDtos));
+            verify(courseRepository, never()).save(course);
         }
     }
 
@@ -279,7 +209,7 @@ class CourseServiceImplTest {
             dogHasHandler.setMember(member);
             dogHasHandler.setDog(new DogReference());
             var space = new Space(dogHasHandler);
-            course.setSpaces(Set.of(space));
+            course.setParticipants(Set.of(space));
             when(courseRepository.findOneByIdAndEntityStatus(course.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(course));
 
             var emailSet = courseService.getEmailsByCourseId(course.getId());
@@ -335,6 +265,9 @@ class CourseServiceImplTest {
 
         @Test
         void setCalendarEntry() {
+            var memberReference = mockMember();
+            courseDto.setMemberId(memberReference.getId());
+
             courseService.save(courseDto);
 
             var actualCourse = getCourseSaved();
@@ -350,6 +283,8 @@ class CourseServiceImplTest {
 
         @Test
         void setRecurrenceOption() {
+            var memberReference = mockMember();
+            courseDto.setMemberId(memberReference.getId());
             courseDto.setNewCalendarEntry(null);
             var daily = new DailyRecurrenceOption();
             daily.setStartTime(LocalTime.of(1, 0, 0));
@@ -372,40 +307,17 @@ class CourseServiceImplTest {
         @Test
         void setNewMember() {
             var memberReference = mockMember();
-            courseDto.setNewMemberId(memberReference.getId());
+            courseDto.setMemberId(memberReference.getId());
 
             courseService.save(courseDto);
 
             assertEquals(memberReference, getCourseSaved().getMember());
-        }
-
-        @Test
-        void keepSameMember() {
-            var memberReference = ReferenceTestFixture.createMemberReference();
-            courseDto.setMember(memberReference);
-
-            courseService.save(courseDto);
-
-            verifyNoInteractions(memberReferenceRepository);
-            assertEquals(memberReference, getCourseSaved().getMember());
-        }
-
-        @Test
-        void updateMember() {
-            var actualMember = ReferenceTestFixture.createMemberReference();
-            var newMember = mockMember();
-            courseDto.setMember(actualMember);
-            courseDto.setNewMemberId(newMember.getId());
-
-            courseService.save(courseDto);
-
-            assertEquals(newMember, getCourseSaved().getMember());
         }
 
         @Test
         void memberDoesNotExist() {
             var newMemberId = UUID.randomUUID();
-            courseDto.setNewMemberId(newMemberId);
+            courseDto.setMemberId(newMemberId);
             when(memberReferenceRepository.findOneByIdAndEntityStatus(newMemberId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
 
             assertThrows(NoSuchElementException.class, () -> courseService.save(courseDto));
@@ -415,7 +327,8 @@ class CourseServiceImplTest {
         void addCoTrainer() {
             var memberReference = mockMember();
             var coTrainer = new CoTrainer(memberReference);
-            courseDto.getNewCoTrainers().add(coTrainer.getId());
+            courseDto.setMemberId(memberReference.getId());
+            courseDto.getCoTrainerIds().add(coTrainer.getId());
 
             courseService.save(courseDto);
 
@@ -427,25 +340,22 @@ class CourseServiceImplTest {
 
         @Test
         void addSpace() {
+            var memberReference = mockMember();
+            courseDto.setMemberId(memberReference.getId());
             var dogHasHandlerReference = new DogHasHandlerReference();
             dogHasHandlerReference.setId(UUID.randomUUID());
             dogHasHandlerReference.setDog(new DogReference());
             dogHasHandlerReference.setMember(ReferenceTestFixture.createMemberReference());
             var space = new Space(dogHasHandlerReference);
-            courseDto.setNewSpaces(Set.of(space.getId()));
+            courseDto.setParticipantIds(Set.of(space.getId()));
             when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(space.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandlerReference));
 
             courseService.save(courseDto);
 
             var actualCourse = getCourseSaved();
-            assertThat(actualCourse.getSpaces())
+            assertThat(actualCourse.getParticipants())
                     .singleElement()
                     .isEqualTo(space);
-        }
-
-        private Course getCourseSaved() {
-            verify(courseRepository).save(courseCaptor.capture());
-            return courseCaptor.getValue();
         }
 
         private MemberReference mockMember() {
@@ -475,28 +385,19 @@ class CourseServiceImplTest {
         }
     }
 
-    @Nested
-    class GetCourseByDogHasHandlerId {
-        @Test
-        void dogHasHandlerDoesNotExist() {
-            var dogHasHandlerId = UUID.randomUUID();
-            var unpaged = Pageable.unpaged();
-            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+    @Test
+    void getCoursesByDogHasHandlerId() {
+        var dogHasHandlerId = UUID.randomUUID();
+        when(courseRepository.findAllBySpaceId(dogHasHandlerId, Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(course)));
 
-            assertThrows(NoSuchElementException.class, () -> courseService.getCourseByDogHasHandlerId(dogHasHandlerId, unpaged));
-        }
+        var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
 
-        @Test
-        void dogHasHandlerExist() {
-            var dogHasHandlerId = UUID.randomUUID();
-            var dogHasHandler = new DogHasHandlerReference();
-            when(dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE)).thenReturn(Optional.of(dogHasHandler));
-            when(courseRepository.findAllBySpace(new Space(dogHasHandler), Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(course)));
+        assertThat(courseDtoPage)
+                .containsExactly(COURSE_MAPPER.toTarget(course));
+    }
 
-            var courseDtoPage = courseService.getCourseByDogHasHandlerId(dogHasHandlerId, Pageable.unpaged());
-
-            assertThat(courseDtoPage)
-                    .containsExactly(COURSE_MAPPER.toTarget(course));
-        }
+    private Course getCourseSaved() {
+        verify(courseRepository).save(courseCaptor.capture());
+        return courseCaptor.getValue();
     }
 }
