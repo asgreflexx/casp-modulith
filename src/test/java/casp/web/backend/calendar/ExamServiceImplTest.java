@@ -305,6 +305,26 @@ class ExamServiceImplTest {
                 .containsExactly(EXAM_MAPPER.toTarget(exam));
     }
 
+    @Nested
+    class GetOneById {
+        @Test
+        void exist() {
+            when(examRepository.findOneByIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(exam));
+
+            var examDto = examService.getOneById(exam.getId());
+
+            assertEquals(exam.getId(), examDto.getId());
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(examRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> examService.getOneById(id));
+        }
+    }
+
     private Exam getExamSaved() {
         verify(examRepository).save(examCaptor.capture());
         return examCaptor.getValue();

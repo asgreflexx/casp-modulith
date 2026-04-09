@@ -277,6 +277,26 @@ class EventServiceImplTest {
         }
     }
 
+    @Nested
+    class GetOneById {
+        @Test
+        void exist() {
+            when(eventRepository.findOneByIdAndEntityStatus(event.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(event));
+
+            var eventDto = eventService.getOneById(event.getId());
+
+            assertEquals(event.getId(), eventDto.getId());
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(eventRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> eventService.getOneById(id));
+        }
+    }
+
     private Event getEventSaved() {
         verify(eventRepository).save(eventCaptor.capture());
         return eventCaptor.getValue();
