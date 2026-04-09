@@ -1,6 +1,5 @@
 package casp.web.backend.calendar;
 
-
 import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.Course;
@@ -14,7 +13,6 @@ import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -57,8 +55,6 @@ class CourseServiceImplTest {
     private MemberReferenceRepository memberReferenceRepository;
     @Mock
     private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
-    @Mock
-    private BaseEventMigrationService migrationService;
     @Captor
     private ArgumentCaptor<Course> courseCaptor;
 
@@ -124,17 +120,6 @@ class CourseServiceImplTest {
 
         verify(courseRepository).save(courseCaptor.capture());
         assertThat(courseCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
-    }
-
-    @Test
-    void migrateDataToV2() {
-        var courseSet = Set.of(course);
-        when(migrationService.mapToCourseV2()).thenReturn(courseSet);
-
-        courseService.migrateDataToV2();
-
-        verify(courseRepository).deleteAll();
-        verify(courseRepository).saveAll(courseSet);
     }
 
     @Test

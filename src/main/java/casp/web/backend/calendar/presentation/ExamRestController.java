@@ -55,14 +55,4 @@ class ExamRestController {
         var examDto = examService.getOneById(id);
         return ResponseEntity.ok(EXAM_READ_MAPPER.toTarget(examDto));
     }
-
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    @PostMapping("migrate-data")
-    ResponseEntity<Void> migrateDataToV2() {
-        examService.migrateDataToV2();
-        return ResponseEntity.noContent().build();
-    }
 }

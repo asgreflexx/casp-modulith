@@ -4,7 +4,7 @@ import casp.web.backend.calendar.CoursesFeesStatsByYearDto;
 import casp.web.backend.calendar.CoursesFeesStatsDto;
 import casp.web.backend.calendar.data.participants.QSpace;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.deprecated.dog.QDogHasHandler;
+import casp.web.backend.dog.data.QDogHasHandler;
 import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;

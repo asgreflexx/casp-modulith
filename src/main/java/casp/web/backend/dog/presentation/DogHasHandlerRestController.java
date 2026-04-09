@@ -24,7 +24,6 @@ import java.util.UUID;
 import static casp.web.backend.dog.presentation.DogHasHandlerReadMapper.READ_MAPPER;
 import static casp.web.backend.dog.presentation.DogHasHandlerWriteMapper.WRITE_MAPPER;
 
-
 @RestController
 @RequestMapping("dog-has-handler")
 @Validated
@@ -42,7 +41,6 @@ class DogHasHandlerRestController {
         var dogHasHandlerDto = dogHasHandlerService.getDogHasHandlerById(id);
         return ResponseEntity.ok(READ_MAPPER.toTarget(dogHasHandlerDto));
     }
-
 
     @PostMapping
     ResponseEntity<DogHasHandlerRead> saveDogHasHandler(@RequestBody @Valid DogHasHandlerWrite dogHasHandlerWrite) {
@@ -94,16 +92,6 @@ class DogHasHandlerRestController {
     @PostMapping("correct-entity-status")
     ResponseEntity<Void> correctEntityStatus() {
         dogHasHandlerService.correctEntityStatus();
-        return ResponseEntity.noContent().build();
-    }
-
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    @PostMapping("migrate-data")
-    ResponseEntity<Void> migrateDataToV2() {
-        dogHasHandlerService.migrateDataToV2();
         return ResponseEntity.noContent().build();
     }
 }

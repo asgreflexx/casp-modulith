@@ -1,6 +1,5 @@
 package casp.web.backend.calendar;
 
-
 import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.Exam;
@@ -11,7 +10,6 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -51,8 +49,6 @@ class ExamServiceImplTest {
     private MemberReferenceRepository memberReferenceRepository;
     @Mock
     private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
-    @Mock
-    private BaseEventMigrationService migrationService;
 
     @Captor
     private ArgumentCaptor<Exam> examCaptor;
@@ -98,17 +94,6 @@ class ExamServiceImplTest {
 
         verify(examRepository).save(examCaptor.capture());
         assertThat(examCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
-    }
-
-    @Test
-    void migrateDataToV2() {
-        var examSet = Set.of(exam);
-        when(migrationService.mapToExamV2()).thenReturn(examSet);
-
-        examService.migrateDataToV2();
-
-        verify(examRepository).deleteAll();
-        verify(examRepository).saveAll(examSet);
     }
 
     @Test
@@ -318,6 +303,26 @@ class ExamServiceImplTest {
 
         assertThat(examDtoPage)
                 .containsExactly(EXAM_MAPPER.toTarget(exam));
+    }
+
+    @Nested
+    class GetOneById {
+        @Test
+        void exist() {
+            when(examRepository.findOneByIdAndEntityStatus(exam.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(exam));
+
+            var examDto = examService.getOneById(exam.getId());
+
+            assertEquals(exam.getId(), examDto.getId());
+        }
+
+        @Test
+        void doesNotExist() {
+            var id = UUID.randomUUID();
+            when(examRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)).thenReturn(Optional.empty());
+
+            assertThrows(NoSuchElementException.class, () -> examService.getOneById(id));
+        }
     }
 
     private Exam getExamSaved() {

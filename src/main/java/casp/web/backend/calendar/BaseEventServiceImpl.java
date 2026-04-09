@@ -3,8 +3,6 @@ package casp.web.backend.calendar;
 import casp.web.backend.calendar.data.BaseEvent;
 import casp.web.backend.calendar.data.BaseEventCustomRepository;
 import casp.web.backend.calendar.data.CalendarEntry;
-import casp.web.backend.calendar.data.Course;
-import casp.web.backend.calendar.data.Exam;
 import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.calendar.options.RecurrenceOptionUtility;
 import casp.web.backend.common.base.BaseRepository;
@@ -13,7 +11,6 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +23,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-
 abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<T> {
     private static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
 
@@ -35,18 +31,15 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
     private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     private final BaseEventCustomRepository<D> baseEventCustomRepository;
     private final Class<D> documentClass;
-    private final BaseEventMigrationService migrationService;
 
     @SuppressWarnings("unchecked")
     BaseEventServiceImpl(MemberReferenceRepository memberReferenceRepository,
                          BaseRepository<D> baseRepository,
-                         DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
-                         BaseEventMigrationService migrationService) {
+                         DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
         this.memberReferenceRepository = memberReferenceRepository;
         this.baseRepository = baseRepository;
         baseEventCustomRepository = (BaseEventCustomRepository<D>) baseRepository;
         this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
-        this.migrationService = migrationService;
         var types = (ParameterizedType) getClass().getGenericSuperclass();
         documentClass = (Class<D>) types.getActualTypeArguments()[0];
     }
@@ -81,21 +74,6 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                 .flatMap(d -> d.getCalendarEntries()
                         .stream()
                         .map(ce -> new CalendarEntryDto(ce, d)));
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public void migrateDataToV2() {
-        baseRepository.deleteAll();
-        Set<D> documents;
-        if (documentClass.equals(Course.class)) {
-            documents = (Set<D>) migrationService.mapToCourseV2();
-        } else if (documentClass.equals(Exam.class)) {
-            documents = (Set<D>) migrationService.mapToExamV2();
-        } else {
-            documents = (Set<D>) migrationService.mapToEventV2();
-        }
-        baseRepository.saveAll(documents);
     }
 
     protected void setCalendarEntriesAndMember(T dto, D document) {

@@ -91,14 +91,6 @@ class MemberRestControllerTest {
     }
 
     @Test
-    void migrateDataToV2() {
-        var response = memberRestController.migrateDataToV2();
-
-        assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(memberService).migrateDataToV2();
-    }
-
-    @Test
     void getActiveMembersEmail() {
         when(memberService.getActiveMembersEmail()).thenReturn(Set.of(memberDto.getEmail()));
 

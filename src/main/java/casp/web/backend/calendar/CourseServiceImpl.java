@@ -6,7 +6,6 @@ import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +29,8 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     @Autowired
     CourseServiceImpl(CourseRepository courseRepository,
                       MemberReferenceRepository memberReferenceRepository,
-                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
-                      BaseEventMigrationService migrationService) {
-        super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
+                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+        super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository);
         this.courseRepository = courseRepository;
     }
 
