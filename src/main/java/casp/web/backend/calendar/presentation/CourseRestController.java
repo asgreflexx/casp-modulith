@@ -81,16 +81,6 @@ class CourseRestController {
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTargetPage(courseDtoPage));
     }
 
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    @PostMapping("migrate-data")
-    ResponseEntity<Void> migrateDataToV2() {
-        courseService.migrateDataToV2();
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("courses-fees-stats")
     ResponseEntity<CoursesFeesStatsDto> getCoursesFeesStats() {
         return ResponseEntity.ok(courseService.getCoursesFeesStats());

@@ -46,14 +46,4 @@ class EventRestController {
         var eventDto = eventService.getOneById(id);
         return ResponseEntity.ok(EVENT_READ_MAPPER.toTarget(eventDto));
     }
-
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    @PostMapping("migrate-data")
-    ResponseEntity<Void> migrateDataToV2() {
-        eventService.migrateDataToV2();
-        return ResponseEntity.noContent().build();
-    }
 }

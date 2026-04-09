@@ -5,7 +5,6 @@ import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.dog.DogHasHandlerOldRepository;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
@@ -41,8 +39,6 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DogHasHandlerServiceImplTest {
-    @Mock
-    private DogHasHandlerOldRepository dogHasHandlerOldRepository;
     @Mock
     private MemberReferenceRepository memberReferenceRepository;
     @Mock
@@ -153,32 +149,6 @@ class DogHasHandlerServiceImplTest {
         var emailSet = dogHasHandlerService.getEmailsByDogHasHandlersIds(Set.of(dogHasHandler.getId()));
 
         assertThat(emailSet).containsExactly(member.getEmail());
-    }
-
-    @ParameterizedTest
-    @MethodSource()
-    void migrateDataToV2(EntityStatusData data) {
-        var dogHasHandlerV1 = mock(casp.web.backend.deprecated.dog.DogHasHandler.class, Answers.RETURNS_DEEP_STUBS);
-        when(dogHasHandlerV1.getDogId()).thenReturn(dog.getId());
-        when(dogHasHandlerV1.getMemberId()).thenReturn(member.getId());
-        when(dogHasHandlerV1.getEntityStatus()).thenReturn(EntityStatus.ACTIVE);
-        when(dogHasHandlerOldRepository.findAll()).thenReturn(List.of(dogHasHandlerV1));
-        dog.setEntityStatus(data.dogStatus);
-        member.setEntityStatus(data.memberStatus);
-        when(dogReferenceRepository.findById(dog.getId())).thenReturn(Optional.of(dog));
-        when(memberReferenceRepository.findById(member.getId())).thenReturn(Optional.of(member));
-
-        dogHasHandlerService.migrateDataToV2();
-
-        verify(dogHasHandlerRepository).saveAll(dogHasHandlerSetCaptor.capture());
-
-        assertThat(dogHasHandlerSetCaptor.getValue())
-                .singleElement()
-                .satisfies(dhh -> {
-                    assertSame(data.expectedDogHasHandlerStatus, dhh.getEntityStatus());
-                    assertSame(dog, dhh.getDog());
-                    assertSame(member, dhh.getMember());
-                });
     }
 
     @Test

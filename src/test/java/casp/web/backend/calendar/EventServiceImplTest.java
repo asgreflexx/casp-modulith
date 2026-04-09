@@ -9,7 +9,6 @@ import casp.web.backend.calendar.data.participants.EventParticipant;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,8 +43,6 @@ class EventServiceImplTest {
     private EventRepository eventRepository;
     @Mock
     private MemberReferenceRepository memberReferenceRepository;
-    @Mock
-    private BaseEventMigrationService migrationService;
     @Captor
     private ArgumentCaptor<Event> eventCaptor;
 
@@ -90,17 +87,6 @@ class EventServiceImplTest {
 
         verify(eventRepository).save(eventCaptor.capture());
         assertThat(eventCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
-    }
-
-    @Test
-    void migrateDataToV2() {
-        var eventSet = Set.of(event);
-        when(migrationService.mapToEventV2()).thenReturn(eventSet);
-
-        eventService.migrateDataToV2();
-
-        verify(eventRepository).deleteAll();
-        verify(eventRepository).saveAll(eventSet);
     }
 
     @Test

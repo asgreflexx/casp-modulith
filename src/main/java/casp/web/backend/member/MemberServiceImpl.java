@@ -1,10 +1,7 @@
 package casp.web.backend.member;
 
-
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.deprecated.member.CardRepository;
-import casp.web.backend.deprecated.member.MemberOldRepository;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
@@ -21,7 +18,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static casp.web.backend.deprecated.member.MemberV2Mapper.MEMBER_V2_MAPPER;
 import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 
 @Service
@@ -32,27 +28,16 @@ class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
     private final DogHasHandlerService dogHasHandlerService;
     private final BaseEventObserver baseEventObserver;
-    private final CardRepository cardRepository;
-    private final MemberOldRepository memberOldRepository;
 
     @Autowired
-    MemberServiceImpl(MemberRepository memberRepository,
-                      DogHasHandlerService dogHasHandlerService,
-                      BaseEventObserver baseEventObserver,
-                      CardRepository cardRepository,
-                      MemberOldRepository memberOldRepository) {
+    MemberServiceImpl(MemberRepository memberRepository, DogHasHandlerService dogHasHandlerService, BaseEventObserver baseEventObserver) {
         this.memberRepository = memberRepository;
         this.dogHasHandlerService = dogHasHandlerService;
         this.baseEventObserver = baseEventObserver;
-        this.cardRepository = cardRepository;
-        this.memberOldRepository = memberOldRepository;
     }
 
     @Override
-    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus,
-                                                                String name,
-                                                                Set<Role> roles,
-                                                                Pageable pageable) {
+    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, Set<Role> roles, Pageable pageable) {
         var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(entityStatus, name, roles, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
@@ -85,16 +70,6 @@ class MemberServiceImpl implements MemberService {
     @Override
     public Set<String> getMembersEmailByIds(Set<UUID> membersId) {
         return memberRepository.findAllByIdInAndEntityStatus(membersId, EntityStatus.ACTIVE).stream().map(Member::getEmail).collect(Collectors.toSet());
-    }
-
-    @Override
-    public void migrateDataToV2() {
-        memberOldRepository.findAll().forEach(mv1 -> {
-            var cardV1Set = cardRepository.findAllByMemberId(mv1.getId());
-            var memberV2 = MEMBER_V2_MAPPER.toMemberV2(mv1);
-            memberV2.setCards(MEMBER_V2_MAPPER.toCardV2Set(cardV1Set));
-            memberRepository.save(memberV2);
-        });
     }
 
     @Override

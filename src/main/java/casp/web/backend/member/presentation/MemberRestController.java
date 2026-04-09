@@ -74,23 +74,13 @@ class MemberRestController {
         return ResponseEntity.ok(memberService.getMembersEmailByIds(membersId));
     }
 
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    @PostMapping("migrate-data")
-    ResponseEntity<Void> migrateDataToV2() {
-        memberService.migrateDataToV2();
-        return ResponseEntity.noContent().build();
-    }
-
     @GetMapping("active-members-emails")
     ResponseEntity<Set<String>> getActiveMembersEmail() {
         return ResponseEntity.ok(memberService.getActiveMembersEmail());
     }
 
     @PostMapping("toggle-status/{id}")
-    ResponseEntity<MemberRead> toggleStatus(final @PathVariable UUID id) {
+    ResponseEntity<MemberRead> toggleStatus(@PathVariable UUID id) {
         return ResponseEntity.ok(READ_MAPPER.toTarget(memberService.toggleStatus(id)));
     }
 

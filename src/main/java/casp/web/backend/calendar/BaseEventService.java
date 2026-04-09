@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-interface BaseEventService<T extends BaseEventDto> {
+interface BaseEventService<T extends BaseEventDto<?>> {
     void save(T dto);
 
     void deleteById(UUID id);
@@ -20,10 +20,4 @@ interface BaseEventService<T extends BaseEventDto> {
     Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId);
 
     T getOneById(UUID id);
-
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    void migrateDataToV2();
 }

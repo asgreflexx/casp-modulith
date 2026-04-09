@@ -2,10 +2,6 @@ package casp.web.backend.member;
 
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.deprecated.member.Card;
-import casp.web.backend.deprecated.member.CardRepository;
-import casp.web.backend.deprecated.member.MemberOldRepository;
-import casp.web.backend.deprecated.member.MembershipFee;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
@@ -21,7 +17,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -45,10 +40,6 @@ import static org.mockito.Mockito.when;
 class MemberServiceImplTest {
     @Mock
     private MemberRepository memberRepository;
-    @Mock
-    private CardRepository cardRepository;
-    @Mock
-    private MemberOldRepository memberOldRepository;
 
     @Mock
     private DogHasHandlerService dogHasHandlerService;
@@ -86,40 +77,6 @@ class MemberServiceImplTest {
         when(memberRepository.findAllByIdInAndEntityStatus(Collections.singleton(member.getId()), EntityStatus.ACTIVE)).thenReturn(Set.of(member));
 
         assertThat(memberService.getMembersEmailByIds(Set.of(member.getId()))).containsExactly(member.getEmail());
-    }
-
-    @Test
-    void migrateDataToV2() {
-        var membershipFee = mock(MembershipFee.class);
-        when(membershipFee.getPaidPrice()).thenReturn(1.0);
-        when(membershipFee.getPaidDate()).thenReturn(LocalDate.now());
-        when(membershipFee.getComment()).thenReturn("comment");
-
-        var card = mock(Card.class);
-        when(card.getCode()).thenReturn(UUID.randomUUID().toString());
-
-        var memberOld = mock(casp.web.backend.deprecated.member.Member.class);
-        when(memberOld.getId()).thenReturn(UUID.randomUUID());
-        when(memberOld.getMembershipFees()).thenReturn(Set.of(membershipFee));
-
-        when(memberOldRepository.findAll()).thenReturn(List.of(memberOld));
-        when(cardRepository.findAllByMemberId(memberOld.getId())).thenReturn(Set.of(card));
-
-        memberService.migrateDataToV2();
-
-        verify(memberRepository).save(memberCaptor.capture());
-        var memberV2 = memberCaptor.getValue();
-        assertEquals(memberOld.getId(), memberV2.getId());
-        assertThat(memberV2.getMembershipFees())
-                .singleElement()
-                .satisfies(mfv2 -> {
-                    assertEquals(membershipFee.getPaidDate(), mfv2.getPaidDate());
-                    assertEquals(membershipFee.getPaidPrice(), mfv2.getPaidPrice());
-                    assertEquals(membershipFee.getComment(), mfv2.getComment());
-                });
-        assertThat(memberV2.getCards())
-                .singleElement()
-                .satisfies(cardV2 -> assertEquals(card.getCode(), cardV2.getCode()));
     }
 
     @Test

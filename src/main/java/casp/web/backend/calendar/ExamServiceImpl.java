@@ -5,7 +5,6 @@ import casp.web.backend.calendar.data.ExamRepository;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.event.BaseEventMigrationService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,11 +18,8 @@ import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
 class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipant> implements ExamService {
     private final ExamRepository examRepository;
 
-    ExamServiceImpl(MemberReferenceRepository memberReferenceRepository,
-                    ExamRepository examRepository,
-                    BaseEventMigrationService migrationService,
-                    DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
-        super(memberReferenceRepository, examRepository, dogHasHandlerReferenceRepository, migrationService);
+    ExamServiceImpl(MemberReferenceRepository memberReferenceRepository, ExamRepository examRepository, DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+        super(memberReferenceRepository, examRepository, dogHasHandlerReferenceRepository);
         this.examRepository = examRepository;
     }
 
@@ -42,15 +38,13 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipan
     }
 
     @Override
-    public Page<ExamDto> getExamsByDogHasHandlerId(final UUID dogHasHandlerId, final Pageable pageable) {
+    public Page<ExamDto> getExamsByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
         var examPage = examRepository.findAllByParticipantId(dogHasHandlerId, pageable);
         return EXAM_MAPPER.toTargetPage(examPage);
     }
 
     @Override
-    Stream<ExamParticipant> mapToParticipant(final UUID id) {
-        return findDogHandlerReferenceById(id)
-                .map(ExamParticipant::new)
-                .stream();
+    Stream<ExamParticipant> mapToParticipant(UUID id) {
+        return findDogHandlerReferenceById(id).map(ExamParticipant::new).stream();
     }
 }

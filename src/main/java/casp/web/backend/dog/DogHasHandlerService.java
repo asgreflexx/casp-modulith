@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.Set;
 import java.util.UUID;
 
-
 public interface DogHasHandlerService {
 
     /**
@@ -55,10 +54,4 @@ public interface DogHasHandlerService {
     Set<DogHasHandlerDto> getDogHasHandlerByDogId(UUID dogId);
 
     void correctEntityStatus();
-
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    void migrateDataToV2();
 }

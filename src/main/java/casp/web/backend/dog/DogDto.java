@@ -1,13 +1,10 @@
 package casp.web.backend.dog;
 
-import casp.web.backend.calendar.SpaceDto;
 import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.enums.Gender;
 import casp.web.backend.dog.data.EuropeNetState;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 public class DogDto extends BaseDto implements DogRequiredFields {
     private String name;

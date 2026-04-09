@@ -131,12 +131,4 @@ class CourseRestControllerTest {
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertThat(response.getBody()).isEqualTo(expectedCoursesFeesStatsDto);
     }
-
-    @Test
-    void migrateDataToV2() {
-        var response = courseRestController.migrateDataToV2();
-
-        assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(courseService).migrateDataToV2();
-    }
 }

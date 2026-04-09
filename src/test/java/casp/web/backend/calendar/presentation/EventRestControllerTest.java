@@ -62,12 +62,4 @@ class EventRestControllerTest {
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertEquals(EVENT_READ_MAPPER.toTarget(eventDto), response.getBody());
     }
-
-    @Test
-    void migrateDataToV2() {
-        var response = eventRestController.migrateDataToV2();
-
-        assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(eventService).migrateDataToV2();
-    }
 }
