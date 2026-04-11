@@ -2,23 +2,20 @@ package casp.web.backend.member.data;
 
 import casp.web.backend.common.validation.Payment;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 public class MembershipFee implements Payment {
+    @Setter
+    @Getter
     private String comment;
     @NotNull
     private Double paidPrice;
+    @Setter
     @NotNull
     private LocalDate paidDate;
-
-    public String getComment() {
-        return comment;
-    }
-
-    public void setComment(String comment) {
-        this.comment = comment;
-    }
 
     @Override
     public Double getPaidPrice() {
@@ -35,7 +32,4 @@ public class MembershipFee implements Payment {
         return paidDate;
     }
 
-    public void setPaidDate(LocalDate paidDate) {
-        this.paidDate = paidDate;
-    }
 }
