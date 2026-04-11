@@ -4,6 +4,8 @@ import casp.web.backend.common.enums.EntityStatus;
 import com.querydsl.core.annotations.QueryEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -11,57 +13,24 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Objects;
 import java.util.UUID;
 
+@Setter
+@Getter
 @QueryEntity
 @Document(collection = "dogHasHandler")
 public class DogHasHandlerReference {
     @Id
     @NotNull
     private UUID id = UUID.randomUUID();
-
     @NotNull
     private EntityStatus entityStatus = EntityStatus.ACTIVE;
-
     @Valid
     @NotNull
     @DBRef
     private MemberReference member;
-
     @Valid
     @NotNull
     @DBRef
     private DogReference dog;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public EntityStatus getEntityStatus() {
-        return entityStatus;
-    }
-
-    public void setEntityStatus(EntityStatus entityStatus) {
-        this.entityStatus = entityStatus;
-    }
-
-    public MemberReference getMember() {
-        return member;
-    }
-
-    public void setMember(MemberReference member) {
-        this.member = member;
-    }
-
-    public DogReference getDog() {
-        return dog;
-    }
-
-    public void setDog(DogReference dog) {
-        this.dog = dog;
-    }
 
     public boolean isActive() {
         return entityStatus == EntityStatus.ACTIVE
