@@ -17,16 +17,12 @@ import java.util.Set;
 @QueryEntity
 @Document
 public class DogHasHandler extends BaseDocument implements DogHasHandlerRequiredFields {
-
     @DBRef
     private MemberReference member;
-
     private String firstName;
     private String lastName;
-
     @DBRef
     private DogReference dog;
-
     private String dogName;
     private String ownerName;
 
