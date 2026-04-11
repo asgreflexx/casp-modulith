@@ -6,8 +6,7 @@ import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
@@ -21,9 +20,9 @@ import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 
+@Slf4j
 @Service
 class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> implements CourseService {
-    private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
     private final CourseRepository courseRepository;
 
     @Autowired
@@ -71,7 +70,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
         var actualVersion = course.getVersion();
         if (actualVersion != courseVersion) {
             var msg = "The course with id %s has been updated in the meantime. The actual version is %d".formatted(courseId, actualVersion);
-            LOG.error(msg);
+            log.error(msg);
             throw new OptimisticLockingFailureException(msg);
         }
         course.setParticipants(COURSE_MAPPER.toSpaces(spaceDtos));

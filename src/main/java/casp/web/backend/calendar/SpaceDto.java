@@ -3,35 +3,25 @@ package casp.web.backend.calendar;
 import casp.web.backend.calendar.data.participants.EventResponse;
 import casp.web.backend.calendar.presentation.SpaceWriteRequiredFields;
 import casp.web.backend.common.reference.DogHasHandlerReference;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Objects;
 import java.util.UUID;
 
 public class SpaceDto implements SpaceWriteRequiredFields {
+    @Setter
+    @Getter
     private UUID courseId;
+    @Setter
+    @Getter
     private String courseName;
     private DogHasHandlerReference dogHasHandler;
     private String note;
     private Double paidPrice;
     private LocalDate paidDate;
     private EventResponse response;
-
-    public UUID getCourseId() {
-        return courseId;
-    }
-
-    public void setCourseId(UUID courseId) {
-        this.courseId = courseId;
-    }
-
-    public String getCourseName() {
-        return courseName;
-    }
-
-    public void setCourseName(String courseName) {
-        this.courseName = courseName;
-    }
 
     public UUID getId() {
         return dogHasHandler.getId();

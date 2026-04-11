@@ -1,12 +1,13 @@
 package casp.web.backend.calendar.data.options;
 
-
 import casp.web.backend.calendar.options.BaseRecurrenceOptionType;
 import jakarta.validation.constraints.NotNull;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+@Setter
 @EventOptionTimesConstraint
 @RecurrenceConstraint
 public class DailyRecurrenceOption extends RecurrenceOption implements EventOptionTimes {
@@ -25,17 +26,9 @@ public class DailyRecurrenceOption extends RecurrenceOption implements EventOpti
         return startTime;
     }
 
-    public void setStartTime(LocalTime startTime) {
-        this.startTime = startTime;
-    }
-
     @Override
     public LocalTime getEndTime() {
         return endTime;
-    }
-
-    public void setEndTime(LocalTime endTime) {
-        this.endTime = endTime;
     }
 
     @Override

@@ -5,11 +5,13 @@ import casp.web.backend.calendar.data.options.RecurrenceOption;
 import casp.web.backend.common.base.BaseView;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequiredFields {
     protected String name;
     protected String description;
@@ -86,17 +88,7 @@ abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequired
     }
 
     @Override
-    public void setParticipantIds(final Set<UUID> participantIds) {
+    public void setParticipantIds(Set<UUID> participantIds) {
         this.participantIds = participantIds;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

@@ -8,12 +8,14 @@ import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.reference.MemberReference;
 import jakarta.validation.Valid;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 abstract class BaseEventRead<P extends BaseParticipant> extends BaseView implements BaseEventRequiredFields<P> {
     protected BaseEventType eventType;
     protected String name;
@@ -26,7 +28,7 @@ abstract class BaseEventRead<P extends BaseParticipant> extends BaseView impleme
     protected List<CalendarEntry> calendarEntries;
     protected Set<P> participants = new HashSet<>();
 
-    BaseEventRead(final BaseEventType eventType) {
+    BaseEventRead(BaseEventType eventType) {
         this.eventType = eventType;
     }
 
@@ -36,7 +38,7 @@ abstract class BaseEventRead<P extends BaseParticipant> extends BaseView impleme
     }
 
     @Override
-    public void setEventType(final BaseEventType eventType) {
+    public void setEventType(BaseEventType eventType) {
         this.eventType = eventType;
     }
 
@@ -126,17 +128,7 @@ abstract class BaseEventRead<P extends BaseParticipant> extends BaseView impleme
     }
 
     @Override
-    public void setParticipants(final Set<@Valid P> participants) {
+    public void setParticipants(Set<@Valid P> participants) {
         this.participants = participants;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

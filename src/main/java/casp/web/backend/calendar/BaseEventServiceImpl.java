@@ -11,8 +11,7 @@ import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
@@ -23,9 +22,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Slf4j
 abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
-
     protected final BaseRepository<D> baseRepository;
     private final MemberReferenceRepository memberReferenceRepository;
     private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
@@ -89,7 +87,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
         return baseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> {
                     var msg = "%s with id %s does not exist or it is not active.".formatted(documentClass.getSimpleName(), id);
-                    LOG.error(msg);
+                    log.error(msg);
                     return new NoSuchElementException(msg);
                 });
     }
@@ -146,7 +144,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                 .ifPresentOrElse(document::setMember,
                         () -> {
                             var msg = "Member with id %s does not exist or it is not active.".formatted(dto.getMemberId());
-                            LOG.error(msg);
+                            log.error(msg);
                             throw new NoSuchElementException(msg);
                         });
     }

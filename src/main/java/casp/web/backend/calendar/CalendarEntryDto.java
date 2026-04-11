@@ -4,17 +4,28 @@ import casp.web.backend.calendar.data.BaseEvent;
 import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.CalendarValidation;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
+@EqualsAndHashCode(of = "id")
 public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarValidation {
+    @Getter
+    @Setter
     private UUID id;
     private LocalDateTime entryFrom;
     private LocalDateTime entryTo;
+    @Getter
+    @Setter
     private UUID baseEventId;
+    @Getter
+    @Setter
     private BaseEventType eventType;
+    @Setter
+    @Getter
     private String name;
 
     public CalendarEntryDto() {
@@ -27,38 +38,6 @@ public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarV
         this.baseEventId = baseEvent.getId();
         this.eventType = baseEvent.getEventType();
         this.name = baseEvent.getName();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(final UUID id) {
-        this.id = id;
-    }
-
-    public UUID getBaseEventId() {
-        return baseEventId;
-    }
-
-    public void setBaseEventId(final UUID baseEventId) {
-        this.baseEventId = baseEventId;
-    }
-
-    public BaseEventType getEventType() {
-        return eventType;
-    }
-
-    public void setEventType(final BaseEventType eventType) {
-        this.eventType = eventType;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
     }
 
     @Override
@@ -84,18 +63,5 @@ public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarV
     @Override
     public int compareTo(CalendarEntryDto calendarEntryDto) {
         return entryFrom.compareTo(calendarEntryDto.entryFrom) + entryTo.compareTo(calendarEntryDto.entryTo);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CalendarEntryDto that)) return false;
-        if (!super.equals(o)) return false;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 }

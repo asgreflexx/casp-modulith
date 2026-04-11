@@ -3,7 +3,9 @@ package casp.web.backend.calendar.presentation;
 import casp.web.backend.calendar.ExamRequiredFields;
 import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class ExamRead extends BaseEventRead<ExamParticipant> implements ExamRequiredFields {
     private String judgeName;
 
@@ -19,15 +21,5 @@ public class ExamRead extends BaseEventRead<ExamParticipant> implements ExamRequ
     @Override
     public void setJudgeName(String judgeName) {
         this.judgeName = judgeName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

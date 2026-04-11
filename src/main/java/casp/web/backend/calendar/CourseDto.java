@@ -3,11 +3,13 @@ package casp.web.backend.calendar;
 import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class CourseDto extends BaseEventDto<Space> implements CourseDtoRequiredFields {
     private int spaceLimit;
     private Set<CoTrainer> coTrainers = new HashSet<>();
@@ -45,15 +47,5 @@ public class CourseDto extends BaseEventDto<Space> implements CourseDtoRequiredF
     @Override
     public void setCoTrainerIds(Set<UUID> coTrainerIds) {
         this.coTrainerIds = coTrainerIds;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

@@ -1,14 +1,15 @@
 package casp.web.backend.calendar.data.options;
 
-
 import casp.web.backend.calendar.options.BaseRecurrenceOptionType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Setter
 @RecurrenceConstraint(message = "The start recurrence date must be at least 6 days before the end recurrence date", plusDays = 6)
 public class WeeklyRecurrenceOption extends RecurrenceOption {
     @Valid
@@ -21,10 +22,6 @@ public class WeeklyRecurrenceOption extends RecurrenceOption {
 
     public List<WeeklyOption> getOccurrences() {
         return occurrences.stream().sorted().toList();
-    }
-
-    public void setOccurrences(List<WeeklyOption> occurrences) {
-        this.occurrences = occurrences;
     }
 
     @Override

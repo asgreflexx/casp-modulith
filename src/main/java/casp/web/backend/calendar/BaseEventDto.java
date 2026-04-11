@@ -1,6 +1,5 @@
 package casp.web.backend.calendar;
 
-
 import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.options.RecurrenceOption;
@@ -9,6 +8,7 @@ import casp.web.backend.calendar.presentation.BaseEventWriteRequiredFields;
 import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.reference.MemberReference;
 import jakarta.validation.Valid;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto implements BaseEventWriteRequiredFields, BaseEventRequiredFields<P> {
     protected BaseEventType eventType;
     protected String name;
@@ -152,7 +153,7 @@ public abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto im
     }
 
     @Override
-    public void setParticipantIds(final Set<UUID> participantIds) {
+    public void setParticipantIds(Set<UUID> participantIds) {
         this.participantIds = participantIds;
     }
 
@@ -162,17 +163,7 @@ public abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto im
     }
 
     @Override
-    public void setParticipants(final Set<@Valid P> participants) {
+    public void setParticipants(Set<@Valid P> participants) {
         this.participants = participants;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

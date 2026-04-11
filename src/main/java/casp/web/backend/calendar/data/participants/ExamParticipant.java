@@ -3,10 +3,16 @@ package casp.web.backend.calendar.data.participants;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@Setter
+@Getter
 public class ExamParticipant extends BaseParticipant {
     @Valid
     @NotNull
@@ -22,26 +28,8 @@ public class ExamParticipant extends BaseParticipant {
         this.dogHasHandler = dogHasHandler;
     }
 
-    public DogHasHandlerReference getDogHasHandler() {
-        return dogHasHandler;
-    }
-
-    public void setDogHasHandler(DogHasHandlerReference dogHasHandler) {
-        this.dogHasHandler = dogHasHandler;
-    }
-
     @Override
     public UUID getId() {
         return dogHasHandler.getId();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

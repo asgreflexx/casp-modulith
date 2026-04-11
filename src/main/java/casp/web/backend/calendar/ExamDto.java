@@ -2,7 +2,9 @@ package casp.web.backend.calendar;
 
 import casp.web.backend.calendar.data.BaseEventType;
 import casp.web.backend.calendar.data.participants.ExamParticipant;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class ExamDto extends BaseEventDto<ExamParticipant> implements ExamRequiredFields {
     private String judgeName;
 
@@ -18,15 +20,5 @@ public class ExamDto extends BaseEventDto<ExamParticipant> implements ExamRequir
     @Override
     public void setJudgeName(String judgeName) {
         this.judgeName = judgeName;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

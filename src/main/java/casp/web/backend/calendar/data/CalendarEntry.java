@@ -1,14 +1,18 @@
 package casp.web.backend.calendar.data;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
-
+@EqualsAndHashCode(of = "id")
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
+    @Setter
+    @Getter
     @Id
     private UUID id = UUID.randomUUID();
 
@@ -24,14 +28,6 @@ public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidat
     public CalendarEntry(LocalDateTime entryFrom, LocalDateTime entryTo) {
         this.entryFrom = entryFrom;
         this.entryTo = entryTo;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
     }
 
     @Override
@@ -57,17 +53,5 @@ public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidat
     @Override
     public int compareTo(CalendarEntry calendar) {
         return entryFrom.compareTo(calendar.entryFrom) + entryTo.compareTo(calendar.entryTo);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CalendarEntry calendar)) return false;
-        return Objects.equals(id, calendar.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
     }
 }
