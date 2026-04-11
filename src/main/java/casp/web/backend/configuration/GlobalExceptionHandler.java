@@ -1,8 +1,7 @@
 package casp.web.backend.configuration;
 
 import jakarta.validation.ConstraintViolationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataAccessException;
@@ -20,11 +19,10 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 import java.util.NoSuchElementException;
 
-
 //https://www.baeldung.com/global-error-handler-in-a-spring-rest-api
+@Slf4j
 @ControllerAdvice
 class GlobalExceptionHandler {
-    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private final String internalExceptionResponse;
 
     @Autowired
@@ -32,18 +30,16 @@ class GlobalExceptionHandler {
         this.internalExceptionResponse = internalExceptionResponse;
     }
 
-    @ExceptionHandler({
-            MissingServletRequestParameterException.class,
+    @ExceptionHandler({MissingServletRequestParameterException.class,
             ConstraintViolationException.class,
             IllegalArgumentException.class,
             IllegalStateException.class,
             MethodArgumentNotValidException.class,
-            MethodArgumentTypeMismatchException.class
-    })
+            MethodArgumentTypeMismatchException.class})
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     GlobalExceptionResponse handleBadRequestException(Exception ex) {
-        LOG.warn("User did something wrong", ex);
+        log.warn("User did something wrong", ex);
         return new GlobalExceptionResponse(ex.getLocalizedMessage());
     }
 
@@ -51,18 +47,16 @@ class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.NOT_FOUND)
     GlobalExceptionResponse handleNoSuchElementException(NoSuchElementException ex) {
-        LOG.warn("The user requested an element that does not exist", ex);
+        log.warn("The user requested an element that does not exist", ex);
         return new GlobalExceptionResponse(ex.getLocalizedMessage());
     }
 
-    @ExceptionHandler({
-            DuplicateKeyException.class,
-            OptimisticLockingFailureException.class
-    })
+    @ExceptionHandler({DuplicateKeyException.class,
+            OptimisticLockingFailureException.class})
     @ResponseBody
     @ResponseStatus(HttpStatus.CONFLICT)
     GlobalExceptionResponse handleConflictException(DataAccessException ex) {
-        LOG.warn("A conflict encountered", ex);
+        log.warn("A conflict encountered", ex);
         return new GlobalExceptionResponse(ex.getLocalizedMessage());
     }
 
@@ -70,7 +64,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     GlobalExceptionResponse handleExceptionInternal(HttpRequestMethodNotSupportedException ex) {
-        LOG.warn("The user made an unsupported call", ex);
+        log.warn("The user made an unsupported call", ex);
         return new GlobalExceptionResponse(ex.getLocalizedMessage());
     }
 
@@ -78,7 +72,7 @@ class GlobalExceptionHandler {
     @ResponseBody
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     GlobalExceptionResponse handleExceptionInternal(RuntimeException ex) {
-        LOG.error("Something went wrong", ex);
+        log.error("Something went wrong", ex);
         return new GlobalExceptionResponse(internalExceptionResponse);
     }
 }
