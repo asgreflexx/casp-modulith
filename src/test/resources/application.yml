@@ -13,13 +13,6 @@ eureka:
   client:
     enabled: false
 
-# For the latest version see: de.flapdoodle.embed.mongo.distribution.Version
-de:
-  flapdoodle:
-    mongodb:
-      embedded:
-        version: 7.0.12
-
 logging:
   level:
     org:

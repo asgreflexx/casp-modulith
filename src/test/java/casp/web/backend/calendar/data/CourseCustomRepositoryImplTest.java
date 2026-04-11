@@ -15,7 +15,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Pageable;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -23,8 +27,12 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@Testcontainers
 @DataMongoTest
 class CourseCustomRepositoryImplTest {
+    @Container
+    @ServiceConnection
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
     @Autowired
     private CourseRepository courseRepository;
     @Autowired
@@ -52,24 +60,21 @@ class CourseCustomRepositoryImplTest {
     void findAllByYear() {
         var coursePage = courseRepository.findAllByYear(2024, Pageable.unpaged());
 
-        assertThat(coursePage)
-                .containsExactly(course);
+        assertThat(coursePage).containsExactly(course);
     }
 
     @Test
     void findAllByMemberIdAndNotDeleted() {
         var courseSet = courseRepository.findAllByMemberIdAndNotDeleted(course.getMember().getId());
 
-        assertThat(courseSet)
-                .containsExactly(course);
+        assertThat(courseSet).containsExactly(course);
     }
 
     @Test
     void findAllByMemberIdAndStatus() {
         var courseSet = courseRepository.findAllByMemberIdAndStatus(course.getMember().getId(), EntityStatus.ACTIVE);
 
-        assertThat(courseSet)
-                .containsExactly(course);
+        assertThat(courseSet).containsExactly(course);
     }
 
     @Test
@@ -125,8 +130,7 @@ class CourseCustomRepositoryImplTest {
 
             var courseSet = courseRepository.findAllBySpaceId(space.getId(), Pageable.unpaged());
 
-            assertThat(courseSet).
-                    containsExactlyInAnyOrder(course, course2);
+            assertThat(courseSet).containsExactlyInAnyOrder(course, course2);
         }
 
         @Test
@@ -139,8 +143,7 @@ class CourseCustomRepositoryImplTest {
 
             var coursePage = courseRepository.findAllBySpaceId(space.getId(), Pageable.unpaged());
 
-            assertThat(coursePage).
-                    containsExactlyInAnyOrder(course);
+            assertThat(coursePage).containsExactlyInAnyOrder(course);
         }
 
         @Test

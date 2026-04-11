@@ -1,6 +1,5 @@
 package casp.web.backend.dog.data;
 
-
 import casp.web.backend.ReferenceTestFixture;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogReference;
@@ -15,14 +14,22 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Pageable;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Testcontainers
 @DataMongoTest
 class DogHasHandlerCustomRepositoryImplTest {
+    @Container
+    @ServiceConnection
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
 
     @Autowired
     private DogHasHandlerRepository dogHasHandlerRepository;
