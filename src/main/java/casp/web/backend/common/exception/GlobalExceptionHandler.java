@@ -4,7 +4,6 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
@@ -18,11 +17,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 //https://www.baeldung.com/global-error-handler-in-a-spring-rest-api
 @Slf4j
 @ControllerAdvice
 class GlobalExceptionHandler {
+    private static final String VALIDATION_ERROR_DETAILS = "Field: %s, rejected value: %s, message: %s";
     private final String internalExceptionResponse;
 
     @Autowired
@@ -30,6 +31,9 @@ class GlobalExceptionHandler {
         this.internalExceptionResponse = internalExceptionResponse;
     }
 
+    // MethodArgumentTypeMismatchException tested: DogHasHandlerRestControllerExceptionIntTest.GetDogHasHandlerById.badRequest
+    // MethodArgumentNotValidException tested: DogHasHandlerRestControllerExceptionIntTest.SaveDogHasHandler.BadRequest.bodyInvalid
+    // ConstraintViolationException tested: DogHasHandlerRestControllerExceptionIntTest.getDogHasHandlersByHandlerIds
     @ExceptionHandler({MissingServletRequestParameterException.class,
             ConstraintViolationException.class,
             IllegalArgumentException.class,
@@ -38,9 +42,25 @@ class GlobalExceptionHandler {
     @ResponseBody
     ProblemDetail handleBadRequestException(Exception ex) {
         log.warn("User did something wrong", ex);
-        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
+        var problemDetail = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        if (ex instanceof MethodArgumentNotValidException exception) {
+            var message = exception
+                    .getBindingResult()
+                    .getFieldErrors()
+                    .stream()
+                    .map(fieldError -> String.format(VALIDATION_ERROR_DETAILS,
+                            fieldError.getField(),
+                            fieldError.getRejectedValue(),
+                            fieldError.getDefaultMessage()))
+                    .collect(Collectors.joining("; "));
+            problemDetail.setDetail(message);
+        } else {
+            problemDetail.setDetail(ex.getLocalizedMessage());
+        }
+        return problemDetail;
     }
 
+    // Tested: DogHasHandlerRestControllerExceptionIntTest.GetDogHasHandlerById.notFound
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseBody
     ProblemDetail handleNoSuchElementException(NoSuchElementException ex) {
@@ -54,7 +74,7 @@ class GlobalExceptionHandler {
             MemberEMailConflictException.class,
             MemberStateConflictException.class})
     @ResponseBody
-    ProblemDetail handleConflictException(DataAccessException ex) {
+    ProblemDetail handleConflictException(Exception ex) {
         log.warn("A conflict encountered", ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getLocalizedMessage());
     }

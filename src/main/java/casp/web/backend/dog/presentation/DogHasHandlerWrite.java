@@ -4,12 +4,13 @@ import casp.web.backend.common.base.BaseView;
 import casp.web.backend.dog.DogHasHandlerDtoRequiredFields;
 import casp.web.backend.dog.data.Grade;
 
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
 public class DogHasHandlerWrite extends BaseView implements DogHasHandlerDtoRequiredFields {
-    private Set<Grade> grades;
+    private Set<Grade> grades = new HashSet<>();
     private UUID memberId;
     private UUID dogId;
 
@@ -53,6 +54,6 @@ public class DogHasHandlerWrite extends BaseView implements DogHasHandlerDtoRequ
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), memberId, dogId);
+        return Objects.hash(memberId, dogId);
     }
 }
