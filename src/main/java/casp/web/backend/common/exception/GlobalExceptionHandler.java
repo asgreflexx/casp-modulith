@@ -8,13 +8,13 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.NoSuchElementException;
@@ -37,42 +37,37 @@ class GlobalExceptionHandler {
             MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class})
     @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    GlobalExceptionResponse handleBadRequestException(Exception ex) {
+    ProblemDetail handleBadRequestException(Exception ex) {
         log.warn("User did something wrong", ex);
-        return new GlobalExceptionResponse(ex.getLocalizedMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(NoSuchElementException.class)
     @ResponseBody
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    GlobalExceptionResponse handleNoSuchElementException(NoSuchElementException ex) {
+    ProblemDetail handleNoSuchElementException(NoSuchElementException ex) {
         log.warn("The user requested an element that does not exist", ex);
-        return new GlobalExceptionResponse(ex.getLocalizedMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler({DuplicateKeyException.class,
             OptimisticLockingFailureException.class})
     @ResponseBody
-    @ResponseStatus(HttpStatus.CONFLICT)
-    GlobalExceptionResponse handleConflictException(DataAccessException ex) {
+    ProblemDetail handleConflictException(DataAccessException ex) {
         log.warn("A conflict encountered", ex);
-        return new GlobalExceptionResponse(ex.getLocalizedMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getLocalizedMessage());
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
-    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
-    GlobalExceptionResponse handleExceptionInternal(HttpRequestMethodNotSupportedException ex) {
+    ProblemDetail handleExceptionInternal(HttpRequestMethodNotSupportedException ex) {
         log.warn("The user made an unsupported call", ex);
-        return new GlobalExceptionResponse(ex.getLocalizedMessage());
+        return ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, ex.getLocalizedMessage());
     }
 
-    @ExceptionHandler(RuntimeException.class)
+    @ExceptionHandler({RuntimeException.class, Exception.class})
     @ResponseBody
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    GlobalExceptionResponse handleExceptionInternal(RuntimeException ex) {
+    ProblemDetail handleExceptionInternal(Exception ex) {
         log.error("Something went wrong", ex);
-        return new GlobalExceptionResponse(internalExceptionResponse);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, internalExceptionResponse);
     }
 }
