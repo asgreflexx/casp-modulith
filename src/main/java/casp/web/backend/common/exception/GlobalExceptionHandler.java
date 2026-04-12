@@ -33,7 +33,6 @@ class GlobalExceptionHandler {
     @ExceptionHandler({MissingServletRequestParameterException.class,
             ConstraintViolationException.class,
             IllegalArgumentException.class,
-            IllegalStateException.class,
             MethodArgumentNotValidException.class,
             MethodArgumentTypeMismatchException.class})
     @ResponseBody
@@ -50,7 +49,10 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler({DuplicateKeyException.class,
-            OptimisticLockingFailureException.class})
+            OptimisticLockingFailureException.class,
+            DogHasHandlerConflictException.class,
+            MemberEMailConflictException.class,
+            MemberStateConflictException.class})
     @ResponseBody
     ProblemDetail handleConflictException(DataAccessException ex) {
         log.warn("A conflict encountered", ex);

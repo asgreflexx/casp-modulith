@@ -1,6 +1,7 @@
 package casp.web.backend.dog;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.exception.DogHasHandlerConflictException;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
@@ -263,7 +264,7 @@ class DogHasHandlerServiceImplTest {
             when(memberReferenceRepository.findOneByIdAndEntityStatus(member.getId(), EntityStatus.ACTIVE)).thenReturn(Optional.of(member));
             when(dogHasHandlerRepository.findByDogIdAndMemberId(dog.getId(), member.getId())).thenReturn(Optional.of(existingDogHasHandler));
 
-            assertThrows(IllegalStateException.class, () -> dogHasHandlerService.saveDogHasHandler(dogHasHandlerDto));
+            assertThrows(DogHasHandlerConflictException.class, () -> dogHasHandlerService.saveDogHasHandler(dogHasHandlerDto));
         }
     }
 

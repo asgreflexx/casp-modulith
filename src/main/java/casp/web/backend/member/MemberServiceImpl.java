@@ -2,6 +2,8 @@ package casp.web.backend.member;
 
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.exception.MemberEMailConflictException;
+import casp.web.backend.common.exception.MemberStateConflictException;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
@@ -99,14 +101,14 @@ class MemberServiceImpl implements MemberService {
             if (m.getEntityStatus() != EntityStatus.ACTIVE) {
                 var msg = "Member with id %s is not active.".formatted(member.getId());
                 log.error(msg);
-                throw new IllegalStateException(msg);
+                throw new MemberStateConflictException(msg);
             }
         });
         memberRepository.findOneByEmail(member.getEmail()).ifPresent(m -> {
             if (!member.equals(m)) {
                 var msg = "Member with email %s already exists.".formatted(member.getEmail());
                 log.error(msg);
-                throw new IllegalStateException(msg);
+                throw new MemberEMailConflictException(msg);
             }
         });
     }

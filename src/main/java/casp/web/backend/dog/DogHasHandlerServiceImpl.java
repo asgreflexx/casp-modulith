@@ -1,6 +1,7 @@
 package casp.web.backend.dog;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.exception.DogHasHandlerConflictException;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
@@ -148,7 +149,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
                         var msg = "There is already a DogHasHandler[id: %s] with this dog[id: %s] and this member[id: %s]"
                                 .formatted(dhh.getId(), dhh.getDog().getId(), dhh.getMember().getId());
                         log.error(msg);
-                        throw new IllegalStateException(msg);
+                        throw new DogHasHandlerConflictException(msg);
                     }
                 });
     }
