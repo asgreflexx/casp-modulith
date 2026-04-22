@@ -12,11 +12,3 @@ casp:
 eureka:
   client:
     enabled: false
-
-logging:
-  level:
-    org:
-      springframework:
-        boot:
-          autoconfigure:
-            mongo:
