@@ -8,8 +8,10 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -34,11 +36,15 @@ class GlobalExceptionHandler {
     // MethodArgumentTypeMismatchException tested: DogHasHandlerRestControllerExceptionIntTest.GetDogHasHandlerById.badRequest
     // MethodArgumentNotValidException tested: DogHasHandlerRestControllerExceptionIntTest.SaveDogHasHandler.BadRequest.bodyInvalid
     // ConstraintViolationException tested: DogHasHandlerRestControllerExceptionIntTest.getDogHasHandlersByHandlerIds
+    // MissingRequestHeaderException tested: CourseRestControllerExceptionIntTest.UpdateSpaces.BadRequest.missingHeader
+    // HttpMessageNotReadableException tested: CourseRestControllerExceptionIntTest.UpdateSpaces.BadRequest.badBody
     @ExceptionHandler({MissingServletRequestParameterException.class,
             ConstraintViolationException.class,
             IllegalArgumentException.class,
             MethodArgumentNotValidException.class,
-            MethodArgumentTypeMismatchException.class})
+            MethodArgumentTypeMismatchException.class,
+            MissingRequestHeaderException.class,
+            HttpMessageNotReadableException.class})
     @ResponseBody
     ProblemDetail handleBadRequestException(Exception ex) {
         log.warn("User did something wrong", ex);

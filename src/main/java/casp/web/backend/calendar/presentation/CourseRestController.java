@@ -75,7 +75,7 @@ class CourseRestController {
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
-    @GetMapping("/space/{dogHasHandlerId}")
+    @GetMapping("space/{dogHasHandlerId}")
     public ResponseEntity<Page<CourseRead>> getCoursesByDogHasHandlerId(@PathVariable UUID dogHasHandlerId, @ParameterObject Pageable pageable) {
         var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, pageable);
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTargetPage(courseDtoPage));
