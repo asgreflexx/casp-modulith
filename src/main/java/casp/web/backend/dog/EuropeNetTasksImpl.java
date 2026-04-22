@@ -18,7 +18,7 @@ import java.util.Map;
 
 @Slf4j
 @Service
-class EuropeNetTasksImpl implements EuropeNetTasks {
+class EuropeNetTasksImpl {
     private static final String DOG_IS_REGISTERED = "Der Hund ist registriert";
     private static final String DOG_NOT_REGISTERED = "Es wurde kein Hund mit diesem Chipcode gefunden";
     private final DogService dogService;
@@ -54,13 +54,6 @@ class EuropeNetTasksImpl implements EuropeNetTasks {
         } else {
             return getNotCheckStatusBecauseOfUnexpectedResponse(body);
         }
-    }
-
-    @Override
-    public Page<DogDto> registerDogsManually(Pageable pageRequest) {
-        var dogPage = dogService.getDogsThatWereNotChecked(pageRequest);
-        registerDogs(dogPage);
-        return dogPage;
     }
 
     @Scheduled(cron = "${casp.cron}")

@@ -1,7 +1,6 @@
 package casp.web.backend.dog.presentation;
 
 import casp.web.backend.dog.DogService;
-import casp.web.backend.dog.EuropeNetTasks;
 import jakarta.validation.Valid;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,12 +28,10 @@ import static casp.web.backend.dog.presentation.DogWriteMapper.WRITE_MAPPER;
 class DogRestController {
 
     private final DogService dogService;
-    private final EuropeNetTasks europeNetTasks;
 
     @Autowired
-    DogRestController(DogService dogService, EuropeNetTasks europeNetTasks) {
+    DogRestController(DogService dogService) {
         this.dogService = dogService;
-        this.europeNetTasks = europeNetTasks;
     }
 
     @GetMapping("{id}")
@@ -60,11 +57,5 @@ class DogRestController {
     ResponseEntity<Void> deleteDogById(@PathVariable UUID id) {
         dogService.deleteDogById(id);
         return ResponseEntity.noContent().build();
-    }
-
-    @PostMapping("register")
-    ResponseEntity<Page<DogRead>> register(@ParameterObject Pageable pageable) {
-        var dogDtoPage = europeNetTasks.registerDogsManually(pageable);
-        return ResponseEntity.ok(READ_MAPPER.toTargetPage(dogDtoPage));
     }
 }
