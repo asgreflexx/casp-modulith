@@ -85,17 +85,19 @@ class GlobalExceptionHandler {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getLocalizedMessage());
     }
 
+    // Tested: GlobalExceptionHandlerIntTest.methodNotSupportedException
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     @ResponseBody
-    ProblemDetail handleExceptionInternal(HttpRequestMethodNotSupportedException ex) {
+    ProblemDetail methodNotSupportedException(HttpRequestMethodNotSupportedException ex) {
         log.warn("The user made an unsupported call", ex);
         return ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, ex.getLocalizedMessage());
     }
 
-    @ExceptionHandler({RuntimeException.class, Exception.class})
+    // Tested: GlobalExceptionHandlerIntTest.handleException
+    @ExceptionHandler(Exception.class)
     @ResponseBody
-    ProblemDetail handleExceptionInternal(Exception ex) {
+    ProblemDetail handleException(Exception ex) {
         log.error("Something went wrong", ex);
-        return ProblemDetail.forStatusAndDetail(HttpStatus.METHOD_NOT_ALLOWED, internalExceptionResponse);
+        return ProblemDetail.forStatusAndDetail(HttpStatus.INTERNAL_SERVER_ERROR, internalExceptionResponse);
     }
 }
