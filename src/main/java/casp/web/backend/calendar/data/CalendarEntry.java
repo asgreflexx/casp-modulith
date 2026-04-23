@@ -1,5 +1,6 @@
 package casp.web.backend.calendar.data;
 
+import com.querydsl.core.annotations.QueryEmbeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@QueryEmbeddable
 @Setter
 @Getter
 @EqualsAndHashCode(of = "id")

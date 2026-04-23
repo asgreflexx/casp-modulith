@@ -14,4 +14,7 @@ public interface BaseEventCustomRepository<T extends BaseEvent<?>> {
     Set<T> findAllByMemberIdAndStatus(UUID memberId, EntityStatus status);
 
     Stream<T> findAllBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId);
+
+    @Deprecated(forRemoval = true, since = "2026-04-23")
+    boolean migrateLocaDateTimeToOffsetDateTime();
 }

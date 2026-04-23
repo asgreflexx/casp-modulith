@@ -4,11 +4,13 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.QDogHasHandlerReference;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 
 import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -18,6 +20,10 @@ import java.util.stream.Collectors;
 abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements BaseEventCustomRepository<T> {
     private static final QBaseEvent BASE_EVENT = QBaseEvent.baseEvent;
     private static final QDogHasHandlerReference DOG_HAS_HANDLER_REFERENCE = QDogHasHandlerReference.dogHasHandlerReference;
+    @Deprecated(forRemoval = true, since = "2026-04-23")
+    private static final ZoneId ZONE_ID = ZoneId.of("Europe/Vienna");
+    @Deprecated(forRemoval = true, since = "2026-04-23")
+    private static final int BATCH_SIZE = 10;
     final MongoOperations mongoOperations;
     private final Class<T> baseEventClass;
 
@@ -40,6 +46,30 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
         var criteria = BASE_EVENT.entityStatus.eq(status)
                 .and(BASE_EVENT.member.id.eq(memberId));
         return findAllByCriteria(criteria);
+    }
+
+    @Override
+    public boolean migrateLocaDateTimeToOffsetDateTime() {
+        var criteria = BASE_EVENT.calendarEntries.any().entryFromODT.isNull();
+        var page = query()
+                .where(criteria)
+                .fetchPage(PageRequest.ofSize(BATCH_SIZE));
+        page
+                .getContent()
+                .forEach(this::convertCalendarEntriesToODT);
+        return page.isEmpty();
+
+    }
+
+    @Deprecated(forRemoval = true, since = "2026-04-23")
+    private void convertCalendarEntriesToODT(T t) {
+        t.calendarEntries.forEach(calendarEntry -> {
+            var entryToODT = calendarEntry.getEntryTo().atZone(ZONE_ID).toOffsetDateTime();
+            var entryFromODT = calendarEntry.getEntryFrom().atZone(ZONE_ID).toOffsetDateTime();
+            calendarEntry.setEntryToODT(entryToODT);
+            calendarEntry.setEntryFromODT(entryFromODT);
+        });
+        mongoOperations.save(t);
     }
 
     protected static BooleanExpression createTimeRangeCriteria(LocalDateTime from, LocalDateTime to) {
