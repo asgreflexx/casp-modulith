@@ -9,23 +9,24 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@Getter
+@Setter
 @EqualsAndHashCode(of = "id")
 public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarValidation {
-    @Getter
-    @Setter
     private UUID id;
+    @Deprecated(forRemoval = true, since = "2026-04-23")
     private LocalDateTime entryFrom;
+    @Deprecated(forRemoval = true, since = "2026-04-23")
     private LocalDateTime entryTo;
-    @Getter
-    @Setter
+    // TODO should be not null
+    private OffsetDateTime entryFromODT;
+    // TODO should be not null
+    private OffsetDateTime entryToODT;
     private UUID baseEventId;
-    @Getter
-    @Setter
     private BaseEventType eventType;
-    @Setter
-    @Getter
     private String name;
 
     public CalendarEntryDto() {
@@ -38,26 +39,6 @@ public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarV
         this.baseEventId = baseEvent.getId();
         this.eventType = baseEvent.getEventType();
         this.name = baseEvent.getName();
-    }
-
-    @Override
-    public LocalDateTime getEntryFrom() {
-        return entryFrom;
-    }
-
-    @Override
-    public void setEntryFrom(LocalDateTime entryFrom) {
-        this.entryFrom = entryFrom;
-    }
-
-    @Override
-    public LocalDateTime getEntryTo() {
-        return entryTo;
-    }
-
-    @Override
-    public void setEntryTo(LocalDateTime entryTo) {
-        this.entryTo = entryTo;
     }
 
     @Override

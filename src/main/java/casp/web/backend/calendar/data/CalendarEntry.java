@@ -1,52 +1,35 @@
 package casp.web.backend.calendar.data;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
+@Setter
+@Getter
 @EqualsAndHashCode(of = "id")
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
-    @Setter
-    @Getter
     @Id
     private UUID id = UUID.randomUUID();
-
-    @NotNull
+    @Deprecated(forRemoval = true, since = "2026-04-23")
     private LocalDateTime entryFrom;
-
-    @NotNull
+    @Deprecated(forRemoval = true, since = "2026-04-23")
     private LocalDateTime entryTo;
+    // TODO should be not null
+    private OffsetDateTime entryFromODT;
+    // TODO should be not null
+    private OffsetDateTime entryToODT;
 
     public CalendarEntry() {
     }
 
+    @Deprecated(forRemoval = true, since = "2026-04-23")
     public CalendarEntry(LocalDateTime entryFrom, LocalDateTime entryTo) {
         this.entryFrom = entryFrom;
-        this.entryTo = entryTo;
-    }
-
-    @Override
-    public LocalDateTime getEntryFrom() {
-        return entryFrom;
-    }
-
-    @Override
-    public void setEntryFrom(LocalDateTime entryFrom) {
-        this.entryFrom = entryFrom;
-    }
-
-    @Override
-    public LocalDateTime getEntryTo() {
-        return entryTo;
-    }
-
-    @Override
-    public void setEntryTo(LocalDateTime entryTo) {
         this.entryTo = entryTo;
     }
 
