@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import static casp.web.backend.calendar.EventMapper.EVENT_MAPPER;
 
 @Service
-class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto, EventParticipant> implements EventService {
+class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto, EventParticipant, EventRepository> implements EventService {
 
     @Autowired
     EventServiceImpl(EventRepository eventRepository) {
@@ -25,7 +25,7 @@ class EventServiceImpl extends BaseEventServiceImpl<Event, EventDto, EventPartic
         setCalendarEntriesAndMember(dto, event);
         setParticipants(dto, event);
 
-        baseRepository.save(event);
+        repository.save(event);
     }
 
     @Override

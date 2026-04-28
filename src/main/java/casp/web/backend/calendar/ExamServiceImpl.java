@@ -13,12 +13,10 @@ import java.util.stream.Stream;
 import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
 
 @Service
-class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipant> implements ExamService {
-    private final ExamRepository examRepository;
+class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipant, ExamRepository> implements ExamService {
 
     ExamServiceImpl(ExamRepository examRepository) {
         super(examRepository);
-        this.examRepository = examRepository;
     }
 
     @Override
@@ -27,7 +25,7 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipan
         setCalendarEntriesAndMember(dto, exam);
         setParticipants(dto, exam);
 
-        baseRepository.save(exam);
+        repository.save(exam);
     }
 
     @Override
@@ -37,7 +35,7 @@ class ExamServiceImpl extends BaseEventServiceImpl<Exam, ExamDto, ExamParticipan
 
     @Override
     public Page<ExamDto> getExamsByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
-        var examPage = examRepository.findAllByParticipantId(dogHasHandlerId, pageable);
+        var examPage = repository.findAllByParticipantId(dogHasHandlerId, pageable);
         return EXAM_MAPPER.toTargetPage(examPage);
     }
 

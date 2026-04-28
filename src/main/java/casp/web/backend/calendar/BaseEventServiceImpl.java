@@ -24,18 +24,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
-abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<T> {
+abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventDto<P>, P extends BaseParticipant, R extends BaseRepository<D>> implements BaseEventService<T> {
     private final BaseEventCustomRepository<D> baseEventCustomRepository;
     private final Class<D> documentClass;
-    final BaseRepository<D> baseRepository;
+    final R repository;
     private MemberReferenceRepository memberReferenceRepository;
     private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     private ZoneId zoneId;
 
     @SuppressWarnings("unchecked")
-    BaseEventServiceImpl(BaseRepository<D> baseRepository) {
-        this.baseRepository = baseRepository;
-        baseEventCustomRepository = (BaseEventCustomRepository<D>) baseRepository;
+    BaseEventServiceImpl(R repository) {
+        this.repository = repository;
+        baseEventCustomRepository = (BaseEventCustomRepository<D>) repository;
         var types = (ParameterizedType) getClass().getGenericSuperclass();
         documentClass = (Class<D>) types.getActualTypeArguments()[0];
     }
@@ -97,7 +97,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
     }
 
     D getOneByIdOrThrowException(UUID id) {
-        return baseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+        return repository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> {
                     var msg = "%s with id %s does not exist or it is not active.".formatted(documentClass.getSimpleName(), id);
                     log.error(msg);
@@ -107,7 +107,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
 
     private void saveItNewEntityStatus(D document, EntityStatus entityStatus) {
         document.setEntityStatus(entityStatus);
-        baseRepository.save(document);
+        repository.save(document);
     }
 
     Optional<DogHasHandlerReference> findDogHandlerReferenceById(UUID dogHasHandlerId) {
@@ -115,7 +115,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
     }
 
     private Set<P> getExistingParticipantsMatchingDtoParticipantIds(T dto) {
-        return baseRepository.findOneByIdAndEntityStatus(dto.getId(), EntityStatus.ACTIVE)
+        return repository.findOneByIdAndEntityStatus(dto.getId(), EntityStatus.ACTIVE)
                 .stream()
                 .flatMap(p -> p.getParticipants().stream())
                 .filter(p -> dto.getParticipantIds().contains(p.getId()))
