@@ -1,23 +1,19 @@
 package casp.web.backend.calendar;
 
 import casp.web.backend.calendar.data.CalendarValidation;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Objects;
 
 @Getter
 @Setter
 public class NewCalendarEntryDto implements CalendarValidation {
-    @Deprecated(forRemoval = true, since = "2026-04-23")
-    private LocalDateTime entryFrom;
-    @Deprecated(forRemoval = true, since = "2026-04-23")
-    private LocalDateTime entryTo;
-    // TODO should be not null
+    @NotNull
     private OffsetDateTime entryFromODT;
-    // TODO should be not null
+    @NotNull
     private OffsetDateTime entryToODT;
 
     @Override

@@ -5,7 +5,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -17,7 +16,6 @@ import java.util.UUID;
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"entryFromODT", "entryToODT"})
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
-    @Id
     private UUID id = UUID.randomUUID();
     @Deprecated(forRemoval = true, since = "2026-04-23")
     private LocalDateTime entryFrom;

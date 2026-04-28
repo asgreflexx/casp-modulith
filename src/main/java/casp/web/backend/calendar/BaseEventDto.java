@@ -7,8 +7,9 @@ import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.calendar.presentation.BaseEventWriteRequiredFields;
 import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.reference.MemberReference;
-import jakarta.validation.Valid;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -17,9 +18,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
-public abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto implements BaseEventWriteRequiredFields, BaseEventRequiredFields<P> {
-    protected BaseEventType eventType;
+abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto implements BaseEventWriteRequiredFields, BaseEventRequiredFields<P> {
     protected String name;
     protected String description;
     protected String location;
@@ -28,142 +30,13 @@ public abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto im
     protected RecurrenceOption recurrenceOption;
     protected LocalDateTime minTime;
     protected LocalDateTime maxTime;
-    protected NewCalendarEntryDto newCalendarEntry;
     protected List<CalendarEntry> calendarEntries = new ArrayList<>();
-    protected Set<UUID> participantIds = new HashSet<>();
     protected Set<P> participants = new HashSet<>();
+    private BaseEventType eventType;
+    private NewCalendarEntryDto newCalendarEntry;
+    private Set<UUID> participantIds = new HashSet<>();
 
-    protected BaseEventDto(BaseEventType eventType) {
+    BaseEventDto(BaseEventType eventType) {
         this.eventType = eventType;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public String getLocation() {
-        return location;
-    }
-
-    @Override
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    @Override
-    public MemberReference getMember() {
-        return member;
-    }
-
-    @Override
-    public void setMember(MemberReference member) {
-        this.member = member;
-    }
-
-    @Override
-    public UUID getMemberId() {
-        return memberId;
-    }
-
-    @Override
-    public void setMemberId(UUID memberId) {
-        this.memberId = memberId;
-    }
-
-    @Override
-    public RecurrenceOption getRecurrenceOption() {
-        return recurrenceOption;
-    }
-
-    @Override
-    public void setRecurrenceOption(RecurrenceOption recurrenceOption) {
-        this.recurrenceOption = recurrenceOption;
-    }
-
-    @Override
-    public BaseEventType getEventType() {
-        return eventType;
-    }
-
-    @Override
-    public void setEventType(BaseEventType eventType) {
-        this.eventType = eventType;
-    }
-
-    @Override
-    public LocalDateTime getMinTime() {
-        return minTime;
-    }
-
-    @Override
-    public void setMinTime(LocalDateTime minTime) {
-        this.minTime = minTime;
-    }
-
-    @Override
-    public LocalDateTime getMaxTime() {
-        return maxTime;
-    }
-
-    @Override
-    public void setMaxTime(LocalDateTime maxTime) {
-        this.maxTime = maxTime;
-    }
-
-    @Override
-    public @Valid NewCalendarEntryDto getNewCalendarEntry() {
-        return newCalendarEntry;
-    }
-
-    @Override
-    public void setNewCalendarEntry(@Valid NewCalendarEntryDto newCalendarEntry) {
-        this.newCalendarEntry = newCalendarEntry;
-    }
-
-    @Override
-    public List<CalendarEntry> getCalendarEntries() {
-        return calendarEntries;
-    }
-
-    @Override
-    public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
-        this.calendarEntries = calendarEntries;
-    }
-
-    @Override
-    public Set<UUID> getParticipantIds() {
-        return participantIds;
-    }
-
-    @Override
-    public void setParticipantIds(Set<UUID> participantIds) {
-        this.participantIds = participantIds;
-    }
-
-    @Override
-    public Set<@Valid P> getParticipants() {
-        return this.participants;
-    }
-
-    @Override
-    public void setParticipants(Set<@Valid P> participants) {
-        this.participants = participants;
     }
 }
