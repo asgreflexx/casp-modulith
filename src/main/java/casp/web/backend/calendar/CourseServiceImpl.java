@@ -4,8 +4,6 @@ import casp.web.backend.calendar.data.Course;
 import casp.web.backend.calendar.data.CourseRepository;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.common.reference.MemberReferenceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -26,10 +24,8 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
     private final CourseRepository courseRepository;
 
     @Autowired
-    CourseServiceImpl(CourseRepository courseRepository,
-                      MemberReferenceRepository memberReferenceRepository,
-                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
-        super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository);
+    CourseServiceImpl(CourseRepository courseRepository) {
+        super(courseRepository);
         this.courseRepository = courseRepository;
     }
 

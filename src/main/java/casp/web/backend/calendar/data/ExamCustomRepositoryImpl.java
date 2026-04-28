@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -34,7 +34,7 @@ class ExamCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Exam> imple
     }
 
     @Override
-    public Stream<Exam> findAllBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId) {
+    public Stream<Exam> findAllBetweenFromAndToOrMemberId(OffsetDateTime from, OffsetDateTime to, @Nullable UUID memberId) {
         var criteria = createTimeRangeCriteria(from, to);
         if (memberId != null) {
             criteria = criteria.and(EXAM.member.id.eq(memberId)

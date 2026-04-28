@@ -1,7 +1,6 @@
 package casp.web.backend.calendar;
 
 import casp.web.backend.ReferenceTestFixture;
-import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.Event;
 import casp.web.backend.calendar.data.EventRepository;
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
@@ -15,11 +14,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.NoSuchElementException;
@@ -28,6 +25,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static casp.web.backend.calendar.CalendarFixture.ZONE_ID;
+import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
+import static casp.web.backend.calendar.CalendarFixture.createLocalDate;
+import static casp.web.backend.calendar.CalendarFixture.createNewCalendarEntryDto;
 import static casp.web.backend.calendar.EventMapper.EVENT_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -48,12 +49,14 @@ class EventServiceImplTest {
 
     private Event event;
 
-    @InjectMocks
     private EventServiceImpl eventService;
 
     @BeforeEach
     void setUp() {
         event = new Event();
+        eventService = new EventServiceImpl(eventRepository);
+        eventService.setZoneId(ZONE_ID);
+        eventService.setMemberReferenceRepository(memberReferenceRepository);
     }
 
     @Test
@@ -101,9 +104,9 @@ class EventServiceImplTest {
 
     @Test
     void getCalendarEntries() {
-        var from = LocalDateTime.now().minusDays(1);
-        var to = from.plusDays(1);
-        var calendarEntry = new CalendarEntry(from, to);
+        var calendarEntry = createCalendarEntry();
+        var from = calendarEntry.getEntryFromODT();
+        var to = calendarEntry.getEntryToODT();
         event.addCalendarEntry(calendarEntry);
         when(eventRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(event));
 
@@ -112,8 +115,8 @@ class EventServiceImplTest {
         assertThat(calendarEntryDtoStream)
                 .singleElement()
                 .satisfies(ce -> {
-                    assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
-                    assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
+                    assertEquals(calendarEntry.getEntryFromODT(), ce.getEntryFromODT());
+                    assertEquals(calendarEntry.getEntryToODT(), ce.getEntryToODT());
                     assertSame(event.getEventType(), ce.getEventType());
                 });
     }
@@ -125,9 +128,7 @@ class EventServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            newCalendarEntryDto = new NewCalendarEntryDto();
-            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
-            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
+            newCalendarEntryDto = createNewCalendarEntryDto();
             eventDto = new EventDto();
             eventDto.setNewCalendarEntry(newCalendarEntryDto);
         }
@@ -143,11 +144,11 @@ class EventServiceImplTest {
             assertThat(actualCourse.getCalendarEntries())
                     .singleElement()
                     .satisfies(ce -> {
-                        assertEquals(newCalendarEntryDto.getEntryFrom(), ce.getEntryFrom());
-                        assertEquals(newCalendarEntryDto.getEntryTo(), ce.getEntryTo());
+                        assertEquals(newCalendarEntryDto.getEntryFromODT(), ce.getEntryFromODT());
+                        assertEquals(newCalendarEntryDto.getEntryToODT(), ce.getEntryToODT());
                     });
-            assertEquals(newCalendarEntryDto.getEntryFrom(), actualCourse.getMinTime());
-            assertEquals(newCalendarEntryDto.getEntryTo(), actualCourse.getMaxTime());
+            assertEquals(newCalendarEntryDto.getEntryFromODT(), actualCourse.getMinTimeODT());
+            assertEquals(newCalendarEntryDto.getEntryToODT(), actualCourse.getMaxTimeODT());
         }
 
         @Test
@@ -158,19 +159,23 @@ class EventServiceImplTest {
             var daily = new DailyRecurrenceOption();
             daily.setStartTime(LocalTime.of(1, 0, 0));
             daily.setEndTime(LocalTime.of(3, 0, 0));
-            daily.setStartRecurrence(LocalDate.of(2024, 10, 1));
-            daily.setEndRecurrence(LocalDate.of(2024, 10, 3));
+            daily.setStartRecurrence(createLocalDate(0));
+            daily.setEndRecurrence(createLocalDate(2));
             eventDto.setRecurrenceOption(daily);
-            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime());
-            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime());
+            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime())
+                    .atZone(ZONE_ID)
+                    .toOffsetDateTime();
+            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime())
+                    .atZone(ZONE_ID)
+                    .toOffsetDateTime();
 
             eventService.save(eventDto);
 
             var actualCourse = getEventSaved();
             assertThat(actualCourse.getCalendarEntries())
                     .hasSize(3);
-            assertEquals(minTime, actualCourse.getMinTime());
-            assertEquals(maxTime, actualCourse.getMaxTime());
+            assertEquals(minTime, actualCourse.getMinTimeODT());
+            assertEquals(maxTime, actualCourse.getMaxTimeODT());
         }
 
         @Test
@@ -199,9 +204,7 @@ class EventServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            var newCalendarEntryDto = new NewCalendarEntryDto();
-            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
-            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
+            var newCalendarEntryDto = createNewCalendarEntryDto();
             eventDto = new EventDto();
             eventDto.setMemberId(mockMember().getId());
             eventDto.setNewCalendarEntry(newCalendarEntryDto);

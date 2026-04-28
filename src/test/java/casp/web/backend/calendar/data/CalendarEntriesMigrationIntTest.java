@@ -61,11 +61,21 @@ class CalendarEntriesMigrationIntTest {
 
         calendarEntriesMigration.migrate();
 
-        var actualCalendarEntries = Stream.of(courseRepository, eventRepository, examRepository)
+        var baseEvents = Stream.of(courseRepository, eventRepository, examRepository)
                 .flatMap(r -> r.findAll().stream())
+                .toList();
+        var actualCalendarEntries = baseEvents
+                .stream()
                 .flatMap(e -> e.getCalendarEntries().stream())
                 .toList();
-
+        assertThat(baseEvents)
+                .hasSize(3)
+                .map(BaseEvent::getMinTimeODT)
+                .allSatisfy(odt -> assertOffsetDateTime(odt, OFFSET_1_HOUR, FIRST_OF_JANUARY));
+        assertThat(baseEvents)
+                .hasSize(3)
+                .map(BaseEvent::getMaxTimeODT)
+                .allSatisfy(odt -> assertOffsetDateTime(odt, OFFSET_2_HOURS, FIRST_OF_MAY));
         assertThat(actualCalendarEntries)
                 .hasSize(3)
                 .allSatisfy(CalendarEntriesMigrationIntTest::assertCalendarEntry);

@@ -8,19 +8,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
+import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
-@DataMongoTest
+@SpringBootTest
 class EventCustomRepositoryImplTest {
     @Container
     @ServiceConnection
@@ -45,23 +45,21 @@ class EventCustomRepositoryImplTest {
 
         @BeforeEach
         void setUp() {
-            calendarEntry = new CalendarEntry();
-            calendarEntry.setEntryFrom(LocalDateTime.of(2024, 1, 1, 0, 0));
-            calendarEntry.setEntryTo(calendarEntry.getEntryFrom().plusHours(10));
+            calendarEntry = createCalendarEntry();
             event1 = eventRepository.save(createEvent("Event1"));
             event2 = eventRepository.save(createEvent("Event2"));
         }
 
         @Test
         void memberIdIsNull() {
-            var actualEvents = eventRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), null);
+            var actualEvents = eventRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), null);
 
             assertThat(actualEvents).containsExactlyInAnyOrder(event1, event2);
         }
 
         @Test
         void memberIdIsTheSameAsEventMember() {
-            var actualEvents = eventRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), event2.member.getId());
+            var actualEvents = eventRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), event2.member.getId());
 
             assertThat(actualEvents).containsExactly(event2);
         }
@@ -70,7 +68,7 @@ class EventCustomRepositoryImplTest {
         void memberIdIsTheSameAsEventParticipant() {
             var participantMemberId = event2.getParticipants().stream().map(ep -> ep.getMember().getId()).toList().getFirst();
 
-            var actualEvents = eventRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), participantMemberId);
+            var actualEvents = eventRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), participantMemberId);
 
             assertThat(actualEvents).containsExactly(event2);
         }

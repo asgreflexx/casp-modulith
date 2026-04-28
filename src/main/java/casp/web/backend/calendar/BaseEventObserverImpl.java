@@ -4,7 +4,7 @@ import casp.web.backend.calendar.data.BaseEventType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +38,7 @@ class BaseEventObserverImpl implements BaseEventObserver {
     }
 
     @Override
-    public List<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, UUID memberId) {
+    public List<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(OffsetDateTime from, OffsetDateTime to, UUID memberId) {
         return observerMap.entrySet()
                 .stream()
                 .flatMap(observer -> observer.getValue().getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId))

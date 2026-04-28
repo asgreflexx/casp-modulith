@@ -17,6 +17,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -28,16 +30,18 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     private static final QSpace SPACE = QSpace.space;
     private static final String TOTAL_PAID = "totalPaid";
     private static final String AGGREGATION_ID = "_id";
+    private final ZoneId zoneId;
 
     @Autowired
-    CourseCustomRepositoryImpl(MongoOperations mongoOperations) {
+    CourseCustomRepositoryImpl(MongoOperations mongoOperations, ZoneId zoneId) {
         super(mongoOperations);
+        this.zoneId = zoneId;
     }
 
     @Override
     public Page<Course> findAllByYear(int year, Pageable pageable) {
-        var from = LocalDateTime.of(LocalDate.of(year, 1, 1), LocalTime.MIN);
-        var to = LocalDateTime.of(LocalDate.of(year, 12, 31), LocalTime.MAX);
+        var from = LocalDateTime.of(LocalDate.of(year, 1, 1), LocalTime.MIN).atZone(zoneId).toOffsetDateTime();
+        var to = LocalDateTime.of(LocalDate.of(year, 12, 31), LocalTime.MAX).atZone(zoneId).toOffsetDateTime();
 
         return query()
                 .where(createTimeRangeCriteria(from, to))
@@ -55,7 +59,9 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     }
 
     @Override
-    public Stream<Course> findAllBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId) {
+    public Stream<Course> findAllBetweenFromAndToOrMemberId(OffsetDateTime from,
+                                                            OffsetDateTime to,
+                                                            @Nullable UUID memberId) {
         var criteria = createTimeRangeCriteria(from, to);
         if (memberId != null) {
             criteria = criteria.and(COURSE.member.id.eq(memberId)

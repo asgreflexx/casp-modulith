@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 
 import java.lang.reflect.ParameterizedType;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
@@ -63,26 +63,28 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
 
     @Deprecated(forRemoval = true, since = "2026-04-23")
     private void convertCalendarEntriesToODT(T t) {
-        t.calendarEntries.forEach(calendarEntry -> {
+        t.getCalendarEntries().forEach(calendarEntry -> {
             var entryToODT = calendarEntry.getEntryTo().atZone(ZONE_ID).toOffsetDateTime();
             var entryFromODT = calendarEntry.getEntryFrom().atZone(ZONE_ID).toOffsetDateTime();
             calendarEntry.setEntryToODT(entryToODT);
             calendarEntry.setEntryFromODT(entryFromODT);
         });
+        t.setMaxTimeODT(t.getMaxTime().atZone(ZONE_ID).toOffsetDateTime());
+        t.setMinTimeODT(t.getMinTime().atZone(ZONE_ID).toOffsetDateTime());
         mongoOperations.save(t);
     }
 
-    protected static BooleanExpression createTimeRangeCriteria(LocalDateTime from, LocalDateTime to) {
+    static BooleanExpression createTimeRangeCriteria(OffsetDateTime from, OffsetDateTime to) {
         return BASE_EVENT.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(BASE_EVENT.maxTime.goe(from)
-                        .and(BASE_EVENT.minTime.loe(to)));
+                .and(BASE_EVENT.maxTimeODT.goe(from)
+                        .and(BASE_EVENT.minTimeODT.loe(to)));
     }
 
     protected SpringDataMongodbQuery<T> query() {
         return new SpringDataMongodbQuery<>(mongoOperations, baseEventClass);
     }
 
-    protected List<UUID> findDogHasHandlerIdsByMemberId(UUID memberId) {
+    List<UUID> findDogHasHandlerIdsByMemberId(UUID memberId) {
         var memberIdCondition = DOG_HAS_HANDLER_REFERENCE.member.id.eq(memberId);
         return activeDogHasHandlerQuery(memberIdCondition)
                 .stream()
@@ -90,7 +92,7 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
                 .toList();
     }
 
-    protected Optional<UUID> findActiveDogHandlerReferenceById(UUID participantId) {
+    Optional<UUID> findActiveDogHandlerReferenceById(UUID participantId) {
         return activeDogHasHandlerQuery(DOG_HAS_HANDLER_REFERENCE.id.eq(participantId))
                 .stream()
                 .findAny()

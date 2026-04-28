@@ -10,20 +10,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Pageable;
 import org.testcontainers.containers.MongoDBContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
+import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @Testcontainers
-@DataMongoTest
+@SpringBootTest
 class ExamCustomRepositoryImplTest {
     @Container
     @ServiceConnection
@@ -106,30 +106,28 @@ class ExamCustomRepositoryImplTest {
 
         @Test
         void memberIdIsNull() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), null);
+            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), null);
 
             assertThat(actualExams).containsExactlyInAnyOrder(exam1, exam2);
         }
 
         @Test
         void memberIdIsTheSameAsExamMember() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), exam2.member.getId());
+            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), exam2.member.getId());
 
             assertThat(actualExams).containsExactly(exam2);
         }
 
         @Test
         void memberIdIsTheSameAsExamParticipant() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), participant2.getDogHasHandler().getMember().getId());
+            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), participant2.getDogHasHandler().getMember().getId());
 
             assertThat(actualExams).containsExactly(exam2);
         }
     }
 
     private Exam createExam(String name, EntityStatus entityStatus, ExamParticipant participant) {
-        calendarEntry = new CalendarEntry();
-        calendarEntry.setEntryFrom(LocalDateTime.of(2024, 1, 1, 0, 0));
-        calendarEntry.setEntryTo(calendarEntry.getEntryFrom().plusHours(10));
+        calendarEntry = createCalendarEntry();
         var exam = new Exam();
         exam.setName(name);
         exam.setEntityStatus(entityStatus);

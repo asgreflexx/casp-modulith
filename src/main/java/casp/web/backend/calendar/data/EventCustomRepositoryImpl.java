@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 import java.util.stream.Stream;
 
@@ -19,7 +19,7 @@ class EventCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Event> imp
     }
 
     @Override
-    public Stream<Event> findAllBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId) {
+    public Stream<Event> findAllBetweenFromAndToOrMemberId(OffsetDateTime from, OffsetDateTime to, @Nullable UUID memberId) {
         var criteria = createTimeRangeCriteria(from, to);
         if (memberId != null) {
             criteria = criteria.and(EVENT.member.id.eq(memberId)

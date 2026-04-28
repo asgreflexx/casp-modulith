@@ -4,6 +4,7 @@ import com.querydsl.core.annotations.QueryEmbeddable;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Setter
 @Getter
 @EqualsAndHashCode(of = "id")
+@ToString(of = {"entryFromODT", "entryToODT"})
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
     @Id
     private UUID id = UUID.randomUUID();
@@ -29,14 +31,13 @@ public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidat
     public CalendarEntry() {
     }
 
-    @Deprecated(forRemoval = true, since = "2026-04-23")
-    public CalendarEntry(LocalDateTime entryFrom, LocalDateTime entryTo) {
-        this.entryFrom = entryFrom;
-        this.entryTo = entryTo;
+    public CalendarEntry(OffsetDateTime entryFromODT, OffsetDateTime entryToODT) {
+        this.entryFromODT = entryFromODT;
+        this.entryToODT = entryToODT;
     }
 
     @Override
     public int compareTo(CalendarEntry calendar) {
-        return entryFrom.compareTo(calendar.entryFrom) + entryTo.compareTo(calendar.entryTo);
+        return entryFromODT.compareTo(calendar.entryFromODT) + entryToODT.compareTo(calendar.entryToODT);
     }
 }

@@ -2,7 +2,7 @@ package casp.web.backend.calendar;
 
 import jakarta.annotation.Nullable;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -13,5 +13,5 @@ public interface BaseEventObserver {
 
     void activateBaseEventsByMemberId(UUID memberId);
 
-    List<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId);
+    List<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(OffsetDateTime from, OffsetDateTime to, @Nullable UUID memberId);
 }

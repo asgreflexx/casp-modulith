@@ -6,6 +6,7 @@ import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.CalendarValidation;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(of = "id")
+@NoArgsConstructor
 public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarValidation {
     private UUID id;
     @Deprecated(forRemoval = true, since = "2026-04-23")
@@ -29,13 +31,12 @@ public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarV
     private BaseEventType eventType;
     private String name;
 
-    public CalendarEntryDto() {
-    }
-
-    public CalendarEntryDto(CalendarEntry calendarEntry, BaseEvent<?> baseEvent) {
+    CalendarEntryDto(CalendarEntry calendarEntry, BaseEvent<?> baseEvent) {
         this.id = calendarEntry.getId();
         this.entryFrom = calendarEntry.getEntryFrom();
         this.entryTo = calendarEntry.getEntryTo();
+        this.entryFromODT = calendarEntry.getEntryFromODT();
+        this.entryToODT = calendarEntry.getEntryToODT();
         this.baseEventId = baseEvent.getId();
         this.eventType = baseEvent.getEventType();
         this.name = baseEvent.getName();
@@ -43,6 +44,6 @@ public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarV
 
     @Override
     public int compareTo(CalendarEntryDto calendarEntryDto) {
-        return entryFrom.compareTo(calendarEntryDto.entryFrom) + entryTo.compareTo(calendarEntryDto.entryTo);
+        return entryFromODT.compareTo(calendarEntryDto.entryFromODT) + entryToODT.compareTo(calendarEntryDto.entryToODT);
     }
 }

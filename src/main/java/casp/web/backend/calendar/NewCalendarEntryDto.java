@@ -24,11 +24,11 @@ public class NewCalendarEntryDto implements CalendarValidation {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof NewCalendarEntryDto that)) return false;
-        return Objects.equals(entryFrom, that.entryFrom) && Objects.equals(entryTo, that.entryTo);
+        return Objects.equals(entryFromODT, that.entryFromODT) && Objects.equals(entryToODT, that.entryToODT);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(entryFrom, entryTo);
+        return Objects.hash(entryFromODT, entryToODT);
     }
 }

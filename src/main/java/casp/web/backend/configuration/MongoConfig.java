@@ -1,6 +1,7 @@
 package casp.web.backend.configuration;
 
 import org.bson.Document;
+import org.springframework.boot.autoconfigure.jackson.JacksonProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -9,6 +10,7 @@ import org.springframework.data.convert.WritingConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
 
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -44,5 +46,10 @@ class MongoConfig {
                 new OffsetDateTimeWriteConverter(),
                 new OffsetDateTimeReadConverter()
         ));
+    }
+
+    @Bean
+    public ZoneId zoneId(JacksonProperties jacksonProperties) {
+        return jacksonProperties.getTimeZone().toZoneId();
     }
 }

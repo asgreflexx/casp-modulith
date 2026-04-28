@@ -5,7 +5,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,16 +20,16 @@ class CalendarFromToValidationTest {
 
     @Test
     void isValid() {
-        when(calendarValidation.getEntryFrom()).thenReturn(LocalDateTime.MIN);
-        when(calendarValidation.getEntryTo()).thenReturn(LocalDateTime.MAX);
+        when(calendarValidation.getEntryFromODT()).thenReturn(OffsetDateTime.MIN);
+        when(calendarValidation.getEntryToODT()).thenReturn(OffsetDateTime.MAX);
 
         assertTrue(VALIDATION.isValid(calendarValidation, null));
     }
 
     @Test
     void isInvalid() {
-        when(calendarValidation.getEntryFrom()).thenReturn(LocalDateTime.MIN);
-        when(calendarValidation.getEntryTo()).thenReturn(LocalDateTime.MIN);
+        when(calendarValidation.getEntryFromODT()).thenReturn(OffsetDateTime.MIN);
+        when(calendarValidation.getEntryToODT()).thenReturn(OffsetDateTime.MIN);
 
         assertFalse(VALIDATION.isValid(calendarValidation, null));
     }

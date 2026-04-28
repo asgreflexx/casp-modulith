@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Pageable;
 import org.testcontainers.containers.MongoDBContainer;
@@ -24,11 +24,13 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import java.time.LocalDateTime;
 import java.util.Set;
 
+import static casp.web.backend.calendar.CalendarFixture.ACTUAL_YEAR;
+import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Testcontainers
-@DataMongoTest
+@SpringBootTest
 class CourseCustomRepositoryImplTest {
     @Container
     @ServiceConnection
@@ -44,6 +46,7 @@ class CourseCustomRepositoryImplTest {
 
     private Course course;
     private CalendarEntry calendarEntry;
+    private int actualYear;
 
     @BeforeEach
     void setUp() {
@@ -52,13 +55,14 @@ class CourseCustomRepositoryImplTest {
         dogReferenceRepository.deleteAll();
         memberReferenceRepository.deleteAll();
 
-        calendarEntry = createCalendarEntry(2024);
+        calendarEntry = createCalendarEntry();
         course = courseRepository.save(createCourse(calendarEntry));
+        actualYear = LocalDateTime.now().getYear();
     }
 
     @Test
     void findAllByYear() {
-        var coursePage = courseRepository.findAllByYear(2024, Pageable.unpaged());
+        var coursePage = courseRepository.findAllByYear(ACTUAL_YEAR, Pageable.unpaged());
 
         assertThat(coursePage).containsExactly(course);
     }
@@ -80,12 +84,11 @@ class CourseCustomRepositoryImplTest {
     @Test
     void getCoursesFeesStats() {
         courseRepository.deleteAll();
-        var year = LocalDateTime.now().getYear();
-        var thisYearCourse = createCourse(createCalendarEntry(year));
-        var inactiveCourse = createCourse(createCalendarEntry(year));
+        var thisYearCourse = createCourse(createCalendarEntry());
+        var inactiveCourse = createCourse(createCalendarEntry());
         inactiveCourse.setEntityStatus(EntityStatus.INACTIVE);
-        var twoYearsAgoCourse = createCourse(createCalendarEntry(year - 2));
-        var threeYearsAgoCourse = createCourse(createCalendarEntry(year - 3));
+        var twoYearsAgoCourse = createCourse(createCalendarEntry(-2));
+        var threeYearsAgoCourse = createCourse(createCalendarEntry(-3));
         var inactiveSpace = createDogHasHandlerReference();
         inactiveSpace.setEntityStatus(EntityStatus.INACTIVE);
         dogHasHandlerReferenceRepository.save(inactiveSpace);
@@ -101,11 +104,11 @@ class CourseCustomRepositoryImplTest {
         var thisYear = coursesFeesStats.thisYear();
         var lastYear = coursesFeesStats.lastYear();
         var twoYearsAgo = coursesFeesStats.twoYearsAgo();
-        assertEquals(year, thisYear.year());
+        assertEquals(this.actualYear, thisYear.year());
         assertEquals(2.0, thisYear.totalPaid());
-        assertEquals(year - 1, lastYear.year());
+        assertEquals(this.actualYear - 1, lastYear.year());
         assertEquals(0.0, lastYear.totalPaid());
-        assertEquals(year - 2, twoYearsAgo.year());
+        assertEquals(this.actualYear - 2, twoYearsAgo.year());
         assertEquals(1.0, twoYearsAgo.totalPaid());
     }
 
@@ -165,35 +168,35 @@ class CourseCustomRepositoryImplTest {
     class FindAllBetweenFromAndTo {
         @Test
         void beforeTheCourse() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom().minusDays(1), calendarEntry.getEntryFrom().minusHours(1), null);
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT().minusDays(1), calendarEntry.getEntryFromODT().minusHours(1), null);
 
             assertThat(actualCourses).isEmpty();
         }
 
         @Test
         void afterTheCourse() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryTo().plusHours(1), calendarEntry.getEntryTo().plusDays(1), null);
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryToODT().plusHours(1), calendarEntry.getEntryToODT().plusDays(1), null);
 
             assertThat(actualCourses).isEmpty();
         }
 
         @Test
         void fromIsLessThanMin() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom().minusDays(1), calendarEntry.getEntryTo(), null);
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT().minusDays(1), calendarEntry.getEntryToODT(), null);
 
             assertThat(actualCourses).containsExactly(course);
         }
 
         @Test
         void toIsMoreThanMax() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo().plusDays(1), null);
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT().plusDays(1), null);
 
             assertThat(actualCourses).containsExactly(course);
         }
 
         @Test
         void fromIsLittleMoreThanMinAndToIsLittleLessThanMax() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom().plusHours(1), calendarEntry.getEntryTo().minusHours(1), null);
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT().plusHours(1), calendarEntry.getEntryToODT().minusHours(1), null);
 
             assertThat(actualCourses).containsExactly(course);
         }
@@ -210,14 +213,14 @@ class CourseCustomRepositoryImplTest {
 
         @Test
         void memberIdIsNull() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), null);
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), null);
 
             assertThat(actualCourses).containsExactlyInAnyOrder(course, course2);
         }
 
         @Test
         void memberIdIsTheSameAsCourseMember() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), course2.member.getId());
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), course2.member.getId());
 
             assertThat(actualCourses).containsExactly(course2);
         }
@@ -228,7 +231,7 @@ class CourseCustomRepositoryImplTest {
             course2.setCoTrainers(Set.of(coTrainer));
             courseRepository.save(course2);
 
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), coTrainer.getId());
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), coTrainer.getId());
 
             assertThat(actualCourses).containsExactly(course2);
         }
@@ -239,17 +242,10 @@ class CourseCustomRepositoryImplTest {
             course2.addSpace(space);
             courseRepository.save(course2);
 
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), space.getDogHasHandler().getMember().getId());
+            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), space.getDogHasHandler().getMember().getId());
 
             assertThat(actualCourses).containsExactly(course2);
         }
-    }
-
-    private static CalendarEntry createCalendarEntry(int year) {
-        var thisYearEntry = new CalendarEntry();
-        thisYearEntry.setEntryFrom(LocalDateTime.of(year, 2, 1, 3, 0));
-        thisYearEntry.setEntryTo(thisYearEntry.getEntryFrom().plusHours(10));
-        return thisYearEntry;
     }
 
     private DogHasHandlerReference createDogHasHandlerReference() {
@@ -265,8 +261,8 @@ class CourseCustomRepositoryImplTest {
         var newCourse = new Course();
         newCourse.setMember(createMemberReference());
         newCourse.addCalendarEntry(localCalendarEntry);
-        newCourse.setMinTime(localCalendarEntry.getEntryFrom());
-        newCourse.setMaxTime(localCalendarEntry.getEntryTo());
+        newCourse.setMinTimeODT(localCalendarEntry.getEntryFromODT());
+        newCourse.setMaxTimeODT(localCalendarEntry.getEntryToODT());
         return newCourse;
     }
 
@@ -277,7 +273,7 @@ class CourseCustomRepositoryImplTest {
 
     private Space createSpace(DogHasHandlerReference dogHasHandlerReference, Course localCourse) {
         var space = new Space(dogHasHandlerReference);
-        space.setPaidDate(localCourse.getMinTime().toLocalDate());
+        space.setPaidDate(localCourse.getMinTimeODT().toLocalDate());
         space.setPaidPrice(1.0);
         localCourse.setSpaceLimit(localCourse.getSpaceLimit() + 1);
         localCourse.addSpace(space);
