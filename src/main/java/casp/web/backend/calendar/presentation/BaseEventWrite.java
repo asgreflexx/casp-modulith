@@ -6,89 +6,23 @@ import casp.web.backend.common.base.BaseView;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 abstract class BaseEventWrite extends BaseView implements BaseEventWriteRequiredFields {
     protected String name;
     protected String description;
     protected String location;
     protected UUID memberId;
-    protected NewCalendarEntryDto newCalendarEntry;
     protected RecurrenceOption recurrenceOption;
     @JsonSetter(nulls = Nulls.SKIP)
-    protected Set<UUID> participantIds = new HashSet<>();
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public String getLocation() {
-        return location;
-    }
-
-    @Override
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    @Override
-    public UUID getMemberId() {
-        return memberId;
-    }
-
-    @Override
-    public void setMemberId(UUID memberId) {
-        this.memberId = memberId;
-    }
-
-    @Override
-    public RecurrenceOption getRecurrenceOption() {
-        return recurrenceOption;
-    }
-
-    @Override
-    public void setRecurrenceOption(RecurrenceOption recurrenceOption) {
-        this.recurrenceOption = recurrenceOption;
-    }
-
-    @Override
-    public NewCalendarEntryDto getNewCalendarEntry() {
-        return newCalendarEntry;
-    }
-
-    @Override
-    public void setNewCalendarEntry(NewCalendarEntryDto newCalendarEntry) {
-        this.newCalendarEntry = newCalendarEntry;
-    }
-
-    @Override
-    public Set<UUID> getParticipantIds() {
-        return this.participantIds;
-    }
-
-    @Override
-    public void setParticipantIds(Set<UUID> participantIds) {
-        this.participantIds = participantIds;
-    }
+    private Set<UUID> participantIds = new HashSet<>();
+    private NewCalendarEntryDto newCalendarEntry;
 }

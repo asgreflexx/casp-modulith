@@ -7,17 +7,20 @@ import casp.web.backend.calendar.data.options.RecurrenceOption;
 import casp.web.backend.calendar.data.participants.BaseParticipant;
 import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.reference.MemberReference;
-import jakarta.validation.Valid;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 abstract class BaseEventRead<P extends BaseParticipant> extends BaseView implements BaseEventRequiredFields<P> {
-    protected BaseEventType eventType;
+    private BaseEventType eventType;
     protected String name;
     protected String description;
     protected String location;
@@ -30,105 +33,5 @@ abstract class BaseEventRead<P extends BaseParticipant> extends BaseView impleme
 
     BaseEventRead(BaseEventType eventType) {
         this.eventType = eventType;
-    }
-
-    @Override
-    public BaseEventType getEventType() {
-        return this.eventType;
-    }
-
-    @Override
-    public void setEventType(BaseEventType eventType) {
-        this.eventType = eventType;
-    }
-
-    @Override
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getDescription() {
-        return description;
-    }
-
-    @Override
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Override
-    public String getLocation() {
-        return location;
-    }
-
-    @Override
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    @Override
-    public MemberReference getMember() {
-        return member;
-    }
-
-    @Override
-    public void setMember(MemberReference member) {
-        this.member = member;
-    }
-
-    @Override
-    public RecurrenceOption getRecurrenceOption() {
-        return recurrenceOption;
-    }
-
-    @Override
-    public void setRecurrenceOption(RecurrenceOption recurrenceOption) {
-        this.recurrenceOption = recurrenceOption;
-    }
-
-    @Override
-    public LocalDateTime getMinTime() {
-        return minTime;
-    }
-
-    @Override
-    public void setMinTime(LocalDateTime minTime) {
-        this.minTime = minTime;
-    }
-
-    @Override
-    public LocalDateTime getMaxTime() {
-        return maxTime;
-    }
-
-    @Override
-    public void setMaxTime(LocalDateTime maxTime) {
-        this.maxTime = maxTime;
-    }
-
-    @Override
-    public List<CalendarEntry> getCalendarEntries() {
-        return calendarEntries;
-    }
-
-    @Override
-    public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
-        this.calendarEntries = calendarEntries;
-    }
-
-    @Override
-    public Set<@Valid P> getParticipants() {
-        return participants;
-    }
-
-    @Override
-    public void setParticipants(Set<@Valid P> participants) {
-        this.participants = participants;
     }
 }
