@@ -26,6 +26,7 @@ import java.util.Set;
 
 import static casp.web.backend.calendar.CalendarFixture.ACTUAL_YEAR;
 import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
+import static casp.web.backend.calendar.CalendarFixture.createCalendarEntryPlusYears;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -87,8 +88,8 @@ class CourseCustomRepositoryImplTest {
         var thisYearCourse = createCourse(createCalendarEntry());
         var inactiveCourse = createCourse(createCalendarEntry());
         inactiveCourse.setEntityStatus(EntityStatus.INACTIVE);
-        var twoYearsAgoCourse = createCourse(createCalendarEntry(-2));
-        var threeYearsAgoCourse = createCourse(createCalendarEntry(-3));
+        var twoYearsAgoCourse = createCourse(createCalendarEntryPlusYears(-2));
+        var threeYearsAgoCourse = createCourse(createCalendarEntryPlusYears(-3));
         var inactiveSpace = createDogHasHandlerReference();
         inactiveSpace.setEntityStatus(EntityStatus.INACTIVE);
         dogHasHandlerReferenceRepository.save(inactiveSpace);

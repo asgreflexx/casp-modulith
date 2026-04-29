@@ -18,10 +18,17 @@ public enum CalendarFixture {
     public static final ZoneId ZONE_ID = ZoneId.of("Europe/Vienna");
 
     public static CalendarEntry createCalendarEntry() {
-        return createCalendarEntry(0);
+        return createCalendarEntryPlusYears(0);
     }
 
-    public static CalendarEntry createCalendarEntry(int plusYears) {
+    public static CalendarEntry createCalendarEntryPlusDays(int plusDays) {
+        var calendarEntry = createCalendarEntry();
+        calendarEntry.setEntryFromODT(calendarEntry.getEntryFromODT().plusDays(plusDays));
+        calendarEntry.setEntryToODT(calendarEntry.getEntryToODT().plusDays(plusDays));
+        return calendarEntry;
+    }
+
+    public static CalendarEntry createCalendarEntryPlusYears(int plusYears) {
         var year = ACTUAL_YEAR + plusYears;
         var entryFromODT = LocalDateTime.of(year, ACTUAL_MONTH, 1, 10, 0)
                 .atZone(ZONE_ID)
