@@ -27,16 +27,13 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.CalendarFixture.ZONE_ID;
-import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
 import static casp.web.backend.calendar.CalendarFixture.createLocalDate;
 import static casp.web.backend.calendar.CalendarFixture.createNewCalendarEntryDto;
 import static casp.web.backend.calendar.ExamMapper.EXAM_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -98,25 +95,6 @@ class ExamServiceImplTest {
 
         verify(examRepository).save(examCaptor.capture());
         assertThat(examCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
-    }
-
-    @Test
-    void getCalendarEntries() {
-        var calendarEntry = createCalendarEntry();
-        var from = calendarEntry.getEntryFromODT();
-        var to = calendarEntry.getEntryToODT();
-        exam.addCalendarEntry(calendarEntry);
-        when(examRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(exam));
-
-        var calendarEntryDtoStream = examService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
-
-        assertThat(calendarEntryDtoStream)
-                .singleElement()
-                .satisfies(ce -> {
-                    assertEquals(calendarEntry.getEntryFromODT(), ce.getEntryFromODT());
-                    assertEquals(calendarEntry.getEntryToODT(), ce.getEntryToODT());
-                    assertSame(exam.getEventType(), ce.getEventType());
-                });
     }
 
     @Nested

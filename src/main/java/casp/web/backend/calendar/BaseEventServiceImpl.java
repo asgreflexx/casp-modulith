@@ -14,7 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.ParameterizedType;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -62,14 +61,6 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
     public void activateBaseEventsByMemberId(UUID memberId) {
         baseEventCustomRepository.findAllByMemberIdAndStatus(memberId, EntityStatus.INACTIVE)
                 .forEach(d -> saveItNewEntityStatus(d, EntityStatus.ACTIVE));
-    }
-
-    @Override
-    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(OffsetDateTime from, OffsetDateTime to, UUID memberId) {
-        return baseEventCustomRepository.findAllBetweenFromAndToOrMemberId(from, to, memberId)
-                .flatMap(d -> d.getCalendarEntries()
-                        .stream()
-                        .map(ce -> new CalendarEntryDto(ce, d)));
     }
 
     @Autowired
