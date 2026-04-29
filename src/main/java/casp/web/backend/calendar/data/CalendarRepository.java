@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-interface CalendarRepository {
+public interface CalendarRepository {
     List<CalendarEntryProjection> findCalendarEntriesByFromAndToAndMemberId(OffsetDateTime from,
                                                                             OffsetDateTime to,
                                                                             @Nullable UUID memberId);

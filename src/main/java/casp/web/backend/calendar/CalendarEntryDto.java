@@ -27,13 +27,17 @@ public class CalendarEntryDto implements Comparable<CalendarEntryDto>, CalendarV
     private BaseEventType eventType;
     private String name;
 
-    CalendarEntryDto(CalendarEntry calendarEntry, BaseEvent<?> baseEvent) {
+    CalendarEntryDto(CalendarEntry calendarEntry, UUID baseEventId, BaseEventType eventType, String name) {
         this.id = calendarEntry.getId();
         this.entryFromODT = calendarEntry.getEntryFromODT();
         this.entryToODT = calendarEntry.getEntryToODT();
-        this.baseEventId = baseEvent.getId();
-        this.eventType = baseEvent.getEventType();
-        this.name = baseEvent.getName();
+        this.baseEventId = baseEventId;
+        this.eventType = eventType;
+        this.name = name;
+    }
+
+    CalendarEntryDto(CalendarEntry calendarEntry, BaseEvent<?> baseEvent) {
+        this(calendarEntry, baseEvent.getId(), baseEvent.getEventType(), baseEvent.getName());
     }
 
     @Override
