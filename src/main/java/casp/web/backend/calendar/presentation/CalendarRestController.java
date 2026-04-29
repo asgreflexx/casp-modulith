@@ -1,7 +1,7 @@
 package casp.web.backend.calendar.presentation;
 
-import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.calendar.CalendarEntryDto;
+import casp.web.backend.calendar.CalendarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -19,13 +19,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("calendar")
 class CalendarRestController {
-    private final BaseEventObserver baseEventObserver;
     private final ZoneId zoneId;
+    private final CalendarService calendarService;
 
     @Autowired
-    CalendarRestController(BaseEventObserver baseEventObserver, ZoneId zoneId) {
-        this.baseEventObserver = baseEventObserver;
+    CalendarRestController(ZoneId zoneId, CalendarService calendarService) {
         this.zoneId = zoneId;
+        this.calendarService = calendarService;
     }
 
     @GetMapping
@@ -34,7 +34,7 @@ class CalendarRestController {
                                                               @RequestParam(required = false) UUID memberId) {
         var atStartOfDay = from.atStartOfDay().atZone(zoneId).toOffsetDateTime();
         var atEndOfDay = to.atTime(LocalTime.MAX).atZone(zoneId).toOffsetDateTime();
-        var calendarEntries = baseEventObserver.getCalendarEntriesBetweenFromAndToOrMemberId(atStartOfDay, atEndOfDay, memberId);
+        var calendarEntries = calendarService.findCalendarEntriesByFromAndToAndMemberId(atStartOfDay, atEndOfDay, memberId);
         return ResponseEntity.ok(calendarEntries);
     }
 }

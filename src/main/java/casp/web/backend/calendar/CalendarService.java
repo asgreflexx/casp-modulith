@@ -6,6 +6,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-interface CalendarService {
+public interface CalendarService {
     List<CalendarEntryDto> findCalendarEntriesByFromAndToAndMemberId(OffsetDateTime from, OffsetDateTime to, @Nullable UUID memberId);
 }
