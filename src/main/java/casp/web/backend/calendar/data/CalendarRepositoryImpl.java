@@ -5,38 +5,48 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.UnionWithOperation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Repository
 class CalendarRepositoryImpl implements CalendarRepository {
-    // cf. casp.web.backend.common.base.BaseDocument.entityStatus
+    // cf. casp.web.backend.common.base.BaseDocument
     private static final String ENTITY_STATUS_FIELD = "entityStatus";
-    // cf. casp.web.backend.calendar.data.BaseEvent.calendarEntries.entryFromODT
-    private static final String FROM_FIELD = "calendarEntries.entryFromODT";
-    // cf. casp.web.backend.calendar.data.BaseEvent.calendarEntries.entryToODT
-    private static final String TO_FIELD = "calendarEntries.entryToODT";
-    // cf. casp.web.backend.calendar.data.BaseEvent.calendarEntries
-    private static final String CALENDAR_ENTRIES_FIELD = "calendarEntries";
-    // cf. casp.web.backend.common.base.BaseDocument.id
     private static final String ID_FIELD = "id";
-    // cf. casp.web.backend.calendar.data.BaseEvent.eventType
+
+    // cf. casp.web.backend.calendar.data.BaseEvent
+    private static final String CALENDAR_ENTRIES_FIELD = "calendarEntries";
+    private static final String FROM_FIELD = CALENDAR_ENTRIES_FIELD + ".entryFromODT";
+    private static final String TO_FIELD = CALENDAR_ENTRIES_FIELD + ".entryToODT";
     private static final String EVENT_TYPE_FIELD = "eventType";
-    // cf. casp.web.backend.calendar.data.BaseEvent.name
     private static final String NAME_FIELD = "name";
+    private static final String MEMBER_ID_FIELD = "member.$id";
+    private static final String PARTICIPANTS_PREFIX = "participants.";
+
     // cf. casp.web.backend.calendar.data.Course
     private static final String COURSE_COLLECTION = "course";
+    private static final String CO_TRAINER_ID_FIELD = "coTrainers." + MEMBER_ID_FIELD;
+
     // cf. casp.web.backend.calendar.data.Exam
     private static final String EXAM_COLLECTION = "exam";
+
     // cf. casp.web.backend.calendar.data.Event
     private static final String EVENT_COLLECTION = "event";
-    // cf. casp.web.backend.calendar.data.BaseEvent.member.id
-    private static final String MEMBER_ID_FIELD = "member.$id";
+    private static final String BASE_EVENT_PARTICIPANTS_FIELD = PARTICIPANTS_PREFIX + MEMBER_ID_FIELD;
+
+    // cf. Exam & Course
+    private static final String DOG_HAS_HANDLER_FIELD = "dogHasHandler";
+    private static final String DOG_HAS_HANDLER_ID_FIELD = PARTICIPANTS_PREFIX + DOG_HAS_HANDLER_FIELD + ".$id";
+    private static final String RESOLVED_DOG_HAS_HANDLER = "resolvedDogHasHandler";
+    private static final String RESOLVED_MEMBER_ID_FIELD = RESOLVED_DOG_HAS_HANDLER + "." + MEMBER_ID_FIELD;
+    private static final String COLLECTION_ID = "_id";
 
     private final MongoOperations mongoOperations;
 
@@ -46,28 +56,48 @@ class CalendarRepositoryImpl implements CalendarRepository {
 
     @Override
     public List<CalendarEntryProjection> findCalendarEntriesByFromAndToAndMemberId(OffsetDateTime from, OffsetDateTime to, @Nullable UUID memberId) {
-        var criteria = Criteria.where(ENTITY_STATUS_FIELD).is(EntityStatus.ACTIVE)
+        var pipeline = new ArrayList<AggregationOperation>();
+        var criteria = initializeCriteria(from, to);
+
+        processCriteriaWithMemberId(criteria, memberId, pipeline);
+        mergeExamAndEventPipelines(pipeline);
+
+        pipeline.add(Aggregation.project(ID_FIELD, CALENDAR_ENTRIES_FIELD, EVENT_TYPE_FIELD, NAME_FIELD));
+        pipeline.add(Aggregation.sort(Sort.Direction.ASC, FROM_FIELD, TO_FIELD));
+
+        return mongoOperations
+                .aggregate(Aggregation.newAggregation(pipeline), COURSE_COLLECTION, CalendarEntryProjection.class)
+                .getMappedResults();
+    }
+
+    private static void mergeExamAndEventPipelines(ArrayList<AggregationOperation> pipeline) {
+        var examUnionOperation = UnionWithOperation.unionWith(EXAM_COLLECTION)
+                .pipeline(pipeline);
+        var eventUnionOperation = UnionWithOperation.unionWith(EVENT_COLLECTION)
+                .pipeline(pipeline);
+        pipeline.add(examUnionOperation);
+        pipeline.add(eventUnionOperation);
+    }
+
+    private static void processCriteriaWithMemberId(Criteria criteria, @Nullable UUID memberId, ArrayList<AggregationOperation> pipeline) {
+        if (memberId == null) {
+            pipeline.add(Aggregation.match(criteria));
+        } else {
+            var lookup = Aggregation.lookup(DOG_HAS_HANDLER_FIELD, DOG_HAS_HANDLER_ID_FIELD, COLLECTION_ID, RESOLVED_DOG_HAS_HANDLER);
+            pipeline.add(lookup);
+            criteria.andOperator(new Criteria().orOperator(
+                    Criteria.where(MEMBER_ID_FIELD).is(memberId),
+                    Criteria.where(BASE_EVENT_PARTICIPANTS_FIELD).is(memberId),
+                    Criteria.where(RESOLVED_MEMBER_ID_FIELD).is(memberId),
+                    Criteria.where(CO_TRAINER_ID_FIELD).is(memberId)
+            ));
+            pipeline.add(Aggregation.match(criteria));
+        }
+    }
+
+    private static Criteria initializeCriteria(OffsetDateTime from, OffsetDateTime to) {
+        return Criteria.where(ENTITY_STATUS_FIELD).is(EntityStatus.ACTIVE)
                 .and(FROM_FIELD).gte(from)
                 .and(TO_FIELD).lte(to);
-        if (memberId != null) {
-            criteria = criteria.and(MEMBER_ID_FIELD).is(memberId);
-        }
-        var matchOperation = Aggregation.match(criteria);
-
-        var examUnionOperation = UnionWithOperation.unionWith(EXAM_COLLECTION)
-                .pipeline(matchOperation);
-        var eventUnionOperation = UnionWithOperation.unionWith(EVENT_COLLECTION)
-                .pipeline(matchOperation);
-
-        var aggregation = Aggregation.newAggregation(
-                matchOperation,
-                examUnionOperation,
-                eventUnionOperation,
-                Aggregation.project(ID_FIELD, CALENDAR_ENTRIES_FIELD, EVENT_TYPE_FIELD, NAME_FIELD),
-                Aggregation.sort(Sort.Direction.ASC, FROM_FIELD, TO_FIELD)
-        );
-        return mongoOperations
-                .aggregate(aggregation, COURSE_COLLECTION, CalendarEntryProjection.class)
-                .getMappedResults();
     }
 }
