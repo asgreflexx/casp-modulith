@@ -73,13 +73,14 @@ class WeeklyOptionUtilityTest {
     void tuesdayAndWednesday() {
         var tuesday = createWeeklyOption(10, 11, DayOfWeek.TUESDAY);
         var wednesday = createWeeklyOption(11, 12, DayOfWeek.WEDNESDAY);
-        var endRecurrence = createLocalDate(6);
+        var endRecurrence = createLocalDate(8);
         option.setOccurrences(List.of(tuesday, wednesday));
         option.setEndRecurrence(endRecurrence);
-        var tuesdayDate = START_RECURRENCE.plusDays(DayOfWeek.TUESDAY.getValue() - 1);
+        var firstTuesdayDate = START_RECURRENCE.plusDays(DayOfWeek.TUESDAY.getValue() - 1);
         var wednesdayDate = START_RECURRENCE.plusDays(DayOfWeek.WEDNESDAY.getValue() - 1);
-        var expectedCalendarEntries = List.of(createCalendarEntry(tuesdayDate, tuesday),
-                createCalendarEntry(wednesdayDate, wednesday));
+        var expectedCalendarEntries = List.of(createCalendarEntry(firstTuesdayDate, tuesday),
+                createCalendarEntry(wednesdayDate, wednesday),
+                createCalendarEntry(endRecurrence, tuesday));
 
         var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option, ZONE_ID);
 
@@ -90,11 +91,12 @@ class WeeklyOptionUtilityTest {
     void mondayAndSunday() {
         var monday = createWeeklyOption(10, 11, DayOfWeek.MONDAY);
         var sunday = createWeeklyOption(11, 12, DayOfWeek.SUNDAY);
-        var endRecurrence = createLocalDate(6);
+        var endRecurrence = createLocalDate(8);
         option.setOccurrences(List.of(monday, sunday));
         option.setEndRecurrence(endRecurrence);
         var expectedCalendarEntries = List.of(createCalendarEntry(START_RECURRENCE, monday),
-                createCalendarEntry(endRecurrence, sunday));
+                createCalendarEntry(endRecurrence.minusDays(2), sunday),
+                createCalendarEntry(endRecurrence.minusDays(1), monday));
 
         var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option, ZONE_ID);
 
