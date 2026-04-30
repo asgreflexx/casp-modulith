@@ -90,42 +90,6 @@ class ExamCustomRepositoryImplTest {
         }
     }
 
-    @Nested
-    class FindAllByMemberId {
-        private Exam exam1;
-        private Exam exam2;
-        private ExamParticipant participant2;
-
-        @BeforeEach
-        void setUp() {
-            var participant1 = new ExamParticipant(dogHasHandlerReferenceRepository.save(ReferenceTestFixture.createDogHasHandlerReference()));
-            exam1 = examRepository.save(createExam("Exam1", EntityStatus.ACTIVE, participant1));
-            participant2 = new ExamParticipant(dogHasHandlerReferenceRepository.save(ReferenceTestFixture.createDogHasHandlerReference()));
-            exam2 = examRepository.save(createExam("Exam2", EntityStatus.ACTIVE, participant2));
-        }
-
-        @Test
-        void memberIdIsNull() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), null);
-
-            assertThat(actualExams).containsExactlyInAnyOrder(exam1, exam2);
-        }
-
-        @Test
-        void memberIdIsTheSameAsExamMember() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), exam2.member.getId());
-
-            assertThat(actualExams).containsExactly(exam2);
-        }
-
-        @Test
-        void memberIdIsTheSameAsExamParticipant() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), participant2.getDogHasHandler().getMember().getId());
-
-            assertThat(actualExams).containsExactly(exam2);
-        }
-    }
-
     private Exam createExam(String name, EntityStatus entityStatus, ExamParticipant participant) {
         calendarEntry = createCalendarEntry();
         var exam = new Exam();

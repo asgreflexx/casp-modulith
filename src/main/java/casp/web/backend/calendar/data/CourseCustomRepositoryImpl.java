@@ -5,7 +5,6 @@ import casp.web.backend.calendar.CoursesFeesStatsDto;
 import casp.web.backend.calendar.data.participants.QSpace;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.dog.data.QDogHasHandler;
-import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,12 +16,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> implements CourseCustomRepository {
@@ -56,21 +53,6 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         return query()
                 .where(COURSE.participants.any().dogHasHandler.id.eq(spaceId), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
                 .fetchPage(pageable);
-    }
-
-    @Override
-    public Stream<Course> findAllBetweenFromAndToOrMemberId(OffsetDateTime from,
-                                                            OffsetDateTime to,
-                                                            @Nullable UUID memberId) {
-        var criteria = createTimeRangeCriteria(from, to);
-        if (memberId != null) {
-            criteria = criteria.and(COURSE.member.id.eq(memberId)
-                    .or(COURSE.coTrainers.any().member.id.eq(memberId))
-                    .or(COURSE.participants.any().dogHasHandler.id.in(findDogHasHandlerIdsByMemberId(memberId))));
-        }
-        return query()
-                .where(criteria)
-                .stream();
     }
 
     // "%s.%s" is a false positive

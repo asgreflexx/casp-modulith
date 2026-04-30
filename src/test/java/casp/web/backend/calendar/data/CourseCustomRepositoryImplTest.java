@@ -1,7 +1,6 @@
 package casp.web.backend.calendar.data;
 
 import casp.web.backend.ReferenceTestFixture;
-import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
@@ -22,7 +21,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 import static casp.web.backend.calendar.CalendarFixture.ACTUAL_YEAR;
 import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
@@ -162,90 +160,6 @@ class CourseCustomRepositoryImplTest {
             var coursePage = courseRepository.findAllBySpaceId(space.getId(), Pageable.unpaged());
 
             assertThat(coursePage).isEmpty();
-        }
-    }
-
-    @Nested
-    class FindAllBetweenFromAndTo {
-        @Test
-        void beforeTheCourse() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT().minusDays(1), calendarEntry.getEntryFromODT().minusHours(1), null);
-
-            assertThat(actualCourses).isEmpty();
-        }
-
-        @Test
-        void afterTheCourse() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryToODT().plusHours(1), calendarEntry.getEntryToODT().plusDays(1), null);
-
-            assertThat(actualCourses).isEmpty();
-        }
-
-        @Test
-        void fromIsLessThanMin() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT().minusDays(1), calendarEntry.getEntryToODT(), null);
-
-            assertThat(actualCourses).containsExactly(course);
-        }
-
-        @Test
-        void toIsMoreThanMax() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT().plusDays(1), null);
-
-            assertThat(actualCourses).containsExactly(course);
-        }
-
-        @Test
-        void fromIsLittleMoreThanMinAndToIsLittleLessThanMax() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT().plusHours(1), calendarEntry.getEntryToODT().minusHours(1), null);
-
-            assertThat(actualCourses).containsExactly(course);
-        }
-    }
-
-    @Nested
-    class FindAllByMemberId {
-        private Course course2;
-
-        @BeforeEach
-        void setUp() {
-            course2 = courseRepository.save(createCourse(CourseCustomRepositoryImplTest.this.calendarEntry));
-        }
-
-        @Test
-        void memberIdIsNull() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), null);
-
-            assertThat(actualCourses).containsExactlyInAnyOrder(course, course2);
-        }
-
-        @Test
-        void memberIdIsTheSameAsCourseMember() {
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), course2.member.getId());
-
-            assertThat(actualCourses).containsExactly(course2);
-        }
-
-        @Test
-        void memberIdIsTheSameAsCourseCoTrainer() {
-            var coTrainer = new CoTrainer(createMemberReference());
-            course2.setCoTrainers(Set.of(coTrainer));
-            courseRepository.save(course2);
-
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), coTrainer.getId());
-
-            assertThat(actualCourses).containsExactly(course2);
-        }
-
-        @Test
-        void memberIdIsTheSameAsCourseSpace() {
-            var space = new Space(createDogHasHandlerReference());
-            course2.addSpace(space);
-            courseRepository.save(course2);
-
-            var actualCourses = courseRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFromODT(), calendarEntry.getEntryToODT(), space.getDogHasHandler().getMember().getId());
-
-            assertThat(actualCourses).containsExactly(course2);
         }
     }
 

@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuer
 import java.lang.reflect.ParameterizedType;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -82,14 +81,6 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
 
     protected SpringDataMongodbQuery<T> query() {
         return new SpringDataMongodbQuery<>(mongoOperations, baseEventClass);
-    }
-
-    List<UUID> findDogHasHandlerIdsByMemberId(UUID memberId) {
-        var memberIdCondition = DOG_HAS_HANDLER_REFERENCE.member.id.eq(memberId);
-        return activeDogHasHandlerQuery(memberIdCondition)
-                .stream()
-                .map(DogHasHandlerReference::getId)
-                .toList();
     }
 
     Optional<UUID> findActiveDogHandlerReferenceById(UUID participantId) {
