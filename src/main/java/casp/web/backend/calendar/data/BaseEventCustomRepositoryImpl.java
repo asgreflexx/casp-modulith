@@ -9,7 +9,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 
 import java.lang.reflect.ParameterizedType;
-import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 import java.util.Set;
@@ -71,12 +70,6 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
         t.setMaxTimeODT(t.getMaxTime().atZone(ZONE_ID).toOffsetDateTime());
         t.setMinTimeODT(t.getMinTime().atZone(ZONE_ID).toOffsetDateTime());
         mongoOperations.save(t);
-    }
-
-    static BooleanExpression createTimeRangeCriteria(OffsetDateTime from, OffsetDateTime to) {
-        return BASE_EVENT.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(BASE_EVENT.maxTimeODT.goe(from)
-                        .and(BASE_EVENT.minTimeODT.loe(to)));
     }
 
     protected SpringDataMongodbQuery<T> query() {
