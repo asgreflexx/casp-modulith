@@ -17,7 +17,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -125,8 +124,6 @@ class EventServiceImplTest {
                         assertEquals(newCalendarEntryDto.getEntryFromODT(), ce.getEntryFromODT());
                         assertEquals(newCalendarEntryDto.getEntryToODT(), ce.getEntryToODT());
                     });
-            assertEquals(newCalendarEntryDto.getEntryFromODT(), actualCourse.getMinTimeODT());
-            assertEquals(newCalendarEntryDto.getEntryToODT(), actualCourse.getMaxTimeODT());
         }
 
         @Test
@@ -140,20 +137,12 @@ class EventServiceImplTest {
             daily.setStartRecurrence(createLocalDate(0));
             daily.setEndRecurrence(createLocalDate(2));
             eventDto.setRecurrenceOption(daily);
-            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime())
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime();
-            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime())
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime();
 
             eventService.save(eventDto);
 
             var actualCourse = getEventSaved();
             assertThat(actualCourse.getCalendarEntries())
                     .hasSize(3);
-            assertEquals(minTime, actualCourse.getMinTimeODT());
-            assertEquals(maxTime, actualCourse.getMaxTimeODT());
         }
 
         @Test

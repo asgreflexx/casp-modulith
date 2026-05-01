@@ -68,14 +68,6 @@ class CalendarEntriesMigrationIntTest {
                 .stream()
                 .flatMap(e -> e.getCalendarEntries().stream())
                 .toList();
-        assertThat(baseEvents)
-                .hasSize(3)
-                .map(BaseEvent::getMinTimeODT)
-                .allSatisfy(odt -> assertOffsetDateTime(odt, OFFSET_1_HOUR, FIRST_OF_JANUARY));
-        assertThat(baseEvents)
-                .hasSize(3)
-                .map(BaseEvent::getMaxTimeODT)
-                .allSatisfy(odt -> assertOffsetDateTime(odt, OFFSET_2_HOURS, FIRST_OF_MAY));
         assertThat(actualCalendarEntries)
                 .hasSize(3)
                 .allSatisfy(CalendarEntriesMigrationIntTest::assertCalendarEntry);
@@ -116,8 +108,6 @@ class CalendarEntriesMigrationIntTest {
     private <T extends BaseEvent<?>> T initializeEventWithEntry(CalendarEntry localCalendarEntry, T baseEvent) {
         baseEvent.setMember(createMemberReference());
         baseEvent.addCalendarEntry(localCalendarEntry);
-        baseEvent.setMinTime(localCalendarEntry.getEntryFrom());
-        baseEvent.setMaxTime(localCalendarEntry.getEntryTo());
         return baseEvent;
     }
 

@@ -11,19 +11,23 @@ import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
+import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public abstract class BaseEvent<P extends BaseParticipant> extends BaseDocument implements BaseEventRequiredFields<P> {
+    static final String MIN_TIME_FIELD = "minTimeODT";
+    static final String MAX_TIME_FIELD = "maxTimeODT";
     protected BaseEventType eventType;
     protected String name;
     protected String description;
@@ -32,18 +36,32 @@ public abstract class BaseEvent<P extends BaseParticipant> extends BaseDocument 
     @DBRef
     protected MemberReference member;
     protected RecurrenceOption recurrenceOption;
-    @Deprecated(forRemoval = true, since = "2026-04-23")
-    protected LocalDateTime minTime;
-    @Deprecated(forRemoval = true, since = "2026-04-23")
-    protected LocalDateTime maxTime;
-    protected OffsetDateTime minTimeODT;
-    protected OffsetDateTime maxTimeODT;
-
     protected List<CalendarEntry> calendarEntries = new ArrayList<>();
+    @Indexed
+    @Field(MIN_TIME_FIELD)
+    protected OffsetDateTime minTime;
+    @Indexed
+    @Field(MAX_TIME_FIELD)
+    protected OffsetDateTime maxTime;
     protected Set<P> participants = new HashSet<>();
 
     protected BaseEvent(BaseEventType eventType) {
         this.eventType = eventType;
+    }
+
+    public void addCalendarEntry(CalendarEntry calendarEntry) {
+        calendarEntries.add(calendarEntry);
+    }
+
+    @Override
+    public Set<P> getParticipants() {
+        return getNotDeletedParticipants();
+    }
+
+    public void addParticipants(Set<P> newParticipants) {
+        var notDeletedParticipants = getNotDeletedParticipants();
+        notDeletedParticipants.addAll(newParticipants);
+        this.participants = notDeletedParticipants;
     }
 
     static boolean isMemberNotDeleted(MemberReference member) {
@@ -56,30 +74,17 @@ public abstract class BaseEvent<P extends BaseParticipant> extends BaseDocument 
                 && EntityStatus.DELETED != dogHasHandler.getDog().getEntityStatus();
     }
 
-    @Override
-    public void setCalendarEntries(List<CalendarEntry> calendarEntries) {
-        calendarEntries.sort(CalendarEntry::compareTo);
-        this.calendarEntries = calendarEntries;
-        minTime = calendarEntries.getFirst().getEntryFrom();
-        maxTime = calendarEntries.getLast().getEntryTo();
-        minTimeODT = calendarEntries.getFirst().getEntryFromODT();
-        maxTimeODT = calendarEntries.getLast().getEntryToODT();
-    }
-
-    public void addCalendarEntry(CalendarEntry calendarEntry) {
-        calendarEntries.add(calendarEntry);
-        setCalendarEntries(calendarEntries);
-    }
-
-    @Override
-    public Set<P> getParticipants() {
-        return getNotDeletedParticipants();
-    }
-
-    public void addParticipants(Set<P> newParticipants) {
-        var notDeletedParticipants = getNotDeletedParticipants();
-        notDeletedParticipants.addAll(newParticipants);
-        this.participants = notDeletedParticipants;
+    void updateBounds() {
+        this.minTime = calendarEntries.stream()
+                .map(CalendarEntry::getEntryFromODT)
+                .filter(Objects::nonNull) // TODO Remove me when CalendarEntry.entryFrom is removed
+                .min(OffsetDateTime::compareTo)
+                .orElse(null); // This will never happen because the list is never empty
+        this.maxTime = calendarEntries.stream()
+                .map(CalendarEntry::getEntryToODT)
+                .filter(Objects::nonNull) // TODO Remove me when CalendarEntry.entryTo is removed
+                .max(OffsetDateTime::compareTo)
+                .orElse(null); // This will never happen because the list is never empty
     }
 
     abstract Set<P> getNotDeletedParticipants();

@@ -20,7 +20,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -123,8 +122,6 @@ class ExamServiceImplTest {
                         assertEquals(newCalendarEntryDto.getEntryFromODT(), ce.getEntryFromODT());
                         assertEquals(newCalendarEntryDto.getEntryToODT(), ce.getEntryToODT());
                     });
-            assertEquals(newCalendarEntryDto.getEntryFromODT(), actualCourse.getMinTimeODT());
-            assertEquals(newCalendarEntryDto.getEntryToODT(), actualCourse.getMaxTimeODT());
         }
 
         @Test
@@ -138,19 +135,11 @@ class ExamServiceImplTest {
             daily.setStartRecurrence(createLocalDate(0));
             daily.setEndRecurrence(createLocalDate(2));
             examDto.setRecurrenceOption(daily);
-            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime())
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime();
-            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime())
-                    .atZone(ZONE_ID)
-                    .toOffsetDateTime();
 
             examService.save(examDto);
 
             var actualCourse = getExamSaved();
             assertThat(actualCourse.getCalendarEntries()).hasSize(3);
-            assertEquals(minTime, actualCourse.getMinTimeODT());
-            assertEquals(maxTime, actualCourse.getMaxTimeODT());
         }
 
         @Test

@@ -176,8 +176,6 @@ class CourseCustomRepositoryImplTest {
         var newCourse = new Course();
         newCourse.setMember(createMemberReference());
         newCourse.addCalendarEntry(localCalendarEntry);
-        newCourse.setMinTimeODT(localCalendarEntry.getEntryFromODT());
-        newCourse.setMaxTimeODT(localCalendarEntry.getEntryToODT());
         return newCourse;
     }
 
@@ -187,9 +185,10 @@ class CourseCustomRepositoryImplTest {
     }
 
     private Space createSpace(DogHasHandlerReference dogHasHandlerReference, Course localCourse) {
+        var paidDate = localCourse.getCalendarEntries().getFirst().getEntryFromODT().toLocalDate();
         var space = new Space(dogHasHandlerReference);
-        space.setPaidDate(localCourse.getMinTimeODT().toLocalDate());
         space.setPaidPrice(1.0);
+        space.setPaidDate(paidDate);
         localCourse.setSpaceLimit(localCourse.getSpaceLimit() + 1);
         localCourse.addSpace(space);
         courseRepository.save(localCourse);

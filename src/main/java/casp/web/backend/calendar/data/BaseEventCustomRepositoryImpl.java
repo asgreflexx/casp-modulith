@@ -67,8 +67,6 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
             calendarEntry.setEntryToODT(entryToODT);
             calendarEntry.setEntryFromODT(entryFromODT);
         });
-        t.setMaxTimeODT(t.getMaxTime().atZone(ZONE_ID).toOffsetDateTime());
-        t.setMinTimeODT(t.getMinTime().atZone(ZONE_ID).toOffsetDateTime());
         mongoOperations.save(t);
     }
 

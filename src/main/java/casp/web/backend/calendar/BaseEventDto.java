@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,9 +28,9 @@ abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto implement
     protected MemberReference member;
     protected UUID memberId;
     protected RecurrenceOption recurrenceOption;
-    protected LocalDateTime minTime;
-    protected LocalDateTime maxTime;
     protected List<CalendarEntry> calendarEntries = new ArrayList<>();
+    protected OffsetDateTime minTime;
+    protected OffsetDateTime maxTime;
     protected Set<P> participants = new HashSet<>();
     private BaseEventType eventType;
     private NewCalendarEntryDto newCalendarEntry;

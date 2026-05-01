@@ -11,7 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,9 +26,9 @@ abstract class BaseEventRead<P extends BaseParticipant> extends BaseView impleme
     protected String location;
     protected MemberReference member;
     protected RecurrenceOption recurrenceOption;
-    protected LocalDateTime minTime;
-    protected LocalDateTime maxTime;
     protected List<CalendarEntry> calendarEntries;
+    protected OffsetDateTime minTime;
+    protected OffsetDateTime maxTime;
     protected Set<P> participants = new HashSet<>();
 
     BaseEventRead(BaseEventType eventType) {
