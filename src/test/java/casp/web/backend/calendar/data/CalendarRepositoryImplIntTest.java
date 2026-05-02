@@ -112,7 +112,7 @@ class CalendarRepositoryImplIntTest {
 
         @Test
         void badRange() {
-            var calendarEntryProjections = calendarRepository.findCalendarEntriesByFromAndToAndMemberId(toDateTime, fromDateTime, null);
+            var calendarEntryProjections = calendarRepository.findCalendarEntriesByFromAndToAndMemberId(fromDateTime.minusDays(3), fromDateTime.minusDays(2), null);
 
             assertThat(calendarEntryProjections).isEmpty();
         }

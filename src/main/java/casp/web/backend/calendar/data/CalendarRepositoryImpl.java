@@ -15,6 +15,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static casp.web.backend.calendar.data.BaseEvent.MAX_TIME_FIELD;
+import static casp.web.backend.calendar.data.BaseEvent.MIN_TIME_FIELD;
+
 @Repository
 class CalendarRepositoryImpl implements CalendarRepository {
     // cf. casp.web.backend.common.base.BaseDocument
@@ -23,8 +26,6 @@ class CalendarRepositoryImpl implements CalendarRepository {
 
     // cf. casp.web.backend.calendar.data.BaseEvent
     private static final String CALENDAR_ENTRIES_FIELD = "calendarEntries";
-    private static final String FROM_FIELD = CALENDAR_ENTRIES_FIELD + ".entryFromODT";
-    private static final String TO_FIELD = CALENDAR_ENTRIES_FIELD + ".entryToODT";
     private static final String EVENT_TYPE_FIELD = "eventType";
     private static final String NAME_FIELD = "name";
     private static final String MEMBER_ID_FIELD = "member.$id";
@@ -62,8 +63,13 @@ class CalendarRepositoryImpl implements CalendarRepository {
         processCriteriaWithMemberId(criteria, memberId, pipeline);
         mergeExamAndEventPipelines(pipeline);
 
-        pipeline.add(Aggregation.project(ID_FIELD, CALENDAR_ENTRIES_FIELD, EVENT_TYPE_FIELD, NAME_FIELD));
-        pipeline.add(Aggregation.sort(Sort.Direction.ASC, FROM_FIELD, TO_FIELD));
+        pipeline.add(Aggregation.project(ID_FIELD,
+                CALENDAR_ENTRIES_FIELD,
+                EVENT_TYPE_FIELD,
+                NAME_FIELD,
+                MIN_TIME_FIELD,
+                MAX_TIME_FIELD));
+        pipeline.add(Aggregation.sort(Sort.Direction.ASC, MIN_TIME_FIELD, MAX_TIME_FIELD));
 
         return mongoOperations
                 .aggregate(Aggregation.newAggregation(pipeline), COURSE_COLLECTION, CalendarEntryProjection.class)
@@ -97,7 +103,7 @@ class CalendarRepositoryImpl implements CalendarRepository {
 
     private static Criteria initializeCriteria(OffsetDateTime from, OffsetDateTime to) {
         return Criteria.where(ENTITY_STATUS_FIELD).is(EntityStatus.ACTIVE)
-                .and(FROM_FIELD).gte(from)
-                .and(TO_FIELD).lte(to);
+                .and(MAX_TIME_FIELD).gte(from)
+                .and(MIN_TIME_FIELD).lte(to);
     }
 }
