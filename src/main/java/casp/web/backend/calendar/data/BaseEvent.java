@@ -18,7 +18,6 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 @Getter
@@ -72,12 +71,10 @@ public abstract class BaseEvent<P extends BaseParticipant> extends BaseDocument 
     void updateBounds() {
         this.minODT = calendarEntries.stream()
                 .map(CalendarEntry::getEntryFromODT)
-                .filter(Objects::nonNull) // TODO Remove me when CalendarEntry.entryFrom is removed
                 .min(OffsetDateTime::compareTo)
                 .orElse(null); // This will never happen because the list is never empty
         this.maxODT = calendarEntries.stream()
                 .map(CalendarEntry::getEntryToODT)
-                .filter(Objects::nonNull) // TODO Remove me when CalendarEntry.entryTo is removed
                 .max(OffsetDateTime::compareTo)
                 .orElse(null); // This will never happen because the list is never empty
     }

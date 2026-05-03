@@ -1,12 +1,12 @@
 package casp.web.backend.calendar.data;
 
 import com.querydsl.core.annotations.QueryEmbeddable;
+import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -17,13 +17,9 @@ import java.util.UUID;
 @ToString(of = {"entryFromODT", "entryToODT"})
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
     private UUID id = UUID.randomUUID();
-    @Deprecated(forRemoval = true, since = "2026-04-23")
-    private LocalDateTime entryFrom;
-    @Deprecated(forRemoval = true, since = "2026-04-23")
-    private LocalDateTime entryTo;
-    // TODO should be not null
+    @NotNull
     private OffsetDateTime entryFromODT;
-    // TODO should be not null
+    @NotNull
     private OffsetDateTime entryToODT;
 
     public CalendarEntry() {
