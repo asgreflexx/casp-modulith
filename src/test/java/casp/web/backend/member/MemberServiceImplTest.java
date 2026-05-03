@@ -96,7 +96,7 @@ class MemberServiceImplTest {
         var expectedMembershipFeesStatsDto = mock(MembershipFeesStatsDto.class);
         when(memberRepository.getMembershipFeesStats()).thenReturn(expectedMembershipFeesStatsDto);
 
-        MembershipFeesStatsDto actualMembershipFeesStatsDto = memberService.getMembershipFeesStats();
+        var actualMembershipFeesStatsDto = memberService.getMembershipFeesStats();
 
         assertEquals(expectedMembershipFeesStatsDto, actualMembershipFeesStatsDto);
     }

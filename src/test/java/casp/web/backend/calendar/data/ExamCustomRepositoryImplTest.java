@@ -35,7 +35,6 @@ class ExamCustomRepositoryImplTest {
     private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     @Autowired
     private MemberReferenceRepository memberReferenceRepository;
-    private CalendarEntry calendarEntry;
 
     @BeforeEach
     void setUp() {
@@ -91,7 +90,7 @@ class ExamCustomRepositoryImplTest {
     }
 
     private Exam createExam(String name, EntityStatus entityStatus, ExamParticipant participant) {
-        calendarEntry = createCalendarEntry();
+        var calendarEntry = createCalendarEntry();
         var exam = new Exam();
         exam.setName(name);
         exam.setEntityStatus(entityStatus);
