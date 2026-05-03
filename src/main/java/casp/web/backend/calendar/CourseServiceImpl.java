@@ -58,6 +58,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space, C
                 .collect(Collectors.toSet());
     }
 
+    @SuppressWarnings("java:S2275") // False-positive the string.formatted is correct
     @Override
     public CourseDto updateSpaces(UUID courseId, long courseVersion, Set<SpaceDto> spaceDtos) {
         var course = getOneByIdOrThrowException(courseId);
