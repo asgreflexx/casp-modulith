@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static casp.web.backend.calendar.data.BaseEvent.MAX_TIME_FIELD;
-import static casp.web.backend.calendar.data.BaseEvent.MIN_TIME_FIELD;
-
 @Repository
 class CalendarRepositoryImpl implements CalendarRepository {
     // cf. casp.web.backend.common.base.BaseDocument
@@ -30,6 +27,8 @@ class CalendarRepositoryImpl implements CalendarRepository {
     private static final String NAME_FIELD = "name";
     private static final String MEMBER_ID_FIELD = "member.$id";
     private static final String PARTICIPANTS_PREFIX = "participants.";
+    private static final String MIN_TIME_FIELD = "minODT";
+    private static final String MAX_TIME_FIELD = "maxODT";
 
     // cf. casp.web.backend.calendar.data.Course
     private static final String COURSE_COLLECTION = "course";

@@ -41,8 +41,8 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         var to = LocalDateTime.of(LocalDate.of(year, 12, 31), LocalTime.MAX).atZone(zoneId).toOffsetDateTime();
 
         var timeRangeCriteria = COURSE.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(COURSE.minTime.goe(from)
-                        .and(COURSE.maxTime.loe(to)));
+                .and(COURSE.minODT.goe(from)
+                        .and(COURSE.maxODT.loe(to)));
         return query()
                 .where(timeRangeCriteria)
                 .fetchPage(pageable);

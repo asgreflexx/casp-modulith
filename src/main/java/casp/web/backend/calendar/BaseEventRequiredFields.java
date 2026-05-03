@@ -45,14 +45,14 @@ public interface BaseEventRequiredFields<P extends BaseParticipant> {
     void setRecurrenceOption(@Valid RecurrenceOption recurrenceOption);
 
     @NotNull
-    OffsetDateTime getMinTime();
+    OffsetDateTime getMinODT();
 
-    void setMinTime(@NotNull OffsetDateTime minTime);
+    void setMinODT(@NotNull OffsetDateTime minODT);
 
     @NotNull
-    OffsetDateTime getMaxTime();
+    OffsetDateTime getMaxODT();
 
-    void setMaxTime(@NotNull OffsetDateTime maxTime);
+    void setMaxODT(@NotNull OffsetDateTime maxODT);
 
     @NotEmpty
     List<@Valid CalendarEntry> getCalendarEntries();

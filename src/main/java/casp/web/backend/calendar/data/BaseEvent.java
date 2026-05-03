@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -26,8 +25,6 @@ import java.util.Set;
 @Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public abstract class BaseEvent<P extends BaseParticipant> extends BaseDocument implements BaseEventRequiredFields<P> {
-    static final String MIN_TIME_FIELD = "minTimeODT";
-    static final String MAX_TIME_FIELD = "maxTimeODT";
     protected BaseEventType eventType;
     protected String name;
     protected String description;
@@ -38,11 +35,9 @@ public abstract class BaseEvent<P extends BaseParticipant> extends BaseDocument 
     protected RecurrenceOption recurrenceOption;
     protected List<CalendarEntry> calendarEntries = new ArrayList<>();
     @Indexed
-    @Field(MIN_TIME_FIELD)
-    protected OffsetDateTime minTime;
+    protected OffsetDateTime minODT;
     @Indexed
-    @Field(MAX_TIME_FIELD)
-    protected OffsetDateTime maxTime;
+    protected OffsetDateTime maxODT;
     protected Set<P> participants = new HashSet<>();
 
     protected BaseEvent(BaseEventType eventType) {
@@ -75,12 +70,12 @@ public abstract class BaseEvent<P extends BaseParticipant> extends BaseDocument 
     }
 
     void updateBounds() {
-        this.minTime = calendarEntries.stream()
+        this.minODT = calendarEntries.stream()
                 .map(CalendarEntry::getEntryFromODT)
                 .filter(Objects::nonNull) // TODO Remove me when CalendarEntry.entryFrom is removed
                 .min(OffsetDateTime::compareTo)
                 .orElse(null); // This will never happen because the list is never empty
-        this.maxTime = calendarEntries.stream()
+        this.maxODT = calendarEntries.stream()
                 .map(CalendarEntry::getEntryToODT)
                 .filter(Objects::nonNull) // TODO Remove me when CalendarEntry.entryTo is removed
                 .max(OffsetDateTime::compareTo)

@@ -29,8 +29,8 @@ abstract class BaseEventDto<P extends BaseParticipant> extends BaseDto implement
     protected UUID memberId;
     protected RecurrenceOption recurrenceOption;
     protected List<CalendarEntry> calendarEntries = new ArrayList<>();
-    protected OffsetDateTime minTime;
-    protected OffsetDateTime maxTime;
+    protected OffsetDateTime minODT;
+    protected OffsetDateTime maxODT;
     protected Set<P> participants = new HashSet<>();
     private BaseEventType eventType;
     private NewCalendarEntryDto newCalendarEntry;

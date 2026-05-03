@@ -27,8 +27,8 @@ abstract class BaseEventRead<P extends BaseParticipant> extends BaseView impleme
     protected MemberReference member;
     protected RecurrenceOption recurrenceOption;
     protected List<CalendarEntry> calendarEntries;
-    protected OffsetDateTime minTime;
-    protected OffsetDateTime maxTime;
+    protected OffsetDateTime minODT;
+    protected OffsetDateTime maxODT;
     protected Set<P> participants = new HashSet<>();
 
     BaseEventRead(BaseEventType eventType) {
