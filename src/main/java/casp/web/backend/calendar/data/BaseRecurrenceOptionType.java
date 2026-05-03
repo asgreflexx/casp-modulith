@@ -1,4 +1,4 @@
-package casp.web.backend.calendar.options;
+package casp.web.backend.calendar.data;
 
 public enum BaseRecurrenceOptionType {
     DAILY,

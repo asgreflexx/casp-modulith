@@ -1,6 +1,7 @@
 package casp.web.backend.dog;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.exception.DogHasHandlerConflictException;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
@@ -8,8 +9,7 @@ import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import jakarta.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,10 +23,9 @@ import java.util.stream.Collectors;
 
 import static casp.web.backend.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 
+@Slf4j
 @Service
 class DogHasHandlerServiceImpl implements DogHasHandlerService {
-    private static final Logger LOG = LoggerFactory.getLogger(DogHasHandlerServiceImpl.class);
-
     private final MemberReferenceRepository memberReferenceRepository;
     private final DogReferenceRepository dogReferenceRepository;
     private final DogHasHandlerRepository dogHasHandlerRepository;
@@ -42,7 +41,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     private static NoSuchElementException throwNoSuchElementException(String clazzName, UUID id) {
         var msg = "%s with id %s not found or it isn't active".formatted(clazzName, id);
-        LOG.error(msg);
+        log.error(msg);
         return new NoSuchElementException(msg);
     }
 
@@ -149,8 +148,8 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
                     if (!dhh.getId().equals(dogHasHandlerDto.getId())) {
                         var msg = "There is already a DogHasHandler[id: %s] with this dog[id: %s] and this member[id: %s]"
                                 .formatted(dhh.getId(), dhh.getDog().getId(), dhh.getMember().getId());
-                        LOG.error(msg);
-                        throw new IllegalStateException(msg);
+                        log.error(msg);
+                        throw new DogHasHandlerConflictException(msg);
                     }
                 });
     }

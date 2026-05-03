@@ -1,7 +1,6 @@
 package casp.web.backend.calendar;
 
 import casp.web.backend.ReferenceTestFixture;
-import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.Course;
 import casp.web.backend.calendar.data.CourseRepository;
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
@@ -19,27 +18,25 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Stream;
 
+import static casp.web.backend.calendar.CalendarFixture.ZONE_ID;
+import static casp.web.backend.calendar.CalendarFixture.createLocalDate;
+import static casp.web.backend.calendar.CalendarFixture.createNewCalendarEntryDto;
 import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -60,21 +57,16 @@ class CourseServiceImplTest {
 
     private Course course;
 
-    @InjectMocks
     private CourseServiceImpl courseService;
-
-    private static Space createSpace() {
-        var member = ReferenceTestFixture.createMemberReference();
-        var dogHasHandler = new DogHasHandlerReference();
-        dogHasHandler.setMember(member);
-        dogHasHandler.setDog(new DogReference());
-        return new Space(dogHasHandler);
-    }
 
     @BeforeEach
     void setUp() {
         course = new Course();
         course.setName("course");
+        courseService = new CourseServiceImpl(courseRepository);
+        courseService.setZoneId(ZONE_ID);
+        courseService.setMemberReferenceRepository(memberReferenceRepository);
+        courseService.setDogHasHandlerReferenceRepository(dogHasHandlerReferenceRepository);
     }
 
     @Test
@@ -120,25 +112,6 @@ class CourseServiceImplTest {
 
         verify(courseRepository).save(courseCaptor.capture());
         assertThat(courseCaptor.getValue().getEntityStatus()).isEqualTo(EntityStatus.ACTIVE);
-    }
-
-    @Test
-    void getCalendarEntries() {
-        var from = LocalDateTime.now().minusDays(1);
-        var to = from.plusDays(1);
-        var calendarEntry = new CalendarEntry(from, to);
-        course.addCalendarEntry(calendarEntry);
-        when(courseRepository.findAllBetweenFromAndToOrMemberId(from, to, null)).thenReturn(Stream.of(course));
-
-        var calendarEntryDtoStream = courseService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, null);
-
-        assertThat(calendarEntryDtoStream)
-                .singleElement()
-                .satisfies(ce -> {
-                    assertEquals(calendarEntry.getEntryFrom(), ce.getEntryFrom());
-                    assertEquals(calendarEntry.getEntryTo(), ce.getEntryTo());
-                    assertSame(course.getEventType(), ce.getEventType());
-                });
     }
 
     @Test
@@ -241,9 +214,7 @@ class CourseServiceImplTest {
 
         @BeforeEach
         void setUp() {
-            newCalendarEntryDto = new NewCalendarEntryDto();
-            newCalendarEntryDto.setEntryFrom(LocalDateTime.MIN);
-            newCalendarEntryDto.setEntryTo(LocalDateTime.MAX);
+            newCalendarEntryDto = createNewCalendarEntryDto();
             courseDto = new CourseDto();
             courseDto.setNewCalendarEntry(newCalendarEntryDto);
         }
@@ -259,11 +230,9 @@ class CourseServiceImplTest {
             assertThat(actualCourse.getCalendarEntries())
                     .singleElement()
                     .satisfies(ce -> {
-                        assertEquals(newCalendarEntryDto.getEntryFrom(), ce.getEntryFrom());
-                        assertEquals(newCalendarEntryDto.getEntryTo(), ce.getEntryTo());
+                        assertEquals(newCalendarEntryDto.getEntryFromODT(), ce.getEntryFromODT());
+                        assertEquals(newCalendarEntryDto.getEntryToODT(), ce.getEntryToODT());
                     });
-            assertEquals(newCalendarEntryDto.getEntryFrom(), actualCourse.getMinTime());
-            assertEquals(newCalendarEntryDto.getEntryTo(), actualCourse.getMaxTime());
         }
 
         @Test
@@ -274,19 +243,15 @@ class CourseServiceImplTest {
             var daily = new DailyRecurrenceOption();
             daily.setStartTime(LocalTime.of(1, 0, 0));
             daily.setEndTime(LocalTime.of(3, 0, 0));
-            daily.setStartRecurrence(LocalDate.of(2024, 10, 1));
-            daily.setEndRecurrence(LocalDate.of(2024, 10, 3));
+            daily.setStartRecurrence(createLocalDate(0));
+            daily.setEndRecurrence(createLocalDate(2));
             courseDto.setRecurrenceOption(daily);
-            var minTime = LocalDateTime.of(daily.getStartRecurrence(), daily.getStartTime());
-            var maxTime = LocalDateTime.of(daily.getEndRecurrence(), daily.getEndTime());
 
             courseService.save(courseDto);
 
             var actualCourse = getCourseSaved();
             assertThat(actualCourse.getCalendarEntries())
                     .hasSize(3);
-            assertEquals(minTime, actualCourse.getMinTime());
-            assertEquals(maxTime, actualCourse.getMaxTime());
         }
 
         @Test
@@ -379,6 +344,14 @@ class CourseServiceImplTest {
 
         assertThat(courseDtoPage)
                 .containsExactly(COURSE_MAPPER.toTarget(course));
+    }
+
+    private static Space createSpace() {
+        var member = ReferenceTestFixture.createMemberReference();
+        var dogHasHandler = new DogHasHandlerReference();
+        dogHasHandler.setMember(member);
+        dogHasHandler.setDog(new DogReference());
+        return new Space(dogHasHandler);
     }
 
     private Course getCourseSaved() {

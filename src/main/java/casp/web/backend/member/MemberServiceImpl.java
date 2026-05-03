@@ -2,12 +2,13 @@ package casp.web.backend.member;
 
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.exception.MemberEMailConflictException;
+import casp.web.backend.common.exception.MemberStateConflictException;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.member.data.Role;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,9 +21,9 @@ import java.util.stream.Collectors;
 
 import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 
+@Slf4j
 @Service
 class MemberServiceImpl implements MemberService {
-    private static final Logger LOG = LoggerFactory.getLogger(MemberServiceImpl.class);
     private static final String EMAIL_FORMAT_IF_DELETED = "%s---%s";
 
     private final MemberRepository memberRepository;
@@ -99,15 +100,15 @@ class MemberServiceImpl implements MemberService {
         memberRepository.findById(member.getId()).ifPresent(m -> {
             if (m.getEntityStatus() != EntityStatus.ACTIVE) {
                 var msg = "Member with id %s is not active.".formatted(member.getId());
-                LOG.error(msg);
-                throw new IllegalStateException(msg);
+                log.error(msg);
+                throw new MemberStateConflictException(msg);
             }
         });
         memberRepository.findOneByEmail(member.getEmail()).ifPresent(m -> {
             if (!member.equals(m)) {
                 var msg = "Member with email %s already exists.".formatted(member.getEmail());
-                LOG.error(msg);
-                throw new IllegalStateException(msg);
+                log.error(msg);
+                throw new MemberEMailConflictException(msg);
             }
         });
     }
@@ -115,7 +116,7 @@ class MemberServiceImpl implements MemberService {
     private Member getMemberIfNotDeleted(UUID id) {
         return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED).orElseThrow(() -> {
             var msg = "Member with id %s not found.".formatted(id);
-            LOG.error(msg);
+            log.error(msg);
             return new NoSuchElementException(msg);
         });
     }

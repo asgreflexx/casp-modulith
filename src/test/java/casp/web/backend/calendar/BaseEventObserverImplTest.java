@@ -7,13 +7,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BaseEventObserverImplTest {
@@ -58,28 +54,5 @@ class BaseEventObserverImplTest {
         verify(courseService).activateBaseEventsByMemberId(memberId);
         verify(eventService).activateBaseEventsByMemberId(memberId);
         verify(examService).activateBaseEventsByMemberId(memberId);
-    }
-
-    @Test
-    void getCalendarEntriesBetweenFromAndToOrMemberId() {
-        var from = LocalDateTime.now();
-        var to = from.plusDays(1);
-        var courseCalendarEntryDto = new CalendarEntryDto();
-        courseCalendarEntryDto.setEntryFrom(from);
-        courseCalendarEntryDto.setEntryTo(from.plusHours(1));
-        var eventCalendarEntryDto = new CalendarEntryDto();
-        eventCalendarEntryDto.setEntryFrom(from.plusHours(2));
-        eventCalendarEntryDto.setEntryTo(from.plusHours(3));
-        var examCalendarEntryDto = new CalendarEntryDto();
-        examCalendarEntryDto.setEntryFrom(from.plusHours(4));
-        examCalendarEntryDto.setEntryTo(from.plusHours(5));
-        when(courseService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId)).thenReturn(Stream.of(courseCalendarEntryDto));
-        when(eventService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId)).thenReturn(Stream.of(eventCalendarEntryDto));
-        when(examService.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId)).thenReturn(Stream.of(examCalendarEntryDto));
-
-        var calendarEntryDtoList = observer.getCalendarEntriesBetweenFromAndToOrMemberId(from, to, memberId);
-
-        assertThat(calendarEntryDtoList)
-                .containsExactly(courseCalendarEntryDto, eventCalendarEntryDto, examCalendarEntryDto);
     }
 }

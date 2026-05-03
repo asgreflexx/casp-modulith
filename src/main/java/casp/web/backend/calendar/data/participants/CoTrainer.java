@@ -3,10 +3,16 @@ package casp.web.backend.calendar.data.participants;
 import casp.web.backend.common.reference.MemberReference;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
+@Setter
+@Getter
 public class CoTrainer extends BaseParticipant {
     @Valid
     @NotNull
@@ -22,26 +28,8 @@ public class CoTrainer extends BaseParticipant {
         this.member = member;
     }
 
-    public MemberReference getMember() {
-        return member;
-    }
-
-    public void setMember(MemberReference member) {
-        this.member = member;
-    }
-
     @Override
     public UUID getId() {
         return member.getId();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

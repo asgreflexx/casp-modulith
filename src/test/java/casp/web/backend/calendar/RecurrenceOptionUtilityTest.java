@@ -1,15 +1,16 @@
-package casp.web.backend.calendar.options;
+package casp.web.backend.calendar;
 
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
 import casp.web.backend.calendar.data.options.WeeklyOption;
 import casp.web.backend.calendar.data.options.WeeklyRecurrenceOption;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,13 +21,8 @@ class RecurrenceOptionUtilityTest {
     private static final LocalTime START_TIME = LocalTime.of(1, 0, 0);
     private static final LocalTime END_TIME = LocalTime.of(2, 0, 0);
     private static final LocalDate RECURRENCE = LocalDate.of(2024, 1, 1);
-    private static final CalendarEntry EXPECTED_CALENDAR_ENTRY = new CalendarEntry();
-
-    @BeforeEach
-    void setUp() {
-        EXPECTED_CALENDAR_ENTRY.setEntryFrom(RECURRENCE.atTime(START_TIME));
-        EXPECTED_CALENDAR_ENTRY.setEntryTo(RECURRENCE.atTime(END_TIME));
-    }
+    private static final ZoneOffset ZONE_OFFSET = ZoneOffset.UTC;
+    private static final CalendarEntry EXPECTED_CALENDAR_ENTRY = new CalendarEntry(OffsetDateTime.of(RECURRENCE, START_TIME, ZONE_OFFSET), OffsetDateTime.of(RECURRENCE, END_TIME, ZONE_OFFSET));
 
     @Test
     void withDailyOption() {
@@ -36,7 +32,7 @@ class RecurrenceOptionUtilityTest {
         option.setStartTime(START_TIME);
         option.setEndTime(END_TIME);
 
-        assertThat(RecurrenceOptionUtility.createCalendarEntries(option))
+        assertThat(RecurrenceOptionUtility.createCalendarEntries(option, ZONE_OFFSET))
                 .singleElement()
                 .satisfies(this::assertCalendarEntry);
     }
@@ -55,13 +51,13 @@ class RecurrenceOptionUtilityTest {
         option.setEndRecurrence(RECURRENCE);
         option.setOccurrences(occurrences);
 
-        assertThat(RecurrenceOptionUtility.createCalendarEntries(option))
+        assertThat(RecurrenceOptionUtility.createCalendarEntries(option, ZONE_OFFSET))
                 .singleElement()
                 .satisfies(this::assertCalendarEntry);
     }
 
     private void assertCalendarEntry(CalendarEntry calendarEntry) {
-        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryFrom(), calendarEntry.getEntryFrom());
-        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryTo(), calendarEntry.getEntryTo());
+        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryFromODT(), calendarEntry.getEntryFromODT());
+        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryToODT(), calendarEntry.getEntryToODT());
     }
 }

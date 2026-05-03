@@ -7,11 +7,12 @@ import casp.web.backend.member.MemberDtoRequiredFields;
 import casp.web.backend.member.data.Card;
 import casp.web.backend.member.data.MembershipFee;
 import casp.web.backend.member.data.Role;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 class MemberRead extends BaseView implements MemberDtoRequiredFields {
     private EntityStatus entityStatus;
     private String firstName;
@@ -156,15 +157,5 @@ class MemberRead extends BaseView implements MemberDtoRequiredFields {
     @Override
     public void setCards(Set<Card> cards) {
         this.cards = cards;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

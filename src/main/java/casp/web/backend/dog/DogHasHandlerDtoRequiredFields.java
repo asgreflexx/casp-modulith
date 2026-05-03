@@ -8,10 +8,9 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface DogHasHandlerDtoRequiredFields {
-    @Valid
-    Set<Grade> getGrades();
+    Set<@Valid Grade> getGrades();
 
-    void setGrades(@Valid Set<Grade> grades);
+    void setGrades(Set<@Valid Grade> grades);
 
     @NotNull
     UUID getMemberId();

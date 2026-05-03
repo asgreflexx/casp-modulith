@@ -1,5 +1,4 @@
-package casp.web.backend.calendar.options;
-
+package casp.web.backend.calendar;
 
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.options.WeeklyOption;
@@ -10,16 +9,18 @@ import org.junit.jupiter.api.Test;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static casp.web.backend.calendar.CalendarFixture.ZONE_ID;
+import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
+import static casp.web.backend.calendar.CalendarFixture.createFirstMondayTheMonth;
+import static casp.web.backend.calendar.CalendarFixture.createLocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-
 class WeeklyOptionUtilityTest {
-    private static final LocalDate START_RECURRENCE = LocalDate.of(2024, 1, 1);
+    private static final LocalDate START_RECURRENCE = createFirstMondayTheMonth();
     private WeeklyRecurrenceOption option;
 
     @BeforeEach
@@ -42,34 +43,26 @@ class WeeklyOptionUtilityTest {
 
         @Test
         void twoEveryWeek() {
-            var endRecurrence = LocalDate.of(2024, 1, 8);
             option.setStartRecurrence(START_RECURRENCE);
-            option.setEndRecurrence(endRecurrence);
+            option.setEndRecurrence(createLocalDate(6));
+            var expectedCalendarEntries = List.of(createCalendarEntry(START_RECURRENCE, monday10Clock),
+                    createCalendarEntry(START_RECURRENCE, monday11Clock));
 
             option.setOccurrences(List.of(monday10Clock, monday11Clock));
 
-            var expectedCalendarEntries = List.of(createExpectedCalendarEntry(START_RECURRENCE, monday10Clock),
-                    createExpectedCalendarEntry(START_RECURRENCE, monday11Clock),
-                    createExpectedCalendarEntry(endRecurrence, monday10Clock),
-                    createExpectedCalendarEntry(endRecurrence, monday11Clock));
-
-            var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option);
+            var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option, ZONE_ID);
 
             assertThat(calendarEntries).zipSatisfy(expectedCalendarEntries, WeeklyOptionUtilityTest::assertCalendarEntry);
         }
 
         @Test
         void twoEveryTwoWeeks() {
-            var endRecurrence = LocalDate.of(2024, 1, 15);
-            option.setEndRecurrence(endRecurrence);
+            option.setEndRecurrence(createLocalDate(13));
             option.setRepeatEvery(2);
+            var expectedCalendarEntries = List.of(createCalendarEntry(START_RECURRENCE, monday10Clock),
+                    createCalendarEntry(START_RECURRENCE, monday11Clock));
 
-            var expectedCalendarEntries = List.of(createExpectedCalendarEntry(START_RECURRENCE, monday10Clock),
-                    createExpectedCalendarEntry(START_RECURRENCE, monday11Clock),
-                    createExpectedCalendarEntry(endRecurrence, monday10Clock),
-                    createExpectedCalendarEntry(endRecurrence, monday11Clock));
-
-            var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option);
+            var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option, ZONE_ID);
 
             assertThat(calendarEntries).zipSatisfy(expectedCalendarEntries, WeeklyOptionUtilityTest::assertCalendarEntry);
         }
@@ -80,15 +73,16 @@ class WeeklyOptionUtilityTest {
     void tuesdayAndWednesday() {
         var tuesday = createWeeklyOption(10, 11, DayOfWeek.TUESDAY);
         var wednesday = createWeeklyOption(11, 12, DayOfWeek.WEDNESDAY);
-        var endRecurrence = LocalDate.of(2024, 1, 15);
+        var endRecurrence = createLocalDate(8);
         option.setOccurrences(List.of(tuesday, wednesday));
         option.setEndRecurrence(endRecurrence);
-        var expectedCalendarEntries = List.of(createExpectedCalendarEntry(LocalDate.of(2024, 1, 2), tuesday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 3), wednesday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 9), tuesday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 10), wednesday));
+        var firstTuesdayDate = START_RECURRENCE.plusDays(DayOfWeek.TUESDAY.getValue() - 1);
+        var wednesdayDate = START_RECURRENCE.plusDays(DayOfWeek.WEDNESDAY.getValue() - 1);
+        var expectedCalendarEntries = List.of(createCalendarEntry(firstTuesdayDate, tuesday),
+                createCalendarEntry(wednesdayDate, wednesday),
+                createCalendarEntry(endRecurrence, tuesday));
 
-        var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option);
+        var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option, ZONE_ID);
 
         assertThat(calendarEntries).zipSatisfy(expectedCalendarEntries, WeeklyOptionUtilityTest::assertCalendarEntry);
     }
@@ -97,16 +91,14 @@ class WeeklyOptionUtilityTest {
     void mondayAndSunday() {
         var monday = createWeeklyOption(10, 11, DayOfWeek.MONDAY);
         var sunday = createWeeklyOption(11, 12, DayOfWeek.SUNDAY);
-        var endRecurrence = LocalDate.of(2024, 1, 15);
+        var endRecurrence = createLocalDate(8);
         option.setOccurrences(List.of(monday, sunday));
         option.setEndRecurrence(endRecurrence);
-        var expectedCalendarEntries = List.of(createExpectedCalendarEntry(LocalDate.of(2024, 1, 1), monday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 7), sunday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 8), monday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 14), sunday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 15), monday));
+        var expectedCalendarEntries = List.of(createCalendarEntry(START_RECURRENCE, monday),
+                createCalendarEntry(endRecurrence.minusDays(2), sunday),
+                createCalendarEntry(endRecurrence.minusDays(1), monday));
 
-        var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option);
+        var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option, ZONE_ID);
 
         assertThat(calendarEntries).zipSatisfy(expectedCalendarEntries, WeeklyOptionUtilityTest::assertCalendarEntry);
     }
@@ -115,20 +107,20 @@ class WeeklyOptionUtilityTest {
     void mondayAndSundayEveryTwoWeeks() {
         var monday = createWeeklyOption(10, 11, DayOfWeek.MONDAY);
         var sunday = createWeeklyOption(11, 12, DayOfWeek.SUNDAY);
-        var endRecurrence = LocalDate.of(2024, 1, 15);
+        var endRecurrence = createLocalDate(13);
         option.setOccurrences(List.of(monday, sunday));
         option.setEndRecurrence(endRecurrence);
         option.setRepeatEvery(2);
-        var expectedCalendarEntries = List.of(createExpectedCalendarEntry(LocalDate.of(2024, 1, 1), monday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 7), sunday),
-                createExpectedCalendarEntry(LocalDate.of(2024, 1, 15), monday));
+        var sundayDate = START_RECURRENCE.plusDays(DayOfWeek.SUNDAY.getValue() - 1);
+        var expectedCalendarEntries = List.of(createCalendarEntry(START_RECURRENCE, monday),
+                createCalendarEntry(sundayDate, sunday));
 
-        var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option);
+        var calendarEntries = WeeklyOptionUtility.createCalendarEntries(option, ZONE_ID);
 
         assertThat(calendarEntries).zipSatisfy(expectedCalendarEntries, WeeklyOptionUtilityTest::assertCalendarEntry);
     }
 
-    private static WeeklyOption createWeeklyOption(final int startHour, final int endHour, final DayOfWeek dayOfWeek) {
+    private static WeeklyOption createWeeklyOption(int startHour, int endHour, DayOfWeek dayOfWeek) {
         var weeklyOption = new WeeklyOption();
         weeklyOption.setDayOfWeek(dayOfWeek);
         weeklyOption.setStartTime(LocalTime.of(startHour, 0, 0));
@@ -136,13 +128,8 @@ class WeeklyOptionUtilityTest {
         return weeklyOption;
     }
 
-    private static CalendarEntry createExpectedCalendarEntry(final LocalDate date, final WeeklyOption option) {
-        return new CalendarEntry(LocalDateTime.of(date, option.getStartTime()), LocalDateTime.of(date, option.getEndTime()));
-    }
-
-    private static void assertCalendarEntry(final CalendarEntry actual, final CalendarEntry expected) {
+    private static void assertCalendarEntry(CalendarEntry actual, CalendarEntry expected) {
         assertEquals(0, actual.compareTo(expected),
                 "Actual is not same as the expected calendar entry");
     }
-
 }

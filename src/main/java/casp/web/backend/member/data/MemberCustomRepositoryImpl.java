@@ -4,9 +4,8 @@ import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.member.MembershipFeesStatsByYearDto;
 import casp.web.backend.member.MembershipFeesStatsDto;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,10 +24,9 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
+@Slf4j
 @Component
 class MemberCustomRepositoryImpl implements MemberCustomRepository {
-    private static final Logger LOG = LoggerFactory.getLogger(MemberCustomRepositoryImpl.class);
     private static final QMember MEMBER = QMember.member;
     private static final BooleanExpression ACTIVE_MEMBER_STATUS_FILTER = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
     private static final QMembershipFee MEMBERSHIP_FEE = QMembershipFee.membershipFee;
@@ -43,7 +41,7 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     }
 
     @Override
-    public Page<Member> findAllByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, final Set<Role> roles, Pageable pageable) {
+    public Page<Member> findAllByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, Set<Role> roles, Pageable pageable) {
         var expression = MEMBER.entityStatus.eq(entityStatus);
         if (ObjectUtils.isNotEmpty(name)) {
             expression = expression.andAnyOf(splitIntoWords(name));
@@ -62,7 +60,7 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
         var expression = MEMBER.entityStatus.eq(entityStatus).and(MEMBER.id.eq(id));
         return Optional.ofNullable(createQuery().where(expression).fetchOne()).orElseThrow(() -> {
             var msg = "Member with id %s not found or it isn't %s.".formatted(id, entityStatus);
-            LOG.error(msg);
+            log.error(msg);
             return new NoSuchElementException(msg);
         });
     }

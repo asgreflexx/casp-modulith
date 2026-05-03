@@ -4,6 +4,7 @@ import casp.web.backend.common.base.BaseDocument;
 import casp.web.backend.common.enums.Gender;
 import casp.web.backend.member.MemberRequiredFields;
 import com.querydsl.core.annotations.QueryEntity;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,32 +13,22 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @QueryEntity
 @Document
 public class Member extends BaseDocument implements MemberRequiredFields {
     private String firstName;
-
     private String lastName;
-
     private LocalDate birthDate;
-
     private Gender gender;
-
     private String telephoneNumber;
-
     @Indexed(unique = true)
     private String email;
-
     private String address;
-
     private String postcode;
-
     private String city;
-
     private Set<Role> roles = new HashSet<>(List.of(Role.USER));
-
     private Set<MembershipFee> membershipFees = new HashSet<>();
-
     private Set<Card> cards = new HashSet<>();
 
     @Override
@@ -158,15 +149,5 @@ public class Member extends BaseDocument implements MemberRequiredFields {
     @Override
     public void setCards(Set<Card> cards) {
         this.cards = cards;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

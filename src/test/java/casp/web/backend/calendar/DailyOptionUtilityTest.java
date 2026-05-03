@@ -1,5 +1,4 @@
-package casp.web.backend.calendar.options;
-
+package casp.web.backend.calendar;
 
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.options.DailyRecurrenceOption;
@@ -9,7 +8,11 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 
+import static casp.web.backend.calendar.CalendarFixture.ZONE_ID;
+import static casp.web.backend.calendar.CalendarFixture.createFirstMondayTheMonth;
+import static casp.web.backend.calendar.CalendarFixture.createLocalDate;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -17,21 +20,22 @@ class DailyOptionUtilityTest {
 
     private static final LocalTime START_TIME = LocalTime.of(1, 0, 0);
     private static final LocalTime END_TIME = LocalTime.of(2, 0, 0);
-    private static final LocalDate START_RECURRENCE = LocalDate.of(2024, 1, 1);
-    private static final LocalDate END_RECURRENCE = START_RECURRENCE.plusDays(9);
-    private static final CalendarEntry EXPECTED_CALENDAR_ENTRY = new CalendarEntry();
+    private static final LocalDate START_RECURRENCE = createFirstMondayTheMonth();
+    private static final LocalDate END_RECURRENCE = createLocalDate(9);
+    private OffsetDateTime entryFromODT;
+    private OffsetDateTime entryToODT;
 
     @BeforeEach
     void setUp() {
-        EXPECTED_CALENDAR_ENTRY.setEntryFrom(LocalDateTime.of(START_RECURRENCE, START_TIME));
-        EXPECTED_CALENDAR_ENTRY.setEntryTo(LocalDateTime.of(START_RECURRENCE, END_TIME));
+        entryFromODT = LocalDateTime.of(START_RECURRENCE, START_TIME).atZone(ZONE_ID).toOffsetDateTime();
+        entryToODT = LocalDateTime.of(START_RECURRENCE, END_TIME).atZone(ZONE_ID).toOffsetDateTime();
     }
 
     @Test
     void create10CalendarEntriesEveryDay() {
         var repeatEvery = 1;
 
-        var calendarEntries = DailyOptionUtility.createCalendarEntries(createDailyOption(repeatEvery));
+        var calendarEntries = DailyOptionUtility.createCalendarEntries(createDailyOption(repeatEvery), ZONE_ID);
 
         assertThat(calendarEntries)
                 .hasSize(10)
@@ -41,9 +45,8 @@ class DailyOptionUtilityTest {
     @Test
     void create5CalendarEntriesEverySecondDay() {
         var repeatEvery = 2;
-        createDailyOption(repeatEvery);
 
-        var calendarEntries = DailyOptionUtility.createCalendarEntries(createDailyOption(repeatEvery));
+        var calendarEntries = DailyOptionUtility.createCalendarEntries(createDailyOption(repeatEvery), ZONE_ID);
 
         assertThat(calendarEntries)
                 .hasSize(5)
@@ -61,10 +64,10 @@ class DailyOptionUtilityTest {
     }
 
     private void assertCalendarEntry(CalendarEntry calendarEntry, int repeat) {
-        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryFrom(), calendarEntry.getEntryFrom());
-        assertEquals(EXPECTED_CALENDAR_ENTRY.getEntryTo(), calendarEntry.getEntryTo());
+        assertEquals(entryFromODT, calendarEntry.getEntryFromODT());
+        assertEquals(entryToODT, calendarEntry.getEntryToODT());
 
-        EXPECTED_CALENDAR_ENTRY.setEntryFrom(EXPECTED_CALENDAR_ENTRY.getEntryFrom().plusDays(repeat));
-        EXPECTED_CALENDAR_ENTRY.setEntryTo(EXPECTED_CALENDAR_ENTRY.getEntryTo().plusDays(repeat));
+        entryFromODT = entryFromODT.plusDays(repeat);
+        entryToODT = entryToODT.plusDays(repeat);
     }
 }

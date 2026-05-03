@@ -2,6 +2,8 @@ package casp.web.backend.member;
 
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.exception.MemberEMailConflictException;
+import casp.web.backend.common.exception.MemberStateConflictException;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
@@ -142,7 +144,7 @@ class MemberServiceImplTest {
             when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(new Member()));
             var memberDto = MEMBER_MAPPER.toTarget(member);
 
-            assertThrows(IllegalStateException.class, () -> memberService.saveMember(memberDto));
+            assertThrows(MemberEMailConflictException.class, () -> memberService.saveMember(memberDto));
         }
 
         @Test
@@ -165,7 +167,7 @@ class MemberServiceImplTest {
             var memberDto = MEMBER_MAPPER.toTarget(member);
             when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
 
-            assertThrows(IllegalStateException.class, () -> memberService.saveMember(memberDto));
+            assertThrows(MemberStateConflictException.class, () -> memberService.saveMember(memberDto));
         }
     }
 

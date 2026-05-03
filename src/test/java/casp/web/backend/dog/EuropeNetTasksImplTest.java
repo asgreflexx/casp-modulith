@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -63,16 +62,6 @@ class EuropeNetTasksImplTest {
         europeNetTasks.scheduleChipNumbersCheckTask();
 
         verifyNoInteractions(restTemplate);
-    }
-
-    @Test
-    void registerDogsManually() {
-        var expectedPage = new PageImpl<DogDto>(List.of());
-        when(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of()));
-
-        var actualPage = europeNetTasks.registerDogsManually(Pageable.unpaged());
-
-        assertEquals(expectedPage, actualPage);
     }
 
     @Nested

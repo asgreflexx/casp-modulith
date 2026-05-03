@@ -4,18 +4,17 @@ import casp.web.backend.calendar.data.BaseEvent;
 import casp.web.backend.calendar.data.BaseEventCustomRepository;
 import casp.web.backend.calendar.data.CalendarEntry;
 import casp.web.backend.calendar.data.participants.BaseParticipant;
-import casp.web.backend.calendar.options.RecurrenceOptionUtility;
 import casp.web.backend.common.base.BaseRepository;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.ParameterizedType;
-import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
@@ -23,23 +22,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventDto<P>, P extends BaseParticipant> implements BaseEventService<T> {
-    private static final Logger LOG = LoggerFactory.getLogger(BaseEventServiceImpl.class);
-
-    protected final BaseRepository<D> baseRepository;
-    private final MemberReferenceRepository memberReferenceRepository;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+@Slf4j
+abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventDto<P>, P extends BaseParticipant, R extends BaseRepository<D>> implements BaseEventService<T> {
     private final BaseEventCustomRepository<D> baseEventCustomRepository;
     private final Class<D> documentClass;
+    final R repository;
+    private MemberReferenceRepository memberReferenceRepository;
+    private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
+    private ZoneId zoneId;
 
     @SuppressWarnings("unchecked")
-    BaseEventServiceImpl(MemberReferenceRepository memberReferenceRepository,
-                         BaseRepository<D> baseRepository,
-                         DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
-        this.memberReferenceRepository = memberReferenceRepository;
-        this.baseRepository = baseRepository;
-        baseEventCustomRepository = (BaseEventCustomRepository<D>) baseRepository;
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
+    BaseEventServiceImpl(R repository) {
+        this.repository = repository;
+        baseEventCustomRepository = (BaseEventCustomRepository<D>) repository;
         var types = (ParameterizedType) getClass().getGenericSuperclass();
         documentClass = (Class<D>) types.getActualTypeArguments()[0];
     }
@@ -68,50 +63,57 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                 .forEach(d -> saveItNewEntityStatus(d, EntityStatus.ACTIVE));
     }
 
-    @Override
-    public Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, UUID memberId) {
-        return baseEventCustomRepository.findAllBetweenFromAndToOrMemberId(from, to, memberId)
-                .flatMap(d -> d.getCalendarEntries()
-                        .stream()
-                        .map(ce -> new CalendarEntryDto(ce, d)));
+    @Autowired
+    void setMemberReferenceRepository(MemberReferenceRepository memberReferenceRepository) {
+        this.memberReferenceRepository = memberReferenceRepository;
     }
 
-    protected void setCalendarEntriesAndMember(T dto, D document) {
+    @Autowired
+    void setDogHasHandlerReferenceRepository(DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
+    }
+
+    @Autowired
+    void setZoneId(ZoneId zoneId) {
+        this.zoneId = zoneId;
+    }
+
+    void setCalendarEntriesAndMember(T dto, D document) {
         setCalendarEntries(dto, document);
         setMember(dto, document);
     }
 
-    protected Optional<MemberReference> findMemberReferenceById(UUID memberId) {
+    Optional<MemberReference> findMemberReferenceById(UUID memberId) {
         return memberReferenceRepository.findOneByIdAndEntityStatus(memberId, EntityStatus.ACTIVE);
     }
 
-    protected D getOneByIdOrThrowException(UUID id) {
-        return baseRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
+    D getOneByIdOrThrowException(UUID id) {
+        return repository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE)
                 .orElseThrow(() -> {
                     var msg = "%s with id %s does not exist or it is not active.".formatted(documentClass.getSimpleName(), id);
-                    LOG.error(msg);
+                    log.error(msg);
                     return new NoSuchElementException(msg);
                 });
     }
 
-    protected void saveItNewEntityStatus(D document, EntityStatus entityStatus) {
+    private void saveItNewEntityStatus(D document, EntityStatus entityStatus) {
         document.setEntityStatus(entityStatus);
-        baseRepository.save(document);
+        repository.save(document);
     }
 
-    protected Optional<DogHasHandlerReference> findDogHandlerReferenceById(UUID dogHasHandlerId) {
+    Optional<DogHasHandlerReference> findDogHandlerReferenceById(UUID dogHasHandlerId) {
         return dogHasHandlerReferenceRepository.findOneByIdAndEntityStatus(dogHasHandlerId, EntityStatus.ACTIVE);
     }
 
-    protected Set<P> getExistingParticipantsMatchingDtoParticipantIds(T dto) {
-        return baseRepository.findOneByIdAndEntityStatus(dto.getId(), EntityStatus.ACTIVE)
+    private Set<P> getExistingParticipantsMatchingDtoParticipantIds(T dto) {
+        return repository.findOneByIdAndEntityStatus(dto.getId(), EntityStatus.ACTIVE)
                 .stream()
                 .flatMap(p -> p.getParticipants().stream())
                 .filter(p -> dto.getParticipantIds().contains(p.getId()))
                 .collect(Collectors.toSet());
     }
 
-    protected Set<P> getNewParticipants(T dto, Set<P> existingParticipants) {
+    private Set<P> getNewParticipants(T dto, Set<P> existingParticipants) {
         var existingParticipantIds = existingParticipants.stream().map(P::getId).collect(Collectors.toSet());
         return dto.getParticipantIds().stream()
                 .filter(participantId -> !existingParticipantIds.contains(participantId))
@@ -134,10 +136,10 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
     private void setCalendarEntries(T dto, D document) {
         if (null == dto.getRecurrenceOption()) {
             var newCalendarEntry = dto.getNewCalendarEntry();
-            var calendarEntry = new CalendarEntry(newCalendarEntry.getEntryFrom(), newCalendarEntry.getEntryTo());
+            var calendarEntry = new CalendarEntry(newCalendarEntry.getEntryFromODT(), newCalendarEntry.getEntryToODT());
             document.addCalendarEntry(calendarEntry);
         } else {
-            document.setCalendarEntries(RecurrenceOptionUtility.createCalendarEntries(dto.getRecurrenceOption()));
+            document.setCalendarEntries(RecurrenceOptionUtility.createCalendarEntries(dto.getRecurrenceOption(), zoneId));
         }
     }
 
@@ -146,7 +148,7 @@ abstract class BaseEventServiceImpl<D extends BaseEvent<P>, T extends BaseEventD
                 .ifPresentOrElse(document::setMember,
                         () -> {
                             var msg = "Member with id %s does not exist or it is not active.".formatted(dto.getMemberId());
-                            LOG.error(msg);
+                            log.error(msg);
                             throw new NoSuchElementException(msg);
                         });
     }

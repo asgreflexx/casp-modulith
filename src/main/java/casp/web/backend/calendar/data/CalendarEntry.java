@@ -1,73 +1,41 @@
 package casp.web.backend.calendar.data;
 
-import jakarta.validation.constraints.NotNull;
-import org.springframework.data.annotation.Id;
+import com.querydsl.core.annotations.QueryEmbeddable;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
-
+@QueryEmbeddable
+@Setter
+@Getter
+@EqualsAndHashCode(of = "id")
+@ToString(of = {"entryFromODT", "entryToODT"})
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
-    @Id
     private UUID id = UUID.randomUUID();
-
-    @NotNull
+    @Deprecated(forRemoval = true, since = "2026-04-23")
     private LocalDateTime entryFrom;
-
-    @NotNull
+    @Deprecated(forRemoval = true, since = "2026-04-23")
     private LocalDateTime entryTo;
+    // TODO should be not null
+    private OffsetDateTime entryFromODT;
+    // TODO should be not null
+    private OffsetDateTime entryToODT;
 
     public CalendarEntry() {
     }
 
-    public CalendarEntry(LocalDateTime entryFrom, LocalDateTime entryTo) {
-        this.entryFrom = entryFrom;
-        this.entryTo = entryTo;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    @Override
-    public LocalDateTime getEntryFrom() {
-        return entryFrom;
-    }
-
-    @Override
-    public void setEntryFrom(LocalDateTime entryFrom) {
-        this.entryFrom = entryFrom;
-    }
-
-    @Override
-    public LocalDateTime getEntryTo() {
-        return entryTo;
-    }
-
-    @Override
-    public void setEntryTo(LocalDateTime entryTo) {
-        this.entryTo = entryTo;
+    public CalendarEntry(OffsetDateTime entryFromODT, OffsetDateTime entryToODT) {
+        this.entryFromODT = entryFromODT;
+        this.entryToODT = entryToODT;
     }
 
     @Override
     public int compareTo(CalendarEntry calendar) {
-        return entryFrom.compareTo(calendar.entryFrom) + entryTo.compareTo(calendar.entryTo);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof CalendarEntry calendar)) return false;
-        return Objects.equals(id, calendar.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
+        return entryFromODT.compareTo(calendar.entryFromODT) + entryToODT.compareTo(calendar.entryToODT);
     }
 }

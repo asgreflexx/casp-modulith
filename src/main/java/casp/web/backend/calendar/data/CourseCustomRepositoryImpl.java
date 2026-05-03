@@ -5,7 +5,6 @@ import casp.web.backend.calendar.CoursesFeesStatsDto;
 import casp.web.backend.calendar.data.participants.QSpace;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.dog.data.QDogHasHandler;
-import jakarta.annotation.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +16,10 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Component
 class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> implements CourseCustomRepository {
@@ -28,19 +27,24 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     private static final QSpace SPACE = QSpace.space;
     private static final String TOTAL_PAID = "totalPaid";
     private static final String AGGREGATION_ID = "_id";
+    private final ZoneId zoneId;
 
     @Autowired
-    CourseCustomRepositoryImpl(MongoOperations mongoOperations) {
+    CourseCustomRepositoryImpl(MongoOperations mongoOperations, ZoneId zoneId) {
         super(mongoOperations);
+        this.zoneId = zoneId;
     }
 
     @Override
     public Page<Course> findAllByYear(int year, Pageable pageable) {
-        var from = LocalDateTime.of(LocalDate.of(year, 1, 1), LocalTime.MIN);
-        var to = LocalDateTime.of(LocalDate.of(year, 12, 31), LocalTime.MAX);
+        var from = LocalDateTime.of(LocalDate.of(year, 1, 1), LocalTime.MIN).atZone(zoneId).toOffsetDateTime();
+        var to = LocalDateTime.of(LocalDate.of(year, 12, 31), LocalTime.MAX).atZone(zoneId).toOffsetDateTime();
 
+        var timeRangeCriteria = COURSE.entityStatus.eq(EntityStatus.ACTIVE)
+                .and(COURSE.minODT.goe(from)
+                        .and(COURSE.maxODT.loe(to)));
         return query()
-                .where(createTimeRangeCriteria(from, to))
+                .where(timeRangeCriteria)
                 .fetchPage(pageable);
     }
 
@@ -52,19 +56,6 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
         return query()
                 .where(COURSE.participants.any().dogHasHandler.id.eq(spaceId), COURSE.entityStatus.eq(EntityStatus.ACTIVE))
                 .fetchPage(pageable);
-    }
-
-    @Override
-    public Stream<Course> findAllBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId) {
-        var criteria = createTimeRangeCriteria(from, to);
-        if (memberId != null) {
-            criteria = criteria.and(COURSE.member.id.eq(memberId)
-                    .or(COURSE.coTrainers.any().member.id.eq(memberId))
-                    .or(COURSE.participants.any().dogHasHandler.id.in(findDogHasHandlerIdsByMemberId(memberId))));
-        }
-        return query()
-                .where(criteria)
-                .stream();
     }
 
     // "%s.%s" is a false positive

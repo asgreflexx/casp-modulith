@@ -1,6 +1,5 @@
 package casp.web.backend.calendar.data.options;
 
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
@@ -9,7 +8,7 @@ public class RecurrenceValidation
     private int plusDays;
 
     @Override
-    public void initialize(final RecurrenceConstraint constraintAnnotation) {
+    public void initialize(RecurrenceConstraint constraintAnnotation) {
         plusDays = constraintAnnotation.plusDays();
     }
 

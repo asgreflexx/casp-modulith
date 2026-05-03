@@ -1,10 +1,6 @@
 package casp.web.backend.calendar;
 
-import jakarta.annotation.Nullable;
-
-import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 interface BaseEventService<T extends BaseEventDto<?>> {
     void save(T dto);
@@ -16,8 +12,6 @@ interface BaseEventService<T extends BaseEventDto<?>> {
     void deactivateBaseEventsByMemberId(UUID memberId);
 
     void activateBaseEventsByMemberId(UUID memberId);
-
-    Stream<CalendarEntryDto> getCalendarEntriesBetweenFromAndToOrMemberId(LocalDateTime from, LocalDateTime to, @Nullable UUID memberId);
 
     T getOneById(UUID id);
 }

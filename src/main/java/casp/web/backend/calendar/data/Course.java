@@ -4,12 +4,14 @@ import casp.web.backend.calendar.CourseRequiredFields;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
 import com.querydsl.core.annotations.QueryEntity;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @QueryEntity
 @Document
 public class Course extends BaseEvent<Space> implements CourseRequiredFields {
@@ -52,25 +54,11 @@ public class Course extends BaseEvent<Space> implements CourseRequiredFields {
         participants.add(space);
     }
 
-    public void removeSpace(Space space) {
-        participants.remove(space);
-    }
-
     @Override
     Set<Space> getNotDeletedParticipants() {
         return participants.stream()
                 .filter(s -> isDogHasHandlerNotDeleted(s.getDogHasHandler()))
                 .collect(Collectors.toSet());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 
     private Set<CoTrainer> getNotDeletedCoTrainers() {

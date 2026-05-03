@@ -1,14 +1,7 @@
 package casp.web.backend.calendar.presentation;
 
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class EventWrite extends BaseEventWrite {
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
 }
