@@ -8,8 +8,6 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
 
 import java.lang.reflect.ParameterizedType;
-import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -42,25 +40,11 @@ abstract class BaseEventCustomRepositoryImpl<T extends BaseEvent<?>> implements 
         return findAllByCriteria(criteria);
     }
 
-    protected static BooleanExpression createTimeRangeCriteria(LocalDateTime from, LocalDateTime to) {
-        return BASE_EVENT.entityStatus.eq(EntityStatus.ACTIVE)
-                .and(BASE_EVENT.maxTime.goe(from)
-                        .and(BASE_EVENT.minTime.loe(to)));
-    }
-
     protected SpringDataMongodbQuery<T> query() {
         return new SpringDataMongodbQuery<>(mongoOperations, baseEventClass);
     }
 
-    protected List<UUID> findDogHasHandlerIdsByMemberId(UUID memberId) {
-        var memberIdCondition = DOG_HAS_HANDLER_REFERENCE.member.id.eq(memberId);
-        return activeDogHasHandlerQuery(memberIdCondition)
-                .stream()
-                .map(DogHasHandlerReference::getId)
-                .toList();
-    }
-
-    protected Optional<UUID> findActiveDogHandlerReferenceById(UUID participantId) {
+    Optional<UUID> findActiveDogHandlerReferenceById(UUID participantId) {
         return activeDogHasHandlerQuery(DOG_HAS_HANDLER_REFERENCE.id.eq(participantId))
                 .stream()
                 .findAny()

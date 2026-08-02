@@ -23,7 +23,6 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @ExtendWith(MockitoExtension.class)
 class ExamRestControllerTest {
     @Mock
@@ -78,13 +77,5 @@ class ExamRestControllerTest {
 
         assertSame(HttpStatus.OK, response.getStatusCode());
         assertEquals(EXAM_READ_MAPPER.toTarget(examDto), response.getBody());
-    }
-
-    @Test
-    void migrateDataToV2() {
-        var response = examRestController.migrateDataToV2();
-
-        assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
-        verify(examService).migrateDataToV2();
     }
 }

@@ -1,18 +1,10 @@
 package casp.web.backend.calendar.data;
 
-import jakarta.validation.constraints.NotNull;
-
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @CalendarFromToConstraint
 public interface CalendarValidation {
-    @NotNull
-    LocalDateTime getEntryFrom();
+    OffsetDateTime getEntryFromODT();
 
-    void setEntryFrom(@NotNull LocalDateTime entryFrom);
-
-    @NotNull
-    LocalDateTime getEntryTo();
-
-    void setEntryTo(@NotNull LocalDateTime entryTo);
+    OffsetDateTime getEntryToODT();
 }

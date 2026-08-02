@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -45,14 +45,14 @@ public interface BaseEventRequiredFields<P extends BaseParticipant> {
     void setRecurrenceOption(@Valid RecurrenceOption recurrenceOption);
 
     @NotNull
-    LocalDateTime getMinTime();
+    OffsetDateTime getMinODT();
 
-    void setMinTime(@NotNull LocalDateTime minTime);
+    void setMinODT(@NotNull OffsetDateTime minODT);
 
     @NotNull
-    LocalDateTime getMaxTime();
+    OffsetDateTime getMaxODT();
 
-    void setMaxTime(@NotNull LocalDateTime maxTime);
+    void setMaxODT(@NotNull OffsetDateTime maxODT);
 
     @NotEmpty
     List<@Valid CalendarEntry> getCalendarEntries();

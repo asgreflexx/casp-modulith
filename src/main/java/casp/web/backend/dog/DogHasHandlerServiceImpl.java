@@ -1,16 +1,15 @@
 package casp.web.backend.dog;
 
 import casp.web.backend.common.enums.EntityStatus;
+import casp.web.backend.common.exception.DogHasHandlerConflictException;
 import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.DogReferenceRepository;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.dog.DogHasHandlerOldRepository;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import jakarta.annotation.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,29 +17,23 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static casp.web.backend.deprecated.dog.DogHasHandlerV2Mapper.DOG_HAS_HANDLER_V2_MAPPER;
 import static casp.web.backend.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 
+@Slf4j
 @Service
 class DogHasHandlerServiceImpl implements DogHasHandlerService {
-    private static final Logger LOG = LoggerFactory.getLogger(DogHasHandlerServiceImpl.class);
-
-    private final DogHasHandlerOldRepository dogHasHandlerOldRepository;
     private final MemberReferenceRepository memberReferenceRepository;
     private final DogReferenceRepository dogReferenceRepository;
     private final DogHasHandlerRepository dogHasHandlerRepository;
 
     @Autowired
-    DogHasHandlerServiceImpl(DogHasHandlerOldRepository dogHasHandlerOldRepository,
-                             MemberReferenceRepository memberReferenceRepository,
+    DogHasHandlerServiceImpl(MemberReferenceRepository memberReferenceRepository,
                              DogReferenceRepository dogReferenceRepository,
                              DogHasHandlerRepository dogHasHandlerRepository) {
-        this.dogHasHandlerOldRepository = dogHasHandlerOldRepository;
         this.memberReferenceRepository = memberReferenceRepository;
         this.dogReferenceRepository = dogReferenceRepository;
         this.dogHasHandlerRepository = dogHasHandlerRepository;
@@ -48,7 +41,7 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     private static NoSuchElementException throwNoSuchElementException(String clazzName, UUID id) {
         var msg = "%s with id %s not found or it isn't active".formatted(clazzName, id);
-        LOG.error(msg);
+        log.error(msg);
         return new NoSuchElementException(msg);
     }
 
@@ -149,25 +142,14 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
         dogHasHandlerRepository.saveAll(dogHasHandlers);
     }
 
-    @Override
-    public void migrateDataToV2() {
-        var dogHasHandlerSet = dogHasHandlerOldRepository.findAll()
-                .stream()
-                .flatMap(dh -> dogReferenceRepository.findById(dh.getDogId())
-                        .flatMap(dog -> findMemberAndMapToDogHasHandlerV2(dh, dog)).stream())
-                .collect(Collectors.toSet());
-
-        dogHasHandlerRepository.saveAll(dogHasHandlerSet);
-    }
-
     private void verifyForDogHasHandlerConflict(DogHasHandlerDto dogHasHandlerDto) {
         dogHasHandlerRepository.findByDogIdAndMemberId(dogHasHandlerDto.getDogId(), dogHasHandlerDto.getMemberId())
                 .ifPresent(dhh -> {
                     if (!dhh.getId().equals(dogHasHandlerDto.getId())) {
                         var msg = "There is already a DogHasHandler[id: %s] with this dog[id: %s] and this member[id: %s]"
                                 .formatted(dhh.getId(), dhh.getDog().getId(), dhh.getMember().getId());
-                        LOG.error(msg);
-                        throw new IllegalStateException(msg);
+                        log.error(msg);
+                        throw new DogHasHandlerConflictException(msg);
                     }
                 });
     }
@@ -189,16 +171,6 @@ class DogHasHandlerServiceImpl implements DogHasHandlerService {
 
     private Set<DogHasHandler> getActiveDogHasHandlerSet(Set<UUID> ids) {
         return dogHasHandlerRepository.findAllByIdInAndEntityStatus(ids, EntityStatus.ACTIVE);
-    }
-
-    private Optional<DogHasHandler> findMemberAndMapToDogHasHandlerV2(casp.web.backend.deprecated.dog.DogHasHandler dh, DogReference dog) {
-        return memberReferenceRepository.findById(dh.getMemberId()).map(member -> {
-            var dogHasHandler = DOG_HAS_HANDLER_V2_MAPPER.toDogHasHandler(dh);
-            dogHasHandler.setDog(dog);
-            dogHasHandler.setMember(member);
-            setTheCorrectEntityStatus(dogHasHandler);
-            return dogHasHandler;
-        });
     }
 
     private void setTheCorrectEntityStatus(DogHasHandler dogHasHandler) {

@@ -1,14 +1,13 @@
 package casp.web.backend.dog;
 
-import casp.web.backend.calendar.SpaceDto;
 import casp.web.backend.common.base.BaseDto;
 import casp.web.backend.common.enums.Gender;
 import casp.web.backend.dog.data.EuropeNetState;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class DogDto extends BaseDto implements DogRequiredFields {
     private String name;
     private String breederName;
@@ -141,15 +140,5 @@ public class DogDto extends BaseDto implements DogRequiredFields {
     @Override
     public void setEuropeNetState(EuropeNetState europeNetState) {
         this.europeNetState = europeNetState;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

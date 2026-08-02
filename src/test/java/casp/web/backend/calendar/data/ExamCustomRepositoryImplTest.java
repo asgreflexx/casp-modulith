@@ -10,23 +10,31 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Pageable;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 
+import static casp.web.backend.calendar.CalendarFixture.createCalendarEntry;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataMongoTest
+@Testcontainers
+@SpringBootTest
 class ExamCustomRepositoryImplTest {
+    @Container
+    @ServiceConnection
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
+
     @Autowired
     private ExamRepository examRepository;
     @Autowired
     private DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
     @Autowired
     private MemberReferenceRepository memberReferenceRepository;
-    private CalendarEntry calendarEntry;
 
     @BeforeEach
     void setUp() {
@@ -81,47 +89,8 @@ class ExamCustomRepositoryImplTest {
         }
     }
 
-    @Nested
-    class FindAllByMemberId {
-        private Exam exam1;
-        private Exam exam2;
-        private ExamParticipant participant2;
-
-
-        @BeforeEach
-        void setUp() {
-            var participant1 = new ExamParticipant(dogHasHandlerReferenceRepository.save(ReferenceTestFixture.createDogHasHandlerReference()));
-            exam1 = examRepository.save(createExam("Exam1", EntityStatus.ACTIVE, participant1));
-            participant2 = new ExamParticipant(dogHasHandlerReferenceRepository.save(ReferenceTestFixture.createDogHasHandlerReference()));
-            exam2 = examRepository.save(createExam("Exam2", EntityStatus.ACTIVE, participant2));
-        }
-
-        @Test
-        void memberIdIsNull() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), null);
-
-            assertThat(actualExams).containsExactlyInAnyOrder(exam1, exam2);
-        }
-
-        @Test
-        void memberIdIsTheSameAsExamMember() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), exam2.member.getId());
-
-            assertThat(actualExams).containsExactly(exam2);
-        }
-
-        @Test
-        void memberIdIsTheSameAsExamParticipant() {
-            var actualExams = examRepository.findAllBetweenFromAndToOrMemberId(calendarEntry.getEntryFrom(), calendarEntry.getEntryTo(), participant2.getDogHasHandler().getMember().getId());
-
-            assertThat(actualExams).containsExactly(exam2);
-        }
-    }
-
     private Exam createExam(String name, EntityStatus entityStatus, ExamParticipant participant) {
-        calendarEntry = new CalendarEntry();
-        calendarEntry.setEntryFrom(LocalDateTime.of(2024, 1, 1, 0, 0));
-        calendarEntry.setEntryTo(calendarEntry.getEntryFrom().plusHours(10));
+        var calendarEntry = createCalendarEntry();
         var exam = new Exam();
         exam.setName(name);
         exam.setEntityStatus(entityStatus);

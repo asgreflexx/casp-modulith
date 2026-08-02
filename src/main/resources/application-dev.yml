@@ -1,9 +1,9 @@
 spring:
-  data:
-    mongodb:
-      database: caspdb
-      uri: mongodb://localhost:27017
-      uuid-representation: standard
+  mongodb:
+    database: caspdb
+    uri: mongodb://localhost:27017
+    representation:
+      uuid: standard
 
 eureka:
   client:

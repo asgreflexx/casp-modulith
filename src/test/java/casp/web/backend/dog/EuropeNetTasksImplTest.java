@@ -1,6 +1,5 @@
 package casp.web.backend.dog;
 
-
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.EuropeNetState;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,23 +10,22 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 class EuropeNetTasksImplTest {
@@ -64,16 +62,6 @@ class EuropeNetTasksImplTest {
         europeNetTasks.scheduleChipNumbersCheckTask();
 
         verifyNoInteractions(restTemplate);
-    }
-
-    @Test
-    void registerDogsManually() {
-        var expectedPage = new PageImpl<DogDto>(List.of());
-        when(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of()));
-
-        var actualPage = europeNetTasks.registerDogsManually(Pageable.unpaged());
-
-        assertEquals(expectedPage, actualPage);
     }
 
     @Nested
@@ -154,5 +142,18 @@ class EuropeNetTasksImplTest {
 
             verify(dogService).saveDog(DOG_MAPPER.toTarget(dog));
         }
+    }
+
+    @Test
+    void throwRestClientException() {
+        dog.setChipNumber("chipNumber");
+        var dogPage = new PageImpl<>(List.of(DOG_MAPPER.toTarget(dog)));
+        when(dogService.getDogsThatWereNotChecked(Pageable.unpaged())).thenReturn(dogPage);
+        when(restTemplate.getForEntity(EURO_PET_NET_API, String.class, URI_VARIABLES)).thenThrow(RestClientException.class);
+
+        europeNetTasks.scheduleChipNumbersCheckTask();
+
+        verify(dogService).saveDog(dogCaptor.capture());
+        assertSame(EuropeNetState.API_NOT_REACHABLE, dogCaptor.getValue().getEuropeNetState());
     }
 }

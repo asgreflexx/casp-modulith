@@ -2,66 +2,20 @@ package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.data.participants.EventResponse;
 import casp.web.backend.common.reference.DogHasHandlerReference;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Getter
+@Setter
 public class SpaceWrite implements SpaceWriteRequiredFields {
     private DogHasHandlerReference dogHasHandler;
     private String note;
     private Double paidPrice;
     private LocalDate paidDate;
     private EventResponse response;
-
-    @Override
-    public DogHasHandlerReference getDogHasHandler() {
-        return dogHasHandler;
-    }
-
-    @Override
-    public void setDogHasHandler(DogHasHandlerReference dogHasHandler) {
-        this.dogHasHandler = dogHasHandler;
-    }
-
-    @Override
-    public String getNote() {
-        return note;
-    }
-
-    @Override
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    @Override
-    public Double getPaidPrice() {
-        return paidPrice;
-    }
-
-    @Override
-    public void setPaidPrice(Double paidPrice) {
-        this.paidPrice = paidPrice;
-    }
-
-    @Override
-    public LocalDate getPaidDate() {
-        return paidDate;
-    }
-
-    @Override
-    public void setPaidDate(LocalDate paidDate) {
-        this.paidDate = paidDate;
-    }
-
-    @Override
-    public EventResponse getResponse() {
-        return response;
-    }
-
-    @Override
-    public void setResponse(EventResponse response) {
-        this.response = response;
-    }
 
     @Override
     public boolean equals(Object o) {

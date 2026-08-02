@@ -4,11 +4,7 @@ import casp.web.backend.calendar.data.Course;
 import casp.web.backend.calendar.data.CourseRepository;
 import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
-import casp.web.backend.common.reference.MemberReferenceRepository;
-import casp.web.backend.deprecated.event.BaseEventMigrationService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
@@ -22,18 +18,13 @@ import java.util.stream.Stream;
 
 import static casp.web.backend.calendar.CourseMapper.COURSE_MAPPER;
 
+@Slf4j
 @Service
-class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> implements CourseService {
-    private static final Logger LOG = LoggerFactory.getLogger(CourseServiceImpl.class);
-    private final CourseRepository courseRepository;
+class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space, CourseRepository> implements CourseService {
 
     @Autowired
-    CourseServiceImpl(CourseRepository courseRepository,
-                      MemberReferenceRepository memberReferenceRepository,
-                      DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository,
-                      BaseEventMigrationService migrationService) {
-        super(memberReferenceRepository, courseRepository, dogHasHandlerReferenceRepository, migrationService);
-        this.courseRepository = courseRepository;
+    CourseServiceImpl(CourseRepository courseRepository) {
+        super(courseRepository);
     }
 
     @Override
@@ -44,7 +35,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
         setCoTrainers(dto, course);
         setParticipants(dto, course);
 
-        courseRepository.save(course);
+        repository.save(course);
     }
 
     @Override
@@ -54,7 +45,7 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
 
     @Override
     public Page<CourseDto> getAllByYear(int year, Pageable pageable) {
-        var coursePage = courseRepository.findAllByYear(year, pageable);
+        var coursePage = repository.findAllByYear(year, pageable);
         return COURSE_MAPPER.toTargetPage(coursePage);
     }
 
@@ -67,28 +58,30 @@ class CourseServiceImpl extends BaseEventServiceImpl<Course, CourseDto, Space> i
                 .collect(Collectors.toSet());
     }
 
+    @SuppressWarnings("java:S2275") // False-positive the string.formatted is correct
     @Override
     public CourseDto updateSpaces(UUID courseId, long courseVersion, Set<SpaceDto> spaceDtos) {
         var course = getOneByIdOrThrowException(courseId);
         var actualVersion = course.getVersion();
         if (actualVersion != courseVersion) {
-            var msg = "The course with id %s has been updated in the meantime. The actual version is %d".formatted(courseId, actualVersion);
-            LOG.error(msg);
+            var msg = "The course with id %s has been updated in the meantime. The actual version is %d"
+                    .formatted(courseId, actualVersion);
+            log.error(msg);
             throw new OptimisticLockingFailureException(msg);
         }
         course.setParticipants(COURSE_MAPPER.toSpaces(spaceDtos));
-        return COURSE_MAPPER.toTarget(courseRepository.save(course));
+        return COURSE_MAPPER.toTarget(repository.save(course));
     }
 
     @Override
     public Page<CourseDto> getCoursesByDogHasHandlerId(UUID dogHasHandlerId, Pageable pageable) {
-        var coursePage = courseRepository.findAllBySpaceId(dogHasHandlerId, pageable);
+        var coursePage = repository.findAllBySpaceId(dogHasHandlerId, pageable);
         return COURSE_MAPPER.toTargetPage(coursePage);
     }
 
     @Override
     public CoursesFeesStatsDto getCoursesFeesStats() {
-        return courseRepository.getCoursesFeesStats();
+        return repository.getCoursesFeesStats();
     }
 
     private void setCoTrainers(CourseDto courseDto, Course course) {

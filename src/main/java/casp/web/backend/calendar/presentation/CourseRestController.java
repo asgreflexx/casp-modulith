@@ -75,20 +75,10 @@ class CourseRestController {
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTarget(courseDto));
     }
 
-    @GetMapping("/space/{dogHasHandlerId}")
+    @GetMapping("space/{dogHasHandlerId}")
     public ResponseEntity<Page<CourseRead>> getCoursesByDogHasHandlerId(@PathVariable UUID dogHasHandlerId, @ParameterObject Pageable pageable) {
         var courseDtoPage = courseService.getCoursesByDogHasHandlerId(dogHasHandlerId, pageable);
         return ResponseEntity.ok(COURSE_READ_MAPPER.toTargetPage(courseDtoPage));
-    }
-
-    /**
-     * @deprecated It will be removed in #3.
-     */
-    @Deprecated(forRemoval = true, since = "0.0.0")
-    @PostMapping("migrate-data")
-    ResponseEntity<Void> migrateDataToV2() {
-        courseService.migrateDataToV2();
-        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("courses-fees-stats")

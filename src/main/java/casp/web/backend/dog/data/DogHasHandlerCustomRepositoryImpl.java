@@ -5,7 +5,6 @@ import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.common.reference.QDogReference;
 import casp.web.backend.common.reference.QMemberReference;
-import casp.web.backend.deprecated.dog.QDogHasHandler;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;

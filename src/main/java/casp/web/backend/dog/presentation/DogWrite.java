@@ -4,9 +4,11 @@ import casp.web.backend.common.base.BaseView;
 import casp.web.backend.common.enums.Gender;
 import casp.web.backend.dog.DogRequiredFields;
 import casp.web.backend.dog.data.EuropeNetState;
+import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class DogWrite extends BaseView implements DogRequiredFields {
     private String name;
     private String breederName;
@@ -139,15 +141,5 @@ public class DogWrite extends BaseView implements DogRequiredFields {
     @Override
     public void setEuropeNetState(EuropeNetState europeNetState) {
         this.europeNetState = europeNetState;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

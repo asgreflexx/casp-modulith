@@ -1,12 +1,9 @@
 package casp.web.backend.dog;
 
-import casp.web.backend.calendar.CourseService;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,24 +14,17 @@ import java.util.UUID;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
 
+@Slf4j
 @Service
 class DogServiceImpl implements DogService {
-    private static final Logger LOG = LoggerFactory.getLogger(DogServiceImpl.class);
-
     private final DogHasHandlerService dogHasHandlerService;
-    private final CourseService courseService;
     private final DogRepository dogRepository;
-    private final DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository;
 
     @Autowired
     DogServiceImpl(DogHasHandlerService dogHasHandlerService,
-                   CourseService courseService,
-                   DogRepository dogRepository,
-                   DogHasHandlerReferenceRepository dogHasHandlerReferenceRepository) {
+                   DogRepository dogRepository) {
         this.dogRepository = dogRepository;
         this.dogHasHandlerService = dogHasHandlerService;
-        this.courseService = courseService;
-        this.dogHasHandlerReferenceRepository = dogHasHandlerReferenceRepository;
     }
 
     @Override
@@ -69,9 +59,8 @@ class DogServiceImpl implements DogService {
     private Dog getActiveDog(UUID id) {
         return dogRepository.findOneByIdAndEntityStatus(id, EntityStatus.ACTIVE).orElseThrow(() -> {
             var msg = "Dog with id %s not found or it isn't active.".formatted(id);
-            LOG.error(msg);
+            log.error(msg);
             return new NoSuchElementException(msg);
         });
     }
-
 }

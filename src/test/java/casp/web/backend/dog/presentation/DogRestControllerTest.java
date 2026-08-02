@@ -2,7 +2,6 @@ package casp.web.backend.dog.presentation;
 
 import casp.web.backend.dog.DogDto;
 import casp.web.backend.dog.DogService;
-import casp.web.backend.dog.EuropeNetTasks;
 import casp.web.backend.dog.TestFixture;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,8 +27,6 @@ import static org.mockito.Mockito.when;
 class DogRestControllerTest {
     @Mock
     private DogService dogService;
-    @Mock
-    private EuropeNetTasks europeNetTasks;
 
     @InjectMocks
     private DogRestController dogRestController;
@@ -77,15 +74,5 @@ class DogRestControllerTest {
 
         assertSame(HttpStatus.NO_CONTENT, response.getStatusCode());
         verify(dogService).deleteDogById(dog.getId());
-    }
-
-    @Test
-    void register() {
-        when(europeNetTasks.registerDogsManually(Pageable.unpaged())).thenReturn(new PageImpl<>(List.of(dog)));
-
-        var response = dogRestController.register(Pageable.unpaged());
-
-        assertSame(HttpStatus.OK, response.getStatusCode());
-        assertThat(response.getBody()).containsExactly(READ_MAPPER.toTarget(dog));
     }
 }

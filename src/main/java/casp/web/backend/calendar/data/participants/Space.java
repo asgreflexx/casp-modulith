@@ -2,14 +2,15 @@ package casp.web.backend.calendar.data.participants;
 
 import casp.web.backend.calendar.presentation.SpaceWriteRequiredFields;
 import casp.web.backend.common.reference.DogHasHandlerReference;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
+@EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Space extends BaseParticipant implements SpaceWriteRequiredFields {
     private String note;
-
     private Double paidPrice;
     private LocalDate paidDate;
 
@@ -68,15 +69,5 @@ public class Space extends BaseParticipant implements SpaceWriteRequiredFields {
     @Override
     public UUID getId() {
         return dogHasHandler.getId();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
     }
 }

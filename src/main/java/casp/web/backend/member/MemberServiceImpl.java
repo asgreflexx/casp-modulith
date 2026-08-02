@@ -1,16 +1,14 @@
 package casp.web.backend.member;
 
-
 import casp.web.backend.calendar.BaseEventObserver;
 import casp.web.backend.common.enums.EntityStatus;
-import casp.web.backend.deprecated.member.CardRepository;
-import casp.web.backend.deprecated.member.MemberOldRepository;
+import casp.web.backend.common.exception.MemberEMailConflictException;
+import casp.web.backend.common.exception.MemberStateConflictException;
 import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.member.data.Role;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,38 +19,26 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static casp.web.backend.deprecated.member.MemberV2Mapper.MEMBER_V2_MAPPER;
 import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 
+@Slf4j
 @Service
 class MemberServiceImpl implements MemberService {
-    private static final Logger LOG = LoggerFactory.getLogger(MemberServiceImpl.class);
     private static final String EMAIL_FORMAT_IF_DELETED = "%s---%s";
 
     private final MemberRepository memberRepository;
     private final DogHasHandlerService dogHasHandlerService;
     private final BaseEventObserver baseEventObserver;
-    private final CardRepository cardRepository;
-    private final MemberOldRepository memberOldRepository;
 
     @Autowired
-    MemberServiceImpl(MemberRepository memberRepository,
-                      DogHasHandlerService dogHasHandlerService,
-                      BaseEventObserver baseEventObserver,
-                      CardRepository cardRepository,
-                      MemberOldRepository memberOldRepository) {
+    MemberServiceImpl(MemberRepository memberRepository, DogHasHandlerService dogHasHandlerService, BaseEventObserver baseEventObserver) {
         this.memberRepository = memberRepository;
         this.dogHasHandlerService = dogHasHandlerService;
         this.baseEventObserver = baseEventObserver;
-        this.cardRepository = cardRepository;
-        this.memberOldRepository = memberOldRepository;
     }
 
     @Override
-    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus,
-                                                                String name,
-                                                                Set<Role> roles,
-                                                                Pageable pageable) {
+    public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, Set<Role> roles, Pageable pageable) {
         var memberPage = memberRepository.findAllByEntityStatusNameAndRoles(entityStatus, name, roles, pageable);
         return MEMBER_MAPPER.toTargetPage(memberPage);
     }
@@ -88,16 +74,6 @@ class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public void migrateDataToV2() {
-        memberOldRepository.findAll().forEach(mv1 -> {
-            var cardV1Set = cardRepository.findAllByMemberId(mv1.getId());
-            var memberV2 = MEMBER_V2_MAPPER.toMemberV2(mv1);
-            memberV2.setCards(MEMBER_V2_MAPPER.toCardV2Set(cardV1Set));
-            memberRepository.save(memberV2);
-        });
-    }
-
-    @Override
     public Set<String> getActiveMembersEmail() {
         return memberRepository.findAllActiveMembersEmails();
     }
@@ -124,15 +100,15 @@ class MemberServiceImpl implements MemberService {
         memberRepository.findById(member.getId()).ifPresent(m -> {
             if (m.getEntityStatus() != EntityStatus.ACTIVE) {
                 var msg = "Member with id %s is not active.".formatted(member.getId());
-                LOG.error(msg);
-                throw new IllegalStateException(msg);
+                log.error(msg);
+                throw new MemberStateConflictException(msg);
             }
         });
         memberRepository.findOneByEmail(member.getEmail()).ifPresent(m -> {
             if (!member.equals(m)) {
                 var msg = "Member with email %s already exists.".formatted(member.getEmail());
-                LOG.error(msg);
-                throw new IllegalStateException(msg);
+                log.error(msg);
+                throw new MemberEMailConflictException(msg);
             }
         });
     }
@@ -140,7 +116,7 @@ class MemberServiceImpl implements MemberService {
     private Member getMemberIfNotDeleted(UUID id) {
         return memberRepository.findOneByIdAndEntityStatusNot(id, EntityStatus.DELETED).orElseThrow(() -> {
             var msg = "Member with id %s not found.".formatted(id);
-            LOG.error(msg);
+            log.error(msg);
             return new NoSuchElementException(msg);
         });
     }

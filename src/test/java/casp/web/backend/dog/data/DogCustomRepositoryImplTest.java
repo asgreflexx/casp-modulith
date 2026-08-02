@@ -1,6 +1,5 @@
 package casp.web.backend.dog.data;
 
-
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.common.reference.DogHasHandlerReferenceRepository;
 import casp.web.backend.common.reference.MemberReferenceRepository;
@@ -10,15 +9,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.data.domain.Pageable;
+import org.testcontainers.containers.MongoDBContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DataMongoTest
+@Testcontainers
+@SpringBootTest
 class DogCustomRepositoryImplTest {
+    @Container
+    @ServiceConnection
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
+
     private static final String FAMILY_NAME = "Doe";
     @Autowired
     private DogRepository dogRepository;
@@ -71,27 +79,23 @@ class DogCustomRepositoryImplTest {
     class FindAllByValue {
         @Test
         void chipNumber() {
-            assertThat(dogRepository.findAllByValue(bonsai.getChipNumber(), Pageable.unpaged()))
-                    .containsExactly(bonsai);
+            assertThat(dogRepository.findAllByValue(bonsai.getChipNumber(), Pageable.unpaged())).containsExactly(bonsai);
         }
 
         @Test
         void name() {
-            assertThat(dogRepository.findAllByValue(bonsai.getName(), Pageable.unpaged()))
-                    .containsExactly(bonsai);
+            assertThat(dogRepository.findAllByValue(bonsai.getName(), Pageable.unpaged())).containsExactly(bonsai);
         }
 
         @Test
         void ownerName() {
-            assertThat(dogRepository.findAllByValue(FAMILY_NAME, Pageable.unpaged()))
-                    .containsExactlyInAnyOrder(bonsai, charlie);
+            assertThat(dogRepository.findAllByValue(FAMILY_NAME, Pageable.unpaged())).containsExactlyInAnyOrder(bonsai, charlie);
         }
 
         @ParameterizedTest
         @NullAndEmptySource
         void value(String value) {
-            assertThat(dogRepository.findAllByValue(value, Pageable.unpaged()))
-                    .containsExactlyInAnyOrder(bonsai, charlie);
+            assertThat(dogRepository.findAllByValue(value, Pageable.unpaged())).containsExactlyInAnyOrder(bonsai, charlie);
         }
     }
 }
