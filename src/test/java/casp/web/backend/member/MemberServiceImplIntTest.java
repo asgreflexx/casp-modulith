@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 class MemberServiceImplIntTest {
     @Container
     @ServiceConnection
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest").withEnv("GLIBC_TUNABLES", "glibc.pthread.rseq=1");
 
     @Autowired
     private MemberRepository memberRepository;

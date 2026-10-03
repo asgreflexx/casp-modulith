@@ -36,7 +36,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CalendarRepositoryImplIntTest {
     @Container
     @ServiceConnection
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
+
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest")
+            // TODO Linux kernel versions 6.19 and newer has a known incompatibility with this version of MongoDB.
+            .withEnv("GLIBC_TUNABLES", "glibc.pthread.rseq=1");
 
     @Autowired
     private MemberReferenceRepository memberReferenceRepository;
