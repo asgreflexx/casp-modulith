@@ -2,8 +2,8 @@ package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.ExamService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,16 +21,12 @@ import java.util.UUID;
 import static casp.web.backend.calendar.presentation.ExamReadMapper.EXAM_READ_MAPPER;
 import static casp.web.backend.calendar.presentation.ExamWriteMapper.EXAM_WRITE_MAPPER;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("exam")
 @Validated
 class ExamRestController {
     private final ExamService examService;
-
-    @Autowired
-    ExamRestController(ExamService examService) {
-        this.examService = examService;
-    }
 
     @PostMapping
     ResponseEntity<Void> save(@RequestBody @Valid ExamWrite examWrite) {

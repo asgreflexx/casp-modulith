@@ -50,6 +50,10 @@ class MongoConfig {
 
     @Bean
     public ZoneId zoneId(JacksonProperties jacksonProperties) {
-        return jacksonProperties.getTimeZone().toZoneId();
+        var timeZone = jacksonProperties.getTimeZone();
+        if (timeZone == null) {
+            throw new IllegalStateException("jacksonProperties.getTimeZone() must not be null");
+        }
+        return timeZone.toZoneId();
     }
 }

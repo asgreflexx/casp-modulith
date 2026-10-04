@@ -8,8 +8,8 @@ import casp.web.backend.dog.DogHasHandlerService;
 import casp.web.backend.member.data.Member;
 import casp.web.backend.member.data.MemberRepository;
 import casp.web.backend.member.data.Role;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,21 +21,14 @@ import java.util.stream.Collectors;
 
 import static casp.web.backend.member.MemberMapper.MEMBER_MAPPER;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 class MemberServiceImpl implements MemberService {
-    private static final String EMAIL_FORMAT_IF_DELETED = "%s---%s";
 
     private final MemberRepository memberRepository;
     private final DogHasHandlerService dogHasHandlerService;
     private final BaseEventObserver baseEventObserver;
-
-    @Autowired
-    MemberServiceImpl(MemberRepository memberRepository, DogHasHandlerService dogHasHandlerService, BaseEventObserver baseEventObserver) {
-        this.memberRepository = memberRepository;
-        this.dogHasHandlerService = dogHasHandlerService;
-        this.baseEventObserver = baseEventObserver;
-    }
 
     @Override
     public Page<MemberDto> getMembersByEntityStatusNameAndRoles(EntityStatus entityStatus, String name, Set<Role> roles, Pageable pageable) {
@@ -63,7 +56,6 @@ class MemberServiceImpl implements MemberService {
         var member = memberRepository.findByIdAndEntityStatusCustom(id, EntityStatus.ACTIVE);
         dogHasHandlerService.deleteDogHasHandlersByMemberId(id);
         baseEventObserver.deleteBaseEventsByMemberId(id);
-        member.setEmail(EMAIL_FORMAT_IF_DELETED.formatted(member.getEmail(), id));
         member.setEntityStatus(EntityStatus.DELETED);
         memberRepository.save(member);
     }
@@ -104,7 +96,7 @@ class MemberServiceImpl implements MemberService {
                 throw new MemberStateConflictException(msg);
             }
         });
-        memberRepository.findOneByEmail(member.getEmail()).ifPresent(m -> {
+        memberRepository.findOneByEmailAndEntityStatusIsNot(member.getEmail(), EntityStatus.DELETED).ifPresent(m -> {
             if (!member.equals(m)) {
                 var msg = "Member with email %s already exists.".formatted(member.getEmail());
                 log.error(msg);

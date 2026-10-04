@@ -5,13 +5,13 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Component
+@Repository
 class DogHasHandlerReferenceCustomRepositoryImpl implements DogHasHandlerReferenceCustomRepository {
     private static final QDogHasHandlerReference DOG_HAS_HANDLER_REFERENCE = QDogHasHandlerReference.dogHasHandlerReference;
     private static final BooleanExpression DOG_HAS_HANDLER_IS_ACTIVE = DOG_HAS_HANDLER_REFERENCE.entityStatus.eq(EntityStatus.ACTIVE);

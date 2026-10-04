@@ -3,8 +3,8 @@ package casp.web.backend.dog.presentation;
 import casp.web.backend.dog.DogHasHandlerService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -24,17 +24,13 @@ import java.util.UUID;
 import static casp.web.backend.dog.presentation.DogHasHandlerReadMapper.READ_MAPPER;
 import static casp.web.backend.dog.presentation.DogHasHandlerWriteMapper.WRITE_MAPPER;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("dog-has-handler")
 @Validated
 class DogHasHandlerRestController {
 
     private final DogHasHandlerService dogHasHandlerService;
-
-    @Autowired
-    DogHasHandlerRestController(DogHasHandlerService dogHasHandlerService) {
-        this.dogHasHandlerService = dogHasHandlerService;
-    }
 
     @GetMapping("{id}")
     ResponseEntity<DogHasHandlerRead> getDogHasHandlerById(@PathVariable UUID id) {

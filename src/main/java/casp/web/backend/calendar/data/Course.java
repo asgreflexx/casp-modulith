@@ -5,12 +5,16 @@ import casp.web.backend.calendar.data.participants.CoTrainer;
 import casp.web.backend.calendar.data.participants.Space;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @QueryEntity
 @Document
@@ -22,16 +26,6 @@ public class Course extends BaseEvent<Space> implements CourseRequiredFields {
 
     public Course() {
         super(BaseEventType.COURSE);
-    }
-
-    @Override
-    public int getSpaceLimit() {
-        return spaceLimit;
-    }
-
-    @Override
-    public void setSpaceLimit(int spaceLimit) {
-        this.spaceLimit = spaceLimit;
     }
 
     @Override
@@ -50,7 +44,7 @@ public class Course extends BaseEvent<Space> implements CourseRequiredFields {
         this.coTrainers = notDeletedCoTrainers;
     }
 
-    public void addSpace(Space space) {
+    void addSpace(Space space) {
         participants.add(space);
     }
 

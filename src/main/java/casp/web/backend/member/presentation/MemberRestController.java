@@ -5,8 +5,8 @@ import casp.web.backend.member.MembershipFeesStatsDto;
 import casp.web.backend.member.data.Role;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -26,17 +26,13 @@ import java.util.UUID;
 import static casp.web.backend.member.presentation.MemberReadMapper.READ_MAPPER;
 import static casp.web.backend.member.presentation.MemberWriteMapper.WRITE_MAPPER;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("member")
 @Validated
 class MemberRestController {
 
     private final MemberService memberService;
-
-    @Autowired
-    MemberRestController(MemberService memberService) {
-        this.memberService = memberService;
-    }
 
     @GetMapping
     ResponseEntity<Page<MemberRead>> getMembers(@RequestParam EntityStatusParam entityStatusParam,

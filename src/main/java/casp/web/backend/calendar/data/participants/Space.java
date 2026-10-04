@@ -3,11 +3,15 @@ package casp.web.backend.calendar.data.participants;
 import casp.web.backend.calendar.presentation.SpaceWriteRequiredFields;
 import casp.web.backend.common.reference.DogHasHandlerReference;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.time.LocalDate;
 import java.util.UUID;
 
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 public class Space extends BaseParticipant implements SpaceWriteRequiredFields {
     private String note;
@@ -23,46 +27,6 @@ public class Space extends BaseParticipant implements SpaceWriteRequiredFields {
 
     public Space(DogHasHandlerReference dogHasHandler) {
         this();
-        this.dogHasHandler = dogHasHandler;
-    }
-
-    @Override
-    public String getNote() {
-        return note;
-    }
-
-    @Override
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    @Override
-    public Double getPaidPrice() {
-        return paidPrice;
-    }
-
-    @Override
-    public void setPaidPrice(Double paidPrice) {
-        this.paidPrice = paidPrice;
-    }
-
-    @Override
-    public LocalDate getPaidDate() {
-        return paidDate;
-    }
-
-    @Override
-    public void setPaidDate(LocalDate paidDate) {
-        this.paidDate = paidDate;
-    }
-
-    @Override
-    public DogHasHandlerReference getDogHasHandler() {
-        return dogHasHandler;
-    }
-
-    @Override
-    public void setDogHasHandler(DogHasHandlerReference dogHasHandler) {
         this.dogHasHandler = dogHasHandler;
     }
 

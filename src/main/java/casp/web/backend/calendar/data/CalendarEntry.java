@@ -4,6 +4,7 @@ import com.querydsl.core.annotations.QueryEmbeddable;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -15,15 +16,13 @@ import java.util.UUID;
 @Getter
 @EqualsAndHashCode(of = "id")
 @ToString(of = {"entryFromODT", "entryToODT"})
+@NoArgsConstructor
 public class CalendarEntry implements Comparable<CalendarEntry>, CalendarValidation {
     private UUID id = UUID.randomUUID();
     @NotNull
     private OffsetDateTime entryFromODT;
     @NotNull
     private OffsetDateTime entryToODT;
-
-    public CalendarEntry() {
-    }
 
     public CalendarEntry(OffsetDateTime entryFromODT, OffsetDateTime entryToODT) {
         this.entryFromODT = entryFromODT;

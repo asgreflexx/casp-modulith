@@ -5,6 +5,8 @@ import casp.web.backend.common.enums.Gender;
 import casp.web.backend.member.MemberRequiredFields;
 import com.querydsl.core.annotations.QueryEntity;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -13,6 +15,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@Getter
+@Setter
 @EqualsAndHashCode(callSuper = true, onlyExplicitlyIncluded = true)
 @QueryEntity
 @Document
@@ -22,7 +26,12 @@ public class Member extends BaseDocument implements MemberRequiredFields {
     private LocalDate birthDate;
     private Gender gender;
     private String telephoneNumber;
-    @Indexed(unique = true)
+    // cf. not casp.web.backend.common.enums.EntityStatus.DELETED
+    // MongoDB is rejecting the index because $ne is not supported in partial indexes.
+    @Indexed(
+            unique = true,
+            partialFilter = "{ 'entityStatus': { '$in': ['ACTIVE', 'INACTIVE'] } }"
+    )
     private String email;
     private String address;
     private String postcode;
@@ -30,124 +39,4 @@ public class Member extends BaseDocument implements MemberRequiredFields {
     private Set<Role> roles = new HashSet<>(List.of(Role.USER));
     private Set<MembershipFee> membershipFees = new HashSet<>();
     private Set<Card> cards = new HashSet<>();
-
-    @Override
-    public String getFirstName() {
-        return firstName;
-    }
-
-    @Override
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    @Override
-    public String getLastName() {
-        return lastName;
-    }
-
-    @Override
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    @Override
-    public LocalDate getBirthDate() {
-        return birthDate;
-    }
-
-    @Override
-    public void setBirthDate(LocalDate birthDate) {
-        this.birthDate = birthDate;
-    }
-
-    @Override
-    public Gender getGender() {
-        return gender;
-    }
-
-    @Override
-    public void setGender(Gender gender) {
-        this.gender = gender;
-    }
-
-    @Override
-    public String getTelephoneNumber() {
-        return telephoneNumber;
-    }
-
-    @Override
-    public void setTelephoneNumber(String telephoneNumber) {
-        this.telephoneNumber = telephoneNumber;
-    }
-
-    @Override
-    public String getEmail() {
-        return email;
-    }
-
-    @Override
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public String getAddress() {
-        return address;
-    }
-
-    @Override
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    @Override
-    public String getPostcode() {
-        return postcode;
-    }
-
-    @Override
-    public void setPostcode(String postcode) {
-        this.postcode = postcode;
-    }
-
-    @Override
-    public String getCity() {
-        return city;
-    }
-
-    @Override
-    public void setCity(String city) {
-        this.city = city;
-    }
-
-    @Override
-    public Set<Role> getRoles() {
-        return roles;
-    }
-
-    @Override
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
-    }
-
-    @Override
-    public Set<MembershipFee> getMembershipFees() {
-        return membershipFees;
-    }
-
-    @Override
-    public void setMembershipFees(Set<MembershipFee> membershipFees) {
-        this.membershipFees = membershipFees;
-    }
-
-    @Override
-    public Set<Card> getCards() {
-        return cards;
-    }
-
-    @Override
-    public void setCards(Set<Card> cards) {
-        this.cards = cards;
-    }
 }

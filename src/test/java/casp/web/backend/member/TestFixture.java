@@ -6,14 +6,10 @@ public enum TestFixture {
     ;
 
     public static Member createMember() {
-        return createMember("John", "Doe");
-    }
-
-    public static Member createMember(String firstName, String lastName) {
         var member = new Member();
-        member.setFirstName(firstName);
-        member.setLastName(lastName);
-        member.setEmail("%s@example.com".formatted(member.getId()));
+        member.setFirstName("John");
+        member.setLastName("Doe");
+        member.setEmail("%s.%s@example.com".formatted(member.getFirstName(), member.getLastName()));
         return member;
     }
 }

@@ -11,7 +11,7 @@ import java.util.UUID;
 @JaversSpringDataAuditable
 public interface MemberRepository extends BaseRepository<Member>, MemberCustomRepository {
 
-    Optional<Member> findOneByEmail(String email);
+    Optional<Member> findOneByEmailAndEntityStatusIsNot(String email, EntityStatus entityStatus);
 
     Set<Member> findAllByIdInAndEntityStatus(Set<UUID> membersId, EntityStatus entityStatus);
 

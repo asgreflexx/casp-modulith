@@ -24,12 +24,6 @@ class ExamTest {
 
     private Exam exam;
 
-    private static Stream<DeletedParticipant> getNotDeletedParticipants() {
-        return Stream.of(new DeletedParticipant(EntityStatus.DELETED, EntityStatus.ACTIVE, EntityStatus.ACTIVE),
-                new DeletedParticipant(EntityStatus.ACTIVE, EntityStatus.DELETED, EntityStatus.ACTIVE),
-                new DeletedParticipant(EntityStatus.ACTIVE, EntityStatus.ACTIVE, EntityStatus.DELETED));
-    }
-
     @BeforeEach
     void setUp() {
         exam = new Exam();
@@ -52,6 +46,13 @@ class ExamTest {
         assertThat(exam.getParticipants())
                 .singleElement()
                 .isEqualTo(active);
+    }
+
+    @SuppressWarnings("java:S1144") // False positive
+    private static Stream<DeletedParticipant> getNotDeletedParticipants() {
+        return Stream.of(new DeletedParticipant(EntityStatus.DELETED, EntityStatus.ACTIVE, EntityStatus.ACTIVE),
+                new DeletedParticipant(EntityStatus.ACTIVE, EntityStatus.DELETED, EntityStatus.ACTIVE),
+                new DeletedParticipant(EntityStatus.ACTIVE, EntityStatus.ACTIVE, EntityStatus.DELETED));
     }
 
     private record DeletedParticipant(

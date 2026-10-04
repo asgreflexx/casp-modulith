@@ -14,13 +14,14 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.time.Month.JANUARY;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class RecurrenceOptionUtilityTest {
     private static final LocalTime START_TIME = LocalTime.of(1, 0, 0);
     private static final LocalTime END_TIME = LocalTime.of(2, 0, 0);
-    private static final LocalDate RECURRENCE = LocalDate.of(2024, 1, 1);
+    private static final LocalDate RECURRENCE = LocalDate.of(2024, JANUARY, 1);
     private static final ZoneOffset ZONE_OFFSET = ZoneOffset.UTC;
     private static final CalendarEntry EXPECTED_CALENDAR_ENTRY = new CalendarEntry(OffsetDateTime.of(RECURRENCE, START_TIME, ZONE_OFFSET), OffsetDateTime.of(RECURRENCE, END_TIME, ZONE_OFFSET));
 

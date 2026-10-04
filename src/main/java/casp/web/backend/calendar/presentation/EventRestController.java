@@ -2,7 +2,7 @@ package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.EventService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,16 +18,12 @@ import java.util.UUID;
 import static casp.web.backend.calendar.presentation.EventReadMapper.EVENT_READ_MAPPER;
 import static casp.web.backend.calendar.presentation.EventWriteMapper.EVENT_WRITE_MAPPER;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("event")
 @Validated
 class EventRestController {
     private final EventService eventService;
-
-    @Autowired
-    EventRestController(EventService eventService) {
-        this.eventService = eventService;
-    }
 
     @PostMapping
     ResponseEntity<Void> save(@RequestBody @Valid EventWrite eventWrite) {

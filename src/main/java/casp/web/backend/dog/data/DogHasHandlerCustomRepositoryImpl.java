@@ -13,14 +13,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Component
+@Repository
 class DogHasHandlerCustomRepositoryImpl implements DogHasHandlerCustomRepository {
     private static final QDogHasHandler DOG_HAS_HANDLER = QDogHasHandler.dogHasHandler;
     private final MongoOperations mongoOperations;

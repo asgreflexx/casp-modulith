@@ -5,6 +5,7 @@ import casp.web.backend.dog.data.EuropeNetState;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Positive;
 
 import java.time.LocalDate;
 
@@ -44,9 +45,10 @@ public interface DogRequiredFields {
 
     void setRabiesDate(LocalDate rabiesDate);
 
-    float getHeight();
+    @Positive
+    Float getHeight();
 
-    void setHeight(float height);
+    void setHeight(@Positive Float height);
 
     @NotBlank
     String getOwnerName();

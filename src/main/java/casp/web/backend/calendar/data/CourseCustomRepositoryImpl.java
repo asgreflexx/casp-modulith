@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Component
+@Repository
 class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> implements CourseCustomRepository {
     private static final QCourse COURSE = QCourse.course;
     private static final QSpace SPACE = QSpace.space;
@@ -62,7 +62,7 @@ class CourseCustomRepositoryImpl extends BaseEventCustomRepositoryImpl<Course> i
     @SuppressWarnings("java:S1192")
     @Override
     public CoursesFeesStatsDto getCoursesFeesStats() {
-        var thisYear = LocalDate.now().getYear();
+        var thisYear = LocalDate.now(zoneId).getYear();
         var lastYear = thisYear - 1;
         var twoYearsAgo = thisYear - 2;
         var participantsFieldName = COURSE.participants.getMetadata().getName();

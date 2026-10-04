@@ -9,11 +9,12 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 // It contains too many interfaces to be a well implemented record.
+@Getter
 @Setter
 @EqualsAndHashCode(of = {"dayOfWeek", "startTime", "endTime"})
 @EventOptionTimesConstraint
 public class WeeklyOption implements Comparable<WeeklyOption>, EventOptionTimes {
-    @Getter
+
     @NotNull
     private DayOfWeek dayOfWeek;
 
@@ -26,17 +27,6 @@ public class WeeklyOption implements Comparable<WeeklyOption>, EventOptionTimes 
     private static int getCompareValue(LocalTime thisLocalTime, LocalTime otherLocalTime) {
         return thisLocalTime.compareTo(otherLocalTime);
     }
-
-    @Override
-    public LocalTime getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public LocalTime getEndTime() {
-        return endTime;
-    }
-
     @Override
     public int compareTo(WeeklyOption other) {
         var compareValue = dayOfWeek.compareTo(other.dayOfWeek);

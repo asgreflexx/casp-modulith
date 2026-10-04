@@ -2,8 +2,8 @@ package casp.web.backend.dog.presentation;
 
 import casp.web.backend.dog.DogService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -22,17 +22,13 @@ import java.util.UUID;
 import static casp.web.backend.dog.presentation.DogReadMapper.READ_MAPPER;
 import static casp.web.backend.dog.presentation.DogWriteMapper.WRITE_MAPPER;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("dog")
 @Validated
 class DogRestController {
 
     private final DogService dogService;
-
-    @Autowired
-    DogRestController(DogService dogService) {
-        this.dogService = dogService;
-    }
 
     @GetMapping("{id}")
     ResponseEntity<DogRead> getDogById(@PathVariable UUID id) {

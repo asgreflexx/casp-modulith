@@ -9,8 +9,8 @@ import casp.web.backend.common.reference.MemberReferenceRepository;
 import casp.web.backend.dog.data.DogHasHandler;
 import casp.web.backend.dog.data.DogHasHandlerRepository;
 import jakarta.annotation.Nullable;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,21 +23,13 @@ import java.util.stream.Collectors;
 
 import static casp.web.backend.dog.DogHasHandlerMapper.DOG_HAS_HANDLER_MAPPER;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 class DogHasHandlerServiceImpl implements DogHasHandlerService {
     private final MemberReferenceRepository memberReferenceRepository;
     private final DogReferenceRepository dogReferenceRepository;
     private final DogHasHandlerRepository dogHasHandlerRepository;
-
-    @Autowired
-    DogHasHandlerServiceImpl(MemberReferenceRepository memberReferenceRepository,
-                             DogReferenceRepository dogReferenceRepository,
-                             DogHasHandlerRepository dogHasHandlerRepository) {
-        this.memberReferenceRepository = memberReferenceRepository;
-        this.dogReferenceRepository = dogReferenceRepository;
-        this.dogHasHandlerRepository = dogHasHandlerRepository;
-    }
 
     private static NoSuchElementException throwNoSuchElementException(String clazzName, UUID id) {
         var msg = "%s with id %s not found or it isn't active".formatted(clazzName, id);

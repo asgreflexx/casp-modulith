@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DogHasHandlerCustomRepositoryImplTest {
     @Container
     @ServiceConnection
-    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest");
+    static MongoDBContainer mongoDBContainer = new MongoDBContainer("mongo:latest").withEnv("GLIBC_TUNABLES", "glibc.pthread.rseq=1");
 
     @Autowired
     private DogHasHandlerRepository dogHasHandlerRepository;

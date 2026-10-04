@@ -10,7 +10,7 @@
     </parent>
     <groupId>casp-web-backend</groupId>
     <artifactId>adminV2</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.14-SNAPSHOT</version>
     <name>AdminV2</name>
     <description>This Administration solution</description>
     <properties>
@@ -150,27 +150,27 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.mysema.maven</groupId>
-                <artifactId>apt-maven-plugin</artifactId>
-                <version>${apt-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>process</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>target/generated-sources/java</outputDirectory>
-                            <processor>
-                                org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
-                            </processor>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
+                    <annotationProcessors>
+                        <!-- https://projectlombok.org/contributing/lombok-execution-path -->
+                        <!-- Lombok uses AnnotationProcessorHider as a wrapper entry point for Java's compiler (javac).
+                        It boots Lombok’s custom ShadowClassLoader to load Lombok's internal AST transformer (lombok.core.AnnotationProcessor).
+                        The "hider" trick prevents Lombok’s internal classes from cluttering your project's IDE auto-complete. -->
+                        <annotationProcessor>lombok.launch.AnnotationProcessorHider$AnnotationProcessor
+                        </annotationProcessor>
+                        <!-- https://mapstruct.org/documentation/1.6/api/org/mapstruct/ap/MappingProcessor.html -->
+                        <!-- This is the core JSR-269 annotation processor for MapStruct.
+                        During compilation, it scans interfaces annotated with @Mapper, generates type-safe implementation classes, and handles method mapping code generation. -->
+                        <annotationProcessor>org.mapstruct.ap.MappingProcessor</annotationProcessor>
+                        <!-- https://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/repository/support/MongoAnnotationProcessor.html -->
+                        <!-- During mvn compile, it scans classes annotated with @Document and automatically generates type-safe metamodel classes (e.g., User $\rightarrow$ QUser).
+                        This allows you to construct compile-time, type-safe queries in Java instead of writing raw MongoDB JSON strings. -->
+                        <annotationProcessor>
+                            org.springframework.data.mongodb.repository.support.MongoAnnotationProcessor
+                        </annotationProcessor>
+                    </annotationProcessors>
                     <annotationProcessorPaths>
                         <path>
                             <groupId>org.projectlombok</groupId>
@@ -187,6 +187,15 @@
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
                             <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.querydsl</groupId>
+                            <artifactId>querydsl-apt</artifactId>
+                            <version>${querydsl.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.springframework.data</groupId>
+                            <artifactId>spring-data-mongodb</artifactId>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>

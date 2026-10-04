@@ -81,7 +81,7 @@ class DogHasHandlerRestControllerExceptionIntTest {
     class SaveDogHasHandler {
         @Test
         void badRequest() throws Exception {
-            var expectedResponseMessage = Arrays.stream("Field: dogId, rejected value: null, message: must not be null; Field: grades[].name, rejected value: null, message: must not be blank; Field: memberId, rejected value: null, message: must not be null; Field: grades[].type, rejected value: null, message: must not be null; Field: grades[].points, rejected value: 0, message: must be greater than 0".split(";"))
+            var expectedResponseMessage = Arrays.stream("Field: dogId, rejected value: null, message: must not be null; Field: grades[].name, rejected value: null, message: must not be blank; Field: memberId, rejected value: null, message: must not be null; Field: grades[].type, rejected value: null, message: must not be null; Field: grades[].points, rejected value: 0, message: must be greater than 0; Field: grades[].examDate, rejected value: null, message: must not be null".split(";"))
                     .map(String::trim)
                     .collect(Collectors.toSet());
             var dogHasHandlerWrite = new DogHasHandlerWrite();

@@ -14,7 +14,7 @@ class OpenApiConfig {
     private final SpringdocProperties springdocProperties;
 
     @Autowired
-    OpenApiConfig(final SpringdocProperties springdocProperties) {
+    OpenApiConfig(SpringdocProperties springdocProperties) {
         this.springdocProperties = springdocProperties;
     }
 

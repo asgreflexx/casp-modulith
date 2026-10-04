@@ -20,5 +20,5 @@ public class Grade {
     @Positive
     private long points;
     @NotNull
-    private LocalDate examDate = LocalDate.now();
+    private LocalDate examDate;
 }

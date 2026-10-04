@@ -5,6 +5,8 @@ import casp.web.backend.common.reference.DogReference;
 import casp.web.backend.common.reference.MemberReference;
 import casp.web.backend.dog.DogHasHandlerRequiredFields;
 import com.querydsl.core.annotations.QueryEntity;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,6 +14,8 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Getter
+@Setter
 // The values are derived from the DBRef fields, so the ignore parameters are unnecessary.
 @SuppressWarnings("java:S1172")
 @QueryEntity
@@ -25,18 +29,8 @@ public class DogHasHandler extends BaseDocument implements DogHasHandlerRequired
     private DogReference dog;
     private String dogName;
     private String ownerName;
-
     private Set<Grade> grades = new HashSet<>();
 
-    @Override
-    public MemberReference getMember() {
-        return member;
-    }
-
-    @Override
-    public void setMember(MemberReference member) {
-        this.member = member;
-    }
 
     public String getFirstName() {
         this.firstName = member.getFirstName();
@@ -56,16 +50,6 @@ public class DogHasHandler extends BaseDocument implements DogHasHandlerRequired
         this.lastName = member.getLastName();
     }
 
-    @Override
-    public DogReference getDog() {
-        return dog;
-    }
-
-    @Override
-    public void setDog(DogReference dog) {
-        this.dog = dog;
-    }
-
     public String getDogName() {
         this.dogName = dog.getName();
         return dogName;
@@ -82,16 +66,6 @@ public class DogHasHandler extends BaseDocument implements DogHasHandlerRequired
 
     public void setOwnerName(String ignore) {
         this.ownerName = dog.getOwnerName();
-    }
-
-    @Override
-    public Set<Grade> getGrades() {
-        return grades;
-    }
-
-    @Override
-    public void setGrades(Set<Grade> grades) {
-        this.grades = grades;
     }
 
     @Override

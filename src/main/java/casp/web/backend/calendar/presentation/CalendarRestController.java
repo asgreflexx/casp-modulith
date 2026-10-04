@@ -2,7 +2,7 @@ package casp.web.backend.calendar.presentation;
 
 import casp.web.backend.calendar.CalendarEntryDto;
 import casp.web.backend.calendar.CalendarService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,17 +16,12 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("calendar")
 class CalendarRestController {
     private final ZoneId zoneId;
     private final CalendarService calendarService;
-
-    @Autowired
-    CalendarRestController(ZoneId zoneId, CalendarService calendarService) {
-        this.zoneId = zoneId;
-        this.calendarService = calendarService;
-    }
 
     @GetMapping
     ResponseEntity<List<CalendarEntryDto>> getCalendarEntries(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,

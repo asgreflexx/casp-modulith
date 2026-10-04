@@ -141,7 +141,7 @@ class MemberServiceImplTest {
         @Test
         void emailExistsButBelongsToOtherMember() {
             when(memberRepository.findById(member.getId())).thenReturn(Optional.empty());
-            when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(new Member()));
+            when(memberRepository.findOneByEmailAndEntityStatusIsNot(member.getEmail(), EntityStatus.DELETED)).thenReturn(Optional.of(new Member()));
             var memberDto = MEMBER_MAPPER.toTarget(member);
 
             assertThrows(MemberEMailConflictException.class, () -> memberService.saveMember(memberDto));
@@ -150,7 +150,7 @@ class MemberServiceImplTest {
         @Test
         void updateMember() {
             when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
-            when(memberRepository.findOneByEmail(member.getEmail())).thenReturn(Optional.of(member));
+            when(memberRepository.findOneByEmailAndEntityStatusIsNot(member.getEmail(), EntityStatus.DELETED)).thenReturn(Optional.of(member));
             when(memberRepository.save(argThat(m -> member.getId() == m.getId()))).thenAnswer(i -> i.getArgument(0));
 
             memberService.saveMember(MEMBER_MAPPER.toTarget(member));
@@ -193,7 +193,6 @@ class MemberServiceImplTest {
             verify(dogHasHandlerService).deleteDogHasHandlersByMemberId(member.getId());
             verify(baseEventObserver).deleteBaseEventsByMemberId(member.getId());
             verify(member).setEntityStatus(EntityStatus.DELETED);
-            verify(member).setEmail("%s---%s".formatted(member.getEmail(), member.getId()));
         }
     }
 

@@ -3,8 +3,8 @@ package casp.web.backend.dog;
 import casp.web.backend.common.enums.EntityStatus;
 import casp.web.backend.dog.data.Dog;
 import casp.web.backend.dog.data.DogRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,18 +14,12 @@ import java.util.UUID;
 
 import static casp.web.backend.dog.DogMapper.DOG_MAPPER;
 
+@RequiredArgsConstructor
 @Slf4j
 @Service
 class DogServiceImpl implements DogService {
     private final DogHasHandlerService dogHasHandlerService;
     private final DogRepository dogRepository;
-
-    @Autowired
-    DogServiceImpl(DogHasHandlerService dogHasHandlerService,
-                   DogRepository dogRepository) {
-        this.dogRepository = dogRepository;
-        this.dogHasHandlerService = dogHasHandlerService;
-    }
 
     @Override
     public DogDto getDogById(UUID id) {

@@ -4,8 +4,8 @@ import casp.web.backend.calendar.CourseService;
 import casp.web.backend.calendar.CoursesFeesStatsDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
+import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
@@ -28,16 +28,13 @@ import java.util.UUID;
 import static casp.web.backend.calendar.presentation.CourseReadMapper.COURSE_READ_MAPPER;
 import static casp.web.backend.calendar.presentation.CourseWriteMapper.COURSE_WRITE_MAPPER;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("course")
 @Validated
 class CourseRestController {
     private final CourseService courseService;
 
-    @Autowired
-    CourseRestController(CourseService courseService) {
-        this.courseService = courseService;
-    }
 
     @PostMapping
     ResponseEntity<Void> save(@RequestBody @Valid CourseWrite courseWrite) {

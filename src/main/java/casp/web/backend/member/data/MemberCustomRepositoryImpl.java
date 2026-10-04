@@ -13,9 +13,10 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.repository.support.SpringDataMongodbQuery;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -25,7 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
+@Repository
 class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private static final QMember MEMBER = QMember.member;
     private static final BooleanExpression ACTIVE_MEMBER_STATUS_FILTER = MEMBER.entityStatus.eq(EntityStatus.ACTIVE);
@@ -34,10 +35,12 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
     private static final String TOTAL_PAID = "totalPaid";
     private static final String AGGREGATION_ID = "_id";
     private final MongoOperations mongoOperations;
+    private final ZoneId zoneId;
 
     @Autowired
-    MemberCustomRepositoryImpl(MongoOperations mongoOperations) {
+    MemberCustomRepositoryImpl(MongoOperations mongoOperations, ZoneId zoneId) {
         this.mongoOperations = mongoOperations;
+        this.zoneId = zoneId;
     }
 
     @Override
@@ -77,7 +80,7 @@ class MemberCustomRepositoryImpl implements MemberCustomRepository {
 
     @Override
     public MembershipFeesStatsDto getMembershipFeesStats() {
-        var thisYear = LocalDate.now().getYear();
+        var thisYear = LocalDate.now(zoneId).getYear();
         var lastYear = thisYear - 1;
         var twoYearsAgo = thisYear - 2;
         var membershipFeeFieldName = MEMBER.membershipFees.getMetadata().getName();
